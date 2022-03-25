@@ -5,7 +5,7 @@ using SpookVooper_2.Database.Models.Entities;
 namespace SpookVooper_2.Database.Models.Users;
 
 
-public class User : Entity, IEntity
+public class User : Entity
 {
     public int Xp { get; set;}
     public int Messages { get; set;}

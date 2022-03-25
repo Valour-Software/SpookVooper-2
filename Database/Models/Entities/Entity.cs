@@ -17,16 +17,6 @@ public enum EntityType
     None
 }
 
-public interface IEntity
-{
-    public string Id { get; set;}
-    public string? Name { get; set;}
-    public string? description { get; set; }
-    
-    public EntityType Type { get; set;}
-    public decimal Credits { get; set;}
-}
-
 public class Entity
 {
     public string Id { get; set;}

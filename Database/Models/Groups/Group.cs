@@ -21,7 +21,7 @@ public enum GroupFlag
     News
 }
 
-public class Group : Entity, IEntity
+public class Group : Entity
 {
     [JsonIgnore]
     public string Api_Key { get; set; }

@@ -6,7 +6,7 @@ using SpookVooper_2.Database.Models.Entities;
 namespace SpookVooper_2.Database.Models.Economy;
 
 
-public class CreditAccount : Entity, IEntity
+public class CreditAccount : Entity
 {
     public string Owner_Id { get; set;}
     [NotMapped]
