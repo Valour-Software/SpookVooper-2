@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using SpookVooper_2.Database.Models.Entities;
 
 namespace SpookVooper_2.Database.Models.Military;
@@ -22,6 +22,7 @@ public class DivisionEquipment
 {
     public string Id { get; set;}
     public DivisionEquipmentType Type { get; set;}
+    // the item that is currently selected to be used
     public TradeItem tradeItem { get; set;}
 }
 
@@ -58,20 +59,19 @@ public class Regiment
     }
 }
 
-public class Division
+public class Division : IHasOwner
 {
-    public List<DivisionEquipment> Equipment { get; set;}
-    public List<Regiment> Regiments { get; set;}
+    public List<DivisionEquipment> Equipment { get; set; }
+    public List<Regiment> Regiments { get; set; }
     // current manpower in this division
-    public int ManPower { get; set;}
-    public string Name { get; set;}
-    public string Owner_Id { get; set;}
-    [NotMapped]
-    public Entity Owner { get; set;}
+    public int ManPower { get; set; }
+    public string Name { get; set; }
+    public string Owner_Id { get; set; }
+
     // current strength of the division
-    public decimal Strength { get; set;}
-    public decimal X { get; set;}
-    public decimal Y { get; set;}
+    public decimal Strength { get; set; }
+    public decimal X { get; set; }
+    public decimal Y { get; set; }
 
     public decimal GetStrength()
     {

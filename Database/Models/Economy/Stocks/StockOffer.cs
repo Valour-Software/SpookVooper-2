@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using SpookVooper_2.Database.Models.Entities;
@@ -11,8 +11,11 @@ public enum OrderType
     Sell
 }
 
-public class StockOffer : Entity
+public class StockOffer : IHasOwner
 {
+    [Key]
+    public string Id { get; set;}
+
     // Owner of this offer
     public string Owner_Id { get; set; }
     

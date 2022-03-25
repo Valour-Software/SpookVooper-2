@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using SpookVooper_2.Database.Models.Entities;
@@ -14,8 +14,10 @@ public enum TransactionType
     StockTrade
 }
 
-public class Transaction : Entity
+public class Transaction
 {
+    [Key]
+    public string Id { get; set; }
     public decimal Credits { get; set; }
     public DateTime Time { get; set; }
     public string FromId { get; set; }

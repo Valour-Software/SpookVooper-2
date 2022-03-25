@@ -1,29 +1,25 @@
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using SpookVooper_2.Database.Models.Entities;
 
-public class TradeItem
+public class TradeItem :  IHasOwner
 {
-    public string Id { get; set;}
-    public string Holder_Id { get; set;}
-    [NotMapped]
-    public Entity Holder { get; set;}
-    public string Definition_Id { get; set;}
-    [NotMapped]
-    public TradeItemDefinition Definition { get; set;}
+    [Key]
+    public string Id { get; set; }
+    public string Owner_Id { get; set; }
+    public string Definition_Id { get; set; }
     public decimal Amount { get; set;}
     // json list of modifiers
-    public string Modifiers { get; set;}
+    public string Modifiers { get; set; }
 }
 
-public class TradeItemDefinition
+public class TradeItemDefinition : IHasOwner
 {
-    public string Id { get; set;}
-    public string Creator_Id { get; set;}
-    [NotMapped]
-    public Entity Creator { get; set;}
+    public string Id { get; set; }
+    public string Owner_Id { get; set; }
     // defines if this definition is owned by SV
-    public bool SV_Owned { get; set;}
+    public bool SV_Owned { get; set; }
     // for example SV would have a "Tank" definition owned by SV, in which case "Tank" would be the name
-    public string Name { get; set;}
-    public DateTime Created { get; set;}
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public DateTime Created { get; set; }
 }
