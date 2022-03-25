@@ -8,13 +8,15 @@ namespace SpookVooper_2.Database.Models.Entities;
 public enum EntityType
 {
     User,
+    Group,
+    GroupRole,
     CreditAccount,
     Division,
     Regiment,
     TradeItem,
     TradeItemDefinition,
-    Tax,
-    TaxCredit,
+    TaxPolicy,
+    TaxCreditPolicy,
     Transaction,
     StockOffer,
     StockObject,
@@ -23,43 +25,14 @@ public enum EntityType
 
 public class Entity
 {
+    // the id will be in the following format:
+    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    // ex: c60c6bd8-0409-4cbd-8bb8-3c87e24c55f8
+    // Groups, Users, Credit Accounts may NOT share the same Id
     [Key]
     public string Id { get; set;}
     public string? Name { get; set;}
     public string? description { get; set; }
     
     public EntityType Type { get; set;}
-
-    public static EntityType GetEntityType(string Id)
-    {
-        switch (Id.Substring(0, 1))
-        {
-            case "a":
-                return EntityType.CreditAccount; 
-            case "u":
-                return EntityType.User;
-            case "d":
-                return EntityType.Division;
-            case "r":
-                return EntityType.Regiment;
-            case "i":
-                return EntityType.TradeItem;
-            case "t":
-                return EntityType.Tax;
-            case "o":
-                return EntityType.StockOffer;
-            case "s":
-                return EntityType.StockObject;
-            case "p":
-                // "p" stands for payment
-                return EntityType.Transaction;
-            case "c":
-                return EntityType.TaxCredit;
-            case "b":
-                // "b" stands for base
-                return EntityType.TradeItemDefinition;
-            default:
-                return EntityType.None;
-        }
-    }
 }
