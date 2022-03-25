@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using SpookVooper_2.Database.Models.Users;
 
 namespace SpookVooper_2.Database.Models.Entities;
@@ -14,11 +15,13 @@ public enum EntityType
     TradeItemDefinition,
     Tax,
     TaxCredit,
+    Transaction,
     None
 }
 
 public class Entity
 {
+    [Key]
     public string Id { get; set;}
     public string? Name { get; set;}
     public string? description { get; set; }
@@ -41,6 +44,9 @@ public class Entity
                 return EntityType.TradeItem;
             case "t":
                 return EntityType.Tax;
+            case "p":
+                // "p" stands for payment
+                return EntityType.Transaction;
             case "c":
                 return EntityType.TaxCredit;
             case "b":
