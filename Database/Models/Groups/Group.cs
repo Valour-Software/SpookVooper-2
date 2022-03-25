@@ -33,5 +33,5 @@ public class Group : Entity
     public List<GroupFlag> Flags { get; set;}
     // if the group is open to the public
     public bool Open { get; set;}
-
+    public string Owner_Id { get; set;}
 }

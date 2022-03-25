@@ -45,12 +45,12 @@ public class Regiment
             case RegimentType.Infantry:
                 return new List<List<int>> {
                     new List<int> {
-                        ((int)DivisionEquipmentType.Ammo),
-                        (int)Count / 1000
+                        (int)DivisionEquipmentType.Ammo,
+                        Count / 1000
                     },
                     new List<int> {
-                        ((int)DivisionEquipmentType.Gun),
-                        (int)Count / 1000
+                        (int)DivisionEquipmentType.Gun,
+                        Count / 1000
                     }
                 };
         }
