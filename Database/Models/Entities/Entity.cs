@@ -16,6 +16,8 @@ public enum EntityType
     Tax,
     TaxCredit,
     Transaction,
+    StockOffer,
+    StockObject,
     None
 }
 
@@ -44,6 +46,10 @@ public class Entity
                 return EntityType.TradeItem;
             case "t":
                 return EntityType.Tax;
+            case "o":
+                return EntityType.StockOffer;
+            case "s":
+                return EntityType.StockObject;
             case "p":
                 // "p" stands for payment
                 return EntityType.Transaction;
