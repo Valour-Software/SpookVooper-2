@@ -27,7 +27,7 @@ public interface IHasOwner
 public interface IEntity
 {
     // the id will be in the following format:
-    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    // x-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     // ex: u-c60c6bd8-0409-4cbd-8bb8-3c87e24c55f8
     [Key]
     public string Id { get; set; }

@@ -21,13 +21,6 @@ public class User : IEntity
     public string Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
-
-    [NotMapped]
-    public EntityType Type {
-        get {
-            return EntityType.User;
-        }
-    }
     public string Image_Url { get; set; }
     public decimal Credits { get; set;}
     public decimal CreditsYesterday { get; set;}
