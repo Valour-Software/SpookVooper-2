@@ -6,15 +6,15 @@ namespace SV2.Database.Models.Military;
 
 public enum RegimentType
 {
-    Infantry,
-    Artillery
+    Infantry = 1,
+    Artillery = 2
 }
 
 public enum DivisionEquipmentType
 {
-    Gun,
+    Gun = 1,
     // 1k units will use 1 ammo per hour of fighting
-    Ammo
+    Ammo = 2
 }
 
 // Represents the current equipment of the division

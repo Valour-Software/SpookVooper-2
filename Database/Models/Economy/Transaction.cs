@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using SV2.Database.Models.Entities;
 
@@ -7,13 +7,13 @@ namespace SV2.Database.Models.Economy;
 
 public enum TransactionType
 {
-    Loan,
+    Loan = 1,
     // also includes trading resources
-    ItemTrade,
-    Paycheck,
-    StockTrade,
+    ItemTrade = 2,
+    Paycheck = 3,
+    StockTrade = 4,
     // use this when the transaction does not fit the other types
-    Payment
+    Payment = 5
 }
 
 public class Transaction

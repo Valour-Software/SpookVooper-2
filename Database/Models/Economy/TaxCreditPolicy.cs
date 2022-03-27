@@ -6,9 +6,9 @@ namespace SV2.Database.Models.Economy.Taxes;
 
 public enum TaxCreditType
 {
-    Employee,
-    Dividend,
-    Donation
+    Employee = 1,
+    Dividend = 2,
+    Donation = 3
 }
 
 public class TaxCreditPolicy

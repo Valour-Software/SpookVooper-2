@@ -7,12 +7,12 @@ namespace SV2.Database.Models.Users;
 
 public enum Rank
 {
-    Spleen,
-    Carb,
-    Gaty,
-    Corgi,
-    Oof,
-    Unranked
+    Spleen = 1,
+    Carb = 2,
+    Gaty = 3,
+    Corgi = 4,
+    Oof = 5,
+    Unranked = 6
 }
 
 public class User : IEntity

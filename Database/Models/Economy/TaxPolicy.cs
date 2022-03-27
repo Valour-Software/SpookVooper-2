@@ -7,17 +7,16 @@ namespace SV2.Database.Models.Economy;
 public enum TaxType
 {
     // PersonalIncome and CorporateIncome are paid daily
-    Transactional,
-    Sales,
-    StockSale,
-    StockBought,
-    PersonalIncome,
-    CorporateIncome,
-    GroupIncome,
-    Payroll,
+    Transactional = 1,
+    Sales = 2,
+    StockSale = 3,
+    StockBought = 4,
+    PersonalIncome = 5,
+    CorporateIncome = 6,
+    GroupIncome = 7,
+    Payroll = 8,
     // only the imperial government can use this one
-    Inactivity,
-    None
+    Inactivity = 9
 }
 
 public class TaxPolicy
