@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
-using SpookVooper_2.Database.Models.Users;
-using SpookVooper_2.Database.Models.Groups;
-using SpookVooper_2.Database.Models.Economy;
+using SV2.Database.Models.Users;
+using SV2.Database.Models.Groups;
+using SV2.Database.Models.Economy;
 
-namespace SpookVooper_2.Database.Models.Entities;
+namespace SV2.Database.Models.Entities;
 
 public enum EntityType
 {
@@ -16,11 +16,12 @@ public enum EntityType
 
 public interface IHasOwner
 {
-    public string Owner_Id { get; set; }
+    public string OwnerId { get; set; }
+    public IEntity Owner { get; set; }
 
     public async Task<IEntity> GetOwner()
     {
-        return await IEntity.FindAsync(Owner_Id);
+        return await IEntity.FindAsync(OwnerId);
     }
 }
 

@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using SpookVooper_2.Database.Models.Entities;
+using SV2.Database.Models.Entities;
 
-namespace SpookVooper_2.Database.Models.Groups;
+namespace SV2.Database.Models.Groups;
 
 public enum GroupType
 {
@@ -34,10 +34,13 @@ public class Group : IHasOwner, IEntity
     public decimal CreditsYesterday { get; set;}
     [JsonIgnore]
     public string Api_Key { get; set; }
-    public GroupType groupType { get; set; }
+    public GroupType GroupType { get; set; }
     // will be use the PostgreSQL Array datatype
     public List<GroupFlag> Flags { get; set; }
     // if the group is open to the public
     public bool Open { get; set; }
-    public string Owner_Id { get; set; }
+    public string OwnerId { get; set; }
+
+    [ForeignKey("OwnerId")]
+    public IEntity Owner { get; set; }
 }

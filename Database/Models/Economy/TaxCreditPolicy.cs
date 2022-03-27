@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using SpookVooper_2.Database.Models.Entities;
+using SV2.Database.Models.Entities;
 
-namespace SpookVooper_2.Database.Models.Economy.Taxes;
+namespace SV2.Database.Models.Economy.Taxes;
 
 public enum TaxCreditType
 {
@@ -17,7 +17,7 @@ public class TaxCreditPolicy
     public string Id { get; set; }
     public string Name { get; set; }
     public decimal Rate { get; set; }
-    public bool DistrictTax { get; set; }
+    // should be set to Null if this is a Imperial Tax Credit
     public string? District_Id { get; set; }
     public TaxCreditType taxCreditType { get; set; }
     // amount this tax credit has paid in the current month

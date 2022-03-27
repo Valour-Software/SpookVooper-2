@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using SpookVooper_2.Database.Models.Entities;
+using SV2.Database.Models.Entities;
 
-namespace SpookVooper_2.Database.Models.Economy.Stocks;
+namespace SV2.Database.Models.Economy.Stocks;
 
 public enum OrderType
 {
@@ -17,7 +17,10 @@ public class StockOffer : IHasOwner
     public string Id { get; set;}
 
     // Owner of this offer
-    public string Owner_Id { get; set; }
+    public string OwnerId { get; set; }
+
+    [NotMapped]
+    public IEntity Owner { get; set; }
     
     // The ticker of the stock in this offer
     public string Ticker { get; set;}

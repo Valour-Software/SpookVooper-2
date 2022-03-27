@@ -1,4 +1,4 @@
-namespace SpookVooper_2.Database.Models.Permissions;
+namespace SV2.Database.Models.Permissions;
 
 /// <summary>
 /// This class contains all group permissions and helper methods for working

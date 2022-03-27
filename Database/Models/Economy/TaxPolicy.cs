@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using SpookVooper_2.Database.Models.Entities;
+using SV2.Database.Models.Entities;
 
-namespace SpookVooper_2.Database.Models.Economy;
+namespace SV2.Database.Models.Economy;
 
 public enum TaxType
 {
@@ -26,8 +26,6 @@ public class TaxPolicy
     public string Id { get; set; }
     public string Name { get; set; }
     public decimal Rate { get; set; }
-    public bool DistrictTax { get; set; }
-    
     // should be null if this tax policy is by Vooperia
     public string? District_Id { get; set; }
     public TaxType taxType { get; set; }

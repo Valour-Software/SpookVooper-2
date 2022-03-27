@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using SpookVooper_2.Database.Models.Entities;
-using SpookVooper_2.Database.Models.Users;
+using SV2.Database.Models.Entities;
+using SV2.Database.Models.Users;
 
-namespace SpookVooper_2.Database.Models.Economy;
+namespace SV2.Database.Models.Economy;
 
 public class UBI
 {

@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
-using SpookVooper_2.Database.Models.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
+using SV2.Database.Models.Entities;
 
-namespace SpookVooper_2.Database.Models.Military;
+namespace SV2.Database.Models.Military;
 
 public enum RegimentType
 {
@@ -22,8 +22,16 @@ public class DivisionEquipment
 {
     public string Id { get; set;}
     public DivisionEquipmentType Type { get; set;}
+    public string tradeItemId { get; set; }
+
+    [ForeignKey("tradeItemId")]
     // the item that is currently selected to be used
     public TradeItem tradeItem { get; set;}
+
+    public string Division_Id { get; set; }
+    
+    [ForeignKey("Division_Id")]
+    public Division Division { get; set; }
 }
 
 // NOTE: there can only be 1 Regiment of a type per Division
@@ -36,6 +44,10 @@ public class Regiment
     // for example in an Infantry Regiment, Count will be the number of soldiers
     // only allowed values are in 1k increments
     public int Count { get; set;}
+    public string Division_Id { get; set; }
+    
+    [ForeignKey("Division_Id")]
+    public Division Division { get; set; }
 
     public List<List<int>> GetEquipmentNeeds()
     {
@@ -61,17 +73,26 @@ public class Regiment
 
 public class Division : IHasOwner
 {
-    public List<DivisionEquipment> Equipment { get; set; }
-    public List<Regiment> Regiments { get; set; }
+    public string Id { get; set; }
+
+    [InverseProperty("Division")]
+    public ICollection<DivisionEquipment> Equipment { get; set; }
+
+    [InverseProperty("Division")]
+    public ICollection<Regiment> Regiments { get; set; }
     // current manpower in this division
     public int ManPower { get; set; }
     public string Name { get; set; }
-    public string Owner_Id { get; set; }
+    public string OwnerId { get; set; }
+
+    [NotMapped]
+    public IEntity Owner { get; set; }
 
     // current strength of the division
     public decimal Strength { get; set; }
-    public decimal X { get; set; }
-    public decimal Y { get; set; }
+    
+    // the id of the Province that this unit is currently in
+    public int Province { get; set; }
 
     public decimal GetStrength()
     {

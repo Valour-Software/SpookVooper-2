@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using SpookVooper_2.Database.Models.Users;
-using SpookVooper_2.Database.Models.Entities;
+using SV2.Database.Models.Users;
+using SV2.Database.Models.Entities;
 
-namespace SpookVooper_2.Database.Models.Economy;
+namespace SV2.Database.Models.Economy;
 
 
 public class CreditAccount : IHasOwner, IEntity
@@ -16,7 +16,9 @@ public class CreditAccount : IHasOwner, IEntity
 
     [NotMapped]
     public string Image_Url { get; set; }
-    public string Owner_Id { get; set;}
+    public string OwnerId { get; set;}
+    [ForeignKey("OwnerId")]
+    public IEntity Owner { get; set; }
 
     [JsonIgnore]
     public string Api_Key { get; set; }

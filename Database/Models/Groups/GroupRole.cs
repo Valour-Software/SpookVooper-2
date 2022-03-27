@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using SpookVooper_2.Database.Models.Entities;
-using SpookVooper_2.Database.Models.Permissions;
+using SV2.Database.Models.Entities;
+using SV2.Database.Models.Permissions;
 
-namespace SpookVooper_2.Database.Models.Groups;
+namespace SV2.Database.Models.Groups;
 
 public class GroupRole
 {
@@ -17,7 +17,7 @@ public class GroupRole
     public string Color { get; set; }
 
     // The group this role belongs to
-    public string Group_Id { get; set; }
+    public string GroupId { get; set; }
 
     // Salary for role, paid every hour
     public decimal Salary { get; set; }

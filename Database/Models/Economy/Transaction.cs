@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using SpookVooper_2.Database.Models.Entities;
+using SV2.Database.Models.Entities;
 
-namespace SpookVooper_2.Database.Models.Economy;
+namespace SV2.Database.Models.Economy;
 
 public enum TransactionType
 {
@@ -11,7 +11,9 @@ public enum TransactionType
     // also includes trading resources
     ItemTrade,
     Paycheck,
-    StockTrade
+    StockTrade,
+    // use this when the transaction does not fit the other types
+    Payment
 }
 
 public class Transaction

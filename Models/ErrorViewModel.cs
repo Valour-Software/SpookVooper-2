@@ -1,4 +1,4 @@
-namespace SpookVooper_2.Models
+namespace SV2.Models
 {
     public class ErrorViewModel
     {
