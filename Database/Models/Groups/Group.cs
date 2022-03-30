@@ -27,9 +27,10 @@ public class Group : IHasOwner, IEntity
 {
     [Key]
     public string Id { get; set; }
-    public string Name { get; }
+    public string Name { get; set; }
     public string Description { get; set; }
     public string Image_Url { get; set; }
+    public string? DistrictId { get; set;}
     public decimal Credits { get; set;}
     public decimal CreditsYesterday { get; set;}
     [JsonIgnore]
@@ -41,6 +42,16 @@ public class Group : IHasOwner, IEntity
     public bool Open { get; set; }
     public string OwnerId { get; set; }
 
-    [ForeignKey("OwnerId")]
+    [NotMapped]
     public IEntity Owner { get; set; }
+
+    public static async Task<Group?> FindAsync(string Id)
+    {
+        if (DBCache.Contains<Group>(Id)) {
+            return DBCache.Get<Group>(Id);
+        }
+        Group? group = await VooperDB.Instance.Groups.FindAsync(Id);
+        await DBCache.Put<Group>(Id, group);
+        return group;
+    }
 }

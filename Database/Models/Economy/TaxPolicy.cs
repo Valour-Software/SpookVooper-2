@@ -16,7 +16,8 @@ public enum TaxType
     GroupIncome = 7,
     Payroll = 8,
     // only the imperial government can use this one
-    Inactivity = 9
+    Inactivity = 9,
+    None = 10
 }
 
 public class TaxPolicy
@@ -26,7 +27,7 @@ public class TaxPolicy
     public string Name { get; set; }
     public decimal Rate { get; set; }
     // should be null if this tax policy is by Vooperia
-    public string? District_Id { get; set; }
+    public string? DistrictId { get; set; }
     public TaxType taxType { get; set; }
     // the min amount after which the tax has effect
     // example for Minimum and Maximum
@@ -38,4 +39,23 @@ public class TaxPolicy
     public decimal Maximum { get; set; }
     // amount this tax has collected in the current month
     public decimal Collected { get; set; }
+    public static async Task<TaxPolicy?> FindAsync(string Id)
+    {
+        if (DBCache.Contains<TaxPolicy>(Id)) {
+            return DBCache.Get<TaxPolicy>(Id);
+        }
+        TaxPolicy? taxPolicy = await VooperDB.Instance.TaxPolicies.FindAsync(Id);
+        await DBCache.Put<TaxPolicy>(Id, taxPolicy);
+        return taxPolicy;
+    }
+
+    public decimal GetTaxAmount(decimal amount) {
+        if (amount < Minimum) {
+            return 0.0m;
+        }
+        if (Maximum != 0.0m) {
+            amount = Math.Min(Maximum, amount);
+        }
+        return amount * (Rate / 100.0m);
+    }
 }

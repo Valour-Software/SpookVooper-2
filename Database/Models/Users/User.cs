@@ -33,4 +33,14 @@ public class User : IEntity
     // the datetime that this user created their account
     public DateTime Created { get; set; }
     public string Image_Url { get; set; }
+    public string? DistrictId { get; set;}
+    public static async Task<User?> FindAsync(string Id)
+    {
+        if (DBCache.Contains<User>(Id)) {
+            return DBCache.Get<User>(Id);
+        }
+        User? user = await VooperDB.Instance.Users.FindAsync(Id);
+        await DBCache.Put<User>(Id, user);
+        return user;
+    }
 }
