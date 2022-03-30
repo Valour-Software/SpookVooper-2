@@ -13,6 +13,8 @@ public class GroupRole
     // this role's permission value
     public ulong PermissionValue { get; set; }
 
+    public List<String> Members { get; set; }
+
     // Hexcode for role color (ex: #ffffff)
     public string Color { get; set; }
 

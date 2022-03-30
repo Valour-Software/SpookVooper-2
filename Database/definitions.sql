@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS GroupRoles (
     GroupId CHAR(38) NOT NULL,
     Salary DECIMAL(20,10) NOT NULL DEFAULT 0.000,
     Authority INT NOT NULL DEFAULT 0,
+    Members CHAR(38)[]
     CONSTRAINT fk_group FOREIGN KEY(GroupId) REFERENCES Groups(Id)
 );
 CREATE TABLE IF NOT EXISTS TradeItemDefinitions (
