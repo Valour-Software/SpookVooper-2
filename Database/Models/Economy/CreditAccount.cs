@@ -11,7 +11,7 @@ public class CreditAccount : IHasOwner, IEntity
 {
     [Key]
     public string Id { get; set;}
-    public string Name { get; }
+    public string Name { get; set; }
     public string Description { get; set; }
 
     [NotMapped]
@@ -23,6 +23,7 @@ public class CreditAccount : IHasOwner, IEntity
     [JsonIgnore]
     public string Api_Key { get; set; }
     public decimal Credits { get; set;}
+    public string? DistrictId { get; set; }
     // used for tax purposes
     public decimal CreditsYesterday { get; set;}
 }

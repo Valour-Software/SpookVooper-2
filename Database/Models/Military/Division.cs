@@ -28,9 +28,9 @@ public class DivisionEquipment
     // the item that is currently selected to be used
     public TradeItem tradeItem { get; set;}
 
-    public string Division_Id { get; set; }
+    public string DivisionId { get; set; }
     
-    [ForeignKey("Division_Id")]
+    [ForeignKey("DivisionId")]
     public Division Division { get; set; }
 }
 
@@ -44,9 +44,9 @@ public class Regiment
     // for example in an Infantry Regiment, Count will be the number of soldiers
     // only allowed values are in 1k increments
     public int Count { get; set;}
-    public string Division_Id { get; set; }
+    public string DivisionId { get; set; }
     
-    [ForeignKey("Division_Id")]
+    [ForeignKey("DivisionId")]
     public Division Division { get; set; }
 
     public List<List<int>> GetEquipmentNeeds()
