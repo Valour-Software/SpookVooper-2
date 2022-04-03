@@ -3,8 +3,10 @@ using SV2.Database.Models.Users;
 using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Items;
+using SV2.Database.Models.Factories;
 using System.Collections.Concurrent;
-
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace SV2.Database;
 
@@ -103,7 +105,7 @@ public static class DBCache
 
     public static async Task LoadAsync()
     {
-        #if !DEBUG
+        //#if !DEBUG
 
         List<Task> tasks = new();
         foreach(Group group in VooperDB.Instance.Groups) {
@@ -115,15 +117,21 @@ public static class DBCache
         foreach(TaxPolicy policy in VooperDB.Instance.TaxPolicies) {
             tasks.Add(DBCache.Put<TaxPolicy>(policy.Id, policy));
         }
-        foreach(TradeItem item in VooperDB.Instance.TradeItems) {
+        foreach(TradeItem item in VooperDB.Instance.TradeItems.Include(x => x.Definition).ThenInclude(x => x.Owner)) {
             tasks.Add(DBCache.Put<TradeItem>(item.Id, item));
         }
         foreach(TradeItemDefinition definition in VooperDB.Instance.TradeItemDefinitions) {
             tasks.Add(DBCache.Put<TradeItemDefinition>(definition.Id, definition));
         }
+        foreach(Factory factory in VooperDB.Instance.Factories) {
+            tasks.Add(DBCache.Put<Factory>(factory.Id, factory));
+        }
+        foreach(Recipe recipe in VooperDB.Instance.Recipes) {
+            tasks.Add(DBCache.Put<Recipe>(recipe.Id, recipe));
+        }
         await Task.WhenAll(tasks);
 
-        #endif
+        //#endif
     }
 
     public static async Task SaveAsync()
@@ -133,6 +141,8 @@ public static class DBCache
         VooperDB.Instance.TaxPolicies.UpdateRange(HCache[typeof(TaxPolicy)].Values as ICollection<TaxPolicy>);
         VooperDB.Instance.TradeItems.UpdateRange(HCache[typeof(TradeItem)].Values as ICollection<TradeItem>);
         VooperDB.Instance.TradeItemDefinitions.UpdateRange(HCache[typeof(TradeItemDefinition)].Values as ICollection<TradeItemDefinition>);
+        VooperDB.Instance.Factories.UpdateRange(HCache[typeof(Factory)].Values as ICollection<Factory>);
+        VooperDB.Instance.Recipes.UpdateRange(HCache[typeof(Recipe)].Values as ICollection<Recipe>);
         await VooperDB.Instance.SaveChangesAsync();
     }
 }

@@ -33,6 +33,9 @@ public class TradeItem :  IHasOwner
                 Definition_Id = Definition_Id,
                 Amount = 0
             };
+            await DBCache.Put<TradeItem>(item.Id, item);
+            await VooperDB.Instance.TradeItems.AddAsync(item);
+            await VooperDB.Instance.SaveChangesAsync();
         }
 
         item.Amount += amount;

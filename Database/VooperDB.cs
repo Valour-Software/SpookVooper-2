@@ -3,6 +3,7 @@ using SV2.Database.Models.Users;
 using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Items;
+using SV2.Database.Models.Factories;
 using SV2.Database.Models.Forums;
 
 /*  Valour - A free and secure chat client
@@ -57,6 +58,8 @@ public class VooperDB : DbContext
     public DbSet<ForumPost> ForumPosts { get; set; }
     public DbSet<TradeItemDefinition> TradeItemDefinitions {get; set; }
     public DbSet<TradeItem> TradeItems { get; set; }
+    public DbSet<Factory> Factories { get; set; }
+    public DbSet<Recipe> Recipes { get; set; }
 
     public static async Task<List<TaxPolicy>> GetTaxPoliciesAsync()
     {
