@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 
+namespace SV2.Database.Models.Items;
+
 public class TradeItem :  IHasOwner
 {
     [Key]
@@ -11,11 +13,30 @@ public class TradeItem :  IHasOwner
     [NotMapped]
     public IEntity Owner { get; set; }
     public string Definition_Id { get; set; }
+    
     [ForeignKey("DefinitionId")]
     public TradeItemDefinition Definition { get; set; }
     public decimal Amount { get; set;}
-    // json list of modifiers
-    public string Modifiers { get; set; }
+    public async Task Give(IEntity entity, decimal amount) 
+    {
+        // check if the entity we are sending already has this TradeItem
+        TradeItem item = DBCache.HCache[typeof(TradeItem)].Values.Select(x => (TradeItem)x).FirstOrDefault(x => x.OwnerId == entity.Id);
+        
+        // if null then create one
+
+        if (item is null) 
+        {
+            item = new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                OwnerId = entity.Id,
+                Definition_Id = Definition_Id,
+                Amount = 0
+            };
+        }
+
+        item.Amount += amount;
+    }
 }
 
 public class TradeItemDefinition : IHasOwner
@@ -29,4 +50,6 @@ public class TradeItemDefinition : IHasOwner
     public string Name { get; set; }
     public string Description { get; set; }
     public DateTime Created { get; set; }
+    // json list of modifiers
+    public string Modifiers { get; set; }
 }

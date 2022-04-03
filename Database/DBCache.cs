@@ -2,6 +2,7 @@ using SV2.Database.Models.Entities;
 using SV2.Database.Models.Users;
 using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
+using SV2.Database.Models.Items;
 using System.Collections.Concurrent;
 
 
@@ -100,11 +101,38 @@ public static class DBCache
         }
     }
 
+    public static async Task LoadAsync()
+    {
+        #if !DEBUG
+
+        List<Task> tasks = new();
+        foreach(Group group in VooperDB.Instance.Groups) {
+            tasks.Add(DBCache.Put<Group>(group.Id, group));
+        }
+        foreach(User user in VooperDB.Instance.Users) {
+            tasks.Add(DBCache.Put<User>(user.Id, user));
+        }
+        foreach(TaxPolicy policy in VooperDB.Instance.TaxPolicies) {
+            tasks.Add(DBCache.Put<TaxPolicy>(policy.Id, policy));
+        }
+        foreach(TradeItem item in VooperDB.Instance.TradeItems) {
+            tasks.Add(DBCache.Put<TradeItem>(item.Id, item));
+        }
+        foreach(TradeItemDefinition definition in VooperDB.Instance.TradeItemDefinitions) {
+            tasks.Add(DBCache.Put<TradeItemDefinition>(definition.Id, definition));
+        }
+        await Task.WhenAll(tasks);
+
+        #endif
+    }
+
     public static async Task SaveAsync()
     {
         VooperDB.Instance.Groups.UpdateRange(HCache[typeof(Group)].Values as ICollection<Group>);
         VooperDB.Instance.Users.UpdateRange(HCache[typeof(User)].Values as ICollection<User>);
         VooperDB.Instance.TaxPolicies.UpdateRange(HCache[typeof(TaxPolicy)].Values as ICollection<TaxPolicy>);
+        VooperDB.Instance.TradeItems.UpdateRange(HCache[typeof(TradeItem)].Values as ICollection<TradeItem>);
+        VooperDB.Instance.TradeItemDefinitions.UpdateRange(HCache[typeof(TradeItemDefinition)].Values as ICollection<TradeItemDefinition>);
         await VooperDB.Instance.SaveChangesAsync();
     }
 }

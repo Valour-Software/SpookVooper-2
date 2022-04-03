@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using SV2.Database.Models.Users;
 using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
+using SV2.Database.Models.Items;
+using SV2.Database.Models.Forums;
 
 /*  Valour - A free and secure chat client
  *  Copyright (C) 2021 Vooper Media LLC
@@ -52,6 +54,9 @@ public class VooperDB : DbContext
     public DbSet<Group> Groups { get; set; }
 
     public DbSet<TaxPolicy> TaxPolicies { get; set; }
+    public DbSet<ForumPost> ForumPosts { get; set; }
+    public DbSet<TradeItemDefinition> TradeItemDefinitions {get; set; }
+    public DbSet<TradeItem> TradeItems { get; set; }
 
     public static async Task<List<TaxPolicy>> GetTaxPoliciesAsync()
     {
