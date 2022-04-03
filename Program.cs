@@ -9,7 +9,8 @@ string CONF_LOC = "SV2Config/";
 string DBCONF_FILE = "DBConfig.json";
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddMvc()
+    .AddRazorRuntimeCompilation();
 
 // Create directory if it doesn't exist
 if (!Directory.Exists(CONF_LOC))

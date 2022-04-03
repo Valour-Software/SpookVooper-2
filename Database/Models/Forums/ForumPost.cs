@@ -21,9 +21,9 @@ public class ForumPost
     public ForumCategory Category { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
-    public ICollection<string> Tags { get; set; }
+    public List<string> Tags { get; set; }
     public DateTime TimePosted { get; set; }
 
     [InverseProperty("Post")]
-    public ICollection<ForumLike> Likes { get; set; }
+    public List<ForumLike> Likes { get; set; }
 }

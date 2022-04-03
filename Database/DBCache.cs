@@ -21,7 +21,7 @@ public static class DBCache
 
         if (!HCache.ContainsKey(typeof(T)))
         {
-            return null;
+            return new List<T>();
         }
         List<T> list = new();
         foreach (T item in HCache[type].Values) {
