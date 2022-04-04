@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SpookVooper_2.Models;
+using SV2.Models;
 using System.Diagnostics;
 
-namespace SpookVooper_2.Controllers
+namespace SV2.Controllers
 {
     public class HomeController : Controller
     {
