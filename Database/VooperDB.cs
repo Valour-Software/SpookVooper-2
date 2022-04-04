@@ -61,20 +61,6 @@ public class VooperDB : DbContext
     public DbSet<Factory> Factories { get; set; }
     public DbSet<Recipe> Recipes { get; set; }
 
-    public static async Task<List<TaxPolicy>> GetTaxPoliciesAsync()
-    {
-        List<TaxPolicy>? policies = DBCache.GetAll<TaxPolicy>().ToList();
-        // if null, then add all policies from database into the cache
-        if (policies is null) {
-            policies = await VooperDB.Instance.TaxPolicies.ToListAsync();
-            foreach(TaxPolicy policy in policies) {
-                await DBCache.Put<TaxPolicy>(policy.Id, policy);
-            }
-        }
-        return policies;
-        
-    }
-
     public VooperDB(DbContextOptions options)
     {
             

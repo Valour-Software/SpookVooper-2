@@ -61,7 +61,7 @@ public class Transaction
 
         if (transactionType != TransactionType.TaxPayment) {
 
-            List<TaxPolicy> policies = (await VooperDB.GetTaxPoliciesAsync()).Where(x => x.DistrictId == null || x.DistrictId == fromEntity.DistrictId || x.DistrictId == toEntity.DistrictId).ToList();
+            List<TaxPolicy> policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == null || x.DistrictId == fromEntity.DistrictId || x.DistrictId == toEntity.DistrictId).ToList();
 
             // must do TAXES (don't let Etho see this)
 
