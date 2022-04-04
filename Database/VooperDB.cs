@@ -63,7 +63,7 @@ public class VooperDB : DbContext
 
     public static async Task<List<TaxPolicy>> GetTaxPoliciesAsync()
     {
-        List<TaxPolicy>? policies = DBCache.GetAll<TaxPolicy>();
+        List<TaxPolicy>? policies = DBCache.GetAll<TaxPolicy>().ToList();
         // if null, then add all policies from database into the cache
         if (policies is null) {
             policies = await VooperDB.Instance.TaxPolicies.ToListAsync();
