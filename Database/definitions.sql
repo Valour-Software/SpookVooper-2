@@ -5,6 +5,10 @@ CREATE TABLE IF NOT EXISTS Users (
     Name VARCHAR(32) NOT NULL,
     Description VARCHAR(1024) NOT NULL,
     Xp INT NOT NULL DEFAULT (0),
+    ForumXp INT NOT NULL DEFAULT (0),
+    MessageXp INT NOT NULL DEFAULT (0),
+    CommentLikes INT NOT NULL DEFAULT (0),
+    PostLikes INT NOT NULL DEFAULT (0),
     Messages INT NOT NULL DEFAULT (0),
     LastSentMessage TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
     Api_Key VARCHAR(36) NOT NULL,
@@ -114,6 +118,7 @@ CREATE TABLE IF NOT EXISTS TradeItemDefinitions (
     OwnerId CHAR(38) NOT NULL,
     Name VARCHAR(32) NOT NULL,
     Description VARCHAR(1048),
+    Modifiers VARCHAR(2048),
     Created TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc')
 );
 CREATE TABLE IF NOT EXISTS TradeItems (
@@ -121,7 +126,6 @@ CREATE TABLE IF NOT EXISTS TradeItems (
     OwnerId CHAR(38) NOT NULL,
     DefinitionId CHAR(36) NOT NULL,
     Amount DECIMAL(20,10) NOT NULL DEFAULT 0.000,
-    Modifiers VARCHAR(2048),
     CONSTRAINT fk_definition FOREIGN KEY(DefinitionId) REFERENCES TradeItemDefinitions(Id)
 );
 CREATE TABLE IF NOT EXISTS Divisions (
