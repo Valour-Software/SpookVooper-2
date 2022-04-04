@@ -17,19 +17,15 @@ public static class DBCache
     /// </summary>
     public static Dictionary<Type, ConcurrentDictionary<string, object>> HCache = new();
 
-    public static List<T>? GetAll<T>() where T : class
-    {   
+    public static IEnumerable<T> GetAll<T>() where T : class
+    {
         var type = typeof(T);
 
-        if (!HCache.ContainsKey(typeof(T)))
-        {
-            return new List<T>();
-        }
-        List<T> list = new();
-        foreach (T item in HCache[type].Values) {
-            list.Add(item);
-        }
-        return list;
+        if (!HCache.ContainsKey(type))
+            yield break;
+
+        foreach (T item in HCache[type].Values)
+            yield return item;
     }
 
     /// <summary>
