@@ -59,6 +59,7 @@ if (!app.Environment.IsDevelopment())
 
 //BaseAPI       .AddRoutes(app);
 EcoAPI        .AddRoutes(app);
+EntityAPI     .AddRoutes(app);
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
