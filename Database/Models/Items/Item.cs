@@ -20,7 +20,7 @@ public class TradeItem :  IHasOwner
     public async Task Give(IEntity entity, decimal amount) 
     {
         // check if the entity we are sending already has this TradeItem
-        TradeItem item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.OwnerId == entity.Id);
+        TradeItem item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.OwnerId == entity.Id && x.Definition_Id == Definition_Id);
         
         // if null then create one
 
