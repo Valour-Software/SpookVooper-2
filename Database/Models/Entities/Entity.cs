@@ -18,7 +18,7 @@ public enum EntityType
 public interface IHasOwner
 {
     public string OwnerId { get; set; }
-    public IEntity Owner { get; set; }
+    public IEntity Owner { get;}
 
     public async Task<IEntity> GetOwner()
     {

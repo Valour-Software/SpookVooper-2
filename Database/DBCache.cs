@@ -81,19 +81,9 @@ public static class DBCache
         switch (Id.Substring(0, 1))
         {
             case "g":
-                if (Contains<Group>(Id)) {
-                    return Get<Group>(Id);
-                }
-                Group group = await VooperDB.Instance.Groups.FindAsync(Id);
-                await Put<Group>(Id, group);
-                return group;
+                return Get<Group>(Id);
             case "u":
-                if (Contains<User>(Id)) {
-                    return Get<User>(Id);
-                }
-                User user = await VooperDB.Instance.Users.FindAsync(Id);
-                await Put<User>(Id, user);;
-                return user;
+                return Get<User>(Id);
             default:
                 return null;
         }

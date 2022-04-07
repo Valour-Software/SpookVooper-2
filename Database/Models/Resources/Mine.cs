@@ -15,7 +15,11 @@ public class Mine : IHasOwner
     public string OwnerId { get; set; }
 
     [NotMapped]
-    public IEntity Owner { get; set; }
+    public IEntity Owner { 
+        get {
+            return IEntity.FindAsync(OwnerId).GetAwaiter().GetResult();
+        }
+    }
 
     public string CountyId { get; set; }
 

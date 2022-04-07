@@ -87,11 +87,38 @@ public class Division : IHasOwner
     public string OwnerId { get; set; }
 
     [NotMapped]
-    public IEntity Owner { get; set; }
+    public IEntity Owner { 
+        get {
+            return IEntity.FindAsync(OwnerId).GetAwaiter().GetResult();
+        }
+    }
 
     // current strength of the division
     public decimal Strength { get; set; }
+
+    public decimal Xp { get; set; }
+
+    [NotMapped]
+    public int Level {
+        get {
+            return GetLevel(Xp);
+        }
+    }
     
+    public int GetLevel(decimal xp)
+    {
+        if (xp > 10_000) {
+            return 4;
+        }
+        if (xp > 5_000) {
+            return 3;
+        }
+        if ( xp > 2_000) {
+            return 2;
+        }
+        return 1;
+    }
+
     // the id of the Province that this unit is currently in
     public int Province { get; set; }
 

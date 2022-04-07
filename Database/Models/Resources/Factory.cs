@@ -25,7 +25,11 @@ public class Factory : IHasOwner
     public string OwnerId { get; set; }
 
     [NotMapped]
-    public IEntity Owner { get; set; }
+    public IEntity Owner { 
+        get {
+            return IEntity.FindAsync(OwnerId).GetAwaiter().GetResult();
+        }
+    }
 
     public string CountyId { get; set; }
     public string RecipeId { get; set; }
@@ -35,12 +39,28 @@ public class Factory : IHasOwner
     public int Level { get; set; }
     public bool HasAEmployee { get; set; }
 
+    // factories will get damaged from Natural Disasters which occurs from events and from VOAA
+    public decimal Damage { get; set; }
+
     public async Task Tick(List<TradeItem> tradeItems)
     {
+        // TODO: when we add district stats (industal stat, etc) update this
         decimal ProductionBonus = 1.0m;
         if (HasAEmployee) {
             ProductionBonus += 0.5m;
         };
+
+        if (Damage < 0.99m) {
+            double diff = Math.Abs((double)Damage-1);
+            decimal Reduction = (decimal)Math.Pow(diff+1,5)/10m;
+            // examples
+            // 10% damage = 6% reduction
+            // 20% damage = 25% reduction
+            // 30% damage = 37% reduction
+
+            ProductionBonus /= Reduction;
+        }
+
 
         for (int i = 0; i < recipe.Inputs_Amounts.Count; i++)
         {

@@ -1,17 +1,22 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
+using SV2.Database.Models.Economy;
 
 namespace SV2.Database.Models.Items;
 
-public class TradeItem :  IHasOwner
+public class TradeItem : IHasOwner
 {
     [Key]
     public string Id { get; set; }
     public string OwnerId { get; set; }
 
     [NotMapped]
-    public IEntity Owner { get; set; }
+    public IEntity Owner { 
+        get {
+            return IEntity.FindAsync(OwnerId).GetAwaiter().GetResult();
+        }
+    }
     public string Definition_Id { get; set; }
     
     [ForeignKey("DefinitionId")]
@@ -49,7 +54,11 @@ public class TradeItemDefinition : IHasOwner
     public string OwnerId { get; set; }
 
     [NotMapped]
-    public IEntity Owner { get; set; }
+    public IEntity Owner { 
+        get {
+            return IEntity.FindAsync(OwnerId).GetAwaiter().GetResult();
+        }
+    }
     // for example SV would have a "Tank" definition owned by SV, in which case "Tank" would be the name
     public string Name { get; set; }
     public string Description { get; set; }
