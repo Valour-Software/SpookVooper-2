@@ -21,11 +21,11 @@ public class TradeItem : IHasOwner
     
     [ForeignKey("DefinitionId")]
     public TradeItemDefinition Definition { get; set; }
-    public decimal Amount { get; set;}
-    public async Task Give(IEntity entity, decimal amount) 
+    public int Amount { get; set;}
+    public async Task Give(IEntity entity, int amount) 
     {
         // check if the entity we are sending already has this TradeItem
-        TradeItem item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.OwnerId == entity.Id && x.Definition_Id == Definition_Id);
+        TradeItem? item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.OwnerId == entity.Id && x.Definition_Id == Definition_Id);
         
         // if null then create one
 

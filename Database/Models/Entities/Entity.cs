@@ -39,4 +39,12 @@ public interface IEntity
     {
         return DBCache.FindEntity(Id);
     }
+    public static IEntity? FindByApiKey(string apikey)
+    {
+        IEntity? entity = DBCache.GetAll<Group>().FirstOrDefault(x => x.Api_Key == apikey);
+        if (entity is null) {
+            entity = DBCache.GetAll<User>().FirstOrDefault(x => x.Api_Key == apikey);
+        }
+        return entity;
+    }
 }

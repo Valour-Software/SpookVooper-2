@@ -8,7 +8,9 @@ namespace SV2.Database.Models.Military;
 public enum RegimentType
 {
     Infantry = 1,
-    Artillery = 2
+    Artillery = 2,
+    Tank = 3,
+    Mech = 4,
 }
 
 public enum DivisionEquipmentType
@@ -41,6 +43,7 @@ public class Regiment
 {
     public string Id { get; set;}
     public RegimentType Type { get; set;}
+    
     // number of things in this regiment
     // for example in an Infantry Regiment, Count will be the number of soldiers
     // only allowed values are in 1k increments
@@ -121,6 +124,30 @@ public class Division : IHasOwner
 
     // the id of the Province that this unit is currently in
     public int Province { get; set; }
+
+    public decimal GetAttack()
+    {
+        decimal attack = 0;
+        foreach(Regiment regiment in Regiments) 
+        {
+            switch (regiment.Type) {
+                case RegimentType.Infantry:
+                    attack += regiment.Count / 1000.0m;
+                    break;
+                case RegimentType.Artillery:
+                    attack += regiment.Count / 1000.0m * 9.0m;
+                    break;
+                case RegimentType.Tank:
+                    attack += regiment.Count / 1000.0m * 20.0m;
+                    break;
+                case RegimentType.Mech:
+                    attack += regiment.Count / 1000.0m * 60.0m;
+                    break;
+            }
+        }
+        attack *= Strength;
+        return attack;
+    }
 
     public decimal GetStrength()
     {

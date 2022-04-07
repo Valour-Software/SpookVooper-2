@@ -11,9 +11,9 @@ public class Recipe
     [Key]
     public string Id { get; set; }
     public List<string> Inputs_Names { get; set; }
-    public List<decimal> Inputs_Amounts { get; set; }
+    public List<int> Inputs_Amounts { get; set; }
     public List<string> Output_Names { get; set; }
-    public List<decimal> Output_Amounts { get; set; }
+    public List<int> Output_Amounts { get; set; }
 }
 
 public class Factory : IHasOwner
@@ -23,6 +23,9 @@ public class Factory : IHasOwner
     public string Name { get; set; }
     public string Description { get; set; }
     public string OwnerId { get; set; }
+
+    // %
+    public int Efficiency { get; set; }
 
     [NotMapped]
     public IEntity Owner { 
@@ -40,19 +43,26 @@ public class Factory : IHasOwner
     public bool HasAEmployee { get; set; }
 
     // factories will get damaged from Natural Disasters which occurs from events and from VOAA
-    public decimal Damage { get; set; }
+    public double Damage { get; set; }
 
     public async Task Tick(List<TradeItem> tradeItems)
     {
+
+        // update efficiency
+        // at 30% efficiency, output is 3.7% which results in 0.74% per IRP day or 2.1% per IRP day
+        int growth = ((int)(Math.Pow(Efficiency, 0.03))*(100/Efficiency)) / 5;
+        growth = (int)Math.Max(growth, 1.5);
+        Efficiency += growth / 12;
+
         // TODO: when we add district stats (industal stat, etc) update this
-        decimal ProductionBonus = 1.0m;
+        double ProductionBonus = 1.0;
         if (HasAEmployee) {
-            ProductionBonus += 0.5m;
+            ProductionBonus += 0.5;
         };
 
-        if (Damage < 0.99m) {
-            double diff = Math.Abs((double)Damage-1);
-            decimal Reduction = (decimal)Math.Pow(diff+1,5)/10m;
+        if (Damage < 0.99) {
+            double diff = Math.Abs(Damage-1);
+            double Reduction = Math.Pow(diff+1,5)/10;
             // examples
             // 10% damage = 6% reduction
             // 20% damage = 25% reduction
@@ -69,7 +79,7 @@ public class Factory : IHasOwner
             if (item is null) {
                 break;
             }
-            decimal amountNeeded = recipe.Inputs_Amounts[i]*ProductionBonus;
+            int amountNeeded = (int)((double)recipe.Inputs_Amounts[i]*ProductionBonus);
             if (item.Amount < amountNeeded) {
                 break;
             }
@@ -92,7 +102,7 @@ public class Factory : IHasOwner
                 await VooperDB.Instance.TradeItems.AddAsync(item);
                 await VooperDB.Instance.SaveChangesAsync();
             }
-            item.Amount += recipe.Output_Amounts[i]*ProductionBonus;
+            item.Amount += (int)((double)recipe.Output_Amounts[i]*ProductionBonus*((double)Efficiency / 100));
         }
     }
 

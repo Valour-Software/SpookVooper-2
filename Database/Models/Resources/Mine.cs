@@ -33,19 +33,19 @@ public class Mine : IHasOwner
     public decimal Rate { get; set;}
 
     // factories will get damaged from Natural Disasters which occurs from events and from VOAA
-    public decimal Damage { get; set; }
+    public double Damage { get; set; }
 
     public async Task Tick(List<TradeItem> tradeItems)
     {
         // TODO: when we add district stats (industal stat, etc) update this
-        decimal ProductionBonus = 1.0m;
+        double ProductionBonus = 1.0;
         if (HasAEmployee) {
-            ProductionBonus += 0.5m;
+            ProductionBonus += 0.5;
         };
 
-        if (Damage < 0.99m) {
-            double diff = Math.Abs((double)Damage-1);
-            decimal Reduction = (decimal)Math.Pow(diff+1,5)/10m;
+        if (Damage < 0.99) {
+            double diff = Math.Abs(Damage-1);
+            double Reduction = Math.Pow(diff+1,5)/10;
             // examples
             // 10% damage = 6% reduction
             // 20% damage = 25% reduction
@@ -68,7 +68,7 @@ public class Mine : IHasOwner
             await VooperDB.Instance.TradeItems.AddAsync(item);
             await VooperDB.Instance.SaveChangesAsync();
         }
-        item.Amount += Rate*ProductionBonus;
+        item.Amount += (int)((double)Rate*ProductionBonus);
     }
 
 }
