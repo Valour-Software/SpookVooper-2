@@ -60,6 +60,7 @@ public class VooperDB : DbContext
     public DbSet<TradeItem> TradeItems { get; set; }
     public DbSet<Factory> Factories { get; set; }
     public DbSet<Recipe> Recipes { get; set; }
+    public DbSet<UBIPolicy> UBIPolicies { get; set; }
 
     public VooperDB(DbContextOptions options)
     {

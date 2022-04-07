@@ -5,7 +5,7 @@ using SV2.Database.Models.Users;
 
 namespace SV2.Database.Models.Economy;
 
-public class UBI
+public class UBIPolicy
 {
     [Key]
     public string Id { get; set; }
@@ -15,8 +15,8 @@ public class UBI
     public bool Anyone { get; set;}
 
     // users with this rank will get paid Rate hourly
-    public Rank ApplicableRank { get; set;}
+    public Rank? ApplicableRank { get; set;}
 
     // should be Null if this is the Vooperian UBI
-    public string? District_Id { get; set;}
+    public string? DistrictId { get; set;}
 }

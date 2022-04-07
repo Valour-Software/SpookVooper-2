@@ -1,6 +1,7 @@
 using SV2.Database;
 using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
+using SV2.Database.Models.Users;
 using SV2.Web;
 
 namespace SV2.Workers
@@ -27,7 +28,7 @@ namespace SV2.Workers
                     {
                         try
                         {
-                            List<GroupRole>? roles = DBCache.GetAll<GroupRole>();
+                            List<GroupRole>? roles = DBCache.GetAll<GroupRole>().ToList();
 
                             foreach(GroupRole role in roles) {
                                 if (role.Salary > 0.1m) {
@@ -47,6 +48,39 @@ namespace SV2.Workers
                                             // no sense to keep paying these members since the group has ran out of credits
                                             break;
                                         }
+                                    }
+                                }
+                                    
+                            }
+
+                            List<UBIPolicy>? UBIPolicies = DBCache.GetAll<UBIPolicy>().ToList();
+
+                            foreach(UBIPolicy policy in UBIPolicies) {
+                                List<User> effected = DBCache.GetAll<User>().ToList();
+                                string fromId = "";
+                                if (policy.DistrictId != null) {
+                                    effected = effected.Where(x => x.DistrictId == policy.DistrictId).ToList();
+                                    fromId = policy.DistrictId;
+                                }
+                                if (policy.ApplicableRank != null) {
+                                    effected = effected.Where(x => x.Rank == policy.ApplicableRank).ToList();
+                                    fromId = "g-vooperia";
+                                }
+                                foreach(User user in effected) {
+                                    Transaction tran = new()
+                                    {
+                                        Id = Guid.NewGuid().ToString(),
+                                        Credits = policy.Rate,
+                                        Time = DateTime.UtcNow,
+                                        FromId = fromId,
+                                        ToId = user.Id,
+                                        transactionType = TransactionType.Paycheck,
+                                        Details = $"UBI for rank {policy.ApplicableRank.ToString()}"
+                                    };
+                                    TaskResult result = await tran.Execute();
+                                    if (!result.Succeeded) {
+                                        // no sense to keep paying these members since the group has ran out of credits
+                                        break;
                                     }
                                 }
                                     

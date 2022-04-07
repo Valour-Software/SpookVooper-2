@@ -125,6 +125,9 @@ public static class DBCache
         foreach(Recipe recipe in VooperDB.Instance.Recipes) {
             tasks.Add(DBCache.Put<Recipe>(recipe.Id, recipe));
         }
+        foreach(UBIPolicy policy in VooperDB.Instance.UBIPolicies) {
+            tasks.Add(DBCache.Put<UBIPolicy>(policy.Id, policy));
+        }
         await Task.WhenAll(tasks);
 
         //#endif
@@ -139,6 +142,7 @@ public static class DBCache
         VooperDB.Instance.TradeItemDefinitions.UpdateRange(HCache[typeof(TradeItemDefinition)].Values as ICollection<TradeItemDefinition>);
         VooperDB.Instance.Factories.UpdateRange(HCache[typeof(Factory)].Values as ICollection<Factory>);
         VooperDB.Instance.Recipes.UpdateRange(HCache[typeof(Recipe)].Values as ICollection<Recipe>);
+        VooperDB.Instance.TaxPolicies.UpdateRange(HCache[typeof(TaxPolicy)].Values as ICollection<TaxPolicy>);
         await VooperDB.Instance.SaveChangesAsync();
     }
 }
