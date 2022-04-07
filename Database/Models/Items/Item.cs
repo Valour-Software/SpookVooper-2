@@ -31,6 +31,7 @@ public class TradeItem :  IHasOwner
                 Id = Guid.NewGuid().ToString(),
                 OwnerId = entity.Id,
                 Definition_Id = Definition_Id,
+                Definition = Definition,
                 Amount = 0
             };
             await DBCache.Put<TradeItem>(item.Id, item);
