@@ -27,7 +27,7 @@ public class Factory : IHasOwner
     [NotMapped]
     public IEntity Owner { 
         get {
-            return IEntity.FindAsync(OwnerId).GetAwaiter().GetResult();
+            return IEntity.Find(OwnerId);
         }
     }
 

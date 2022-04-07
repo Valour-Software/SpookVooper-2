@@ -76,7 +76,7 @@ public static class DBCache
         return null;
     }
 
-    public static async Task<IEntity?> FindEntityAsync(string Id)
+    public static IEntity? FindEntity(string Id)
     {
         switch (Id.Substring(0, 1))
         {
@@ -103,7 +103,7 @@ public static class DBCache
         foreach(TaxPolicy policy in VooperDB.Instance.TaxPolicies) {
             tasks.Add(DBCache.Put<TaxPolicy>(policy.Id, policy));
         }
-        foreach(TradeItem item in VooperDB.Instance.TradeItems.Include(x => x.Definition).ThenInclude(x => x.Owner)) {
+        foreach(TradeItem item in VooperDB.Instance.TradeItems.Include(x => x.Definition)) {
             tasks.Add(DBCache.Put<TradeItem>(item.Id, item));
         }
         foreach(TradeItemDefinition definition in VooperDB.Instance.TradeItemDefinitions) {

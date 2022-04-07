@@ -14,7 +14,7 @@ public class TradeItem : IHasOwner
     [NotMapped]
     public IEntity Owner { 
         get {
-            return IEntity.FindAsync(OwnerId).GetAwaiter().GetResult();
+            return IEntity.Find(OwnerId);
         }
     }
     public string Definition_Id { get; set; }
@@ -56,7 +56,7 @@ public class TradeItemDefinition : IHasOwner
     [NotMapped]
     public IEntity Owner { 
         get {
-            return IEntity.FindAsync(OwnerId).GetAwaiter().GetResult();
+            return IEntity.Find(OwnerId);
         }
     }
     // for example SV would have a "Tank" definition owned by SV, in which case "Tank" would be the name

@@ -46,8 +46,8 @@ public class Transaction
             return new TaskResult(false, $"An entity cannot send credits to itself.");
         }
 
-        IEntity? fromEntity = await IEntity.FindAsync(FromId);
-        IEntity? toEntity = await IEntity.FindAsync(ToId);
+        IEntity? fromEntity = IEntity.Find(FromId);
+        IEntity? toEntity = IEntity.Find(ToId);
 
         if (fromEntity == null) { return new TaskResult(false, $"Failed to find sender {FromId}."); }
         if (toEntity == null) { return new TaskResult(false, $"Failed to find reciever {ToId}."); }

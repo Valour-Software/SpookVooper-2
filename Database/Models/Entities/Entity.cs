@@ -19,11 +19,6 @@ public interface IHasOwner
 {
     public string OwnerId { get; set; }
     public IEntity Owner { get;}
-
-    public async Task<IEntity> GetOwner()
-    {
-        return await IEntity.FindAsync(OwnerId);
-    }
 }
 
 public interface IEntity
@@ -40,8 +35,8 @@ public interface IEntity
     public string Api_Key { get; set; }
     public string Image_Url { get; set; }
     public string? DistrictId { get; set; }
-    public static async Task<IEntity?> FindAsync(string Id)
+    public static IEntity? Find(string Id)
     {
-        return await DBCache.FindEntityAsync(Id);
+        return DBCache.FindEntity(Id);
     }
 }
