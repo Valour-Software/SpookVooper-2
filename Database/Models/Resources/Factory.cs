@@ -45,6 +45,10 @@ public class Factory : IHasOwner
     // factories will get damaged from Natural Disasters which occurs from events and from VOAA
     public double Damage { get; set; }
 
+    /// <summary>
+    /// This function is called every hour IRP time, or normally, 3 times per real life hour.
+    /// </summary>
+
     public async Task Tick(List<TradeItem> tradeItems)
     {
 
@@ -52,7 +56,7 @@ public class Factory : IHasOwner
         // at 30% efficiency, output is 3.7% which results in 0.74% per IRP day or 2.1% per IRP day
         int growth = ((int)(Math.Pow(Efficiency, 0.03))*(100/Efficiency)) / 5;
         growth = (int)Math.Max(growth, 1.5);
-        Efficiency += growth / 12;
+        Efficiency += growth / 24;
 
         // TODO: when we add district stats (industal stat, etc) update this
         double ProductionBonus = 1.0;
@@ -79,7 +83,7 @@ public class Factory : IHasOwner
             if (item is null) {
                 break;
             }
-            int amountNeeded = (int)((double)recipe.Inputs_Amounts[i]*ProductionBonus);
+            int amountNeeded = (int)((double)recipe.Inputs_Amounts[i]*ProductionBonus*((double)Efficiency / 100));
             if (item.Amount < amountNeeded) {
                 break;
             }
@@ -95,7 +99,7 @@ public class Factory : IHasOwner
                 {
                     Id = Guid.NewGuid().ToString(),
                     OwnerId = OwnerId,
-                    Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == recipe.Output_Names[i] && x.OwnerId == "g-vooperia").Id,
+                    Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == recipe.Output_Names[i] && x.OwnerId == "g-vooperia")!.Id,
                     Amount = 0
                 };
                 await DBCache.Put<TradeItem>(item.Id, item);
