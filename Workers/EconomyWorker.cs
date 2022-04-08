@@ -32,6 +32,7 @@ namespace SV2.Workers
 
                             foreach(GroupRole role in roles) {
                                 if (role.Salary > 0.1m) {
+                                    TaxCreditPolicy taxcredit = DBCache.GetAll<TaxCreditPolicy>().FirstOrDefault(x => x.DistrictId == role.Group.DistrictId && x.taxCreditType == TaxCreditType.Employee);
                                     foreach(String Id in role.Members) {
                                         Transaction tran = new()
                                         {
@@ -47,6 +48,19 @@ namespace SV2.Workers
                                         if (!result.Succeeded) {
                                             // no sense to keep paying these members since the group has ran out of credits
                                             break;
+                                        }
+                                        if (taxcredit is not null) {
+                                            Transaction TaxCreditTran = new()
+                                            {
+                                                Id = Guid.NewGuid().ToString(),
+                                                Credits = role.Salary*taxcredit.Rate,
+                                                Time = DateTime.UtcNow,
+                                                FromId = taxcredit.DistrictId!,
+                                                ToId = role.GroupId,
+                                                transactionType = TransactionType.TaxCreditPayment,
+                                                Details = $"Employee Tax Credit Payment"
+                                            };
+                                            await TaxCreditTran.Execute();
                                         }
                                     }
                                 }

@@ -14,13 +14,16 @@ public class TradeItem : IHasOwner
     [NotMapped]
     public IEntity Owner { 
         get {
-            return IEntity.Find(OwnerId);
+            return IEntity.Find(OwnerId)!;
         }
     }
     public string Definition_Id { get; set; }
     
-    [ForeignKey("DefinitionId")]
-    public TradeItemDefinition Definition { get; set; }
+    public TradeItemDefinition Definition { 
+        get {
+            return DBCache.Get<TradeItemDefinition>(Definition_Id);
+        }
+    }
     public int Amount { get; set;}
     public async Task Give(IEntity entity, int amount) 
     {
@@ -36,7 +39,6 @@ public class TradeItem : IHasOwner
                 Id = Guid.NewGuid().ToString(),
                 OwnerId = entity.Id,
                 Definition_Id = Definition_Id,
-                Definition = Definition,
                 Amount = 0
             };
             await DBCache.Put<TradeItem>(item.Id, item);
@@ -56,7 +58,7 @@ public class TradeItemDefinition : IHasOwner
     [NotMapped]
     public IEntity Owner { 
         get {
-            return IEntity.Find(OwnerId);
+            return IEntity.Find(OwnerId)!;
         }
     }
     // for example SV would have a "Tank" definition owned by SV, in which case "Tank" would be the name

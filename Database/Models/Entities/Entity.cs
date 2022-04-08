@@ -32,6 +32,8 @@ public interface IEntity
     public string Description { get; set; }
     decimal Credits { get; set;}
     decimal CreditsYesterday { get; set;}
+    
+    [JsonIgnore]
     public string Api_Key { get; set; }
     public string Image_Url { get; set; }
     public string? DistrictId { get; set; }
