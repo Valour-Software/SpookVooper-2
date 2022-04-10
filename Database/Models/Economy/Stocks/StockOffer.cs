@@ -14,15 +14,18 @@ public enum OrderType
 public class StockOffer : IHasOwner
 {
     [Key]
+    [GuidID]
     public string Id { get; set;}
 
     // Owner of this offer
+    [EntityId]
     public string OwnerId { get; set; }
 
     [NotMapped]
     public IEntity Owner { get; set; }
     
     // The ticker of the stock in this offer
+    [VarChar(4)]
     public string Ticker { get; set;}
 
     public OrderType orderType { get; set;}

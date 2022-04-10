@@ -9,6 +9,7 @@ namespace SV2.Database.Models.Factories;
 public class Recipe
 {
     [Key]
+    [GuidID]
     public string Id { get; set; }
     public List<string> Inputs_Names { get; set; }
     public List<int> Inputs_Amounts { get; set; }
@@ -19,9 +20,16 @@ public class Recipe
 public class Factory : IHasOwner
 {
     [Key]
+    [GuidID]
     public string Id { get; set; }
+
+    [VarChar(64)]
     public string Name { get; set; }
+
+    [VarChar(1024)]
     public string Description { get; set; }
+
+    [EntityId]
     public string OwnerId { get; set; }
 
     // %
@@ -30,17 +38,20 @@ public class Factory : IHasOwner
     [NotMapped]
     public IEntity Owner { 
         get {
-            return IEntity.Find(OwnerId);
+            return IEntity.Find(OwnerId)!;
         }
     }
 
+    [GuidID]
     public string CountyId { get; set; }
+
+    [GuidID]
     public string RecipeId { get; set; }
 
     [ForeignKey("RecipeId")]
     public Recipe recipe { get; set; }
     public int Level { get; set; }
-    public bool HasAEmployee { get; set; }
+    public bool HasAnEmployee { get; set; }
 
     // factories will get damaged from Natural Disasters which occurs from events and from VOAA
     public double Damage { get; set; }
@@ -60,7 +71,7 @@ public class Factory : IHasOwner
 
         // TODO: when we add district stats (industal stat, etc) update this
         double ProductionBonus = 1.0;
-        if (HasAEmployee) {
+        if (HasAnEmployee) {
             ProductionBonus += 0.5;
         };
 

@@ -8,12 +8,21 @@ namespace SV2.Database.Models.Economy.Stocks;
 public class StockObject : IHasOwner
 {
     [Key]
+    [GuidID]
     public string Id { get; set;}
 
     // Owner of this stock object
+    [EntityId]
     public string OwnerId { get; set; }
+    
     [NotMapped]
-    public IEntity Owner { get; set; }
+    public IEntity Owner {
+        get {
+            return IEntity.Find(OwnerId)!;
+        }
+    }
+
+    [VarChar(4)]
     public string Ticker { get; set;}
     public int Amount { get; set;}
 }

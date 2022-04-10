@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Items;
@@ -23,14 +24,19 @@ public enum DivisionEquipmentType
 // Represents the current equipment of the division
 public class DivisionEquipment
 {
+    [Key]
+    [GuidID]
     public string Id { get; set;}
     public DivisionEquipmentType Type { get; set;}
+    
+    [GuidID]
     public string tradeItemId { get; set; }
 
     [ForeignKey("tradeItemId")]
     // the item that is currently selected to be used
     public TradeItem tradeItem { get; set;}
 
+    [GuidID]
     public string DivisionId { get; set; }
     
     [ForeignKey("DivisionId")]
@@ -41,6 +47,8 @@ public class DivisionEquipment
 // an Infantry Regiment might have 5k or 500k troops in it
 public class Regiment
 {
+    [Key]
+    [GuidID]
     public string Id { get; set;}
     public RegimentType Type { get; set;}
     
@@ -48,6 +56,8 @@ public class Regiment
     // for example in an Infantry Regiment, Count will be the number of soldiers
     // only allowed values are in 1k increments
     public int Count { get; set;}
+
+    [GuidID]
     public string DivisionId { get; set; }
     
     [ForeignKey("DivisionId")]
@@ -77,6 +87,8 @@ public class Regiment
 
 public class Division : IHasOwner
 {
+    [Key]
+    [GuidID]
     public string Id { get; set; }
 
     [InverseProperty("Division")]
@@ -86,13 +98,17 @@ public class Division : IHasOwner
     public ICollection<Regiment> Regiments { get; set; }
     // current manpower in this division
     public int ManPower { get; set; }
+
+    [VarChar(64)]
     public string Name { get; set; }
+
+    [EntityId]
     public string OwnerId { get; set; }
 
     [NotMapped]
     public IEntity Owner { 
         get {
-            return IEntity.Find(OwnerId);
+            return IEntity.Find(OwnerId)!;
         }
     }
 

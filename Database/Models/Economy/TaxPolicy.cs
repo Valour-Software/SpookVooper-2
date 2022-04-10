@@ -23,10 +23,14 @@ public enum TaxType
 public class TaxPolicy
 {
     [Key]
+    [GuidID]
     public string Id { get; set; }
+
+    [VarChar(64)]
     public string Name { get; set; }
     public decimal Rate { get; set; }
     // should be null if this tax policy is by Vooperia
+    [EntityId]
     public string? DistrictId { get; set; }
     public TaxType taxType { get; set; }
     // the min amount after which the tax has effect

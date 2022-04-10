@@ -9,25 +9,34 @@ namespace SV2.Database.Models.Factories;
 public class Mine : IHasOwner
 {
     [Key]
+    [GuidID]
     public string Id { get; set; }
+
+    [VarChar(64)]
     public string Name { get; set; }
+
+    [VarChar(1024)]
     public string Description { get; set; }
+
+    [EntityId]
     public string OwnerId { get; set; }
 
     [NotMapped]
     public IEntity Owner { 
         get {
-            return IEntity.Find(OwnerId);
+            return IEntity.Find(OwnerId)!;
         }
     }
 
+    [GuidID]
     public string CountyId { get; set; }
 
     // the name of the resource that this mine mines
+    [VarChar(32)]
     public string ResourceName { get; set; }
 
     public int Level { get; set; }
-    public bool HasAEmployee { get; set; }
+    public bool HasAnEmployee { get; set; }
 
     // amount of ResourceName that this mine produces per hour
     public decimal Rate { get; set;}
@@ -39,7 +48,7 @@ public class Mine : IHasOwner
     {
         // TODO: when we add district stats (industal stat, etc) update this
         double ProductionBonus = 1.0;
-        if (HasAEmployee) {
+        if (HasAnEmployee) {
             ProductionBonus += 0.5;
         };
 

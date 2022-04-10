@@ -16,12 +16,19 @@ public enum TerrainType
 public class Province
 {
     [Key]
+    [GuidID]
     public int Id { get; set;}
+
+    [VarChar(64)]
     public string? Name { get; set;}
+
+    [GuidID]
     public string CountyId { get; set; }
 
     [ForeignKey("CountyId")]
     public County County { get; set; }
+
+    [EntityId]
     public string DistrictId { get; set; }
 
     [ForeignKey("DistrictId")]

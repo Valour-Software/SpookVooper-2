@@ -8,7 +8,10 @@ namespace SV2.Database.Models.Items;
 public class TradeItem : IHasOwner
 {
     [Key]
+    [GuidID]
     public string Id { get; set; }
+
+    [EntityId]
     public string OwnerId { get; set; }
 
     [NotMapped]
@@ -17,6 +20,8 @@ public class TradeItem : IHasOwner
             return IEntity.Find(OwnerId)!;
         }
     }
+    
+    [GuidID]
     public string Definition_Id { get; set; }
     
     public TradeItemDefinition Definition { 
@@ -52,7 +57,11 @@ public class TradeItem : IHasOwner
 
 public class TradeItemDefinition : IHasOwner
 {
+    [Key]
+    [GuidID]
     public string Id { get; set; }
+
+    [EntityId]
     public string OwnerId { get; set; }
 
     [NotMapped]
@@ -62,7 +71,10 @@ public class TradeItemDefinition : IHasOwner
         }
     }
     // for example SV would have a "Tank" definition owned by SV, in which case "Tank" would be the name
+    [VarChar(64)]
     public string Name { get; set; }
+
+    [VarChar(1024)]
     public string Description { get; set; }
     public DateTime Created { get; set; }
     // json list of modifiers

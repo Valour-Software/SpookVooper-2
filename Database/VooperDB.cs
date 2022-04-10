@@ -61,6 +61,14 @@ public class VooperDB : DbContext
     public DbSet<Factory> Factories { get; set; }
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<UBIPolicy> UBIPolicies { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
+
+    public static string GenerateSQL()
+    {
+        string sql = VooperDB.Instance.Database.GenerateCreateScript();
+        sql = sql.Replace("numeric", "DECIMAL(20,10)");
+        return sql;
+    }
 
     public VooperDB(DbContextOptions options)
     {

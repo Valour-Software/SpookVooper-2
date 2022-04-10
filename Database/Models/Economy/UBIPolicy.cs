@@ -8,6 +8,7 @@ namespace SV2.Database.Models.Economy;
 public class UBIPolicy
 {
     [Key]
+    [GuidID]
     public string Id { get; set; }
     public decimal Rate { get; set;}
 
@@ -18,5 +19,6 @@ public class UBIPolicy
     public Rank? ApplicableRank { get; set;}
 
     // should be Null if this is the Vooperian UBI
+    [EntityId]
     public string? DistrictId { get; set;}
 }

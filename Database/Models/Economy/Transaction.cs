@@ -23,12 +23,20 @@ public enum TransactionType
 public class Transaction
 {
     [Key]
+    [GuidID]
     public string Id { get; set; }
     public decimal Credits { get; set; }
+
     public DateTime Time { get; set; }
+
+    [EntityId]
     public string FromId { get; set; }
+
+    [EntityId]
     public string ToId { get; set; }
     public TransactionType transactionType { get; set; }
+
+    [VarChar(1024)]
     public string Details { get; set; }
 
     public async Task<TaskResult> Execute(bool Force = false)
@@ -154,6 +162,8 @@ public class Transaction
 
         fromEntity.Credits -= Credits;
         toEntity.Credits += Credits;
+
+        VooperDB.Instance.Transactions.AddAsync(this);
 
         return new TaskResult(true, $"Successfully sent ¢{Credits} to {toEntity.Name} with ¢{totaltaxpaid} tax.");
 
