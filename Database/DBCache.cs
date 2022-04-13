@@ -78,6 +78,9 @@ public static class DBCache
 
     public static IEntity? FindEntity(string Id)
     {
+        if (Id is null) {
+            return null;
+        }
         switch (Id.Substring(0, 1))
         {
             case "g":
@@ -103,7 +106,7 @@ public static class DBCache
         foreach(TaxPolicy policy in VooperDB.Instance.TaxPolicies) {
             tasks.Add(DBCache.Put<TaxPolicy>(policy.Id, policy));
         }
-        foreach(TradeItem item in VooperDB.Instance.TradeItems.Include(x => x.Definition)) {
+        foreach(TradeItem item in VooperDB.Instance.TradeItems) {
             tasks.Add(DBCache.Put<TradeItem>(item.Id, item));
         }
         foreach(TradeItemDefinition definition in VooperDB.Instance.TradeItemDefinitions) {
@@ -125,14 +128,14 @@ public static class DBCache
 
     public static async Task SaveAsync()
     {
-        VooperDB.Instance.Groups.UpdateRange(HCache[typeof(Group)].Values as ICollection<Group>);
-        VooperDB.Instance.Users.UpdateRange(HCache[typeof(User)].Values as ICollection<User>);
-        VooperDB.Instance.TaxPolicies.UpdateRange(HCache[typeof(TaxPolicy)].Values as ICollection<TaxPolicy>);
-        VooperDB.Instance.TradeItems.UpdateRange(HCache[typeof(TradeItem)].Values as ICollection<TradeItem>);
-        VooperDB.Instance.TradeItemDefinitions.UpdateRange(HCache[typeof(TradeItemDefinition)].Values as ICollection<TradeItemDefinition>);
-        VooperDB.Instance.Factories.UpdateRange(HCache[typeof(Factory)].Values as ICollection<Factory>);
-        VooperDB.Instance.Recipes.UpdateRange(HCache[typeof(Recipe)].Values as ICollection<Recipe>);
-        VooperDB.Instance.TaxPolicies.UpdateRange(HCache[typeof(TaxPolicy)].Values as ICollection<TaxPolicy>);
+        VooperDB.Instance.Groups.UpdateRange(GetAll<Group>());
+        VooperDB.Instance.Users.UpdateRange(GetAll<User>());
+        VooperDB.Instance.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
+        VooperDB.Instance.TradeItems.UpdateRange(GetAll<TradeItem>());
+        VooperDB.Instance.TradeItemDefinitions.UpdateRange(GetAll<TradeItemDefinition>());
+        VooperDB.Instance.Factories.UpdateRange(GetAll<Factory>());
+        VooperDB.Instance.Recipes.UpdateRange(GetAll<Recipe>());
+        VooperDB.Instance.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
         await VooperDB.Instance.SaveChangesAsync();
     }
 }

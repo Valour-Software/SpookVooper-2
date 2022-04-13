@@ -43,15 +43,6 @@ public class TaxPolicy
     public decimal Maximum { get; set; }
     // amount this tax has collected in the current month
     public decimal Collected { get; set; }
-    public static async Task<TaxPolicy?> FindAsync(string Id)
-    {
-        if (DBCache.Contains<TaxPolicy>(Id)) {
-            return DBCache.Get<TaxPolicy>(Id);
-        }
-        TaxPolicy? taxPolicy = await VooperDB.Instance.TaxPolicies.FindAsync(Id);
-        await DBCache.Put<TaxPolicy>(Id, taxPolicy);
-        return taxPolicy;
-    }
 
     public decimal GetTaxAmount(decimal amount) {
         if (amount < Minimum) {

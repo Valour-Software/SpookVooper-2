@@ -22,11 +22,13 @@ public class User : IEntity
     [EntityId]
     public string Id { get; set; }
 
+    public ulong ValourId { get; set; }
+
     [VarChar(64)]
     public string Name { get; set; }
 
     [VarChar(1024)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public int Xp { get; set;}
     public int ForumXp { get; set;}
     public int MessageXp { get; set;}
@@ -45,7 +47,7 @@ public class User : IEntity
     public DateTime Created { get; set; }
 
     [VarChar(128)]
-    public string Image_Url { get; set; }
+    public string? Image_Url { get; set; }
 
     [EntityId]
     public string? DistrictId { get; set;}
@@ -73,5 +75,23 @@ public class User : IEntity
             return true;
         }
         return false;
+    }
+
+    public User(string name, ulong valourId)
+    {
+        Id = "u-"+Guid.NewGuid().ToString();
+        ValourId = valourId;
+        Name = name;
+        Xp = 0;
+        ForumXp = 0;
+        MessageXp = 0;
+        Messages = 0;
+        PostLikes = 0;
+        CommentLikes = 0;
+        Api_Key = Guid.NewGuid().ToString();
+        Credits = 0.0m;
+        CreditsYesterday = 0.0m;
+        Rank = Rank.Unranked;
+        Created = DateTime.UtcNow;
     }
 }

@@ -74,4 +74,19 @@ public class VooperDB : DbContext
     {
             
     }
+
+    public static async Task Startup() 
+    {
+        await DBCache.LoadAsync();
+        if (DBCache.FindEntity("g-vooperia") is not null) {
+            return;
+        }
+        Group Vooperia = new Group("Vooperia", "g-t");
+        Vooperia.Id = "g-vooperia";
+        Vooperia.GroupType = GroupType.NonProfit;
+        Vooperia.Credits = 500_000_000.0m;
+        await DBCache.Put<Group>(Vooperia.Id, Vooperia);
+        await VooperDB.Instance.Groups.AddAsync(Vooperia);
+        await VooperDB.Instance.SaveChangesAsync();
+    }
 }

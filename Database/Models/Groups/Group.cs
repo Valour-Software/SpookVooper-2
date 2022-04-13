@@ -34,10 +34,10 @@ public class Group : IHasOwner, IEntity
     public string Name { get; set; }
 
     [VarChar(2048)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [VarChar(512)]
-    public string Image_Url { get; set; }
+    public string? Image_Url { get; set; }
     
     [EntityId]
     public string? DistrictId { get; set;}
@@ -62,6 +62,19 @@ public class Group : IHasOwner, IEntity
         get {
             return IEntity.Find(OwnerId)!;
         }
+    }
+
+    public Group(string name, string ownerId)
+    {
+        Id = "g-"+Guid.NewGuid().ToString();
+        Name = name;
+        Api_Key = Guid.NewGuid().ToString();
+        Credits = 0.0m;
+        CreditsYesterday = 0.0m;
+        OwnerId = ownerId;
+        Open = false;
+        Flags = new();
+        GroupType = GroupType.Company;
     }
 
     public bool HasPermissionWithKey(string apikey, GroupPermission permission)

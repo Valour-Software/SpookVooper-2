@@ -8,7 +8,7 @@ public class GuidID : ColumnAttribute
 {
     public GuidID()
     {
-        TypeName = "CHAR(36)";
+        TypeName = "VARCHAR(36)";
     }
 }
 
@@ -16,7 +16,7 @@ public class EntityId : ColumnAttribute
 {
     public EntityId()
     {
-        TypeName = "CHAR(38)";
+        TypeName = "VARCHAR(38)";
     }
 }
 

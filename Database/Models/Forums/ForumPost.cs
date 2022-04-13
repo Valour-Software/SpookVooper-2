@@ -13,13 +13,24 @@ public enum ForumCategory
 public class ForumPost
 {
     [Key]
+    [GuidID]
     public string Id { get; set; }
+
+    [EntityId]
     public string AuthorId { get; set; }
     
     [NotMapped]
-    public IEntity Author { get; set; }
+    public IEntity Author {
+        get {
+            return IEntity.Find(AuthorId)!;
+        }
+    }
     public ForumCategory Category { get; set; }
+
+    [VarChar(64)]
     public string Title { get; set; }
+
+    [VarChar(32768)]
     public string Content { get; set; }
     public List<string> Tags { get; set; }
     public DateTime TimePosted { get; set; }
