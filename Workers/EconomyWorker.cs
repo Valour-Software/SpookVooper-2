@@ -76,9 +76,11 @@ namespace SV2.Workers
                                     effected = effected.Where(x => x.DistrictId == policy.DistrictId).ToList();
                                     fromId = policy.DistrictId;
                                 }
+                                else {
+                                    fromId = "g-vooperia";
+                                }
                                 if (policy.ApplicableRank != null) {
                                     effected = effected.Where(x => x.Rank == policy.ApplicableRank).ToList();
-                                    fromId = "g-vooperia";
                                 }
                                 foreach(User user in effected) {
                                     Transaction tran = new()
@@ -99,6 +101,9 @@ namespace SV2.Workers
                                 }
                                     
                             }
+
+                            // for right now, just save cache to database every hour
+                            await DBCache.SaveAsync();
 
                             await Task.Delay(1000 * 60 * 60);
                         }
