@@ -68,17 +68,11 @@ public interface IEntity
                 break;
             }
         }
-        Transaction taxtrans = new()
-        {
-            Id = Guid.NewGuid().ToString(),
-            Credits = totaldue,
-            Time = DateTime.UtcNow,
-            FromId = Id,
-            ToId = DistrictId,
-            transactionType = TransactionType.TaxPayment,
-            Details = $"Income Tax Payment"
-        };
-        taxtrans.Execute(true);
+
+        if (totaldue > 0.01m) {
+            Transaction taxtrans = new Transaction(Id, DistrictId!, totaldue, TransactionType.TaxPayment, $"Income Tax Payment");
+            taxtrans.Execute(true);
+        }
 
         amount = Credits-CreditsYesterday;
         totaldue = 0.0m;
@@ -92,17 +86,10 @@ public interface IEntity
                 break;
             }
         }
-        taxtrans = new()
-        {
-            Id = Guid.NewGuid().ToString(),
-            Credits = totaldue,
-            Time = DateTime.UtcNow,
-            FromId = Id,
-            ToId = "g-vooperia",
-            transactionType = TransactionType.TaxPayment,
-            Details = $"Income Tax Payment"
-        };
-        taxtrans.Execute(true);
+        if (totaldue > 0.01m) {
+            Transaction taxtrans = new Transaction(Id, "g-vooperia", totaldue, TransactionType.TaxPayment, $"Income Tax Payment");
+            taxtrans.Execute(true);
+        }
     }
 
     public bool HasPermission(IEntity entity, GroupPermission permission);

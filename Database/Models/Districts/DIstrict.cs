@@ -23,9 +23,12 @@ public class District
 
     [InverseProperty("District")]
     public ICollection<County> Counties { get; set;}
-    // the group that represents this district 
-    [ForeignKey("GroupId")]
-    public Group Group { get; set;}
+
+    public Group Group { 
+        get {
+            return DBCache.Get<Group>(GroupId)!;
+        }
+    }
 
     [EntityId]
     public string GroupId { get; set; }

@@ -120,7 +120,7 @@ public enum PermissionState
 /// Permission codes use two ulongs to represent
 /// three possible states for every permission
 /// </summary>
-public struct PermissionNodeCode
+public struct PermissionCode
 {
     // Just for reference,
     // If the mask bit is 0, then it is always undefined
@@ -130,7 +130,7 @@ public struct PermissionNodeCode
     public ulong Code { get; set; }
     public ulong Mask { get; set; }
 
-    public PermissionNodeCode(ulong code, ulong mask)
+    public PermissionCode(ulong code, ulong mask)
     {
         this.Code = code;
         this.Mask = mask;

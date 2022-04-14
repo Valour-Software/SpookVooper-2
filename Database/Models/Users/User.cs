@@ -9,7 +9,7 @@ namespace SV2.Database.Models.Users;
 public enum Rank
 {
     Spleen = 1,
-    Carb = 2,
+    Crab = 2,
     Gaty = 3,
     Corgi = 4,
     Oof = 5,
@@ -22,6 +22,8 @@ public class User : IEntity
     [EntityId]
     public string Id { get; set; }
 
+    [Column(TypeName = "bigint")]
+
     public ulong ValourId { get; set; }
 
     [VarChar(64)]
@@ -29,9 +31,9 @@ public class User : IEntity
 
     [VarChar(1024)]
     public string? Description { get; set; }
-    public int Xp { get; set;}
+    public float Xp { get; set;}
     public int ForumXp { get; set;}
-    public int MessageXp { get; set;}
+    public float MessageXp { get; set;}
     public int CommentLikes { get; set;}
     public int PostLikes { get; set;}
     public int Messages { get; set;}

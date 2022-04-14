@@ -34,32 +34,14 @@ namespace SV2.Workers
                                 if (role.Salary > 0.1m) {
                                     TaxCreditPolicy taxcredit = DBCache.GetAll<TaxCreditPolicy>().FirstOrDefault(x => x.DistrictId == role.Group.DistrictId && x.taxCreditType == TaxCreditType.Employee);
                                     foreach(String Id in role.Members) {
-                                        Transaction tran = new()
-                                        {
-                                            Id = Guid.NewGuid().ToString(),
-                                            Credits = role.Salary,
-                                            Time = DateTime.UtcNow,
-                                            FromId = role.GroupId,
-                                            ToId = Id,
-                                            transactionType = TransactionType.Paycheck,
-                                            Details = $"{role.Name} Salary"
-                                        };
+                                        Transaction tran = new Transaction(role.GroupId, Id, role.Salary, TransactionType.Paycheck, $"{role.Name} Salary");
                                         TaskResult result = await tran.Execute();
                                         if (!result.Succeeded) {
                                             // no sense to keep paying these members since the group has ran out of credits
                                             break;
                                         }
                                         if (taxcredit is not null) {
-                                            Transaction TaxCreditTran = new()
-                                            {
-                                                Id = Guid.NewGuid().ToString(),
-                                                Credits = role.Salary*taxcredit.Rate,
-                                                Time = DateTime.UtcNow,
-                                                FromId = taxcredit.DistrictId!,
-                                                ToId = role.GroupId,
-                                                transactionType = TransactionType.TaxCreditPayment,
-                                                Details = $"Employee Tax Credit Payment"
-                                            };
+                                            Transaction TaxCreditTran = new Transaction(taxcredit.DistrictId!, role.GroupId, role.Salary*taxcredit.Rate, TransactionType.TaxCreditPayment, $"Employee Tax Credit Payment");
                                             await TaxCreditTran.Execute();
                                         }
                                     }
@@ -74,7 +56,7 @@ namespace SV2.Workers
                                 string fromId = "";
                                 if (policy.DistrictId != null) {
                                     effected = effected.Where(x => x.DistrictId == policy.DistrictId).ToList();
-                                    fromId = policy.DistrictId;
+                                    fromId = "g-"+policy.DistrictId;
                                 }
                                 else {
                                     fromId = "g-vooperia";
@@ -83,16 +65,7 @@ namespace SV2.Workers
                                     effected = effected.Where(x => x.Rank == policy.ApplicableRank).ToList();
                                 }
                                 foreach(User user in effected) {
-                                    Transaction tran = new()
-                                    {
-                                        Id = Guid.NewGuid().ToString(),
-                                        Credits = policy.Rate,
-                                        Time = DateTime.UtcNow,
-                                        FromId = fromId,
-                                        ToId = user.Id,
-                                        transactionType = TransactionType.Paycheck,
-                                        Details = $"UBI for rank {policy.ApplicableRank.ToString()}"
-                                    };
+                                    Transaction tran = new Transaction(fromId, user.Id, policy.Rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
                                     TaskResult result = await tran.Execute();
                                     if (!result.Succeeded) {
                                         // no sense to keep paying these members since the group has ran out of credits

@@ -17,7 +17,7 @@ public class County
 
     [VarChar(512)]
     public string? Description { get; set; }
-    public ulong Population { get; set;}
+    public int Population { get; set;}
 
     [EntityId]
     public string DistrictId { get; set;}

@@ -3,6 +3,7 @@ using SV2.Database.Models.Users;
 using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Items;
+using SV2.Database.Models.Districts;
 using SV2.Database.Models.Factories;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -121,6 +122,12 @@ public static class DBCache
         foreach(UBIPolicy policy in VooperDB.Instance.UBIPolicies) {
             tasks.Add(DBCache.Put<UBIPolicy>(policy.Id, policy));
         }
+        foreach(District district in VooperDB.Instance.Districts) {
+            tasks.Add(DBCache.Put<District>(district.Id, district));
+        }
+        foreach(GroupRole role in VooperDB.Instance.GroupRoles) {
+            tasks.Add(DBCache.Put<GroupRole>(role.Id, role));
+        }
         await Task.WhenAll(tasks);
 
         //#endif
@@ -136,6 +143,7 @@ public static class DBCache
         VooperDB.Instance.Factories.UpdateRange(GetAll<Factory>());
         VooperDB.Instance.Recipes.UpdateRange(GetAll<Recipe>());
         VooperDB.Instance.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
+        VooperDB.Instance.Districts.UpdateRange(GetAll<District>());
         await VooperDB.Instance.SaveChangesAsync();
     }
 }

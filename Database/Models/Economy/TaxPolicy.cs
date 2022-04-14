@@ -29,10 +29,12 @@ public class TaxPolicy
     [VarChar(64)]
     public string Name { get; set; }
     public decimal Rate { get; set; }
+    
     // should be null if this tax policy is by Vooperia
     [EntityId]
     public string? DistrictId { get; set; }
     public TaxType taxType { get; set; }
+
     // the min amount after which the tax has effect
     // example for Minimum and Maximum
     // if a sales tax has a min of $1 and a max of $3 then

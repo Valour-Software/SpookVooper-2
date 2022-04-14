@@ -77,6 +77,18 @@ public class Group : IHasOwner, IEntity
         GroupType = GroupType.Company;
     }
 
+    public GroupRole GetHighestRole(IEntity user) 
+    {
+        GroupRole role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(user.Id)).OrderByDescending(x => x.Authority).First();
+        return role;
+    }
+
+    public GroupRole GetHighestRoleWithPermission(IEntity user, GroupPermission permission) 
+    {
+        GroupRole role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(user.Id) && HasPermission(user, permission)).OrderByDescending(x => x.Authority).First();
+        return role;
+    }
+
     public bool HasPermissionWithKey(string apikey, GroupPermission permission)
     {
         if (apikey == Api_Key) {
@@ -94,10 +106,22 @@ public class Group : IHasOwner, IEntity
             return true;
         }
 
-        foreach(GroupRole role in DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(entity.Id)))
+        foreach(GroupRole role in DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(entity.Id)).OrderByDescending(x => x.Authority))
         {
-            if (role.HasPermission(permission)) {
+            PermissionCode code = new PermissionCode(role.PermissionValue, permission.Value);
+            PermissionState state = code.GetState(permission);
+
+            if (state == PermissionState.Undefined)
+            {
+                continue;
+            }
+            else if (state == PermissionState.True)
+            {
                 return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

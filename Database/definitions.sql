@@ -1,194 +1,183 @@
-BEGIN;
-CREATE TABLE IF NOT EXISTS Users (
-    Id VARCHAR(38) NOT NULL PRIMARY KEY,
-    DistrictId VARCHAR(64) NOT NULL,
-    Name VARCHAR(32) NOT NULL,
-    Description VARCHAR(1024) NOT NULL,
-    Xp INT NOT NULL DEFAULT (0),
-    ForumXp INT NOT NULL DEFAULT (0),
-    MessageXp INT NOT NULL DEFAULT (0),
-    CommentLikes INT NOT NULL DEFAULT (0),
-    PostLikes INT NOT NULL DEFAULT (0),
-    Messages INT NOT NULL DEFAULT (0),
-    LastSentMessage TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
-    Api_Key VARCHAR(36) NOT NULL,
-    Credits DECIMAL(20,10) NOT NULL DEFAULT (0),
-    CreditsYesterday DECIMAL(20,10) NOT NULL DEFAULT (0),
-    Rank Int NOT NULL DEFAULT (0),
-    Created TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
-    Image_Url TEXT
+CREATE TABLE districts (
+    id VARCHAR(36) NOT NULL,
+    name VARCHAR(64) NULL,
+    description VARCHAR(512) NULL,
+    groupid VARCHAR(38) NOT NULL,
+    senator_id VARCHAR(38) NULL,
+    CONSTRAINT pk_districts PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS Groups (
-    Id VARCHAR(38) NOT NULL PRIMARY KEY,
-    DistrictId VARCHAR(64) NOT NULL,
-    Name VARCHAR(32) NOT NULL,
-    Description VARCHAR(1024) NOT NULL,
-    Image_Url TEXT,
-    Credits DECIMAL(20,10) NOT NULL DEFAULT (0),
-    CreditsYesterday DECIMAL(20,10) NOT NULL DEFAULT (0),
-    Api_Key VARCHAR(36) NOT NULL,
-    GroupType INT NOT NULL,
-    Flags integer[],
-    Open boolean NOT NULL,
-    OwnerId VARCHAR(38) NOT NULL
+
+
+CREATE TABLE forumposts (
+    id VARCHAR(36) NOT NULL,
+    authorid VARCHAR(38) NOT NULL,
+    category integer NOT NULL,
+    title VARCHAR(64) NOT NULL,
+    content VARCHAR(32768) NOT NULL,
+    tags text[] NOT NULL,
+    timeposted timestamp with time zone NOT NULL,
+    CONSTRAINT pk_forumposts PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS Districts (
-    Id VARCHAR(36) NOT NULL PRIMARY KEY,
-    Name VARCHAR(32),
-    Description VARCHAR(1024) NOT NULL,
-    GroupId VARCHAR(38) NOT NULL,
-    SenatorId VARCHAR(38),
-    CONSTRAINT fk_group FOREIGN KEY(GroupId) REFERENCES Groups(Id)
+
+
+CREATE TABLE grouproles (
+    id VARCHAR(36) NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    permissionvalue numeric(20,0) NOT NULL,
+    members text[] NOT NULL,
+    color text NOT NULL,
+    groupid VARCHAR(38) NOT NULL,
+    salary DECIMAL(20,10) NOT NULL,
+    authority integer NOT NULL,
+    CONSTRAINT pk_grouproles PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS Counties (
-    Id VARCHAR(36) NOT NULL PRIMARY KEY,
-    Name VARCHAR(32),
-    Description VARCHAR(1024) NOT NULL,
-    Population INT NOT NULL,
-    DistrictId VARCHAR(36) NOT NULL,
-    CONSTRAINT fk_district FOREIGN KEY(DistrictId) REFERENCES Districts(Id)
+
+
+CREATE TABLE groups (
+    id VARCHAR(38) NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    description VARCHAR(2048) NULL,
+    image_url VARCHAR(512) NULL,
+    districtid VARCHAR(38) NULL,
+    credits DECIMAL(20,10) NOT NULL,
+    creditsyesterday DECIMAL(20,10) NOT NULL,
+    api_key VARCHAR(36) NOT NULL,
+    grouptype integer NOT NULL,
+    flags integer[] NOT NULL,
+    open boolean NOT NULL,
+    ownerid VARCHAR(38) NOT NULL,
+    CONSTRAINT pk_groups PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS StockDefinitions (
-    Ticker VARCHAR(4) NOT NULL PRIMARY KEY,
-    GroupId VARCHAR(38) NOT NULL,
-    Current_Value DECIMAL(20,10)
+
+
+CREATE TABLE recipes (
+    id VARCHAR(36) NOT NULL,
+    inputs_names text[] NOT NULL,
+    inputs_amounts integer[] NOT NULL,
+    output_names text[] NOT NULL,
+    output_amounts integer[] NOT NULL,
+    CONSTRAINT pk_recipes PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS StockObjects (
-    Id VARCHAR(36) NOT NULL PRIMARY KEY,
-    Ticker VARCHAR(4) NOT NULL,
-    OwnerId VARCHAR(38) NOT NULL,
-    Amount INT NOT NULL
+
+
+CREATE TABLE taxpolicies (
+    id VARCHAR(36) NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    rate DECIMAL(20,10) NOT NULL,
+    districtid VARCHAR(38) NULL,
+    taxtype integer NOT NULL,
+    minimum DECIMAL(20,10) NOT NULL,
+    maximum DECIMAL(20,10) NOT NULL,
+    collected DECIMAL(20,10) NOT NULL,
+    CONSTRAINT pk_taxpolicies PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS StockOffers (
-    Id VARCHAR(36) NOT NULL PRIMARY KEY,
-    Ticker VARCHAR(4) NOT NULL,
-    OwnerId VARCHAR(38) NOT NULL,
-    Amount INT NOT NULL,
-    orderType INT NOT NULL,
-    Target DECIMAL(20,10) NOT NULL
+
+
+CREATE TABLE tradeitemdefinitions (
+    id VARCHAR(36) NOT NULL,
+    ownerid VARCHAR(38) NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    description VARCHAR(1024) NOT NULL,
+    created timestamp with time zone NOT NULL,
+    modifiers text NOT NULL,
+    CONSTRAINT pk_tradeitemdefinitions PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS TaxCreditPolicies (
-    Id VARCHAR(36) NOT NULL PRIMARY KEY,
-    Name VARCHAR(32) NOT NULL,
-    Rate DECIMAL(20,10) NOT NULL,
-    DistrictId VARCHAR(36),
-    taxCreditType INT NOT NULL,
-    Paid DECIMAL(20,10) NOT NULL
+
+
+CREATE TABLE tradeitems (
+    id VARCHAR(36) NOT NULL,
+    ownerid VARCHAR(38) NOT NULL,
+    definition_id VARCHAR(36) NOT NULL,
+    amount integer NOT NULL,
+    CONSTRAINT pk_tradeitems PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS TaxPolicies (
-    Id VARCHAR(36) NOT NULL PRIMARY KEY,
-    Name VARCHAR(32) NOT NULL,
-    Rate DECIMAL(20,10) NOT NULL,
-    DistrictId VARCHAR(36),
-    taxType INT NOT NULL,
-    Minimum DECIMAL(20,10) NOT NULL,
-    Maximum DECIMAL(20,10) NOT NULL,
-    Collected DECIMAL(20,10) NOT NULL
+
+
+CREATE TABLE transactions (
+    id VARCHAR(36) NOT NULL,
+    credits DECIMAL(20,10) NOT NULL,
+    time timestamp with time zone NOT NULL,
+    fromid VARCHAR(38) NOT NULL,
+    toid VARCHAR(38) NOT NULL,
+    transactiontype integer NOT NULL,
+    details VARCHAR(1024) NOT NULL,
+    CONSTRAINT pk_transactions PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS Transactions (
-    Id VARCHAR(36) NOT NULL PRIMARY KEY,
-    Credits DECIMAL(20,10) NOT NULL,
-    Time TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
-    FromId VARCHAR(38) NOT NULL,
-    ToId VARCHAR(38) NOT NULL,
-    taxType INT NOT NULL,
-    transactionType INT NOT NULL,
-    Details VARCAHR(1024) NOT NULL
+
+
+CREATE TABLE ubipolicies (
+    id VARCHAR(36) NOT NULL,
+    rate DECIMAL(20,10) NOT NULL,
+    anyone boolean NOT NULL,
+    applicablerank integer NULL,
+    districtid VARCHAR(38) NULL,
+    CONSTRAINT pk_ubipolicies PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS UBIs (
-    Id VARCHAR(36) NOT NULL PRIMARY KEY,
-    Rate DECIMAL(20,10) NOT NULL,
-    Anyone boolean NOT NULL,
-    ApplicableRank INT NOT NULL,
-    DistrictId VARCHAR(36)
+
+
+CREATE TABLE users (
+    id VARCHAR(38) NOT NULL,
+    valourid bigint NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    description VARCHAR(1024) NULL,
+    xp real NOT NULL,
+    forumxp integer NOT NULL,
+    messagexp real NOT NULL,
+    commentlikes integer NOT NULL,
+    postlikes integer NOT NULL,
+    messages integer NOT NULL,
+    lastsentmessage timestamp with time zone NOT NULL,
+    api_key VARCHAR(36) NOT NULL,
+    credits DECIMAL(20,10) NOT NULL,
+    creditsyesterday DECIMAL(20,10) NOT NULL,
+    rank integer NOT NULL,
+    created timestamp with time zone NOT NULL,
+    image_url VARCHAR(128) NULL,
+    districtid VARCHAR(38) NULL,
+    CONSTRAINT pk_users PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS GroupRoles (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    Name VARCHAR(32) NOT NULL,
-    PermissionValue BIGINT NOT NULL,
-    Color CHAR(6) NOT NULL,
-    GroupId CHAR(38) NOT NULL,
-    Salary DECIMAL(20,10) NOT NULL DEFAULT 0.000,
-    Authority INT NOT NULL DEFAULT 0,
-    Members CHAR(38)[]
-    CONSTRAINT fk_group FOREIGN KEY(GroupId) REFERENCES Groups(Id)
+
+
+CREATE TABLE county (
+    id VARCHAR(36) NOT NULL,
+    name VARCHAR(64) NULL,
+    description VARCHAR(512) NULL,
+    population integer NOT NULL,
+    districtid VARCHAR(38) NOT NULL,
+    CONSTRAINT pk_county PRIMARY KEY (id),
+    CONSTRAINT fk_county_districts_districtid FOREIGN KEY (districtid) REFERENCES districts (id) ON DELETE CASCADE
 );
-CREATE TABLE IF NOT EXISTS TradeItemDefinitions (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    OwnerId CHAR(38) NOT NULL,
-    Name VARCHAR(32) NOT NULL,
-    Description VARCHAR(1048),
-    Modifiers VARCHAR(2048),
-    Created TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc')
+
+
+CREATE TABLE forumlike (
+    id VARCHAR(36) NOT NULL,
+    postid VARCHAR(36) NOT NULL,
+    addedbyid VARCHAR(38) NOT NULL,
+    CONSTRAINT pk_forumlike PRIMARY KEY (id),
+    CONSTRAINT fk_forumlike_forumposts_postid FOREIGN KEY (postid) REFERENCES forumposts (id) ON DELETE CASCADE
 );
-CREATE TABLE IF NOT EXISTS TradeItems (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    OwnerId CHAR(38) NOT NULL,
-    DefinitionId CHAR(36) NOT NULL,
-    Amount DECIMAL(20,10) NOT NULL DEFAULT 0.000,
-    CONSTRAINT fk_definition FOREIGN KEY(DefinitionId) REFERENCES TradeItemDefinitions(Id)
+
+
+CREATE TABLE factories (
+    id VARCHAR(36) NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    description VARCHAR(1024) NOT NULL,
+    ownerid VARCHAR(38) NOT NULL,
+    efficiency integer NOT NULL,
+    countyid VARCHAR(36) NOT NULL,
+    recipeid VARCHAR(36) NOT NULL,
+    level integer NOT NULL,
+    hasanemployee boolean NOT NULL,
+    damage double precision NOT NULL,
+    CONSTRAINT pk_factories PRIMARY KEY (id),
+    CONSTRAINT fk_factories_recipes_recipeid FOREIGN KEY (recipeid) REFERENCES recipes (id) ON DELETE CASCADE
 );
-CREATE TABLE IF NOT EXISTS Divisions (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    Name VARCHAR(32) NOT NULL,
-    ManPower INT NOT NULL,
-    OwnerId CHAR(38) NOT NULL,
-    Strength DECIMAL(20, 10) NOT NULL,
-    Province INT NOT NULL
-);
-CREATE TABLE IF NOT EXISTS DivisionEquipment (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    Type INT NOT NULL,
-    tradeItemId CHAR(36) NOT NULL,
-    DivisionId CHAR(36) NOT NULL,
-    CONSTRAINT fk_tradeitem FOREIGN KEY(tradeItemId) REFERENCES TradeItems(Id),
-    CONSTRAINT fk_division FOREIGN KEY(DivisionId) REFERENCES Divisions(Id)
-);
-CREATE TABLE IF NOT EXISTS Regiments (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    Type INT NOT NULL,
-    Count INT NOT NULL,
-    DivisionId CHAR(36) NOT NULL,
-    CONSTRAINT fk_division FOREIGN KEY(DivisionId) REFERENCES Divisions(Id)
-);
-CREATE TABLE IF NOT EXISTS ForumPosts (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    AuthorId CHAR(38) NOT NULL,
-    Category INT NOT NULL,
-    Title VARCHAR(64) NOT NULL,
-    Content VARCHAR(16384) NOT NULL,
-    Tags VARCHAR(16)[],
-    TimePosted TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc')
-);
-CREATE TABLE IF NOT EXISTS ForumPostLikes (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    AddedById CHAR(38) NOT NULL,
-    PostId CHAR(36) NOT NULL,
-    CONSTRAINT fk_post FOREIGN KEY(PostId) REFERENCES ForumPosts(Id)
-);
-CREATE TABLE IF NOT EXISTS ForumPostComments (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    AuthorId CHAR(38) NOT NULL,
-    Content VARCHAR(16384) NOT NULL,
-    PostedOnId CHAR(36) NOT NULL,
-    CommentedOnId CHAR(36),
-    TimePosted TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
-    CONSTRAINT fk_post FOREIGN KEY(PostedOnId) REFERENCES ForumPosts(Id),
-    CONSTRAINT fk_parentcomment FOREIGN KEY(CommentedOnId) REFERENCES ForumPostComments(Id)
-);
-CREATE TABLE IF NOT EXISTS ForumPostCommentLikes (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    AddedById CHAR(38) NOT NULL,
-    CommentId CHAR(36) NOT NULL,
-    CONSTRAINT fk_comment FOREIGN KEY(CommentId) REFERENCES ForumPostComments(Id)
-);
-CREATE TABLE IF NOT EXISTS Credentials (
-    Id CHAR(36) NOT NULL PRIMARY KEY,
-    UserId CHAR(38) NOT NULL,
-    CredentialType VARCHAR(16) NOT NULL,
-    Identifier VARCHAR(64) NOT NULL,
-    Secret BYTEA NOT NULL,
-    Salt BYTEA NOT NULL,
-    CONSTRAINT fk_user FOREIGN KEY(UserId) REFERENCES Users(Id)
-);
-COMMIT;
+
+
+CREATE INDEX ix_county_districtid ON county (districtid);
+
+
+CREATE INDEX ix_factories_recipeid ON factories (recipeid);
+
+
+CREATE INDEX ix_forumlike_postid ON forumlike (postid);

@@ -14,6 +14,7 @@ public class GroupRole
 
     [VarChar(64)]
     public string Name { get; set; }
+    
     // this role's permission value
     public ulong PermissionValue { get; set; }
 
@@ -36,6 +37,23 @@ public class GroupRole
     // Salary for role, paid every hour
     public decimal Salary { get; set; }
     public int Authority { get; set; }
+
+    public GroupRole()
+    {
+
+    }
+
+    public GroupRole(string name, string groupid, decimal salary, int authority)
+    {
+        Id = Guid.NewGuid().ToString();
+        Name = name;
+        PermissionValue = 0;
+        Members = new();
+        Color = "ffffff";
+        GroupId = groupid;
+        Salary = salary;
+        Authority = authority;
+    }
 
     public bool HasPermission(GroupPermission permission)
     {

@@ -39,6 +39,22 @@ public class Transaction
     [VarChar(1024)]
     public string Details { get; set; }
 
+    public Transaction()
+    {
+        
+    }
+
+    public Transaction(string fromId, string toId, decimal credits, TransactionType TransactionType, string details)
+    {
+        Id = Guid.NewGuid().ToString();
+        Credits = credits;
+        FromId = fromId;
+        ToId = toId;
+        Time = DateTime.UtcNow;
+        transactionType = TransactionType;
+        Details = details;
+    }
+
     public async Task<TaskResult> Execute(bool Force = false)
     {
         if (!Force && Credits < 0)
@@ -111,47 +127,20 @@ public class Transaction
                     if (policy.taxType == TaxType.Sales || policy.taxType == TaxType.Transactional || policy.taxType == TaxType.Payroll) {
                         _FromId = ToId;
                     }
-                    Transaction taxtrans = new()
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Credits = amount,
-                        Time = DateTime.UtcNow,
-                        FromId = _FromId,
-                        ToId = "g-vooperia",
-                        transactionType = TransactionType.TaxPayment,
-                        Details = $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}"
-                    };
+                    Transaction taxtrans = new Transaction(_FromId, "g-vooperia", amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
                     policy.Collected += amount;
                     totaltaxpaid += amount;
                     await taxtrans.Execute(true);
                 }
                 else {
                     if (policy.DistrictId == fromEntity.DistrictId && policy.taxType != TaxType.Sales && policy.taxType != TaxType.Payroll && policy.taxType != TaxType.Transactional) {
-                        Transaction taxtrans = new()
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Credits = amount,
-                            Time = DateTime.UtcNow,
-                            FromId = FromId,
-                            ToId = policy.DistrictId,
-                            transactionType = TransactionType.TaxPayment,
-                            Details = $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}"
-                        };
+                        Transaction taxtrans = new Transaction(FromId, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
                         await taxtrans.Execute(true);
                     }
                     else if (policy.DistrictId == toEntity.DistrictId){
-                        Transaction taxtrans = new()
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Credits = amount,
-                            Time = DateTime.UtcNow,
-                            FromId = toEntity.Id,
-                            ToId = policy.DistrictId,
-                            transactionType = TransactionType.TaxPayment,
-                            Details = $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}"
-                        };
+                        Transaction taxtrans = new Transaction(toEntity.Id, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
                         await taxtrans.Execute(true);

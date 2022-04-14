@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using SV2.API;
 using SV2.Workers;
+using SV2.VoopAI;
+
+await VoopAI.Main();
 
 var builder = WebApplication.CreateBuilder(args);
 string CONF_LOC = "SV2Config/";
@@ -73,5 +76,9 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+// ensure districts & Vooperia are created
+await VooperDB.Startup();
 
 app.Run();
