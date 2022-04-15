@@ -61,7 +61,6 @@ public class VooperDB : DbContext
     public DbSet<TradeItemDefinition> TradeItemDefinitions {get; set; }
     public DbSet<TradeItem> TradeItems { get; set; }
     public DbSet<Factory> Factories { get; set; }
-    public DbSet<Recipe> Recipes { get; set; }
     public DbSet<UBIPolicy> UBIPolicies { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<District> Districts { get; set; }

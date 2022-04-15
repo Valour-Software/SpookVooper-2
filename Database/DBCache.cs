@@ -116,9 +116,6 @@ public static class DBCache
         foreach(Factory factory in VooperDB.Instance.Factories) {
             tasks.Add(DBCache.Put<Factory>(factory.Id, factory));
         }
-        foreach(Recipe recipe in VooperDB.Instance.Recipes) {
-            tasks.Add(DBCache.Put<Recipe>(recipe.Id, recipe));
-        }
         foreach(UBIPolicy policy in VooperDB.Instance.UBIPolicies) {
             tasks.Add(DBCache.Put<UBIPolicy>(policy.Id, policy));
         }
@@ -141,7 +138,6 @@ public static class DBCache
         VooperDB.Instance.TradeItems.UpdateRange(GetAll<TradeItem>());
         VooperDB.Instance.TradeItemDefinitions.UpdateRange(GetAll<TradeItemDefinition>());
         VooperDB.Instance.Factories.UpdateRange(GetAll<Factory>());
-        VooperDB.Instance.Recipes.UpdateRange(GetAll<Recipe>());
         VooperDB.Instance.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
         VooperDB.Instance.Districts.UpdateRange(GetAll<District>());
         await VooperDB.Instance.SaveChangesAsync();
