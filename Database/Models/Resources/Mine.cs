@@ -47,8 +47,6 @@ public class Mine : IHasOwner
     public double QuantityGrowthRate { get; set; }
     public double QuantityCap { get; set; }
 
-    public double Efficiency { get; set; }
-
     // every tick (1 hour), Age increases by 1
     public int Age { get; set; }
 
@@ -78,10 +76,15 @@ public class Mine : IHasOwner
 
         // tick Quantity system
 
+        // ex:
+        // 3 days : 26.24%
+        // 11 days: 57.28%
+        // 32 days: 82.78% 
+
         if (Quantity < QuantityCap) {
             HoursSinceBuilt += 1;
             double days = HoursSinceBuilt/24;
-            double newQuantity = Math.Max(1, Math.Log10( Math.Pow(days, 20) / 40));
+            double newQuantity = Math.Max(1.5, Math.Log10( Math.Pow(days, 20) / 40));
             newQuantity = Math.Min(0.1, newQuantity);
             newQuantity *= QuantityGrowthRate;
 

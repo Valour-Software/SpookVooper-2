@@ -15,9 +15,9 @@ namespace SV2.Managers;
 public class Recipe
 {
     public string Name { get; set; }
-    public Dictionary<string, float> Inputs { get; set; }
-    public Dictionary<string, float> Outputs { get; set; }
-    public float ProcessingCost { get; set; }
+    public Dictionary<string, double> Inputs { get; set; }
+    public Dictionary<string, double> Outputs { get; set; }
+    public double ProcessingCost { get; set; }
 }
 
 public class Material_Group
