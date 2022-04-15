@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using SV2.Database.Models.Entities;
 
-namespace SV2.Database.Models.Economy.Taxes;
+namespace SV2.Database.Models.Economy;
 
 public enum TaxCreditType
 {
@@ -14,11 +14,15 @@ public enum TaxCreditType
 public class TaxCreditPolicy
 {
     [Key]
+    [GuidID]
     public string Id { get; set; }
+
+    [VarChar(64)]
     public string Name { get; set; }
     public decimal Rate { get; set; }
     // should be set to Null if this is a Imperial Tax Credit
-    public string? District_Id { get; set; }
+    [EntityId]
+    public string? DistrictId { get; set; }
     public TaxCreditType taxCreditType { get; set; }
     // amount this tax credit has paid in the current month
     public decimal Paid { get; set; }

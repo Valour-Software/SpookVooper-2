@@ -1,0 +1,194 @@
+BEGIN;
+CREATE TABLE IF NOT EXISTS Users (
+    Id VARCHAR(38) NOT NULL PRIMARY KEY,
+    DistrictId VARCHAR(64) NOT NULL,
+    Name VARCHAR(32) NOT NULL,
+    Description VARCHAR(1024) NOT NULL,
+    Xp INT NOT NULL DEFAULT (0),
+    ForumXp INT NOT NULL DEFAULT (0),
+    MessageXp INT NOT NULL DEFAULT (0),
+    CommentLikes INT NOT NULL DEFAULT (0),
+    PostLikes INT NOT NULL DEFAULT (0),
+    Messages INT NOT NULL DEFAULT (0),
+    LastSentMessage TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+    Api_Key VARCHAR(36) NOT NULL,
+    Credits DECIMAL(20,10) NOT NULL DEFAULT (0),
+    CreditsYesterday DECIMAL(20,10) NOT NULL DEFAULT (0),
+    Rank Int NOT NULL DEFAULT (0),
+    Created TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+    Image_Url TEXT
+);
+CREATE TABLE IF NOT EXISTS Groups (
+    Id VARCHAR(38) NOT NULL PRIMARY KEY,
+    DistrictId VARCHAR(64) NOT NULL,
+    Name VARCHAR(32) NOT NULL,
+    Description VARCHAR(1024) NOT NULL,
+    Image_Url TEXT,
+    Credits DECIMAL(20,10) NOT NULL DEFAULT (0),
+    CreditsYesterday DECIMAL(20,10) NOT NULL DEFAULT (0),
+    Api_Key VARCHAR(36) NOT NULL,
+    GroupType INT NOT NULL,
+    Flags integer[],
+    Open boolean NOT NULL,
+    OwnerId VARCHAR(38) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS Districts (
+    Id VARCHAR(36) NOT NULL PRIMARY KEY,
+    Name VARCHAR(32),
+    Description VARCHAR(1024) NOT NULL,
+    GroupId VARCHAR(38) NOT NULL,
+    SenatorId VARCHAR(38),
+    CONSTRAINT fk_group FOREIGN KEY(GroupId) REFERENCES Groups(Id)
+);
+CREATE TABLE IF NOT EXISTS Counties (
+    Id VARCHAR(36) NOT NULL PRIMARY KEY,
+    Name VARCHAR(32),
+    Description VARCHAR(1024) NOT NULL,
+    Population INT NOT NULL,
+    DistrictId VARCHAR(36) NOT NULL,
+    CONSTRAINT fk_district FOREIGN KEY(DistrictId) REFERENCES Districts(Id)
+);
+CREATE TABLE IF NOT EXISTS StockDefinitions (
+    Ticker VARCHAR(4) NOT NULL PRIMARY KEY,
+    GroupId VARCHAR(38) NOT NULL,
+    Current_Value DECIMAL(20,10)
+);
+CREATE TABLE IF NOT EXISTS StockObjects (
+    Id VARCHAR(36) NOT NULL PRIMARY KEY,
+    Ticker VARCHAR(4) NOT NULL,
+    OwnerId VARCHAR(38) NOT NULL,
+    Amount INT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS StockOffers (
+    Id VARCHAR(36) NOT NULL PRIMARY KEY,
+    Ticker VARCHAR(4) NOT NULL,
+    OwnerId VARCHAR(38) NOT NULL,
+    Amount INT NOT NULL,
+    orderType INT NOT NULL,
+    Target DECIMAL(20,10) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS TaxCreditPolicies (
+    Id VARCHAR(36) NOT NULL PRIMARY KEY,
+    Name VARCHAR(32) NOT NULL,
+    Rate DECIMAL(20,10) NOT NULL,
+    DistrictId VARCHAR(36),
+    taxCreditType INT NOT NULL,
+    Paid DECIMAL(20,10) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS TaxPolicies (
+    Id VARCHAR(36) NOT NULL PRIMARY KEY,
+    Name VARCHAR(32) NOT NULL,
+    Rate DECIMAL(20,10) NOT NULL,
+    DistrictId VARCHAR(36),
+    taxType INT NOT NULL,
+    Minimum DECIMAL(20,10) NOT NULL,
+    Maximum DECIMAL(20,10) NOT NULL,
+    Collected DECIMAL(20,10) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS Transactions (
+    Id VARCHAR(36) NOT NULL PRIMARY KEY,
+    Credits DECIMAL(20,10) NOT NULL,
+    Time TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+    FromId VARCHAR(38) NOT NULL,
+    ToId VARCHAR(38) NOT NULL,
+    taxType INT NOT NULL,
+    transactionType INT NOT NULL,
+    Details VARCAHR(1024) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS UBIs (
+    Id VARCHAR(36) NOT NULL PRIMARY KEY,
+    Rate DECIMAL(20,10) NOT NULL,
+    Anyone boolean NOT NULL,
+    ApplicableRank INT NOT NULL,
+    DistrictId VARCHAR(36)
+);
+CREATE TABLE IF NOT EXISTS GroupRoles (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    Name VARCHAR(32) NOT NULL,
+    PermissionValue BIGINT NOT NULL,
+    Color CHAR(6) NOT NULL,
+    GroupId CHAR(38) NOT NULL,
+    Salary DECIMAL(20,10) NOT NULL DEFAULT 0.000,
+    Authority INT NOT NULL DEFAULT 0,
+    Members CHAR(38)[]
+    CONSTRAINT fk_group FOREIGN KEY(GroupId) REFERENCES Groups(Id)
+);
+CREATE TABLE IF NOT EXISTS TradeItemDefinitions (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    OwnerId CHAR(38) NOT NULL,
+    Name VARCHAR(32) NOT NULL,
+    Description VARCHAR(1048),
+    Modifiers VARCHAR(2048),
+    Created TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc')
+);
+CREATE TABLE IF NOT EXISTS TradeItems (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    OwnerId CHAR(38) NOT NULL,
+    DefinitionId CHAR(36) NOT NULL,
+    Amount DECIMAL(20,10) NOT NULL DEFAULT 0.000,
+    CONSTRAINT fk_definition FOREIGN KEY(DefinitionId) REFERENCES TradeItemDefinitions(Id)
+);
+CREATE TABLE IF NOT EXISTS Divisions (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    Name VARCHAR(32) NOT NULL,
+    ManPower INT NOT NULL,
+    OwnerId CHAR(38) NOT NULL,
+    Strength DECIMAL(20, 10) NOT NULL,
+    Province INT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS DivisionEquipment (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    Type INT NOT NULL,
+    tradeItemId CHAR(36) NOT NULL,
+    DivisionId CHAR(36) NOT NULL,
+    CONSTRAINT fk_tradeitem FOREIGN KEY(tradeItemId) REFERENCES TradeItems(Id),
+    CONSTRAINT fk_division FOREIGN KEY(DivisionId) REFERENCES Divisions(Id)
+);
+CREATE TABLE IF NOT EXISTS Regiments (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    Type INT NOT NULL,
+    Count INT NOT NULL,
+    DivisionId CHAR(36) NOT NULL,
+    CONSTRAINT fk_division FOREIGN KEY(DivisionId) REFERENCES Divisions(Id)
+);
+CREATE TABLE IF NOT EXISTS ForumPosts (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    AuthorId CHAR(38) NOT NULL,
+    Category INT NOT NULL,
+    Title VARCHAR(64) NOT NULL,
+    Content VARCHAR(16384) NOT NULL,
+    Tags VARCHAR(16)[],
+    TimePosted TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc')
+);
+CREATE TABLE IF NOT EXISTS ForumPostLikes (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    AddedById CHAR(38) NOT NULL,
+    PostId CHAR(36) NOT NULL,
+    CONSTRAINT fk_post FOREIGN KEY(PostId) REFERENCES ForumPosts(Id)
+);
+CREATE TABLE IF NOT EXISTS ForumPostComments (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    AuthorId CHAR(38) NOT NULL,
+    Content VARCHAR(16384) NOT NULL,
+    PostedOnId CHAR(36) NOT NULL,
+    CommentedOnId CHAR(36),
+    TimePosted TIMESTAMP NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+    CONSTRAINT fk_post FOREIGN KEY(PostedOnId) REFERENCES ForumPosts(Id),
+    CONSTRAINT fk_parentcomment FOREIGN KEY(CommentedOnId) REFERENCES ForumPostComments(Id)
+);
+CREATE TABLE IF NOT EXISTS ForumPostCommentLikes (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    AddedById CHAR(38) NOT NULL,
+    CommentId CHAR(36) NOT NULL,
+    CONSTRAINT fk_comment FOREIGN KEY(CommentId) REFERENCES ForumPostComments(Id)
+);
+CREATE TABLE IF NOT EXISTS Credentials (
+    Id CHAR(36) NOT NULL PRIMARY KEY,
+    UserId CHAR(38) NOT NULL,
+    CredentialType VARCHAR(16) NOT NULL,
+    Identifier VARCHAR(64) NOT NULL,
+    Secret BYTEA NOT NULL,
+    Salt BYTEA NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY(UserId) REFERENCES Users(Id)
+);
+COMMIT;
