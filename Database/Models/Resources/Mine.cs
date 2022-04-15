@@ -52,7 +52,7 @@ public class Mine : IHasOwner
     // every tick (1 hour), Age increases by 1
     public int Age { get; set; }
 
-    public int HoursSinceProductionWasChanged { get; set; }
+    public int HoursSinceBuilt { get; set; }
 
     public async Task Tick(List<TradeItem> tradeItems)
     {
@@ -79,8 +79,8 @@ public class Mine : IHasOwner
         // tick Quantity system
 
         if (Quantity < QuantityCap) {
-            HoursSinceProductionWasChanged += 1;
-            double days = HoursSinceProductionWasChanged/24;
+            HoursSinceBuilt += 1;
+            double days = HoursSinceBuilt/24;
             double newQuantity = Math.Max(1, Math.Log10( Math.Pow(days, 20) / 40));
             newQuantity = Math.Min(0.1, newQuantity);
             newQuantity *= QuantityGrowthRate;
