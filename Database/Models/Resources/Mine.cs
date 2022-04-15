@@ -39,29 +39,58 @@ public class Mine : IHasOwner
     public bool HasAnEmployee { get; set; }
 
     // amount of ResourceName that this mine produces per hour
-    public decimal Rate { get; set;}
+    public double Rate { get; set;}
 
-    // factories will get damaged from Natural Disasters which occurs from events and from VOAA
-    public double Damage { get; set; }
+    public double Quantity { get; set; }
+
+    // base is 1x
+    public double QuantityGrowthRate { get; set; }
+    public double QuantityCap { get; set; }
+
+    public double Efficiency { get; set; }
+
+    // every tick (1 hour), Age increases by 1
+    public int Age { get; set; }
+
+    public int HoursSinceProductionWasChanged { get; set; }
 
     public async Task Tick(List<TradeItem> tradeItems)
     {
         // TODO: when we add district stats (industal stat, etc) update this
-        double ProductionBonus = 1.0;
+        
+
+        double rate = Rate;
+
         if (HasAnEmployee) {
-            ProductionBonus += 0.5;
+            rate *= 1.5;
         };
 
-        if (Damage < 0.99) {
-            double diff = Math.Abs(Damage-1);
-            double Reduction = Math.Pow(diff+1,5)/10;
-            // examples
-            // 10% damage = 6% reduction
-            // 20% damage = 25% reduction
-            // 30% damage = 37% reduction
+        // ((A2^1.2/1.6)-1)/1000
 
-            ProductionBonus /= Reduction;
+        // ex:
+        // 10 days : 1% lost
+        // 100 days: 15.8% lost
+        // 300 days: 58.8% lost
+
+        double AgeProductionLost = ( (Math.Pow(Age, 1.2) / 1.6)-1 ) / 1000;
+
+        rate *= 1-AgeProductionLost;
+
+        // tick Quantity system
+
+        if (Quantity < QuantityCap) {
+            HoursSinceProductionWasChanged += 1;
+            double days = HoursSinceProductionWasChanged/24;
+            double newQuantity = Math.Max(1, Math.Log10( Math.Pow(days, 20) / 40));
+            newQuantity = Math.Min(0.1, newQuantity);
+            newQuantity *= QuantityGrowthRate;
+
+            Quantity = newQuantity;
         }
+
+        rate *= Quantity;
+
+        rate *= 10;
 
         // find the tradeitem
         TradeItem? item = tradeItems.FirstOrDefault(x => x.Definition.Name == ResourceName && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
@@ -77,7 +106,7 @@ public class Mine : IHasOwner
             await VooperDB.Instance.TradeItems.AddAsync(item);
             await VooperDB.Instance.SaveChangesAsync();
         }
-        item.Amount += (int)((double)Rate*ProductionBonus);
+        item.Amount += (int)rate;
     }
 
 }
