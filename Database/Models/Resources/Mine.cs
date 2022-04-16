@@ -47,6 +47,11 @@ public class Mine : IHasOwner
     public double QuantityGrowthRate { get; set; }
     public double QuantityCap { get; set; }
 
+    // default is 1, size directly increases output
+    // max value is 10
+
+    public int Size { get; set; }
+
     // every tick (1 hour), Age increases by 1
     public int Age { get; set; }
 
@@ -58,6 +63,8 @@ public class Mine : IHasOwner
         
 
         double rate = Rate;
+
+        rate *= Size;
 
         if (HasAnEmployee) {
             rate *= 1.5;

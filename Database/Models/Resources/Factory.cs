@@ -44,15 +44,21 @@ public class Factory : IHasOwner
     public int Level { get; set; }
     public bool HasAnEmployee { get; set; }
 
+    // effects production speed, grows over time, min value is 10%
     public double Quantity { get; set; }
 
     // base is 1x
     public double QuantityGrowthRate { get; set; }
+
+
     public double QuantityCap { get; set; }
 
     public double Efficiency { get; set; }
 
-    public double BaseSpeed { get; set; }
+    // default is 1, size directly increases output, but harms efficiency
+    // max value is 10, and at 10, it costs 4x more input to produce the same output
+
+    public int Size { get; set; }
 
     public int HoursSinceChangedProductionRecipe { get; set; }
 
@@ -66,7 +72,7 @@ public class Factory : IHasOwner
     public async Task Tick(List<TradeItem> tradeItems)
     {
         // TODO: when we add district stats (industal stat, etc) update this
-        double rate = BaseSpeed;
+        double rate = Size;
 
         if (HasAnEmployee) {
             rate *= 1.5;
@@ -93,7 +99,7 @@ public class Factory : IHasOwner
         if (Quantity < QuantityCap) {
             HoursSinceChangedProductionRecipe += 1;
             double days = HoursSinceChangedProductionRecipe/24;
-            double newQuantity = Math.Max(1.5, Math.Log10( Math.Pow(days, 20) / 40));
+            double newQuantity = Math.Max(QuantityCap, Math.Log10( Math.Pow(days, 20) / 40));
             newQuantity = Math.Min(0.1, newQuantity);
             newQuantity *= QuantityGrowthRate;
 
@@ -102,7 +108,7 @@ public class Factory : IHasOwner
 
         rate *= Quantity;
 
-        rate *= 10;
+        rate *= 30;
 
 
         foreach(string Resource in recipe.Inputs.Keys) 
@@ -112,7 +118,7 @@ public class Factory : IHasOwner
             if (item is null) {
                 break;
             }
-            int amountNeeded = (int)(recipe.Inputs[Resource]*rate*(1-Efficiency));
+            int amountNeeded = (int)(recipe.Inputs[Resource]*rate/Efficiency);
             if (item.Amount < amountNeeded) {
                 break;
             }
