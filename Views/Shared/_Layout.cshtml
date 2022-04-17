@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using SV2.Managers;
+
+<!DOCTYPE html>
 <html lang="en-us">
 <head>
     <!--
@@ -93,10 +95,10 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="SearchDropdown">
                                 @{
-                                    User user = null;
+                                    User? user = UserManager.GetUser(Context);
                                     //if (User != null) { user = await userManager.GetUserAsync(User); }
 
-                                    if (user != null)
+                                    if (user is not null)
                                     {
                                         <a class="dropdown-item" asp-controller="Manage" asp-action="Index">My Account</a>
                                         <a class="dropdown-item" asp-controller="User" asp-action="Info" asp-route-svid="@user.Id">My Page</a>

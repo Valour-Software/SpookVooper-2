@@ -1,20 +1,51 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SV2.Models;
 using SV2.Managers;
+using SV2.Database.Models.Users;
 using System.Diagnostics;
 
 namespace SV2.Controllers
 {
-    public class UserController : Controller
+    public class AccountController : Controller
     {
-        private readonly ILogger<UserController> _logger;
+        private readonly ILogger<AccountController> _logger;
         
         [TempData]
         public string StatusMessage { get; set; }
 
-        public UserController(ILogger<UserController> logger)
+        public AccountController(ILogger<AccountController> logger)
         {
             _logger = logger;
+        }
+
+        public async Task<IActionResult> Manage()
+        {
+            User? user = UserManager.GetUser(HttpContext);
+
+            if (user is null) 
+            {
+                return Redirect("/account/login");
+            }
+
+            return View(user);
+        }
+
+        public async Task<IActionResult> ViewAPIKey()
+        {
+            User? user = UserManager.GetUser(HttpContext);
+
+            if (user is null) 
+            {
+                return Redirect("/account/login");
+            }
+
+            return View((object)user.Api_Key);
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Remove("svid");
+            return Redirect("/");
         }
 
         public IActionResult Entered()
@@ -22,7 +53,7 @@ namespace SV2.Controllers
             string svid = UserManager.GetSvidFromSession(HttpContext);
             Console.WriteLine(HttpContext.Session.GetString("code"));
             HttpContext.Session.SetString("svid", svid);
-            return View((object)svid);
+            return Redirect("/");
         }
 
         public IActionResult Login()

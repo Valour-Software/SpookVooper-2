@@ -52,7 +52,10 @@ builder.Services.AddDbContextPool<VooperDB>(options =>
 
 builder.Services.AddHostedService<EconomyWorker>();
 
-builder.Services.AddSession();
+builder.Services.AddSession(options =>
+    {
+        options.IdleTimeout = TimeSpan.FromDays(90);
+    });
 
 var app = builder.Build();
 
@@ -87,5 +90,6 @@ app.MapControllerRoute(
 
 // ensure districts & Vooperia are created
 await VooperDB.Startup();
+await ResourceManager.Load();
 
 app.Run();

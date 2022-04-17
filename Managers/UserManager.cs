@@ -19,6 +19,9 @@ public static class UserManager
 
     public static User? GetUser(HttpContext ctx)
     {
+        if (ctx.Session.GetString("svid") is null) {
+            return null;
+        }
         return DBCache.Get<User>(ctx.Session.GetString("svid"));
     }
     
