@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using SV2.API;
 using SV2.Workers;
+using SV2.Managers;
 using SV2.VoopAI;
+using Microsoft.AspNetCore.Identity;
 
 await VoopAI.Main();
 
@@ -50,6 +52,8 @@ builder.Services.AddDbContextPool<VooperDB>(options =>
 
 builder.Services.AddHostedService<EconomyWorker>();
 
+builder.Services.AddSession();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -69,8 +73,11 @@ DevAPI         .AddRoutes(app);
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseSession();
+
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

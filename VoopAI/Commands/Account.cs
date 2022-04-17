@@ -12,6 +12,7 @@ using SV2.Database.Models.Users;
 using System.Linq;
 using System.Collections.Concurrent;
 using SV2.Web;
+using SV2.Managers;
 
 namespace SV2.VoopAI.Commands;
 
@@ -61,6 +62,21 @@ class AccountCommands : CommandModuleBase
         }
     }
 
+    [Command("login")]
+    public async Task Login(CommandContext ctx, string code)
+    {
+        User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.User_Id);
+        if (user is null)
+        {
+            user = new User(ctx.Member.Nickname, ctx.Member.User_Id);
+            await DBCache.Put<User>(user.Id, user);
+            await VooperDB.Instance.Users.AddAsync(user);
+            await VooperDB.Instance.SaveChangesAsync();
+        }
+        UserManager.AddLogin(code, user!.Id);
+        await ctx.ReplyAsync("Successfully logged you in! Please go back to the login page and click 'Entered'");
+    }
+
     [Command("svid")]
     public async Task ViewSVID(CommandContext ctx) 
     {
@@ -103,6 +119,7 @@ class AccountCommands : CommandModuleBase
         builder.AddPage(page);
         await ctx.ReplyAsync(builder);
     }
+    
     [Command("savedb")]
     public async Task savedb(CommandContext ctx) 
     {
