@@ -59,6 +59,8 @@ class AccountCommands : CommandModuleBase
             CharactersThisMinute[ctx.Member.User_Id] += Content.Length;
 
             _user.Messages += 1;
+
+            _user.Image_Url = (await ctx.Member.GetUserAsync()).Pfp_Url;
         }
     }
 

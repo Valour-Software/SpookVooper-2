@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
+using SV2.Database.Models.Users;
 using SV2.Database.Models.Permissions;
 
 namespace SV2.Database.Models.Groups;
@@ -38,9 +39,35 @@ public class GroupRole
     public decimal Salary { get; set; }
     public int Authority { get; set; }
 
+    public static GroupRole Default = new GroupRole()
+    {
+        Color = "",
+        GroupId = "",
+        Name = "Default Role",
+        Authority = int.MinValue,
+        PermissionValue = 0
+    };
+
     public GroupRole()
     {
 
+    }
+
+    public IEnumerable<User> GetMembers()
+    {
+        return DBCache.GetAll<User>().Where(x => Members.Contains(x.Id));
+    }
+
+    public List<String> GetPermissions()
+    {
+        List<String> strings = new();
+        foreach(GroupPermission perm in Enum.GetValues(typeof(GroupPermissions)))
+        {
+            if ((perm.Value & PermissionValue) == perm.Value) {
+                strings.Add(perm.Name);
+            }
+        }
+        return strings;
     }
 
     public GroupRole(string name, string groupid, decimal salary, int authority)

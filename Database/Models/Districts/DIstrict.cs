@@ -35,4 +35,9 @@ public class District
 
     [EntityId]
     public string? Senator_Id { get; set;}
+
+    public static District Find(string id)
+    {
+        return DBCache.GetAll<District>().FirstOrDefault(x => x.Id == id)!;
+    }
 }

@@ -35,6 +35,8 @@ public static class GroupPermissions
     public static readonly GroupPermission ManageMembership = new GroupPermission(0x04, "Manage Membership", "Allows members to kick or ban users from the group which are below their authority.");
     public static readonly GroupPermission Post = new GroupPermission(0x8, "Post", "Allows members to post as this group. For example to make group forum posts or post new articles.");
     public static readonly GroupPermission Eco = new GroupPermission(0x10, "Eco", "Allows members to send transactions, trade stocks, etc as this group.");
+    public static readonly GroupPermission Edit = new GroupPermission(0x20, "Edit", "Allows members to edit details about this group.");
+    public static readonly GroupPermission News = new GroupPermission(0x20, "News", "Allows members to post news under this group.");
 }
 
 public class GroupPermission : Permission

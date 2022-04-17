@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Permissions;
+using SV2.Database.Models.Users;
 
 namespace SV2.Database.Models.Groups;
 
@@ -43,6 +44,8 @@ public class Group : IHasOwner, IEntity
     public string? DistrictId { get; set;}
     public decimal Credits { get; set;}
     public decimal CreditsYesterday { get; set;}
+
+    public List<string> MembersIds { get; set; }
     
     [JsonIgnore]
     [VarChar(36)]
@@ -52,6 +55,16 @@ public class Group : IHasOwner, IEntity
     public List<GroupFlag> Flags { get; set; }
     // if the group is open to the public
     public bool Open { get; set; }
+
+    public bool IsInGroup(User user)
+    {
+        return MembersIds.Contains(user.Id);
+    }
+
+    public IEnumerable<User> GetMembers()
+    {
+        return MembersIds.Select(x => User.Find(x));
+    }
     
     [EntityId]
     public string OwnerId { get; set; }
@@ -75,11 +88,16 @@ public class Group : IHasOwner, IEntity
         Open = false;
         Flags = new();
         GroupType = GroupType.Company;
+        MembersIds = new() {OwnerId};
     }
 
-    public GroupRole GetHighestRole(IEntity user) 
+    public GroupRole? GetHighestRole(IEntity user) 
     {
-        GroupRole role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(user.Id)).OrderByDescending(x => x.Authority).First();
+        GroupRole? role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(user.Id)).OrderByDescending(x => x.Authority).FirstOrDefault();
+        if (role is null)
+        {
+            return GroupRole.Default;
+        }
         return role;
     }
 
@@ -129,13 +147,8 @@ public class Group : IHasOwner, IEntity
 
     }
 
-    public static async Task<Group?> FindAsync(string Id)
+    public static Group? Find(string Id)
     {
-        if (DBCache.Contains<Group>(Id)) {
-            return DBCache.Get<Group>(Id);
-        }
-        Group? group = await VooperDB.Instance.Groups.FindAsync(Id);
-        await DBCache.Put<Group>(Id, group);
-        return group;
+        return DBCache.Get<Group>(Id);
     }
 }
