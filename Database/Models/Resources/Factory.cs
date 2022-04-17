@@ -14,10 +14,10 @@ public class Factory : IHasOwner
     public string Id { get; set; }
 
     [VarChar(64)]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [VarChar(1024)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [EntityId]
     public string OwnerId { get; set; }
@@ -33,7 +33,7 @@ public class Factory : IHasOwner
     public string CountyId { get; set; }
 
     [VarChar(256)]
-    public string RecipeName { get; set; }
+    public string? RecipeName { get; set; }
     
     [NotMapped]
     public Recipe recipe {
@@ -41,8 +41,7 @@ public class Factory : IHasOwner
             return ResourceManager.Recipes.FirstOrDefault(x => x.Name == RecipeName);
         }
     }
-    public int Level { get; set; }
-    public bool HasAnEmployee { get; set; }
+    public string? EmployeeId { get; set; }
 
     // effects production speed, grows over time, min value is 10%
     public double Quantity { get; set; }
@@ -65,8 +64,28 @@ public class Factory : IHasOwner
     // every tick (1 hour), Age increases by 1
     public int Age { get; set; }
 
+    public Factory()
+    {
+        
+    }
+
+    public Factory(string ownerid, string countyid)
+    {
+        // why so many variables
+        Id = Guid.NewGuid().ToString();
+        OwnerId = ownerid;
+        CountyId = countyid;
+        Quantity = 0.1;
+        QuantityCap = 1.5;
+        QuantityGrowthRate = 1;
+        Efficiency = 1;
+        Size = 1;
+        HoursSinceChangedProductionRecipe = 1;
+        Age = 1;
+    }
+
     /// <summary>
-    /// This function is called every hour IRP time, or normally, 3 times per real life hour.
+    /// This function is called every IRL hour
     /// </summary>
 
     public async Task Tick(List<TradeItem> tradeItems)
@@ -74,7 +93,7 @@ public class Factory : IHasOwner
         // TODO: when we add district stats (industal stat, etc) update this
         double rate = Size;
 
-        if (HasAnEmployee) {
+        if (EmployeeId != null) {
             rate *= 1.5;
         };
 

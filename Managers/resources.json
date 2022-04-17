@@ -9,6 +9,10 @@
             "Materials": ["Iron Ore","Gold ore","Crystallite ore","Coal ore","Copper ore"]
         },
         {
+            "Name": "Metals",
+            "Materials": ["Copper", "Iron", "Gold"]
+        },
+        {
             "Name":"Components",
             "Materials": ["Copper wire"]
         }

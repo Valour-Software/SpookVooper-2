@@ -109,7 +109,7 @@ public class Mine : IHasOwner
             {
                 Id = Guid.NewGuid().ToString(),
                 OwnerId = OwnerId,
-                Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == ResourceName && x.OwnerId == "g-vooperia").Id,
+                Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == ResourceName && x.OwnerId == "g-vooperia")!.Id,
                 Amount = 0
             };
             await DBCache.Put<TradeItem>(item.Id, item);

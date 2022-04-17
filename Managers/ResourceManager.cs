@@ -34,23 +34,23 @@ public class TopLevelResources
 
 public static class ResourceManager 
 {
-    static public List<string> resources = new();
+    static public List<string> Resources = new();
     static public List<Recipe> Recipes = new();
     static public List<Material_Group> Material_Groups = new();
 
     public static async Task Load()
     {
-        TopLevelResources toplevelresource = await JsonSerializer.DeserializeAsync<TopLevelResources>(File.OpenRead("resources.json"));
+        TopLevelResources toplevelresource = await JsonSerializer.DeserializeAsync<TopLevelResources>(File.OpenRead("./Managers/resources.json"));
 
         Material_Groups = toplevelresource.Material_Groups;
 
-        resources = toplevelresource.Material_Groups.SelectMany(x => x.Materials).ToList();
+        Resources = toplevelresource.Material_Groups.SelectMany(x => x.Materials).ToList();
 
         Recipes = toplevelresource.Recipes;
 
         // need to create item definitions
 
-        foreach(string Resource in resources)
+        foreach(string Resource in Resources)
         {
             TradeItemDefinition? def = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.OwnerId == "g-vooperia" && x.Name == Resource);
 
