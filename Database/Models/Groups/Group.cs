@@ -77,6 +77,11 @@ public class Group : IHasOwner, IEntity
         }
     }
 
+    public Group()
+    {
+        
+    }
+
     public Group(string name, string ownerId)
     {
         Id = "g-"+Guid.NewGuid().ToString();
