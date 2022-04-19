@@ -7,7 +7,7 @@ using SV2.Database.Models.Users;
 
 namespace SV2.Database.Models.Groups;
 
-public enum GroupType
+public enum GroupTypes
 {
     Company,
     // a corporation is a company that is listed on SVSE or a company on a private stock exchange that the CFV has determined is a corporation
@@ -50,7 +50,7 @@ public class Group : IHasOwner, IEntity
     [JsonIgnore]
     [VarChar(36)]
     public string Api_Key { get; set; }
-    public GroupType GroupType { get; set; }
+    public GroupTypes GroupType { get; set; }
     // will be use the PostgreSQL Array datatype
     public List<GroupFlag> Flags { get; set; }
     // if the group is open to the public
@@ -92,7 +92,7 @@ public class Group : IHasOwner, IEntity
         OwnerId = ownerId;
         Open = false;
         Flags = new();
-        GroupType = GroupType.Company;
+        GroupType = GroupTypes.Company;
         MembersIds = new() {OwnerId};
     }
 

@@ -20,10 +20,59 @@ namespace SV2.Controllers
             _logger = logger;
         }
 
+        public IActionResult Index()
+        {
+            return View();
+        }
+
         public IActionResult View(string id)
         {
             Group? group = Group.Find(id);
             return View(group);
+        }
+
+        public IActionResult Create()
+        {
+            User? user = UserManager.GetUser(HttpContext);
+
+            if (user is null) 
+            {
+                return Redirect("/account/login");
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Group model)
+        {
+            User? user = UserManager.GetUser(HttpContext);
+
+            if (user is null) 
+            {
+                return Redirect("/account/login");
+            }
+
+            model.Name = model.Name.Trim();
+
+            if (DBCache.GetAll<Group>().Any(x => x.Name == model.Name)) {
+                StatusMessage = $"Error: Name {model.Name} is already taken!";
+                return Redirect($"/group/create");
+            }
+
+            Group group = new Group(model.Name, user.Id);
+            group.Description = model.Description;
+            group.GroupType = model.GroupType;
+            group.DistrictId = model.DistrictId;
+            group.Image_Url = model.Image_Url;
+            group.OwnerId = user.Id;
+
+            await DBCache.Put<Group>(group.Id, group);
+            await VooperDB.Instance.Groups.AddAsync(group);
+            await VooperDB.Instance.SaveChangesAsync();
+
+            return Redirect($"/group/view/{group.Id}");
         }
 
         public IActionResult Edit(string id)
