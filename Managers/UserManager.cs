@@ -19,10 +19,12 @@ public static class UserManager
 
     public static User? GetUser(HttpContext ctx)
     {
-        if (ctx.Session.GetString("svid") is null) {
+        string? d = null;
+        ctx.Request.Cookies.TryGetValue("svid", out d);
+        if (d is null) {
             return null;
         }
-        return DBCache.Get<User>(ctx.Session.GetString("svid"));
+        return DBCache.Get<User>(d!);
     }
     
     public static void AddLogin(string code, string id)

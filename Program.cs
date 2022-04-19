@@ -1,4 +1,16 @@
 global using SV2.Database;
+global using SV2.Database.Models.Districts;
+global using SV2.Database.Models.Economy;
+global using SV2.Database.Models.Entities;
+global using SV2.Database.Models.Factories;
+global using SV2.Database.Models.Forums;
+global using SV2.Database.Models.Government;
+global using SV2.Database.Models.Groups;
+global using SV2.Database.Models.Items;
+global using SV2.Database.Models.Military;
+global using SV2.Database.Models.Permissions;
+global using SV2.Database.Models.Buildings;
+global using SV2.Database.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using SV2.API;
@@ -6,6 +18,7 @@ using SV2.Workers;
 using SV2.Managers;
 using SV2.VoopAI;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.DataProtection;
 
 await VoopAI.Main();
 
@@ -51,6 +64,8 @@ builder.Services.AddDbContextPool<VooperDB>(options =>
 });
 
 builder.Services.AddHostedService<EconomyWorker>();
+
+builder.Services.AddDataProtection().PersistKeysToDbContext<VooperDB>();
 
 builder.Services.AddSession(options =>
     {

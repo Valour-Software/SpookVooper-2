@@ -6,7 +6,9 @@ using SV2.Database.Models.Items;
 using SV2.Database.Models.Factories;
 using SV2.Database.Models.Forums;
 using SV2.Database.Models.Districts;
+using SV2.Database.Models.Government;
 using System;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 
 /*  Valour - A free and secure chat client
  *  Copyright (C) 2021 Vooper Media LLC
@@ -16,7 +18,7 @@ using System;
 
 namespace SV2.Database;
 
-public class VooperDB : DbContext
+public class VooperDB : DbContext, IDataProtectionKeyContext
 {
 
     public static VooperDB Instance = new VooperDB(DBOptions);
@@ -65,6 +67,9 @@ public class VooperDB : DbContext
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<District> Districts { get; set; }
     public DbSet<GroupRole> GroupRoles { get; set; }
+    public DbSet<Election> Elections { get; set; }
+    public DbSet<Vote> Votes { get; set; }
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
     public static string GenerateSQL()
     {
@@ -81,10 +86,23 @@ public class VooperDB : DbContext
     public static async Task Startup() 
     {
         await DBCache.LoadAsync();
+
+        //List<string> cands = new List<string>() {
+        //    "u-3bfaf0da-05db-4b4d-b77e-78d2faca261a", 
+        //    "u-42a0bc23-6a2b-428b-940c-1595f355c8d0",
+        //    "u-c6a3c7e4-825a-46a6-b75b-a1e420cb31d4",
+        //    "u-df8a7699-ec5e-486e-8f0c-a81dd2bb3427"
+        //};
+
+        //Election elec = new Election(DateTime.UtcNow, DateTime.UtcNow.AddDays(1), cands, "new-vooperis", ElectionType.Senate);
+        //await DBCache.Put<Election>(elec.Id, elec);
+        //await VooperDB.Instance.Elections.AddAsync(elec);
+        
+
         if (DBCache.FindEntity("g-vooperia") is null) {
             Group Vooperia = new Group("Vooperia", "g-t");
             Vooperia.Id = "g-vooperia";
-            Vooperia.GroupType = GroupType.NonProfit;
+            Vooperia.GroupType = GroupTypes.NonProfit;
             Vooperia.Credits = 500_000_000.0m;
             await DBCache.Put<Group>(Vooperia.Id, Vooperia);
             await VooperDB.Instance.Groups.AddAsync(Vooperia);
