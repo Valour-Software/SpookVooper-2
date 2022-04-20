@@ -7,7 +7,7 @@ using SV2.Managers;
 
 namespace SV2.Database.Models.Factories;
 
-public class Factory : IHasOwner
+public class Factory : IHasOwner, IBuilding
 {
     [Key]
     [GuidID]
@@ -64,6 +64,36 @@ public class Factory : IHasOwner
     // every tick (1 hour), Age increases by 1
     public int Age { get; set; }
 
+    [NotMapped]
+    public BuildingType buildingType { 
+        get {
+            return BuildingType.Factory;
+        }
+    }
+
+    [NotMapped]
+    public County County {
+        get {
+            return DBCache.Get<County>(CountyId)!;
+        }
+    }
+
+    public string GetProduction()
+    {
+        if (recipe is null)
+        {
+            return "";
+        }
+        string output = "";
+        foreach(KeyValuePair<string, double> item in recipe.Outputs) {
+            output += $"{item.Key}, ";
+        }
+        if (output != "") {
+            output = output.Substring(0, output.Length-2);
+        }
+        return output;
+    }
+
     public Factory()
     {
         
@@ -90,6 +120,11 @@ public class Factory : IHasOwner
 
     public async Task Tick(List<TradeItem> tradeItems)
     {
+
+        if (RecipeName is null) {
+            return;
+        }
+
         // TODO: when we add district stats (industal stat, etc) update this
         double rate = Size;
 

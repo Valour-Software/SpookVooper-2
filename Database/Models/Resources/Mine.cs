@@ -6,17 +6,17 @@ using SV2.Database.Models.Items;
 
 namespace SV2.Database.Models.Factories;
 
-public class Mine : IHasOwner
+public class Mine : IHasOwner, IBuilding
 {
     [Key]
     [GuidID]
     public string Id { get; set; }
 
     [VarChar(64)]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [VarChar(1024)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [EntityId]
     public string OwnerId { get; set; }
@@ -56,6 +56,25 @@ public class Mine : IHasOwner
     public int Age { get; set; }
 
     public int HoursSinceBuilt { get; set; }
+
+    [NotMapped]
+    public BuildingType buildingType { 
+        get {
+            return BuildingType.Factory;
+        }
+    }
+
+    [NotMapped]
+    public County County {
+        get {
+            return DBCache.Get<County>(CountyId)!;
+        }
+    }
+
+    public string GetProduction()
+    {
+        return ResourceName;
+    }
 
     public async Task Tick(List<TradeItem> tradeItems)
     {
@@ -100,7 +119,7 @@ public class Mine : IHasOwner
 
         rate *= Quantity;
 
-        rate *= 10;
+        rate *= 30;
 
         // find the tradeitem
         TradeItem? item = tradeItems.FirstOrDefault(x => x.Definition.Name == ResourceName && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
