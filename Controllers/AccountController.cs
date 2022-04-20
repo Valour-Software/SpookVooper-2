@@ -44,7 +44,7 @@ namespace SV2.Controllers
 
         public IActionResult Logout()
         {
-            HttpContext.Session.Remove("svid");
+            HttpContext.Response.Cookies.Delete("svid");
             return Redirect("/");
         }
 
@@ -52,7 +52,7 @@ namespace SV2.Controllers
         {
             string svid = UserManager.GetSvidFromSession(HttpContext);
             Console.WriteLine(HttpContext.Session.GetString("code"));
-            HttpContext.Session.SetString("svid", svid);
+            HttpContext.Response.Cookies.Append("svid", svid);
             return Redirect("/");
         }
 
