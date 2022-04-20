@@ -69,19 +69,30 @@ public class DistrictPolicyModel
         AddUBIPolicy(Rank.Spleen, district.Id);
         UBIPolicies.Reverse();
 
-        IEnumerable<TaxPolicy> oldpols = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == district.Id && (x.taxType == TaxType.PersonalIncome || x.taxType == TaxType.CorporateIncome));
+        IEnumerable<TaxPolicy> oldpols = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == district.Id).OrderBy(x => x.taxType);
         if (oldpols.Count() > 0) {
             foreach(TaxPolicy pol in oldpols) {
                 TaxPolicies.Add(pol);
             }
         }
         else {
+            // Do other taxe
+             
+            AddTaxPolicy(district.Id, TaxType.Payroll);
+            AddTaxPolicy(district.Id, TaxType.Sales);
+            AddTaxPolicy(district.Id, TaxType.StockBought);
+            AddTaxPolicy(district.Id, TaxType.StockSale);
+            AddTaxPolicy(district.Id, TaxType.Transactional);
+
             // do personal tax brackets
 
             for (int i = 0; i < 4; i++)
             {
                 AddTaxPolicy(district.Id, TaxType.PersonalIncome);
             }
+
+
+           
 
             // do corporate tax brackets
 

@@ -11,10 +11,10 @@ public enum TaxType
     Sales = 2,
     StockSale = 3,
     StockBought = 4,
-    PersonalIncome = 5,
-    CorporateIncome = 6,
-    GroupIncome = 7,
-    Payroll = 8,
+    Payroll = 5,
+    PersonalIncome = 6,
+    CorporateIncome = 7,
+    GroupIncome = 8,
     // only the imperial government can use this one
     Inactivity = 9,
     None = 10

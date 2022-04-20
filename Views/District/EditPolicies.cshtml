@@ -59,12 +59,32 @@
                                 <span asp-validation-for="@Model.UBIPolicies[i].Rate" class="text-danger"></span>
                             </div>
                         }
+                        <br>
+                        <h4>Other taxes</h4>
+
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        @for (int i = 0; i < 5; i++)
+                        {
+                            <div class="form-group">
+                                <label>@Model.TaxPolicies[i].taxType Tax</label>
+                                <input asp-for="@Model.TaxPolicies[i].Minimum" class="form-control" />
+                                <input asp-for="@Model.TaxPolicies[i].Maximum" class="form-control" />
+                                <label>The amount between the two above boxes will be taxed at (%)</label>
+                                <input asp-for="@Model.TaxPolicies[i].Rate" class="form-control" />
+                                @Html.HiddenFor(x => x.TaxPolicies[i].Id)
+                                @Html.HiddenFor(x => x.TaxPolicies[i].taxType)
+                                <span asp-validation-for="@Model.TaxPolicies[i].Rate" class="text-danger"></span>
+                            </div>
+                            <br>
+                            <br>
+                        }
+
                     </div>
                     <div class="m-2" style="width:300px;margin-left:70px !important;">
                         <h4>Personal Income Tax Rates (in %)</h4>
 
                         <div asp-validation-summary="All" class="text-danger"></div>
-                        @for (int i = 0; i < 4; i++) {
+                        @for (int i = 5; i < 9; i++) {
                             <div class="form-group">
                                 <input asp-for="@Model.TaxPolicies[i].Minimum" class="form-control" />
                                 <input asp-for="@Model.TaxPolicies[i].Maximum" class="form-control" />
@@ -82,7 +102,7 @@
                         <h4>Corporate Income Tax Rates (in %)</h4>
 
                         <div asp-validation-summary="All" class="text-danger"></div>
-                        @for (int i = 4; i < Model.TaxPolicies.Count(); i++) {
+                        @for (int i = 9; i < Model.TaxPolicies.Count(); i++) {
                             <div class="form-group">
                                 <input asp-for="@Model.TaxPolicies[i].Minimum" class="form-control" />
                                 <input asp-for="@Model.TaxPolicies[i].Maximum" class="form-control" />
