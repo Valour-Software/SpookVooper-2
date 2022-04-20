@@ -53,14 +53,20 @@ public class User : IEntity
 
     [EntityId]
     public string? DistrictId { get; set;}
-    public static async Task<User?> FindAsync(string Id)
+
+    public bool IsMinister(Ministers minister)
     {
-        if (DBCache.Contains<User>(Id)) {
-            return DBCache.Get<User>(Id);
-        }
-        User? user = await VooperDB.Instance.Users.FindAsync(Id);
-        await DBCache.Put<User>(Id, user);
-        return user;
+        return false;
+    }
+
+    public static User? FindByName(string name)
+    {
+        return DBCache.GetAll<User>().FirstOrDefault(x => x.Name == name);
+    }
+    
+    public static User? Find(string Id)
+    {
+        return DBCache.Get<User>(Id);
     }
 
     public bool HasPermissionWithKey(string apikey, GroupPermission permission)
