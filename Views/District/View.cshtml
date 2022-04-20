@@ -17,7 +17,7 @@
 <!-- Main row for page -->
 <div class="d-flex flex-row align-content-center" style="width:100%">
     <!-- Leftmost column -->
-    <div class="p-2 flex-shrink-1 ml-auto"></div>
+    <div class="p-2 flex-shrink-1 ms-auto"></div>
 
     <!-- Center column -->
     <div class="p-4" style="width:80em">
@@ -25,10 +25,12 @@
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
         @{
-            if (Model != null)
+            if (Model is not null)
             {
-
-                User? senator = DBCache.Get<User>(Model.SenatorId);
+                User? senator = null;
+                if (Model.SenatorId is not null) {
+                    senator = DBCache.Get<User>(Model.SenatorId);
+                }
                 User? user = UserManager.GetUser(Context);
 
                 if (user != null && senator != null && (senator.Id == user.Id || user.Name == "SpikeViper"))
@@ -38,7 +40,7 @@
 
                 <div class="d-flex align-content-center align-items-center">
 
-                    <div class="ml-auto" style="display: inline-block; vertical-align:central; height:100%">
+                    <div class="ms-auto" style="display: inline-block; vertical-align:central; height:100%">
                         <img src="@Model.FlagUrl" style="width:5em; vertical-align:middle" />
                     </div>
 
@@ -47,7 +49,7 @@
                         <h1 style="text-align:center" class="display-3">@Model.Name</h1>
                     </div>
 
-                    <div class="mr-auto" style="display: inline-block; vertical-align:central; height:100%">
+                    <div class="me-auto" style="display: inline-block; vertical-align:central; height:100%">
                         <img src="@Model.FlagUrl" style="width:5em; vertical-align:middle" />
                     </div>
 
@@ -130,6 +132,14 @@
                 }
 
                 <br />
+
+                if (user!.Id == Model.GovernorId) {
+                    <div class="p-2 align-self-center" style="text-align:center">
+                            <a asp-controller="District" asp-action="EditPolicies" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit Policies</a>
+                    </div>
+                }
+
+                <br />
                 <br />
                 <br />
                 <br />
@@ -142,7 +152,6 @@
 
                 <br />
                 <hr />
-                }
             } 
             else
             {
@@ -152,5 +161,5 @@
     </div>
 
     <!-- Rightmost column -->
-    <div class="p-4 flex-shrink-1 mr-auto"></div>
+    <div class="p-4 flex-shrink-1 me-auto"></div>
 </div>

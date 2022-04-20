@@ -17,6 +17,19 @@ namespace SV2.Controllers
             _logger = logger;
         }
 
+        public IActionResult View(string Id)
+        {
+            District district = DBCache.Get<District>(Id);
+            User? user = UserManager.GetUser(HttpContext);
+
+            if (user is null) 
+            {
+                return Redirect("/account/login");
+            }
+
+            return View(district);
+        }
+
         public IActionResult EditPolicies(string Id)
         {
             District district = DBCache.Get<District>(Id);
