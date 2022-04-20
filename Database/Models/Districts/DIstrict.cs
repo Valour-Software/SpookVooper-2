@@ -34,7 +34,13 @@ public class District
     public string GroupId { get; set; }
 
     [EntityId]
-    public string? Senator_Id { get; set;}
+    public string? SenatorId { get; set;}
+
+    [EntityId]
+    public string? GovernorId { get; set;}
+
+    [VarChar(128)]
+    public string? FlagUrl { get; set; }
 
     public static District Find(string id)
     {
