@@ -1,7 +1,5 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using SV2.Database.Models.Entities;
-using SV2.Database.Models.Users;
 
 namespace SV2.Database.Models.Economy;
 
@@ -21,4 +19,9 @@ public class UBIPolicy
     // should be Null if this is the Vooperian UBI
     [EntityId]
     public string? DistrictId { get; set;}
+
+    public UBIPolicy()
+    {
+
+    }
 }

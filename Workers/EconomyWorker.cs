@@ -52,6 +52,10 @@ namespace SV2.Workers
                             List<UBIPolicy>? UBIPolicies = DBCache.GetAll<UBIPolicy>().ToList();
 
                             foreach(UBIPolicy policy in UBIPolicies) {
+                                if (policy.Rate <= 0.0m)
+                                {
+                                    continue;
+                                }
                                 List<User> effected = DBCache.GetAll<User>().ToList();
                                 string fromId = "";
                                 if (policy.DistrictId != null) {

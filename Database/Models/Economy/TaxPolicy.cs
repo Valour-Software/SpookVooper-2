@@ -27,7 +27,7 @@ public class TaxPolicy
     public string Id { get; set; }
 
     [VarChar(64)]
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public decimal Rate { get; set; }
     
     // should be null if this tax policy is by Vooperia

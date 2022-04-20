@@ -91,6 +91,10 @@ public class Transaction
 
             foreach (TaxPolicy policy in policies)
             {
+                if (policy.Rate <= 0.01m)
+                {
+                    continue;
+                }
                 decimal amount = 0.0m;
                 switch (policy.taxType) 
                 {
