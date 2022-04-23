@@ -83,7 +83,7 @@ public class Transaction
 
         decimal totaltaxpaid = 0.0m;
 
-        if (transactionType != TransactionType.TaxPayment) {
+        if (transactionType != TransactionType.TaxPayment && transactionType != TransactionType.Loan) {
 
             List<TaxPolicy> policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == null || x.DistrictId == fromEntity.DistrictId || x.DistrictId == toEntity.DistrictId).ToList();
 
