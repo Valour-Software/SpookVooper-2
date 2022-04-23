@@ -36,8 +36,8 @@ public interface IEntity
 
     [VarChar(512)]
     public string Description { get; set; }
-    decimal Credits { get; set;}
-    decimal CreditsYesterday { get; set;}
+    public decimal Credits { get; set;}
+    public List<decimal>? CreditSnapshots { get; set;}
     
     [JsonIgnore]
     [VarChar(36)]
@@ -53,7 +53,12 @@ public interface IEntity
 
     public async Task DoIncomeTax()
     {
-        decimal amount = Credits-CreditsYesterday;
+
+        if (CreditSnapshots is null) {
+            CreditSnapshots = new();
+        }
+
+        decimal amount = Credits-CreditSnapshots.Take(7).Sum();
         if (amount <= 0.0m) {
             return;
         }
@@ -74,7 +79,7 @@ public interface IEntity
             taxtrans.Execute(true);
         }
 
-        amount = Credits-CreditsYesterday;
+        amount = Credits-CreditSnapshots.Take(7).Sum();
         totaldue = 0.0m;
 
         // do imperial level taxes

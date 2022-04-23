@@ -43,7 +43,7 @@ public class User : IEntity
     [VarChar(36)]
     public string Api_Key { get; set; }
     public decimal Credits { get; set;}
-    public decimal CreditsYesterday { get; set;}
+    public List<decimal>? CreditSnapshots { get; set;}
     public Rank Rank { get; set;}
     // the datetime that this user created their account
     public DateTime Created { get; set; }
@@ -98,7 +98,7 @@ public class User : IEntity
         CommentLikes = 0;
         Api_Key = Guid.NewGuid().ToString();
         Credits = 0.0m;
-        CreditsYesterday = 0.0m;
+        CreditSnapshots = new();
         Rank = Rank.Unranked;
         Created = DateTime.UtcNow;
     }

@@ -40,7 +40,7 @@ public class CreditAccount : IHasOwner, IEntity
     [EntityId]
     public string? DistrictId { get; set; }
     // used for tax purposes
-    public decimal CreditsYesterday { get; set;}
+    public List<decimal> CreditSnapshots { get; set;}
 
     public bool HasPermissionWithKey(string apikey, GroupPermission permission)
     {

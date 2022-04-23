@@ -43,7 +43,7 @@ public class Group : IHasOwner, IEntity
     [EntityId]
     public string? DistrictId { get; set;}
     public decimal Credits { get; set;}
-    public decimal CreditsYesterday { get; set;}
+    public List<decimal>? CreditSnapshots { get; set;}
 
     public List<string> MembersIds { get; set; }
     
@@ -88,7 +88,7 @@ public class Group : IHasOwner, IEntity
         Name = name;
         Api_Key = Guid.NewGuid().ToString();
         Credits = 0.0m;
-        CreditsYesterday = 0.0m;
+        CreditSnapshots = new();
         OwnerId = ownerId;
         Open = false;
         Flags = new();
