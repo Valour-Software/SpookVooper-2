@@ -82,6 +82,19 @@ namespace SV2.Workers
                             // for right now, just save cache to database every hour
                             await DBCache.SaveAsync();
 
+                            if (DateTime.UtcNow.Hour == 1) {
+                                // every day, update credit snapchats
+                                List<IEntity> entities = DBCache.GetAll<User>().ToList<IEntity>();
+                                entities.AddRange(DBCache.GetAll<Group>());
+                                foreach(IEntity entity in entities)
+                                {
+                                    if (entity.CreditSnapshots is null) {
+                                        entity.CreditSnapshots = new();
+                                    }
+                                    entity.CreditSnapshots.Add(entity.Credits);
+                                }
+                            }
+
                             await Task.Delay(1000 * 60 * 60);
                         }
                         catch(System.Exception e)

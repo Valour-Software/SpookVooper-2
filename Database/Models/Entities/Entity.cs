@@ -58,7 +58,7 @@ public interface IEntity
             CreditSnapshots = new();
         }
 
-        decimal amount = Credits-CreditSnapshots.Take(7).Sum();
+        decimal amount = Credits-CreditSnapshots.TakeLast(7).Sum();
         if (amount <= 0.0m) {
             return;
         }
@@ -79,7 +79,7 @@ public interface IEntity
             taxtrans.Execute(true);
         }
 
-        amount = Credits-CreditSnapshots.Take(7).Sum();
+        amount = Credits-CreditSnapshots.TakeLast(7).Sum();
         totaldue = 0.0m;
 
         // do imperial level taxes
