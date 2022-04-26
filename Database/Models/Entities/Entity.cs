@@ -76,7 +76,7 @@ public interface IEntity
 
         if (totaldue > 0.01m) {
             Transaction taxtrans = new Transaction(Id, DistrictId!, totaldue, TransactionType.TaxPayment, $"Income Tax Payment");
-            taxtrans.Execute(true);
+            taxtrans.NonAsyncExecute(true);
         }
 
         amount = Credits-CreditSnapshots.TakeLast(7).Sum();
@@ -93,7 +93,7 @@ public interface IEntity
         }
         if (totaldue > 0.01m) {
             Transaction taxtrans = new Transaction(Id, "g-vooperia", totaldue, TransactionType.TaxPayment, $"Income Tax Payment");
-            taxtrans.Execute(true);
+            taxtrans.NonAsyncExecute(true);
         }
     }
 

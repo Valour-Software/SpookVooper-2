@@ -11,8 +11,6 @@ namespace SV2.Workers
         private readonly IServiceScopeFactory _scopeFactory;
         public readonly ILogger<EconomyWorker> _logger;
 
-        static public HashSet<string> ActiveSvids = new();
-
         public EconomyWorker(ILogger<EconomyWorker> logger,
                             IServiceScopeFactory scopeFactory)
         {
@@ -44,7 +42,7 @@ namespace SV2.Workers
                                         }
                                         if (taxcredit is not null) {
                                             Transaction TaxCreditTran = new Transaction(taxcredit.DistrictId!, role.GroupId, role.Salary*taxcredit.Rate, TransactionType.TaxCreditPayment, $"Employee Tax Credit Payment");
-                                            await TaxCreditTran.Execute();
+                                            TaxCreditTran.NonAsyncExecute();
                                         }
                                     }
                                 }  
@@ -71,11 +69,7 @@ namespace SV2.Workers
                                 }
                                 foreach(User user in effected) {
                                     Transaction tran = new Transaction(fromId, user.Id, policy.Rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
-                                    TaskResult result = await tran.Execute();
-                                    if (!result.Succeeded) {
-                                        // no sense to keep paying these members since the group has ran out of credits
-                                        break;
-                                    }
+                                    tran.NonAsyncExecute();
                                 }
                             }
 

@@ -40,6 +40,18 @@ public class Transaction
     [VarChar(1024)]
     public string Details { get; set; }
 
+    [NotMapped]
+
+    public bool IsCompleted = false;
+
+    [NotMapped]
+
+    public TaskResult? Result = null;
+
+    [NotMapped]
+
+    public bool Force = false;
+
     public Transaction()
     {
         
@@ -56,12 +68,28 @@ public class Transaction
         Details = details;
     }
 
-    public async Task<TaskResult> Execute(bool Force = false)
+    public async Task<TaskResult> Execute(bool force = false)
+    {
+        Force = force;
+        TransactionManager.transactionQueue.Enqueue(this);
+
+        while (!IsCompleted) await Task.Delay(1);
+
+        return Result!;
+    }
+
+    public void NonAsyncExecute(bool force = false)
+    {
+        Force = true;
+        TransactionManager.transactionQueue.Enqueue(this);
+    }
+
+    public async Task<TaskResult> ExecuteFromManager(bool Force = false)
     {
 
-        while (EconomyWorker.ActiveSvids.Contains(FromId) || EconomyWorker.ActiveSvids.Contains(ToId))
+        while (TransactionManager.ActiveSvids.Contains(FromId) || TransactionManager.ActiveSvids.Contains(ToId))
         {
-            await Task.Delay(10);
+            await Task.Delay(1);
         }
 
         if (!Force && Credits < 0)
@@ -83,13 +111,13 @@ public class Transaction
         if (fromEntity == null) { return new TaskResult(false, $"Failed to find sender {FromId}."); }
         if (toEntity == null) { return new TaskResult(false, $"Failed to find reciever {ToId}."); }
 
-        EconomyWorker.ActiveSvids.Add(FromId);
-        EconomyWorker.ActiveSvids.Add(ToId);
+        TransactionManager.ActiveSvids.Add(FromId);
+        TransactionManager.ActiveSvids.Add(ToId);
 
         if (!Force && fromEntity.Credits < Credits)
         {
-            EconomyWorker.ActiveSvids.Remove(FromId);
-            EconomyWorker.ActiveSvids.Remove(ToId);
+            TransactionManager.ActiveSvids.Remove(FromId);
+            TransactionManager.ActiveSvids.Remove(ToId);
             return new TaskResult(false, $"{fromEntity.Name} cannot afford to send ¢{Credits}");
         }
 
@@ -146,20 +174,20 @@ public class Transaction
                     Transaction taxtrans = new Transaction(_FromId, "g-vooperia", amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
                     policy.Collected += amount;
                     totaltaxpaid += amount;
-                    taxtrans.Execute(true);
+                    taxtrans.NonAsyncExecute(true);
                 }
                 else {
                     if (policy.DistrictId == fromEntity.DistrictId && policy.taxType != TaxType.Sales && policy.taxType != TaxType.Payroll && policy.taxType != TaxType.Transactional) {
                         Transaction taxtrans = new Transaction(FromId, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
-                        taxtrans.Execute(true);
+                        taxtrans.NonAsyncExecute(true);
                     }
                     else if (policy.DistrictId == toEntity.DistrictId){
                         Transaction taxtrans = new Transaction(toEntity.Id, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
-                        taxtrans.Execute(true);
+                        taxtrans.NonAsyncExecute(true);
                     }
                 }
             }
@@ -170,8 +198,8 @@ public class Transaction
 
         VooperDB.Instance.Transactions.AddAsync(this);
 
-        EconomyWorker.ActiveSvids.Remove(FromId);
-        EconomyWorker.ActiveSvids.Remove(ToId);
+        TransactionManager.ActiveSvids.Remove(FromId);
+        TransactionManager.ActiveSvids.Remove(ToId);
 
         return new TaskResult(true, $"Successfully sent ¢{Credits} to {toEntity.Name} with ¢{totaltaxpaid} tax.");
 

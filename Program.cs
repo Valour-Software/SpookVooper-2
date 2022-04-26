@@ -11,6 +11,10 @@ global using SV2.Database.Models.Military;
 global using SV2.Database.Models.Permissions;
 global using SV2.Database.Models.Buildings;
 global using SV2.Database.Models.Users;
+global using SV2.Database.Models.OAuth2;
+global using SV2.Models.Districts;
+global using SV2.Managers;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using SV2.API;
@@ -64,6 +68,7 @@ builder.Services.AddDbContextPool<VooperDB>(options =>
 });
 
 builder.Services.AddHostedService<EconomyWorker>();
+builder.Services.AddHostedService<TransactionWorker>();
 
 builder.Services.AddDataProtection().PersistKeysToDbContext<VooperDB>();
 
