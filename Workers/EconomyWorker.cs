@@ -83,6 +83,7 @@ namespace SV2.Workers
                                         entity.CreditSnapshots = new();
                                     }
                                     entity.CreditSnapshots.Add(entity.Credits);
+                                    await entity.DoIncomeTax();
                                 }
                             }
 
