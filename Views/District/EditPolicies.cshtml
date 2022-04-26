@@ -63,7 +63,7 @@
                         <h4>Other taxes</h4>
 
                         <div asp-validation-summary="All" class="text-danger"></div>
-                        @for (int i = 0; i < 5; i++)
+                        @for (int i = 0; i < 7; i++)
                         {
                             <div class="form-group">
                                 <label>@Model.TaxPolicies[i].taxType Tax</label>
@@ -84,7 +84,7 @@
                         <h4>Personal Income Tax Rates (in %)</h4>
 
                         <div asp-validation-summary="All" class="text-danger"></div>
-                        @for (int i = 5; i < 9; i++) {
+                        @for (int i = 7; i < 11; i++) {
                             <div class="form-group">
                                 <input asp-for="@Model.TaxPolicies[i].Minimum" class="form-control" />
                                 <input asp-for="@Model.TaxPolicies[i].Maximum" class="form-control" />
@@ -102,7 +102,7 @@
                         <h4>Corporate Income Tax Rates (in %)</h4>
 
                         <div asp-validation-summary="All" class="text-danger"></div>
-                        @for (int i = 9; i < Model.TaxPolicies.Count(); i++) {
+                        @for (int i = 11; i < Model.TaxPolicies.Count(); i++) {
                             <div class="form-group">
                                 <input asp-for="@Model.TaxPolicies[i].Minimum" class="form-control" />
                                 <input asp-for="@Model.TaxPolicies[i].Maximum" class="form-control" />

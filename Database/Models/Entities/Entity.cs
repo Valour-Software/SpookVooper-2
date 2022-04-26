@@ -68,6 +68,7 @@ public interface IEntity
         foreach(TaxPolicy policy in DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId).OrderBy(x => x.Minimum))
         {
             totaldue += policy.GetTaxAmount(amount);
+            policy.Collected += policy.GetTaxAmount(amount);
             amount -= policy.Maximum;
             if (amount <= 0.0m) {
                 break;
@@ -87,6 +88,7 @@ public interface IEntity
         {
             totaldue += policy.GetTaxAmount(amount);
             amount -= policy.Maximum;
+            policy.Collected += policy.GetTaxAmount(amount);
             if (amount <= 0.0m) {
                 break;
             }
@@ -95,6 +97,18 @@ public interface IEntity
             Transaction taxtrans = new Transaction(Id, "g-vooperia", totaldue, TransactionType.TaxPayment, $"Income Tax Payment");
             taxtrans.NonAsyncExecute(true);
         }
+
+        // do district level balance tx
+        TaxPolicy _policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == DistrictId && x.taxType == TaxType.Balance);
+        if (_policy is not null) {
+            totaldue = _policy.GetTaxAmount(Credits);
+            if (totaldue > 0.01m) {
+                Transaction taxtrans = new Transaction(Id, DistrictId!, totaldue, TransactionType.TaxPayment, $"Balance Tax Payment tax id: {_policy.Id}");
+                taxtrans.NonAsyncExecute(true);
+                _policy.Collected += totaldue;
+            }
+        }
+
     }
 
     public bool HasPermission(IEntity entity, GroupPermission permission);
