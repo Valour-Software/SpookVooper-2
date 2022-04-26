@@ -54,6 +54,10 @@ public interface IEntity
     public async Task DoIncomeTax()
     {
 
+        if (Credits <= 0.0m) {
+            return;
+        }
+
         if (CreditSnapshots is null) {
             CreditSnapshots = new();
         }
