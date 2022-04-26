@@ -11,6 +11,8 @@ namespace SV2.Workers
         private readonly IServiceScopeFactory _scopeFactory;
         public readonly ILogger<EconomyWorker> _logger;
 
+        static public HashSet<string> ActiveSvids = new();
+
         public EconomyWorker(ILogger<EconomyWorker> logger,
                             IServiceScopeFactory scopeFactory)
         {
@@ -45,8 +47,7 @@ namespace SV2.Workers
                                             await TaxCreditTran.Execute();
                                         }
                                     }
-                                }
-                                    
+                                }  
                             }
 
                             List<UBIPolicy>? UBIPolicies = DBCache.GetAll<UBIPolicy>().ToList();
@@ -76,11 +77,7 @@ namespace SV2.Workers
                                         break;
                                     }
                                 }
-                                    
                             }
-
-                            // for right now, just save cache to database every hour
-                            await DBCache.SaveAsync();
 
                             if (DateTime.UtcNow.Hour == 1) {
                                 // every day, update credit snapchats
@@ -108,7 +105,9 @@ namespace SV2.Workers
                 while (!task.IsCompleted)
                 {
                     _logger.LogInformation("Economy Worker running at: {time}", DateTimeOffset.Now);
-                    await Task.Delay(60000, stoppingToken);
+                    // for right now, just save cache to database every 2 minutes
+                    await DBCache.SaveAsync();
+                    await Task.Delay(120_000, stoppingToken);
                 }
 
                 _logger.LogInformation("Economy Worker task stopped at: {time}", DateTimeOffset.Now);

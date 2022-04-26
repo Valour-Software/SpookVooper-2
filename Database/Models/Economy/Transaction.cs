@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using SV2.Database.Models.Entities;
+using SV2.Workers;
 using SV2.Web;
 
 namespace SV2.Database.Models.Economy;
@@ -57,6 +58,12 @@ public class Transaction
 
     public async Task<TaskResult> Execute(bool Force = false)
     {
+
+        while (EconomyWorker.ActiveSvids.Contains(FromId) || EconomyWorker.ActiveSvids.Contains(ToId))
+        {
+            await Task.Delay(10);
+        }
+
         if (!Force && Credits < 0)
         {
             return new TaskResult(false, "Transaction must be positive.");
@@ -76,8 +83,13 @@ public class Transaction
         if (fromEntity == null) { return new TaskResult(false, $"Failed to find sender {FromId}."); }
         if (toEntity == null) { return new TaskResult(false, $"Failed to find reciever {ToId}."); }
 
+        EconomyWorker.ActiveSvids.Add(FromId);
+        EconomyWorker.ActiveSvids.Add(ToId);
+
         if (!Force && fromEntity.Credits < Credits)
         {
+            EconomyWorker.ActiveSvids.Remove(FromId);
+            EconomyWorker.ActiveSvids.Remove(ToId);
             return new TaskResult(false, $"{fromEntity.Name} cannot afford to send ¢{Credits}");
         }
 
@@ -134,20 +146,20 @@ public class Transaction
                     Transaction taxtrans = new Transaction(_FromId, "g-vooperia", amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
                     policy.Collected += amount;
                     totaltaxpaid += amount;
-                    await taxtrans.Execute(true);
+                    taxtrans.Execute(true);
                 }
                 else {
                     if (policy.DistrictId == fromEntity.DistrictId && policy.taxType != TaxType.Sales && policy.taxType != TaxType.Payroll && policy.taxType != TaxType.Transactional) {
                         Transaction taxtrans = new Transaction(FromId, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
-                        await taxtrans.Execute(true);
+                        taxtrans.Execute(true);
                     }
                     else if (policy.DistrictId == toEntity.DistrictId){
                         Transaction taxtrans = new Transaction(toEntity.Id, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
-                        await taxtrans.Execute(true);
+                        taxtrans.Execute(true);
                     }
                 }
             }
@@ -157,6 +169,9 @@ public class Transaction
         toEntity.Credits += Credits;
 
         VooperDB.Instance.Transactions.AddAsync(this);
+
+        EconomyWorker.ActiveSvids.Remove(FromId);
+        EconomyWorker.ActiveSvids.Remove(ToId);
 
         return new TaskResult(true, $"Successfully sent ¢{Credits} to {toEntity.Name} with ¢{totaltaxpaid} tax.");
 
