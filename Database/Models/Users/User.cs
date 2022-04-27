@@ -43,6 +43,7 @@ public class User : IEntity
     [VarChar(36)]
     public string Api_Key { get; set; }
     public decimal Credits { get; set;}
+    public decimal TaxAbleCredits { get; set; }
     public List<decimal>? CreditSnapshots { get; set;}
     public Rank Rank { get; set;}
     // the datetime that this user created their account

@@ -35,7 +35,8 @@ public class CreditAccount : IHasOwner, IEntity
 
     [JsonIgnore]
     public string Api_Key { get; set; }
-    public decimal Credits { get; set;}
+    public decimal Credits { get; set; }
+    public decimal TaxAbleCredits { get; set; }
 
     [EntityId]
     public string? DistrictId { get; set; }

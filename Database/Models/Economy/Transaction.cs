@@ -196,6 +196,12 @@ public class Transaction
         fromEntity.Credits -= Credits;
         toEntity.Credits += Credits;
 
+        if (transactionType == TransactionType.ItemTrade || transactionType == TransactionType.Paycheck || transactionType == TransactionType.Payment || transactionType == TransactionType.StockTrade)
+        {
+            fromEntity.TaxAbleCredits -= Credits;
+            toEntity.TaxAbleCredits += Credits;
+        }
+
         VooperDB.Instance.Transactions.AddAsync(this);
 
         TransactionManager.ActiveSvids.Remove(FromId);

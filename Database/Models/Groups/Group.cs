@@ -43,6 +43,7 @@ public class Group : IHasOwner, IEntity
     [EntityId]
     public string? DistrictId { get; set;}
     public decimal Credits { get; set;}
+    public decimal TaxAbleCredits { get; set; }
     public List<decimal>? CreditSnapshots { get; set;}
 
     public List<string> MembersIds { get; set; }
