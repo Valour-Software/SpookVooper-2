@@ -69,7 +69,17 @@ public interface IEntity
         decimal totaldue = 0.0m;
 
         // do district level taxes
-        foreach(TaxPolicy policy in DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId).OrderBy(x => x.Minimum))
+        List<TaxPolicy> policies = new();
+        switch (Id.Substring(0, 1))
+        {
+            case "g":
+                policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList();
+                break;
+            case "u":
+                policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList();
+                break;
+        }
+        foreach(TaxPolicy policy in policies)
         {
             totaldue += policy.GetTaxAmount(amount);
             policy.Collected += policy.GetTaxAmount(amount);
@@ -87,8 +97,18 @@ public interface IEntity
         amount = Credits-CreditSnapshots.TakeLast(7).Sum();
         totaldue = 0.0m;
 
+        switch (Id.Substring(0, 1))
+        {
+            case "g":
+                policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == null && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList();
+                break;
+            case "u":
+                policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == null && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList();
+                break;
+        }
+
         // do imperial level taxes
-        foreach(TaxPolicy policy in DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == null).OrderBy(x => x.Minimum))
+        foreach(TaxPolicy policy in policies)
         {
             totaldue += policy.GetTaxAmount(amount);
             amount -= policy.Maximum;
