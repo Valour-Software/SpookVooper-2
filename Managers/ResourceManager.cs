@@ -16,7 +16,7 @@ public class Recipe
 {
     public string Name { get; set; }
     public Dictionary<string, double> Inputs { get; set; }
-    public Dictionary<string, double> Outputs { get; set; }
+    public KeyValuePair<string, double> Output { get; set; }
     public double ProcessingCost { get; set; }
 }
 
