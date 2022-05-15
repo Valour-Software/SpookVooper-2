@@ -95,7 +95,7 @@ public interface IEntity
             taxtrans.NonAsyncExecute(true);
         }
 
-        amount = TaxAbleCredits-CreditSnapshots.TakeLast(7).Sum();
+        amount = TaxAbleCredits-(CreditSnapshots.TakeLast(7).Sum()/7);
         totaldue = 0.0m;
 
         switch (Id.Substring(0, 1))
@@ -119,7 +119,7 @@ public interface IEntity
             }
         }
         if (totaldue > 0.01m) {
-            Transaction taxtrans = new Transaction(Id, "g-vooperia", totaldue, TransactionType.TaxPayment, $"Income Tax Payment");
+            Transaction taxtrans = new Transaction(Id, "g-vooperia", totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{amount} income");
             taxtrans.NonAsyncExecute(true);
         }
 
