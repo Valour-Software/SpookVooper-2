@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS factories (
     efficiency double precision NOT NULL,
     size integer NOT NULL,
     hourssincechangedproductionrecipe integer NOT NULL,
+    leftover double precision NOT NULL,
     age integer NOT NULL,
     CONSTRAINT pk_factories PRIMARY KEY (id)
 );

@@ -56,6 +56,7 @@ public class Mine : IHasOwner, IBuilding
     public int Age { get; set; }
 
     public int HoursSinceBuilt { get; set; }
+    public double LeftOver { get; set; }
 
     [NotMapped]
     public BuildingType buildingType { 
@@ -119,8 +120,6 @@ public class Mine : IHasOwner, IBuilding
 
         rate *= Quantity;
 
-        rate *= 30;
-
         // find the tradeitem
         TradeItem? item = tradeItems.FirstOrDefault(x => x.Definition.Name == ResourceName && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
         if (item is null) {
@@ -135,7 +134,15 @@ public class Mine : IHasOwner, IBuilding
             await VooperDB.Instance.TradeItems.AddAsync(item);
             await VooperDB.Instance.SaveChangesAsync();
         }
-        item.Amount += (int)rate;
+        int wholerate = (int)Math.Floor(rate);
+        LeftOver += rate-wholerate;
+        if (LeftOver >= 1.0) {
+            item.Amount += 1;
+            LeftOver -= 1.0;
+        }
+        item.Amount += wholerate;
+
+        // need to do district taxes
     }
 
 }

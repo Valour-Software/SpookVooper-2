@@ -64,6 +64,8 @@ public class Factory : IHasOwner, IBuilding
     // every tick (1 hour), Age increases by 1
     public int Age { get; set; }
 
+    public double LeftOver { get; set; }
+
     [NotMapped]
     public BuildingType buildingType { 
         get {
@@ -85,9 +87,7 @@ public class Factory : IHasOwner, IBuilding
             return "";
         }
         string output = "";
-        foreach(KeyValuePair<string, double> item in recipe.Outputs) {
-            output += $"{item.Key}, ";
-        }
+        output += $"{recipe.Output.Key}, ";
         if (output != "") {
             output = output.Substring(0, output.Length-2);
         }
@@ -162,13 +162,12 @@ public class Factory : IHasOwner, IBuilding
 
         rate *= Quantity;
 
-        rate *= 30;
-
+        TradeItem? item = null;
 
         foreach(string Resource in recipe.Inputs.Keys) 
         {
             // find the tradeitem
-            TradeItem? item = tradeItems.FirstOrDefault(x => x.Definition.Name == Resource && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
+            item = tradeItems.FirstOrDefault(x => x.Definition.Name == Resource && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
             if (item is null) {
                 break;
             }
@@ -179,24 +178,29 @@ public class Factory : IHasOwner, IBuilding
             item.Amount -= amountNeeded;
         }
 
-        foreach(string Resource in recipe.Outputs.Keys) 
-        {
-            // find the tradeitem
-            TradeItem? item = tradeItems.FirstOrDefault(x => x.Definition.Name == Resource && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
-            if (item is null) {
-                item = new()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    OwnerId = OwnerId,
-                    Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == Resource && x.OwnerId == "g-vooperia")!.Id,
-                    Amount = 0
-                };
-                await DBCache.Put<TradeItem>(item.Id, item);
-                await VooperDB.Instance.TradeItems.AddAsync(item);
-                await VooperDB.Instance.SaveChangesAsync();
-            }
-            item.Amount += (int)(recipe.Outputs[Resource]*rate);
+        string output = recipe.Output.Key;
+        // find the tradeitem
+        item = tradeItems.FirstOrDefault(x => x.Definition.Name == output && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
+        if (item is null) {
+            item = new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                OwnerId = OwnerId,
+                Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == output && x.OwnerId == "g-vooperia")!.Id,
+                Amount = 0
+            };
+            await DBCache.Put<TradeItem>(item.Id, item);
+            await VooperDB.Instance.TradeItems.AddAsync(item);
+            await VooperDB.Instance.SaveChangesAsync();
         }
+        rate *= recipe.Output.Value;
+        int wholerate = (int)Math.Floor(rate);
+        LeftOver += rate-wholerate;
+        if (LeftOver >= 1.0) {
+            item.Amount += 1;
+            LeftOver -= 1.0;
+        }
+        item.Amount += wholerate;
     }
 
 }
