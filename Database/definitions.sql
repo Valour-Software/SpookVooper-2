@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS taxpolicies (
     minimum DECIMAL(20,10) NOT NULL,
     maximum DECIMAL(20,10) NOT NULL,
     collected DECIMAL(20,10) NOT NULL,
+    target VARCHAR(32) NULL,
     CONSTRAINT pk_taxpolicies PRIMARY KEY (id)
 );
 

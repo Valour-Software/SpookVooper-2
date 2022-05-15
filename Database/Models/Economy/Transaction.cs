@@ -80,7 +80,7 @@ public class Transaction
 
     public void NonAsyncExecute(bool force = false)
     {
-        Force = true;
+        Force = force;
         TransactionManager.transactionQueue.Enqueue(this);
     }
 
@@ -171,20 +171,20 @@ public class Transaction
                     if (policy.taxType == TaxType.Sales || policy.taxType == TaxType.Transactional || policy.taxType == TaxType.Payroll) {
                         _FromId = ToId;
                     }
-                    Transaction taxtrans = new Transaction(_FromId, "g-vooperia", amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
+                    Transaction taxtrans = new Transaction(_FromId, "g-vooperia", amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
                     policy.Collected += amount;
                     totaltaxpaid += amount;
                     taxtrans.NonAsyncExecute(true);
                 }
                 else {
                     if (policy.DistrictId == fromEntity.DistrictId && policy.taxType != TaxType.Sales && policy.taxType != TaxType.Payroll && policy.taxType != TaxType.Transactional) {
-                        Transaction taxtrans = new Transaction(FromId, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
+                        Transaction taxtrans = new Transaction(FromId, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
                         taxtrans.NonAsyncExecute(true);
                     }
                     else if (policy.DistrictId == toEntity.DistrictId){
-                        Transaction taxtrans = new Transaction(toEntity.Id, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}. Tax Id: {policy.Id}");
+                        Transaction taxtrans = new Transaction(toEntity.Id, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
                         taxtrans.NonAsyncExecute(true);

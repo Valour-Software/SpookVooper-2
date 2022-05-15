@@ -137,12 +137,18 @@ public class Mine : IHasOwner, IBuilding
         int wholerate = (int)Math.Floor(rate);
         LeftOver += rate-wholerate;
         if (LeftOver >= 1.0) {
-            item.Amount += 1;
+            wholerate += 1;
             LeftOver -= 1.0;
         }
         item.Amount += wholerate;
 
-        // need to do district taxes
-    }
+        // do district taxes
 
+        TaxPolicy? policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == County.DistrictId && x.taxType == TaxType.ResourceMined && x.Target == ResourceName);
+        if (policy is not null) {
+            decimal due = policy.GetTaxAmountForResource(wholerate);
+            Transaction taxtrans = new Transaction(Id, policy!.DistrictId!, due, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
+            taxtrans.NonAsyncExecute(true);
+        }
+    }
 }

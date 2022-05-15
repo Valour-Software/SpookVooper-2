@@ -20,6 +20,7 @@ public enum TaxType
     PersonalIncome = 10,
     CorporateIncome = 11,
     GroupIncome = 12,
+    ResourceMined = 13
 }
 
 public class TaxPolicy
@@ -48,6 +49,10 @@ public class TaxPolicy
     // amount this tax has collected in the current month
     public decimal Collected { get; set; }
 
+    // mainly used for the ResourceMined tax but can be expanded in future to be used for other taxes
+    [VarChar(32)]
+    public string? Target { get; set;}
+
     public decimal GetTaxAmount(decimal amount) {
         if (amount < Minimum) {
             return 0.0m;
@@ -56,5 +61,15 @@ public class TaxPolicy
             amount = Math.Min(Maximum, amount);
         }
         return amount * (Rate / 100.0m);
+    }
+
+    public decimal GetTaxAmountForResource(decimal amount) {
+        if (amount < Minimum) {
+            return 0.0m;
+        }
+        if (Maximum != 0.0m) {
+            amount = Math.Min(Maximum, amount);
+        }
+        return amount * Rate;
     }
 }

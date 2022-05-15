@@ -197,7 +197,7 @@ public class Factory : IHasOwner, IBuilding
         int wholerate = (int)Math.Floor(rate);
         LeftOver += rate-wholerate;
         if (LeftOver >= 1.0) {
-            item.Amount += 1;
+            wholerate += 1;
             LeftOver -= 1.0;
         }
         item.Amount += wholerate;
