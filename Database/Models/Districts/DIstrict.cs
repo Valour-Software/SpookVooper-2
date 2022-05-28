@@ -22,7 +22,7 @@ public class District
     public string? Description { get; set; }
 
     [InverseProperty("District")]
-    public ICollection<County> Counties { get; set;}
+    public ICollection<Province> Provinces { get; set;}
 
     public Group Group { 
         get {

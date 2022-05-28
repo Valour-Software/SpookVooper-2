@@ -29,9 +29,6 @@ public class Factory : IHasOwner, IBuilding
         }
     }
 
-    [GuidID]
-    public string CountyId { get; set; }
-
     [VarChar(256)]
     public string? RecipeName { get; set; }
     
@@ -73,10 +70,13 @@ public class Factory : IHasOwner, IBuilding
         }
     }
 
+    [GuidID]
+    public string ProvinceId { get; set; } 
+
     [NotMapped]
-    public County County {
+    public Province Province {
         get {
-            return DBCache.Get<County>(CountyId)!;
+            return DBCache.Get<Province>(ProvinceId)!;
         }
     }
 
@@ -99,12 +99,12 @@ public class Factory : IHasOwner, IBuilding
         
     }
 
-    public Factory(string ownerid, string countyid)
+    public Factory(string ownerid, string provinceid)
     {
         // why so many variables
         Id = Guid.NewGuid().ToString();
         OwnerId = ownerid;
-        CountyId = countyid;
+        ProvinceId = provinceid;
         Quantity = 0.1;
         QuantityCap = 1.5;
         QuantityGrowthRate = 1;

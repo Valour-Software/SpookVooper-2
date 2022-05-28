@@ -25,12 +25,12 @@ public interface IBuilding
         }
     }
 
-    public string CountyId { get; set; } 
+    public string ProvinceId { get; set; } 
 
     [NotMapped]
-    public County County {
+    public Province Province {
         get {
-            return DBCache.Get<County>(CountyId)!;
+            return DBCache.Get<Province>(ProvinceId)!;
         }
     }
 

@@ -28,9 +28,6 @@ public class Mine : IHasOwner, IBuilding
         }
     }
 
-    [GuidID]
-    public string CountyId { get; set; }
-
     // the name of the resource that this mine mines
     [VarChar(32)]
     public string ResourceName { get; set; }
@@ -65,10 +62,13 @@ public class Mine : IHasOwner, IBuilding
         }
     }
 
+    [GuidID]
+    public string ProvinceId { get; set; } 
+
     [NotMapped]
-    public County County {
+    public Province Province {
         get {
-            return DBCache.Get<County>(CountyId)!;
+            return DBCache.Get<Province>(ProvinceId)!;
         }
     }
 
@@ -144,7 +144,7 @@ public class Mine : IHasOwner, IBuilding
 
         // do district taxes
 
-        TaxPolicy? policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == County.DistrictId && x.taxType == TaxType.ResourceMined && x.Target == ResourceName);
+        TaxPolicy? policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == Province.DistrictId && x.taxType == TaxType.ResourceMined && x.Target == ResourceName);
         if (policy is not null) {
             decimal due = policy.GetTaxAmountForResource(wholerate);
             Transaction taxtrans = new Transaction(Id, policy!.DistrictId!, due, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");

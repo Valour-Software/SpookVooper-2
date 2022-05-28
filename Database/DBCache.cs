@@ -1,10 +1,3 @@
-using SV2.Database.Models.Entities;
-using SV2.Database.Models.Users;
-using SV2.Database.Models.Groups;
-using SV2.Database.Models.Economy;
-using SV2.Database.Models.Items;
-using SV2.Database.Models.Districts;
-using SV2.Database.Models.Factories;
 using System.Collections.Concurrent;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -125,6 +118,15 @@ public static class DBCache
         foreach(GroupRole role in VooperDB.Instance.GroupRoles) {
             tasks.Add(DBCache.Put<GroupRole>(role.Id, role));
         }
+        foreach(Election election in VooperDB.Instance.Elections) {
+            tasks.Add(DBCache.Put<Election>(election.Id, election));
+        }
+        foreach(Vote vote in VooperDB.Instance.Votes) {
+            tasks.Add(DBCache.Put<Vote>(vote.Id, vote));
+        }
+        foreach(Province province in VooperDB.Instance.Provinces) {
+            tasks.Add(DBCache.Put<Province>(province.Id, province));
+        }
         await Task.WhenAll(tasks);
 
         //#endif
@@ -140,6 +142,7 @@ public static class DBCache
         VooperDB.Instance.Factories.UpdateRange(GetAll<Factory>());
         VooperDB.Instance.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
         VooperDB.Instance.Districts.UpdateRange(GetAll<District>());
+        VooperDB.Instance.Provinces.UpdateRange(GetAll<Province>());
         await VooperDB.Instance.SaveChangesAsync();
     }
 }

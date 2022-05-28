@@ -66,6 +66,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<UBIPolicy> UBIPolicies { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<District> Districts { get; set; }
+    public DbSet<Province> Provinces { get; set; }
     public DbSet<GroupRole> GroupRoles { get; set; }
     public DbSet<Election> Elections { get; set; }
     public DbSet<Vote> Votes { get; set; }
@@ -75,6 +76,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     {
         string sql = VooperDB.Instance.Database.GenerateCreateScript();
         sql = sql.Replace("numeric ", "DECIMAL(20,10) ");
+        sql = sql.Replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS");
         return sql;
     }
 

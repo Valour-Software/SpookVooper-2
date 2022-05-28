@@ -10,27 +10,32 @@ public enum TerrainType
     Plains = 1,
     Mountain = 2,
     Hills = 3,
-    Urban = 4
+    Urban = 4,
+    Forests = 5,
+    River = 6,
+    Marsh = 7
 }
 
 public class Province
 {
     [Key]
     [GuidID]
-    public int Id { get; set;}
+    public string Id { get; set;}
 
     [VarChar(64)]
     public string? Name { get; set;}
-
-    [GuidID]
-    public string CountyId { get; set; }
-
-    [ForeignKey("CountyId")]
-    public County County { get; set; }
 
     [EntityId]
     public string DistrictId { get; set; }
 
     [ForeignKey("DistrictId")]
     public District Owner { get; set; }
+
+    public IEnumerable<IBuilding> GetBuildings()
+    {
+        List<IBuilding> buildings = new();
+        buildings.AddRange(DBCache.GetAll<Factory>().Where(x => x.ProvinceId == Id));
+        buildings.AddRange(DBCache.GetAll<Mine>().Where(x => x.ProvinceId == Id));
+        return buildings;
+    }
 }
