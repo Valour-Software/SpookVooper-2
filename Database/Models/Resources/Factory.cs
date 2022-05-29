@@ -33,9 +33,9 @@ public class Factory : IHasOwner, IBuilding
     public string? RecipeName { get; set; }
     
     [NotMapped]
-    public Recipe recipe {
+    public Recipe? recipe {
         get {
-            return ResourceManager.Recipes.FirstOrDefault(x => x.Name == RecipeName);
+            return DBCache.Get<Recipe>(RecipeName);
         }
     }
     public string? EmployeeId { get; set; }
@@ -161,6 +161,8 @@ public class Factory : IHasOwner, IBuilding
         }
 
         rate *= Quantity;
+
+        rate *= recipe.HourlyProduction;
 
         TradeItem? item = null;
 

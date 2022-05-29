@@ -127,6 +127,9 @@ public static class DBCache
         foreach(Province province in VooperDB.Instance.Provinces) {
             tasks.Add(DBCache.Put<Province>(province.Id, province));
         }
+        foreach(Recipe recipe in VooperDB.Instance.Recipes) {
+            tasks.Add(DBCache.Put<Recipe>(recipe.Id, recipe));
+        }
         await Task.WhenAll(tasks);
 
         //#endif
@@ -143,6 +146,7 @@ public static class DBCache
         VooperDB.Instance.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
         VooperDB.Instance.Districts.UpdateRange(GetAll<District>());
         VooperDB.Instance.Provinces.UpdateRange(GetAll<Province>());
+        VooperDB.Instance.Recipes.UpdateRange(GetAll<Recipe>());
         await VooperDB.Instance.SaveChangesAsync();
     }
 }

@@ -71,7 +71,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<Election> Elections { get; set; }
     public DbSet<Vote> Votes { get; set; }
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
-
+    public DbSet<Recipe> Recipes { get; set; }
     public static string GenerateSQL()
     {
         string sql = VooperDB.Instance.Database.GenerateCreateScript();

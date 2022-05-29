@@ -11,13 +11,9 @@ using System.Text.Json.Serialization;
 
 namespace SV2.Managers;
 
-
-public class Recipe
+public class BaseRecipe
 {
     public string Name { get; set; }
-    public Dictionary<string, double> Inputs { get; set; }
-    public KeyValuePair<string, double> Output { get; set; }
-    public double ProcessingCost { get; set; }
 }
 
 public class Material_Group
@@ -29,13 +25,13 @@ public class Material_Group
 public class TopLevelResources
 {
     public List<Material_Group> Material_Groups { get; set; }
-    public List<Recipe> Recipes { get; set; }
+    public List<BaseRecipe> Recipes { get; set; }
 }
 
 public static class ResourceManager 
 {
     static public List<string> Resources = new();
-    static public List<Recipe> Recipes = new();
+    static public List<BaseRecipe> Recipes = new();
     static public List<Material_Group> Material_Groups = new();
 
     public static async Task Load()
