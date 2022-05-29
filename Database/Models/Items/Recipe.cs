@@ -12,8 +12,18 @@ public enum BuildInModifierTypes
 
 public class Modifier
 {
-    public double Value { get; set; }
+    public int Level { get; set; }
     public BuildInModifierTypes ModifierType { get; set; }
+
+    [VarChar(32)]
+    public string RecipeName { get; set; }
+
+    [NotMapped]
+    public ModifierLevelDefinition ModifierLevelDefinition {
+        get {
+            return ResourceManager.ModifierLevelDefinitions.FirstOrDefault(x => x.RecipeName == RecipeName)!;
+        }
+    }
 }
 
 public class Recipe : IHasOwner

@@ -13,7 +13,18 @@ namespace SV2.Managers;
 
 public class BaseRecipe
 {
+    public KeyValuePair<string, int> Output { get; set; }
     public string Name { get; set; }
+}
+
+public class ModifierLevelDefinition
+{
+    public BuildInModifierTypes ModifierType { get; set; }
+    public double ModifierValue { get; set; }
+    public int Level { get; set; }
+    public Dictionary<string, int> Inputs { get; set; }
+    public double HourlyProduction { get; set; }
+    public string RecipeName { get; set; }
 }
 
 public class Material_Group
@@ -33,6 +44,7 @@ public static class ResourceManager
     static public List<string> Resources = new();
     static public List<BaseRecipe> Recipes = new();
     static public List<Material_Group> Material_Groups = new();
+    static public List<ModifierLevelDefinition> ModifierLevelDefinitions = new();
 
     public static async Task Load()
     {
