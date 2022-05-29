@@ -166,20 +166,6 @@ public class Factory : IHasOwner, IBuilding
 
         TradeItem? item = null;
 
-        foreach(string Resource in recipe.Inputs.Keys) 
-        {
-            // find the tradeitem
-            item = tradeItems.FirstOrDefault(x => x.Definition.Name == Resource && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
-            if (item is null) {
-                break;
-            }
-            int amountNeeded = (int)(recipe.Inputs[Resource]*rate/Efficiency);
-            if (item.Amount < amountNeeded) {
-                break;
-            }
-            item.Amount -= amountNeeded;
-        }
-
         string output = recipe.Output.Key;
         // find the tradeitem
         item = tradeItems.FirstOrDefault(x => x.Definition.Name == output && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
@@ -201,6 +187,24 @@ public class Factory : IHasOwner, IBuilding
         if (LeftOver >= 1.0) {
             wholerate += 1;
             LeftOver -= 1.0;
+        }
+        foreach(string Resource in recipe.Inputs.Keys) 
+        {
+            item = tradeItems.FirstOrDefault(x => x.Definition.Name == Resource && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
+            if (item is null) {
+                return;
+            }
+            int amountNeeded = (int)(recipe.Inputs[Resource]*wholerate/Efficiency);
+            if (item.Amount < amountNeeded) {
+                return;
+            }
+        }
+        foreach(string Resource in recipe.Inputs.Keys) 
+        {
+            // find the tradeitem
+            item = tradeItems.FirstOrDefault(x => x.Definition.Name == Resource && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
+            int amountNeeded = (int)(recipe.Inputs[Resource]*wholerate/Efficiency);
+            item.Amount -= amountNeeded;
         }
         item.Amount += wholerate;
     }
