@@ -4,7 +4,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>SpookVooper_2</RootNamespace>
+    <RootNamespace>SV2</RootNamespace>
+    <EnablePreviewFeatures>True</EnablePreviewFeatures>
+    <Version>0.0.1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="6.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.3" />
+    <PackageReference Include="Npgsql" Version="6.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3" />
+    <PackageReference Include="Valour.Net" Version="0.5.0" />
+    <PackageReference Include="westwind.aspnetcore.markdown" Version="3.8.0" />
+    <ProjectReference Include="Valour\API\Valour.Api.csproj" />
+  </ItemGroup>
 
 </Project>
