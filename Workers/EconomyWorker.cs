@@ -68,7 +68,17 @@ namespace SV2.Workers
                                     effected = effected.Where(x => x.Rank == policy.ApplicableRank).ToList();
                                 }
                                 foreach(User user in effected) {
-                                    Transaction tran = new Transaction(fromId, user.Id, policy.Rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
+                                    decimal rate = policy.Rate;
+
+                                    // if the user has joined less than 4 weeks ago
+                                    if (DateTime.UtcNow.Subtract(user.Joined).Days <= 28) {
+                                        decimal increase = 2.0m;
+                                        if (DateTime.UtcNow.Subtract(user.Joined).Days >= 7) {
+                                            increase -= Math.Min(0, DateTime.UtcNow.Subtract(user.Joined).Days-7)/21*2;
+                                        }
+                                        rate *= increase+1;
+                                    }
+                                    Transaction tran = new Transaction(fromId, user.Id, rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
                                     tran.NonAsyncExecute();
                                 }
                             }

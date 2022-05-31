@@ -162,6 +162,7 @@ CREATE TABLE IF NOT EXISTS users (
     postlikes integer NOT NULL,
     messages integer NOT NULL,
     lastsentmessage timestamp with time zone NOT NULL,
+    joined timestamp with time zone NOT NULL
     api_key VARCHAR(36) NOT NULL,
     credits DECIMAL(20,10) NOT NULL,
     taxablecredits DECIMAL(20,10) NOT NULL,
