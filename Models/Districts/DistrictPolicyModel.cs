@@ -83,8 +83,11 @@ public class DistrictPolicyModel
             AddTaxPolicy(district.Id, TaxType.StockBought);
             AddTaxPolicy(district.Id, TaxType.StockSale);
             AddTaxPolicy(district.Id, TaxType.Transactional);
-            AddTaxPolicy(district.Id, TaxType.Balance);
-            AddTaxPolicy(district.Id, TaxType.Wealth);
+            AddTaxPolicy(district.Id, TaxType.UserBalance);
+            AddTaxPolicy(district.Id, TaxType.GroupBalance);
+            AddTaxPolicy(district.Id, TaxType.UserWealth);
+            AddTaxPolicy(district.Id, TaxType.GroupWealth);
+            AddTaxPolicy(district.Id, TaxType.ResourceMined);
 
             // do personal tax brackets
 

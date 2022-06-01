@@ -12,15 +12,17 @@ public enum TaxType
     StockSale = 3,
     StockBought = 4,
     Payroll = 5,
-    Balance = 6,
-    Wealth = 7,
+    UserBalance = 6,
+    UserWealth = 7,
     // only the imperial government can use this one
     Inactivity = 8,
     None = 9,
     PersonalIncome = 10,
     CorporateIncome = 11,
     GroupIncome = 12,
-    ResourceMined = 13
+    ResourceMined = 13,
+    GroupBalance = 14,
+    GroupWealth = 15
 }
 
 public class TaxPolicy
