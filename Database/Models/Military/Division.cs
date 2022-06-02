@@ -113,8 +113,8 @@ public class Division : IHasOwner
         }
     }
 
-    // current strength of the division
-    public decimal Strength { get; set; }
+    // current effectiveness of this division
+    public decimal CombatEffectiveness { get; set; }
 
     public decimal Xp { get; set; }
 
@@ -151,18 +151,18 @@ public class Division : IHasOwner
             TradeItem EquipmentItem = Equipment.FirstOrDefault(x => x.ItemName == MainEquipmentNeeded).tradeItem;
             attack += EquipmentItem.Definition.BuiltinModifiers.FirstOrDefault(x => x.ModifierType == BuildInModifierTypes.Attack)!.ModifierLevelDefinition.ModifierValue*regiment.Count;
         }
-        attack *= Strength;
+        attack *= CombatEffectiveness;
         return attack;
     }
 
-    public decimal GetStrength()
+    public decimal GetCombatEffectiveness()
     {
-        // Strength is computed as which of the following has the lowest ratio:
+        // CombatEffectiveness is computed as which of the following has the lowest ratio:
         // 1. ManPower / ManPowerNeeded
         // 2. Equipment in storage / EquipmentNeeded
         
         int totalManPowerNeeded = Regiments.Sum(x => x.Count);
-        decimal manPowerStrength = ManPower/totalManPowerNeeded;
+        decimal manPowerEffectiveness = ManPower/totalManPowerNeeded;
         decimal totalEquipmentNeed = 0;
         decimal currentequipment = 0;
         foreach (Regiment regiment in Regiments) {
@@ -171,7 +171,7 @@ public class Division : IHasOwner
                 currentequipment += Math.Min(equipmentNeed.Value, Equipment.First(x => x.ItemName == equipmentNeed.Key).tradeItem.Amount);
             }
         }
-        decimal equipmentStrength = currentequipment/totalEquipmentNeed;
-        return Math.Min(manPowerStrength, equipmentStrength);
+        decimal equipmentEffectiveness = currentequipment/totalEquipmentNeed;
+        return Math.Min(manPowerEffectiveness, equipmentEffectiveness);
     }
 }
