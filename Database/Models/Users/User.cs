@@ -38,6 +38,7 @@ public class User : IEntity
     public int PostLikes { get; set;}
     public int Messages { get; set;}
     public DateTime LastSentMessage { get; set;}
+    public DateTime Joined { get; set;}
 
     [JsonIgnore]
     [VarChar(36)]
