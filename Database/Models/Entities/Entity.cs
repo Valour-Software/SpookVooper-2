@@ -124,7 +124,7 @@ public interface IEntity
         }
 
         // do district level balance tx
-        TaxPolicy _policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == DistrictId && x.taxType == TaxType.Balance);
+        TaxPolicy _policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == DistrictId && x.taxType == TaxType.UserBalance);
         if (_policy is not null) {
             totaldue = _policy.GetTaxAmount(Credits);
             if (totaldue > 0.01m) {
