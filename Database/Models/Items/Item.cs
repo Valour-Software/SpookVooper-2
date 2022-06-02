@@ -24,9 +24,10 @@ public class TradeItem : IHasOwner
     [GuidID]
     public string Definition_Id { get; set; }
     
+    [NotMapped]
     public TradeItemDefinition Definition { 
         get {
-            return DBCache.Get<TradeItemDefinition>(Definition_Id);
+            return DBCache.Get<TradeItemDefinition>(Definition_Id)!;
         }
     }
     public int Amount { get; set;}
@@ -55,6 +56,22 @@ public class TradeItem : IHasOwner
     }
 }
 
+public class BuiltinModifier
+{
+    public int Level { get; set; }
+    
+    public BuildInModifierTypes ModifierType { get; set; }
+
+    public string RecipeName { get; set; }
+    
+    [NotMapped]
+    public ModifierLevelDefinition ModifierLevelDefinition {
+        get {
+            return ResourceManager.ModifierLevelDefinitions.FirstOrDefault(x => x.RecipeName == RecipeName && x.ModifierType == ModifierType)!;
+        }
+    }
+}
+
 public class TradeItemDefinition : IHasOwner
 {
     [Key]
@@ -77,6 +94,10 @@ public class TradeItemDefinition : IHasOwner
     [VarChar(1024)]
     public string? Description { get; set; }
     public DateTime Created { get; set; }
+
+    [Column(TypeName = "jsonb")]
+    public List<BuiltinModifier> BuiltinModifiers { get; set; }
+
     // json list of modifiers
     public string? Modifiers { get; set; }
 

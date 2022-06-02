@@ -12,7 +12,6 @@ public enum BuildInModifierTypes
 
 public class Modifier
 {
-    public int Level { get; set; }
     public BuildInModifierTypes ModifierType { get; set; }
 
     [VarChar(32)]
@@ -21,7 +20,7 @@ public class Modifier
     [NotMapped]
     public ModifierLevelDefinition ModifierLevelDefinition {
         get {
-            return ResourceManager.ModifierLevelDefinitions.FirstOrDefault(x => x.RecipeName == RecipeName)!;
+            return ResourceManager.ModifierLevelDefinitions.FirstOrDefault(x => x.RecipeName == RecipeName && x.ModifierType == ModifierType)!;
         }
     }
 }

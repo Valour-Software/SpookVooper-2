@@ -14,27 +14,24 @@ public enum RegimentType
     Mech = 4,
 }
 
-public enum DivisionEquipmentType
-{
-    Gun = 1,
-    // 1k units will use 1 ammo per hour of fighting
-    Ammo = 2
-}
-
 // Represents the current equipment of the division
 public class DivisionEquipment
 {
     [Key]
     [GuidID]
     public string Id { get; set;}
-    public DivisionEquipmentType Type { get; set;}
+    public string ItemName { get; set;}
     
     [GuidID]
     public string tradeItemId { get; set; }
-
-    [ForeignKey("tradeItemId")]
+    
+    [NotMapped]
     // the item that is currently selected to be used
-    public TradeItem tradeItem { get; set;}
+    public TradeItem tradeItem {
+        get {
+            return DBCache.Get<TradeItem>(tradeItemId)!;
+        }
+    }
 
     [GuidID]
     public string DivisionId { get; set; }
@@ -63,25 +60,29 @@ public class Regiment
     [ForeignKey("DivisionId")]
     public Division Division { get; set; }
 
-    public List<List<int>> GetEquipmentNeeds()
+    public List<KeyValuePair<string, int>> GetEquipmentNeeds()
     {
-        // NOTE: 1 of any equipment is enough for 1k troops that uses that equipment
+        // NOTE: 1 of Infantry equipment is enough for 1k troops that uses that equipment, anything else is 1 for 100 troops
         // for example 100k Infantry needs 100 Guns & 100 Ammo.
         switch (Type)
         {
             case RegimentType.Infantry:
-                return new List<List<int>> {
-                    new List<int> {
-                        (int)DivisionEquipmentType.Ammo,
-                        Count / 1000
-                    },
-                    new List<int> {
-                        (int)DivisionEquipmentType.Gun,
-                        Count / 1000
-                    }
+                return new List<KeyValuePair<string, int>> {
+                    KeyValuePair.Create("Ammo", Count/1000),
+                    KeyValuePair.Create("Rifle", Count/1000)
                 };
         }
-        return new List<List<int>> {};
+        return new List<KeyValuePair<string, int>> {};
+    }
+
+    public string GetWeapon()
+    {
+        switch (Type)
+        {
+            case RegimentType.Infantry:
+                return "Rifle";
+        }
+        return "";
     }
 }
 
@@ -146,20 +147,9 @@ public class Division : IHasOwner
         decimal attack = 0;
         foreach(Regiment regiment in Regiments) 
         {
-            switch (regiment.Type) {
-                case RegimentType.Infantry:
-                    attack += regiment.Count / 1000.0m;
-                    break;
-                case RegimentType.Artillery:
-                    attack += regiment.Count / 1000.0m * 9.0m;
-                    break;
-                case RegimentType.Tank:
-                    attack += regiment.Count / 1000.0m * 15.0m;
-                    break;
-                case RegimentType.Mech:
-                    attack += regiment.Count / 1000.0m * 60.0m;
-                    break;
-            }
+            string MainEquipmentNeeded = regiment.GetWeapon();
+            TradeItem EquipmentItem = Equipment.FirstOrDefault(x => x.ItemName == MainEquipmentNeeded).tradeItem;
+            attack += EquipmentItem.Definition.BuiltinModifiers.FirstOrDefault(x => x.ModifierType == BuildInModifierTypes.Attack)!.ModifierLevelDefinition.ModifierValue*regiment.Count;
         }
         attack *= Strength;
         return attack;
@@ -176,9 +166,9 @@ public class Division : IHasOwner
         decimal totalEquipmentNeed = 0;
         decimal currentequipment = 0;
         foreach (Regiment regiment in Regiments) {
-            foreach(List<int> equipmentNeed in regiment.GetEquipmentNeeds()) {
-                totalEquipmentNeed += (decimal)equipmentNeed[1];
-                currentequipment += Math.Min(equipmentNeed[1], Equipment.First(x => (int)x.Type == equipmentNeed[0]).tradeItem.Amount);
+            foreach(KeyValuePair<string, int> equipmentNeed in regiment.GetEquipmentNeeds()) {
+                totalEquipmentNeed += (decimal)equipmentNeed.Value;
+                currentequipment += Math.Min(equipmentNeed.Value, Equipment.First(x => x.ItemName == equipmentNeed.Key).tradeItem.Amount);
             }
         }
         decimal equipmentStrength = currentequipment/totalEquipmentNeed;

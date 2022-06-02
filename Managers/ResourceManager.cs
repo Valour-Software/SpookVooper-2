@@ -15,12 +15,14 @@ public class BaseRecipe
 {
     public KeyValuePair<string, int> Output { get; set; }
     public string Name { get; set; }
+
+    public List<Modifier> Modifiers { get; set; }
 }
 
 public class ModifierLevelDefinition
 {
     public BuildInModifierTypes ModifierType { get; set; }
-    public double ModifierValue { get; set; }
+    public decimal ModifierValue { get; set; }
     public int Level { get; set; }
     public Dictionary<string, int> Inputs { get; set; }
     public double HourlyProduction { get; set; }
