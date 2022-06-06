@@ -29,6 +29,25 @@ public class ModifierLevelDefinition
     public string RecipeName { get; set; }
 }
 
+public class ConsumerGood
+{
+    public string Name { get; set; }
+
+    // in x per 1,000 citizens per year
+    public double PopGrowthRateModifier { get; set; }
+
+    // the score per 10k citizens that have this good filled
+    public double EconomicScoreModifier { get; set; }
+    
+    // 10k citizens will consume this many units per hour
+    public double PopConsumptionRate { get; set; }
+}
+
+public class ConsumerGoodGroup
+{
+    public List<ConsumerGood> ConsumerGoods { get; set; }
+}
+
 public class Material_Group
 {
     public string Name { get; set; }
@@ -39,6 +58,9 @@ public class TopLevelResources
 {
     public List<Material_Group> Material_Groups { get; set; }
     public List<BaseRecipe> Recipes { get; set; }
+    
+    [JsonPropertyName("Consumer Goods")]
+    public ConsumerGoodGroup ConsumerGoodGroup { get; set; }
 }
 
 public static class ResourceManager 
@@ -46,6 +68,7 @@ public static class ResourceManager
     static public List<string> Resources = new();
     static public List<BaseRecipe> Recipes = new();
     static public List<Material_Group> Material_Groups = new();
+    static public List<ConsumerGood> ConsumerGoods = new();
     static public List<ModifierLevelDefinition> ModifierLevelDefinitions = new();
 
     public static async Task Load()

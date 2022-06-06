@@ -1,32 +1,78 @@
 {
-    "Material_Groups": [
+     "Material_Groups": [
         {
             "Name":"Food",
             "Materials": ["Corn", "Wheat"]
         },
         {
             "Name":"Ore",
-            "Materials": ["Iron Ore","Gold ore","Crystallite ore","Coal ore","Copper ore"]
+            "Materials": ["Quartz Ore", "Iron Ore","Gold Ore","Crystallite Ore","Coal Ore","Copper Ore", "Aluminum Ore", "Lithium Ore", "Uranium Ore", "Oil", "Natural Gas", "Silicon"]
         },
         {
-            "Name": "Metals",
-            "Materials": ["Copper", "Iron", "Gold"]
+            "Name": "Basic Metals",
+            "Materials": ["Quartz","Iron","Gold","Crystallite","Coal","Copper","Aluminum","Lithium", "Uranium"]
+        },
+        {
+            "Name": "Building Materials",
+            "Materials": ["Steel"]
         },
         {
             "Name":"Components",
-            "Materials": ["Copper wire"]
+            "Materials": ["Copper Wire", "Iron Plate"]
+        },
+        {
+            "Name": "Basic Consumer Goods",
+            "Materials": ["Computer", "Furniture"]
+
+        }
+    ],
+    "Consumer Goods": [
+        {
+            "Name": "Computer",
+            "Population Growth Rate Modifier": 10,
+            "Economic Score Modifier": 5,
+            "Consumption Rate": 1
+        },
+        {
+            "Name": "Furniture",
+            "Population Growth Rate Modifier": 4,
+            "Economic Score Modifier": 2,
+            "Consumption Rate": 2
         }
     ],
     "Recipes": [
         {
-            "Name": "Copper Processing",
+            "Name": "Copper Wire Production",
             "Inputs": {
-                "Copper Ore": 1
+                "Copper": 2
             },
             "Outputs": {
-                "Copper": 1
+                "Copper Wire": 3
             },
             "ProcessingCost": 1
+        },
+        {
+            "Name": "Steel Production",
+            "Inputs": {
+                "Iron": 3,
+                "Coal": 1
+            },
+            "Outputs": {
+                "Steel": 2
+            },
+            "ProcessingCost": 8
+        },
+        {
+            "Name": "Computer Chip Production",
+            "Inputs": {
+                "Copper Wire": 5,
+                "Quartz": 3,
+                "Silicon": 10
+            },
+            "Outputs": {
+                "Computer Chip": 1
+            },
+            "ProcessingCost": 10
         }
     ]
 }
