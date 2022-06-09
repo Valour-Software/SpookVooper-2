@@ -150,11 +150,13 @@ public class Factory : IHasOwner, IBuilding
         // 11 days: 57.28%
         // 32 days: 82.78% 
 
+        QuantityCap = 1+Province.Owner.GetModifier(DistrictModifierType.FactoryQuantityCap);
+
         if (Quantity < QuantityCap) {
             HoursSinceChangedProductionRecipe += 1;
             double days = HoursSinceChangedProductionRecipe/24;
-            double newQuantity = Math.Max(QuantityCap, Math.Log10( Math.Pow(days, 20) / 40));
-            newQuantity = Math.Min(0.1, newQuantity);
+            double newQuantity = Math.Max(QuantityCap, Math.Log10( Math.Pow(days, 20) / 40)*Province.Owner.GetModifier(DistrictModifierType.FactoryQuantityGrowthRateFactor));
+            newQuantity = Math.Min(0.1+Province.Owner.GetModifier(DistrictModifierType.FactoryBaseQuantity), newQuantity);
             newQuantity *= QuantityGrowthRate;
 
             Quantity = newQuantity;
@@ -163,6 +165,18 @@ public class Factory : IHasOwner, IBuilding
         rate *= Quantity;
 
         rate *= recipe.HourlyProduction;
+
+        // apply district modifers
+        rate *= Province.Owner.GetModifier(DistrictModifierType.FactorySpeedFactor);
+
+        // update Efficiency
+
+        Efficiency = 1;
+        // apply size debuff to Efficiency
+        // we subtract 0.4 since at size 1 there is no debuff
+        Efficiency += size*0.4-0.4;
+
+        Efficiency *= Province.Owner.GetModifier(DistrictModifierType.FactoryEfficiencyFactor);
 
         TradeItem? item = null;
 

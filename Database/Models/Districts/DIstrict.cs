@@ -11,7 +11,7 @@ namespace SV2.Database.Models.Districts;
 public class DistrictModifier
 {
     public DistrictModifierType Type { get; set; }
-    public decimal amount { get; set; }  
+    public decimal Amount { get; set; }  
 }
 
 public class District
@@ -57,5 +57,20 @@ public class District
     public static District Find(string id)
     {
         return DBCache.GetAll<District>().FirstOrDefault(x => x.Id == id)!;
+    }
+
+    public decimal GetModifier(DistrictModifierType modifierType)
+    {
+        DistrictModifier modifier = Modifiers.FirstOrDefault(x => x.Type == modifierType);
+        if (modifier == null) {
+            string modifierTypeName = modifierType.ToString();
+            if (modifierTypeName.Contains("Factor")) {
+                // if this modifier is factor then it applies a percent change so just return 1 (100%)
+                return 1;
+            }
+            return 0;
+        }
+
+        return modifier.Amount;
     }
 }

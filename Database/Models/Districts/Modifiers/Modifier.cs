@@ -10,7 +10,7 @@ public enum DistrictModifierType
     FactoryBaseQuantity = 2,
     FactoryQuantityGrowthRateFactor = 3,
     FactoryQuantityCap = 4,
-    FactoryEfficiencyFactory = 5,
+    FactoryEfficiencyFactor = 5,
     MineSpeedFactor = 6,
     MineBaseQuantity = 7,
     MineQuantityGrowthRateFactor = 8,
