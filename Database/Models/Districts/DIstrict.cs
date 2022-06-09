@@ -11,7 +11,7 @@ namespace SV2.Database.Models.Districts;
 public class DistrictModifier
 {
     public DistrictModifierType Type { get; set; }
-    public decimal Amount { get; set; }  
+    public double Amount { get; set; }  
 }
 
 public class District
