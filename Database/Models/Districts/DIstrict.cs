@@ -59,7 +59,7 @@ public class District
         return DBCache.GetAll<District>().FirstOrDefault(x => x.Id == id)!;
     }
 
-    public decimal GetModifier(DistrictModifierType modifierType)
+    public double GetModifier(DistrictModifierType modifierType)
     {
         DistrictModifier modifier = Modifiers.FirstOrDefault(x => x.Type == modifierType);
         if (modifier == null) {
