@@ -26,12 +26,10 @@ public class District
     [VarChar(512)]
     public string? Description { get; set; }
 
-    public List<string> ProvinceIds { get; set; }
-
     [NotMapped]
     public List<Province> Provinces {
         get {
-            return DBCache.GetAll<Province>().Where(x => ProvinceIds.Contains(x.Id)).ToList();
+            return DBCache.GetAll<Province>().Where(x => x.DistrictId == Id).ToList();
         }
     }
 

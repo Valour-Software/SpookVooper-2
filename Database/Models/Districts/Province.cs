@@ -27,9 +27,13 @@ public class Province
 
     [EntityId]
     public string DistrictId { get; set; }
-
-    [ForeignKey("DistrictId")]
-    public District Owner { get; set; }
+    
+    [NotMapped]
+    public District Owner { 
+        get {
+            return DBCache.Get<District>(DistrictId)!;
+        }
+    }
 
     public IEnumerable<IBuilding> GetBuildings()
     {
