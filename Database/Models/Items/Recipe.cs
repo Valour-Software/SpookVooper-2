@@ -10,21 +10,6 @@ public enum BuildInModifierTypes
     Attack = 1
 }
 
-public class Modifier
-{
-    public BuildInModifierTypes ModifierType { get; set; }
-
-    [VarChar(32)]
-    public string RecipeName { get; set; }
-
-    [NotMapped]
-    public ModifierLevelDefinition ModifierLevelDefinition {
-        get {
-            return ResourceManager.ModifierLevelDefinitions.FirstOrDefault(x => x.RecipeName == RecipeName && x.ModifierType == ModifierType)!;
-        }
-    }
-}
-
 public class Recipe : IHasOwner
 {
     [Key]
