@@ -14,6 +14,7 @@ global using SV2.Database.Models.Users;
 global using SV2.Database.Models.OAuth2;
 global using SV2.Models.Districts;
 global using SV2.Managers;
+global using SV2.Database.Models.Districts.Modifiers;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;

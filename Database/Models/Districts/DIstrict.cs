@@ -8,6 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SV2.Database.Models.Districts;
 
+public class DistrictModifier
+{
+    public DistrictModifierType Type { get; set; }
+    public decimal amount { get; set; }  
+}
 
 public class District
 {
@@ -21,8 +26,14 @@ public class District
     [VarChar(512)]
     public string? Description { get; set; }
 
-    [InverseProperty("District")]
-    public ICollection<Province> Provinces { get; set;}
+    public List<string> ProvinceIds { get; set; }
+
+    [NotMapped]
+    public List<Province> Provinces {
+        get {
+            return DBCache.GetAll<Province>().Where(x => ProvinceIds.Contains(x.Id)).ToList();
+        }
+    }
 
     public Group Group { 
         get {
@@ -41,6 +52,9 @@ public class District
 
     [VarChar(128)]
     public string? FlagUrl { get; set; }
+
+    [Column(TypeName = "jsonb")]
+    public List<DistrictModifier> Modifiers { get; set; }
 
     public static District Find(string id)
     {
