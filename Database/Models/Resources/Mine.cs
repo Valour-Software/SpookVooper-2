@@ -108,17 +108,21 @@ public class Mine : IHasOwner, IBuilding
         // 11 days: 57.28%
         // 32 days: 82.78% 
 
+        QuantityCap = 1+Province.Owner.GetModifier(DistrictModifierType.MineQuantityCap);
+
         if (Quantity < QuantityCap) {
             HoursSinceBuilt += 1;
             double days = HoursSinceBuilt/24;
-            double newQuantity = Math.Max(1.5, Math.Log10( Math.Pow(days, 20) / 40));
-            newQuantity = Math.Min(0.1, newQuantity);
-            newQuantity *= QuantityGrowthRate;
+            double newQuantity = Math.Max(QuantityCap, Math.Log10( Math.Pow(days, 20) / 40));
+            newQuantity = Math.Min(0.1+Province.Owner.GetModifier(DistrictModifierType.MineBaseQuantity), newQuantity);
+            newQuantity *= QuantityGrowthRate*Province.Owner.GetModifier(DistrictModifierType.MineQuantityGrowthRateFactor);
 
             Quantity = newQuantity;
         }
 
         rate *= Quantity;
+
+        rate *= Province.Owner.GetModifier(DistrictModifierType.MineSpeedFactor);
 
         // find the tradeitem
         TradeItem? item = tradeItems.FirstOrDefault(x => x.Definition.Name == ResourceName && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
