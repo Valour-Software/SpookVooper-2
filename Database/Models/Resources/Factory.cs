@@ -155,9 +155,9 @@ public class Factory : IHasOwner, IBuilding
         if (Quantity < QuantityCap) {
             HoursSinceChangedProductionRecipe += 1;
             double days = HoursSinceChangedProductionRecipe/24;
-            double newQuantity = Math.Max(QuantityCap, Math.Log10( Math.Pow(days, 20) / 40)*Province.Owner.GetModifier(DistrictModifierType.FactoryQuantityGrowthRateFactor));
+            double newQuantity = Math.Max(QuantityCap, Math.Log10( Math.Pow(days, 20) / 40));
             newQuantity = Math.Min(0.1+Province.Owner.GetModifier(DistrictModifierType.FactoryBaseQuantity), newQuantity);
-            newQuantity *= QuantityGrowthRate;
+            newQuantity *= QuantityGrowthRate*Province.Owner.GetModifier(DistrictModifierType.FactoryQuantityGrowthRateFactor);
 
             Quantity = newQuantity;
         }
