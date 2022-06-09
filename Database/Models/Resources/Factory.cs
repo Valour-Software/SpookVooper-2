@@ -129,7 +129,8 @@ public class Factory : IHasOwner, IBuilding
         double rate = Size;
 
         if (EmployeeId != null) {
-            rate *= 1.5;
+            // 2.5x production boost if this factory has an employee
+            rate *= 2.5;
         };
 
         // ((A2^1.2/1.6)-1)/1000
