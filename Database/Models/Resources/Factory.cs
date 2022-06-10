@@ -106,7 +106,7 @@ public class Factory : IHasOwner, IBuilding
         OwnerId = ownerid;
         ProvinceId = provinceid;
         Quantity = 0.1;
-        QuantityCap = 1.5;
+        QuantityCap = 1;
         QuantityGrowthRate = 1;
         Efficiency = 1;
         Size = 1;
@@ -175,7 +175,7 @@ public class Factory : IHasOwner, IBuilding
         Efficiency = 1;
         // apply size debuff to Efficiency
         // we subtract 0.4 since at size 1 there is no debuff
-        Efficiency += size*0.4-0.4;
+        Efficiency += Size*0.4-0.4;
 
         Efficiency *= Province.Owner.GetModifier(DistrictModifierType.FactoryEfficiencyFactor);
 
