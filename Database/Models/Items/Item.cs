@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Economy;
+using SV2.Web;
 
 namespace SV2.Database.Models.Items;
 
@@ -31,29 +32,6 @@ public class TradeItem : IHasOwner
         }
     }
     public int Amount { get; set;}
-    public async Task Give(IEntity entity, int amount) 
-    {
-        // check if the entity we are sending already has this TradeItem
-        TradeItem? item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.OwnerId == entity.Id && x.Definition_Id == Definition_Id);
-        
-        // if null then create one
-
-        if (item is null) 
-        {
-            item = new()
-            {
-                Id = Guid.NewGuid().ToString(),
-                OwnerId = entity.Id,
-                Definition_Id = Definition_Id,
-                Amount = 0
-            };
-            await DBCache.Put<TradeItem>(item.Id, item);
-            await VooperDB.Instance.TradeItems.AddAsync(item);
-            await VooperDB.Instance.SaveChangesAsync();
-        }
-
-        item.Amount += amount;
-    }
 }
 
 public class BuiltinModifier

@@ -13,10 +13,10 @@ namespace SV2.Managers;
 
 public class BaseRecipe
 {
-    public KeyValuePair<string, int> Output { get; set; }
+    public Dictionary<string, int> Inputs { get; set; }
+    public KeyValuePair<string, decimal> Output { get; set; }
     public string Name { get; set; }
-
-    public List<Modifier> Modifiers { get; set; }
+    public List<ModifierLevelDefinition>? Modifiers { get; set; }
 }
 
 public class ModifierLevelDefinition

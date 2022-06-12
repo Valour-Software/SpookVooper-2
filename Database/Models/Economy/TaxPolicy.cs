@@ -22,7 +22,11 @@ public enum TaxType
     GroupIncome = 12,
     ResourceMined = 13,
     GroupBalance = 14,
-    GroupWealth = 15
+    GroupWealth = 15,
+    
+    // tariffs are taxed at per resource traded not % of value traded
+    ImportTariff = 16,
+    ExportTariff = 17
 }
 
 public class TaxPolicy
@@ -52,6 +56,7 @@ public class TaxPolicy
     public decimal Collected { get; set; }
 
     // mainly used for the ResourceMined tax but can be expanded in future to be used for other taxes
+    // other taxes like Import Tariffs and Export Tariffs
     [VarChar(32)]
     public string? Target { get; set;}
 
