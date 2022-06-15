@@ -64,9 +64,13 @@ public class User : IEntity
     [EntityId]
     public string? DistrictId { get; set;}
 
-    public bool IsMinister(Ministers minister)
+    public bool IsMinister(MinisterType ministertype)
     {
-        return false;
+        Minister? minister = DBCache.GetAll<Minister>().FirstOrDefault(x => x.UserId == Id && x.Type == ministertype);
+        if (minister is null) {
+            return false;
+        }
+        return true;
     }
 
     public static User? FindByName(string name)
