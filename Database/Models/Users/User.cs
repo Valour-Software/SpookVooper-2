@@ -37,7 +37,15 @@ public class User : IEntity
     public int CommentLikes { get; set;}
     public int PostLikes { get; set;}
     public int Messages { get; set;}
-    public DateTime LastSentMessage { get; set;}
+
+    // xp calc stuff
+
+    public float PointsTotal { get; set; }
+    public int ActiveMinutes { get; set; }
+    public int CharsThisMinute { get; set; }
+    public int TotalChars { get; set; }
+    public DateTime LastActiveMinute { get; set; }
+
     public DateTime Joined { get; set;}
 
     [JsonIgnore]

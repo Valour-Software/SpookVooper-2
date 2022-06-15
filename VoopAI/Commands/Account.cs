@@ -28,39 +28,54 @@ class AccountCommands : CommandModuleBase
 
     ConcurrentDictionary<ulong, DateTime> LastMinuteTicked = new();
 
-    ConcurrentDictionary<ulong, int> CharactersThisMinute = new();
+    ConcurrentDictionary<ulong, int> PointsThisMinute = new();
 
     [Event("Message")]
     public async Task OnMessage(CommandContext ctx)
     {
-        User? _user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.User_Id);
-        if (_user is not null)
+        User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.User_Id);
+        if (user is not null)
         {
 
             if (LastMinuteTicked.ContainsKey(ctx.Member.User_Id)) {
                 if (LastMinuteTicked[ctx.Member.User_Id].AddSeconds(60) < DateTime.UtcNow) {
-                    double xpgain = (Math.Log10((double)CharactersThisMinute[ctx.Member.User_Id]) - 1)*1.75;
-                    if (xpgain < 0) {
-                        xpgain = 0;
-                    }
-                    _user.Xp += (float)xpgain;
-                    _user.MessageXp += (float)xpgain;
-                    CharactersThisMinute[ctx.Member.User_Id] = 0;
+                    double xpgain = (Math.Log10((double)PointsThisMinute[ctx.Member.User_Id]) - 1)*3;
+                    xpgain = Math.Max(0.2, xpgain);
+                    user.Xp += (float)xpgain;
+                    user.MessageXp += (float)xpgain;
+                    user.ActiveMinutes += 1;
+                    PointsThisMinute[ctx.Member.User_Id] = 0;
                     LastMinuteTicked[ctx.Member.User_Id] = DateTime.UtcNow;
                 }
             }
             else {
                 LastMinuteTicked.TryAdd(ctx.Member.User_Id, DateTime.UtcNow);
-                CharactersThisMinute.TryAdd(ctx.Member.User_Id, 0);
+                PointsThisMinute.TryAdd(ctx.Member.User_Id, 0);
             }
 
             string Content = RemoveWhitespace(ctx.Message.Content);
 
-            CharactersThisMinute[ctx.Member.User_Id] += Content.Length;
+            Content = Content.Replace("*", "");
 
-            _user.Messages += 1;
+            int Points = 0;
 
-            _user.Image_Url = (await ctx.Member.GetUserAsync()).Pfp_Url;
+            // do char points
+            // each char grants 1 point
+            Points += Content.Length;
+
+            // if there is media then add 100 points
+            if (Content.Contains("https://vmps.valour.gg"))
+            {
+                Points += 100;
+            }
+
+            PointsThisMinute[ctx.Member.User_Id] += Points;
+            user.TotalChars += Content.Length;
+            user.PointsTotal += Points;
+
+            user.Messages += 1;
+
+            user.Image_Url = (await ctx.Member.GetUserAsync()).Pfp_Url;
         }
     }
 
