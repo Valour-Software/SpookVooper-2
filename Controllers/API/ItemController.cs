@@ -9,6 +9,7 @@ namespace SV2.API
 {
     public class ItemAPI : BaseAPI
     {
+        private static IdManager idManager = new(1);
         public static void AddRoutes(WebApplication app)
         {
             app.MapGet   ("api/item/{itemid}", GetItem);
@@ -17,14 +18,14 @@ namespace SV2.API
             app.MapGet   ("api/definition/{definitionid}/items", GetItemsFromDefinition);
         }
 
-        private static async Task GetItemsFromDefinition(HttpContext ctx, VooperDB db, string definitionid)
+        private static async Task GetItemsFromDefinition(HttpContext ctx, VooperDB db, long definitionid)
         {
             IEnumerable<TradeItem> definitions = DBCache.GetAll<TradeItem>().Where(x => x.Definition_Id == definitionid);
 
             await ctx.Response.WriteAsJsonAsync(definitions);
         }
 
-        private static async Task GetItem(HttpContext ctx, VooperDB db, string itemid)
+        private static async Task GetItem(HttpContext ctx, VooperDB db, long itemid)
         {
             // find Item
             TradeItem? item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.Id == itemid);
@@ -37,7 +38,7 @@ namespace SV2.API
             await ctx.Response.WriteAsJsonAsync(item);
         }
 
-        private static async Task GetOwner(HttpContext ctx, VooperDB db, string itemid)
+        private static async Task GetOwner(HttpContext ctx, VooperDB db, long itemid)
         {
             // find Item
             TradeItem? item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.Id == itemid);
@@ -50,7 +51,7 @@ namespace SV2.API
             await ctx.Response.WriteAsJsonAsync(item.Owner);
         }
 
-        private static async Task Give(HttpContext ctx, VooperDB db, string itemid, string apikey, string fromid, string toid, int amount)
+        private static async Task Give(HttpContext ctx, VooperDB db, long itemid, string apikey, long fromid, long toid, int amount)
         {
             // find Item
             TradeItem? item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.Id == itemid);
@@ -107,9 +108,17 @@ namespace SV2.API
                 return;
             }
 
-            await item.Give(toentity!, amount);
+            ItemTrade trade = new() {
+                Id = idManager.Generate(),
+                Amount = amount,
+                FromId = fromid,
+                ToId = toid,
+                Time = DateTime.UtcNow,
+                Definition_Id = item.Definition_Id,
+                Details = "Item Trade from API",
+            };
 
-            await ctx.Response.WriteAsync($"Successfully gave {amount} of {item.Definition.Name} to {toentity!.Name}.");
+            await ctx.Response.WriteAsync((await trade.Execute()).Info);
         }
     }
 }

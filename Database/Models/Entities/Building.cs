@@ -11,13 +11,13 @@ public enum BuildingType
 
 public interface IBuilding
 {
-    public string Id { get; set; }
+    public long Id { get; set; }
 
     public string? Name { get; set; }
 
     public string? Description { get; set; }
 
-    public string OwnerId { get; set; }
+    public long OwnerId { get; set; }
 
     public IEntity Owner { 
         get {
@@ -25,7 +25,7 @@ public interface IBuilding
         }
     }
 
-    public string ProvinceId { get; set; } 
+    public long ProvinceId { get; set; } 
 
     [NotMapped]
     public Province Province {

@@ -17,8 +17,7 @@ public class DistrictModifier
 public class District
 {
     [Key]
-    [GuidID]
-    public string Id { get; set;}
+    public long Id {get; set; }
 
     [VarChar(64)]
     public string? Name { get; set;}
@@ -39,14 +38,11 @@ public class District
         }
     }
 
-    [EntityId]
-    public string GroupId { get; set; }
+    public long GroupId { get; set; }
 
-    [EntityId]
-    public string? SenatorId { get; set;}
+    public long? SenatorId { get; set;}
 
-    [EntityId]
-    public string? GovernorId { get; set;}
+    public long? GovernorId { get; set;}
 
     [VarChar(128)]
     public string? FlagUrl { get; set; }
@@ -54,7 +50,7 @@ public class District
     [Column(TypeName = "jsonb")]
     public List<DistrictModifier> Modifiers { get; set; }
 
-    public static District Find(string id)
+    public static District Find(long id)
     {
         return DBCache.GetAll<District>().FirstOrDefault(x => x.Id == id)!;
     }

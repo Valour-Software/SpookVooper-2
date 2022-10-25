@@ -15,6 +15,14 @@ global using SV2.Database.Models.OAuth2;
 global using SV2.Models.Districts;
 global using SV2.Managers;
 global using SV2.Database.Models.Districts.Modifiers;
+global using Valour.Api.Items.Planets;
+global using Valour.Api.Items.Planets.Members;
+global using Valour.Api.Items.Channels;
+global using Valour.Api.Items.Messages;
+global using Valour.Api.Items.Messages.Embeds.Items;
+global using Valour.Api.Items.Messages.Embeds;
+global using System.Net.Http.Json;
+global using Valour.Net.Client;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -62,6 +70,23 @@ else
     File.WriteAllText(CONF_LOC + DBCONF_FILE, JsonSerializer.Serialize(dbconfig));
     Console.WriteLine("Error: No DB config was found. Creating file...");
 }
+
+VooperDB.DbFactory = VooperDB.GetDbFactory();
+
+using var dbctx = VooperDB.DbFactory.CreateDbContext();
+
+string sql = VooperDB.GenerateSQL();
+
+try
+{
+    await File.WriteAllTextAsync("../Database/Definitions.sql", sql);
+}
+catch (Exception e)
+{
+
+}
+
+VooperDB.RawSqlQuery<string>(sql, null, true);
 
 builder.Services.AddDbContextPool<VooperDB>(options =>
 {

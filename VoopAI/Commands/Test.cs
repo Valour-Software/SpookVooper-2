@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Valour.Net;
-using Valour.Net.Models;
 using Valour.Net.ModuleHandling;
 using Valour.Net.CommandHandling;
 using Valour.Net.CommandHandling.Attributes;

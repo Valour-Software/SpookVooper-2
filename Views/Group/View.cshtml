@@ -45,7 +45,7 @@
                 </div>
             </div>
 
-            @if (!String.IsNullOrWhiteSpace(Model.DistrictId))
+            @if (Model.DistrictId != 100)
             {
                 <p class="m-2" style="text-align:center; font-size:x-large">District: @District.Find(Model.DistrictId).Name</p>
             }

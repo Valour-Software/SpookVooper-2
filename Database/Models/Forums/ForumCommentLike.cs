@@ -7,15 +7,12 @@ namespace SV2.Database.Models.Forums;
 public class ForumCommentLike
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
-    [GuidID]
-    public string CommentId { get; set; }
+    public long CommentId { get; set; }
 
     [ForeignKey("CommentId")]
     public ForumComment Comment { get; set ;}
 
-    [EntityId]
-    public string AddedById { get; set; }
+    public long AddedById { get; set; }
 }

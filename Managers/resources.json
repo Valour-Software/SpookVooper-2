@@ -23,7 +23,6 @@
         {
             "Name": "Basic Consumer Goods",
             "Materials": ["Computer", "Furniture"]
-
         }
     ],
     "Consumer Goods": [

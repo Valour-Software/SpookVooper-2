@@ -11,8 +11,7 @@ namespace SV2.Database.Models.Economy;
 public class CreditAccount : IHasOwner, IEntity
 {
     [Key]
-    [GuidID]
-    public string Id { get; set;}
+    public long Id {get; set; }
 
     [VarChar(64)]
     public string Name { get; set; }
@@ -23,8 +22,7 @@ public class CreditAccount : IHasOwner, IEntity
     [NotMapped]
     public string Image_Url { get; set; }
 
-    [EntityId]
-    public string OwnerId { get; set;}
+    public long OwnerId { get; set;}
     
     [ForeignKey("OwnerId")]
     public IEntity Owner { 
@@ -37,11 +35,14 @@ public class CreditAccount : IHasOwner, IEntity
     public string Api_Key { get; set; }
     public decimal Credits { get; set; }
     public decimal TaxAbleCredits { get; set; }
-
-    [EntityId]
-    public string? DistrictId { get; set; }
+    public long DistrictId { get; set; }
     // used for tax purposes
     public List<decimal> CreditSnapshots { get; set;}
+    public EntityType entityType {
+        get {
+            return EntityType.CreditAccount;
+        }
+    }
 
     public bool HasPermissionWithKey(string apikey, GroupPermission permission)
     {

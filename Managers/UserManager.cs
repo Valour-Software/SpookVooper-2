@@ -14,8 +14,8 @@ namespace SV2.Managers;
 
 public static class UserManager
 {
-    static List<String> LoginCodes = new();
-    static Dictionary<String, String> SessionIdsToSvids = new();
+    static List<string> LoginCodes = new();
+    static Dictionary<string, long> SessionIdsToSvids = new();
 
     public static User? GetUser(HttpContext ctx)
     {
@@ -24,17 +24,17 @@ public static class UserManager
         if (d is null) {
             return null;
         }
-        return DBCache.Get<User>(d!);
+        return DBCache.Get<User>(long.Parse(d!));
     }
     
-    public static void AddLogin(string code, string id)
+    public static void AddLogin(string code, long id)
     {
         SessionIdsToSvids.Add(code, id);
     }
 
-    public static string? GetSvidFromSession(HttpContext ctx)
+    public static long GetSvidFromSession(HttpContext ctx)
     {
-        string? svid = "";
+        long svid = 0;
         SessionIdsToSvids.Remove(ctx.Session.GetString("code"), out svid);
         return svid;
     }

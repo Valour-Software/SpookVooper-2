@@ -9,8 +9,7 @@ namespace SV2.Database.Models.Factories;
 public class Mine : IHasOwner, IBuilding
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
     [VarChar(64)]
     public string? Name { get; set; }
@@ -18,8 +17,7 @@ public class Mine : IHasOwner, IBuilding
     [VarChar(1024)]
     public string? Description { get; set; }
 
-    [EntityId]
-    public string OwnerId { get; set; }
+    public long OwnerId { get; set; }
 
     [NotMapped]
     public IEntity Owner { 
@@ -62,8 +60,7 @@ public class Mine : IHasOwner, IBuilding
         }
     }
 
-    [GuidID]
-    public string ProvinceId { get; set; } 
+    public long ProvinceId { get; set; } 
 
     [NotMapped]
     public Province Province {
@@ -126,13 +123,13 @@ public class Mine : IHasOwner, IBuilding
         rate *= Province.Owner.GetModifier(DistrictModifierType.MineSpeedFactor);
 
         // find the tradeitem
-        TradeItem? item = tradeItems.FirstOrDefault(x => x.Definition.Name == ResourceName && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
+        TradeItem? item = tradeItems.FirstOrDefault(x => x.Definition.Name == ResourceName && x.Definition.OwnerId == 100 && x.OwnerId == OwnerId);
         if (item is null) {
             item = new()
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = IdManagers.ItemTradeIdGenerator.Generate(),
                 OwnerId = OwnerId,
-                Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == ResourceName && x.OwnerId == "g-vooperia")!.Id,
+                Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == ResourceName && x.OwnerId == 100)!.Id,
                 Amount = 0
             };
             await DBCache.Put<TradeItem>(item.Id, item);

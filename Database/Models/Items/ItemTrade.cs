@@ -9,8 +9,7 @@ using SV2.Web;
 public class ItemTrade
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
     public int Amount { get; set; }
     
     [NotMapped]
@@ -19,15 +18,13 @@ public class ItemTrade
             return DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Id == Definition_Id)!;
         }
     }
-    public string Definition_Id { get; set; }
+    public long Definition_Id { get; set; }
 
     public DateTime Time { get; set; }
 
-    [EntityId]
-    public string FromId { get; set; }
+    public long FromId { get; set; }
 
-    [EntityId]
-    public string ToId { get; set; }
+    public long ToId { get; set; }
 
     [VarChar(1024)]
     public string Details { get; set; }
@@ -49,9 +46,9 @@ public class ItemTrade
         
     }
 
-    public ItemTrade(string fromId, string toId, int amount, string definition_id, string details)
+    public ItemTrade(long fromId, long toId, int amount, long definition_id, string details)
     {
-        Id = Guid.NewGuid().ToString();
+        Id = IdManagers.ItemTradeIdGenerator.Generate();
         Amount = amount;
         FromId = fromId;
         ToId = toId;
@@ -65,7 +62,7 @@ public class ItemTrade
         Force = force;
         ItemTradeManager.itemTradeQueue.Enqueue(this);
 
-        while (!IsCompleted) await Task.Delay(1);
+        while (!IsCompleted) await Task.Delay(5);
 
         return Result!;
     }
@@ -121,7 +118,7 @@ public class ItemTrade
         {
             toitem = new()
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = IdManagers.ItemIdGenerator.Generate(),
                 OwnerId = ToId,
                 Definition_Id = Definition_Id,
                 Amount = 0
@@ -133,7 +130,7 @@ public class ItemTrade
 
         // do tariffs
 
-        if (ResourceManager.Resources.Contains(toitem.Definition.Name) && toitem.Definition.OwnerId == "g-vooperia")
+        if (ResourceManager.Resources.Contains(toitem.Definition.Name) && toitem.Definition.OwnerId == 100)
         {
             TaxPolicy? FromDistrictTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == fromEntity.DistrictId & (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));
             TaxPolicy? ToDistrictTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == toEntity.DistrictId & (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));

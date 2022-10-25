@@ -17,7 +17,7 @@ namespace SV2.Controllers
             _logger = logger;
         }
 
-        public IActionResult View(string Id)
+        public IActionResult View(long Id)
         {
             District district = DBCache.Get<District>(Id);
             User? user = UserManager.GetUser(HttpContext);
@@ -30,7 +30,7 @@ namespace SV2.Controllers
             return View(district);
         }
 
-        public IActionResult EditPolicies(string Id)
+        public IActionResult EditPolicies(long Id)
         {
             District district = DBCache.Get<District>(Id);
             User? user = UserManager.GetUser(HttpContext);
@@ -82,7 +82,7 @@ namespace SV2.Controllers
                     oldpol.Rate = pol.Rate;
                 }
                 else {
-                    pol.Id = Guid.NewGuid().ToString();
+                    pol.Id = IdManagers.UBIPolicyIdGenerator.Generate();
                     pol.DistrictId = model.DistrictId;
                     await DBCache.Put<UBIPolicy>(pol.Id, pol);
                     await VooperDB.Instance.UBIPolicies.AddAsync(pol);
@@ -103,7 +103,7 @@ namespace SV2.Controllers
                     oldpol.Maximum = pol.Maximum;
                 }
                 else {
-                    pol.Id = Guid.NewGuid().ToString();
+                    pol.Id = IdManagers.TaxPolicyIdGenerator.Generate();
                     pol.DistrictId = model.DistrictId;
                     await DBCache.Put<TaxPolicy>(pol.Id, pol);
                     await VooperDB.Instance.TaxPolicies.AddAsync(pol);

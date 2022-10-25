@@ -18,12 +18,10 @@ public enum RegimentType
 public class DivisionEquipment
 {
     [Key]
-    [GuidID]
-    public string Id { get; set;}
+    public long Id {get; set; }
     public string ItemName { get; set;}
     
-    [GuidID]
-    public string tradeItemId { get; set; }
+    public long tradeItemId { get; set; }
     
     [NotMapped]
     // the item that is currently selected to be used
@@ -33,8 +31,7 @@ public class DivisionEquipment
         }
     }
 
-    [GuidID]
-    public string DivisionId { get; set; }
+    public long DivisionId { get; set; }
     
     [ForeignKey("DivisionId")]
     public Division Division { get; set; }
@@ -45,8 +42,7 @@ public class DivisionEquipment
 public class Regiment
 {
     [Key]
-    [GuidID]
-    public string Id { get; set;}
+    public long Id {get; set; }
     public RegimentType Type { get; set;}
     
     // number of things in this regiment
@@ -54,8 +50,7 @@ public class Regiment
     // only allowed values are in 1k increments
     public int Count { get; set;}
 
-    [GuidID]
-    public string DivisionId { get; set; }
+    public long DivisionId { get; set; }
     
     [ForeignKey("DivisionId")]
     public Division Division { get; set; }
@@ -89,8 +84,7 @@ public class Regiment
 public class Division : IHasOwner
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
     [InverseProperty("Division")]
     public ICollection<DivisionEquipment> Equipment { get; set; }
@@ -103,8 +97,7 @@ public class Division : IHasOwner
     [VarChar(64)]
     public string Name { get; set; }
 
-    [EntityId]
-    public string OwnerId { get; set; }
+    public long OwnerId { get; set; }
 
     [NotMapped]
     public IEntity Owner { 

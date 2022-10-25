@@ -9,6 +9,12 @@ using SV2.Database.Models.Districts;
 using SV2.Database.Models.Government;
 using System;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using System.Data.Common;
+using System.Data;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal;
+using System.Text;
 
 /*  Valour - A free and secure chat client
  *  Copyright (C) 2021 Vooper Media LLC
@@ -17,6 +23,23 @@ using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
  */
 
 namespace SV2.Database;
+
+/// <summary>A replacement for <see cref="NpgsqlSqlGenerationHelper"/>
+/// to convert PascalCaseCsharpyIdentifiers to alllowercasenames.
+/// So table and column names with no embedded punctuation
+/// get generated with no quotes or delimiters.</summary>
+public class NpgsqlSqlGenerationLowercasingHelper : NpgsqlSqlGenerationHelper
+{
+    //Don't lowercase ef's migration table
+    const string dontAlter = "__EFMigrationsHistory";
+    static string Customize(string input) => input == dontAlter ? input : input.ToLower();
+    public NpgsqlSqlGenerationLowercasingHelper(RelationalSqlGenerationHelperDependencies dependencies)
+        : base(dependencies) { }
+    public override string DelimitIdentifier(string identifier)
+        => base.DelimitIdentifier(Customize(identifier));
+    public override void DelimitIdentifier(StringBuilder builder, string identifier)
+        => base.DelimitIdentifier(builder, Customize(identifier));
+}
 
 public class VooperDB : DbContext, IDataProtectionKeyContext
 {
@@ -28,8 +51,9 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         options.UseNpgsql(ConnectionString, options => { 
-            options.EnableRetryOnFailure(); 
+            options.EnableRetryOnFailure();
         });
+        options.ReplaceService<ISqlGenerationHelper, NpgsqlSqlGenerationLowercasingHelper>();
         options.UseLowerCaseNamingConvention();
     }
 
@@ -43,9 +67,58 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     /// This is only here to fulfill the need of the constructor.
     /// It does literally nothing at all.
     /// </summary>
-    public static DbContextOptions DBOptions = new DbContextOptionsBuilder().UseNpgsql(ConnectionString, options => {
-        options.EnableRetryOnFailure();
-    }).Options;
+    public static DbContextOptions DBOptions;
+
+    public static string GenerateSQL()
+    {
+        using var dbctx = DbFactory.CreateDbContext();
+        string sql = dbctx.Database.GenerateCreateScript();
+        sql = sql.Replace("numeric(20,0) ", "BIGINT ");
+        sql = sql.Replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS");
+        sql = sql.Replace("CREATE INDEX", "CREATE INDEX IF NOT EXISTS");
+        sql = sql.Replace("CREATE INDEX IF NOT EXISTS ix_messages_hash ON messages (hash);", "CREATE UNIQUE INDEX IF NOT EXISTS ix_messages_hash ON messages (hash);");
+        return sql;
+    }
+
+    public static PooledDbContextFactory<VooperDB> DbFactory;
+
+    public static PooledDbContextFactory<VooperDB> GetDbFactory()
+    {
+        string ConnectionString = $"Host={DBConfig.instance.Host};Database={DBConfig.instance.Database};Username={DBConfig.instance.Username};Pwd={DBConfig.instance.Password}";
+        var options = new DbContextOptionsBuilder<VooperDB>()
+            .UseNpgsql(ConnectionString, options => {
+                options.EnableRetryOnFailure();
+            })
+            .ReplaceService<ISqlGenerationHelper, NpgsqlSqlGenerationLowercasingHelper>()
+            .Options;
+        return new PooledDbContextFactory<VooperDB>(options);
+    }
+
+    public static List<T> RawSqlQuery<T>(string query, Func<DbDataReader, T>? map, bool noresult = false)
+    {
+        using var dbctx = DbFactory.CreateDbContext();
+        using DbCommand command = dbctx.Database.GetDbConnection().CreateCommand();
+        command.CommandText = query;
+        command.CommandType = CommandType.Text;
+
+        //Console.WriteLine(ConfigManger.Config);
+
+        dbctx.Database.OpenConnection();
+
+        using var result = command.ExecuteReader();
+        if (!noresult)
+        {
+            var entities = new List<T>();
+
+            while (result.Read())
+            {
+                entities.Add(map(result));
+            }
+
+            return entities;
+        }
+        return new List<T>();
+    }
 
 
     /// <summary>
@@ -74,13 +147,6 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<ItemTrade> ItemTrades { get; set; }
     public DbSet<Minister> Ministers { get; set; }
-    public static string GenerateSQL()
-    {
-        string sql = VooperDB.Instance.Database.GenerateCreateScript();
-        sql = sql.Replace("numeric ", "DECIMAL(20,10) ");
-        sql = sql.Replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS");
-        return sql;
-    }
 
     public VooperDB(DbContextOptions options)
     {
@@ -103,16 +169,16 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
         //await VooperDB.Instance.Elections.AddAsync(elec);
         
 
-        if (DBCache.FindEntity("g-vooperia") is null) {
-            Group Vooperia = new Group("Vooperia", "g-t");
-            Vooperia.Id = "g-vooperia";
+        if (DBCache.FindEntity(100) is null) {
+            Group Vooperia = new Group("Vooperia", 100);
+            Vooperia.Id = 100;
             Vooperia.GroupType = GroupTypes.NonProfit;
             Vooperia.Credits = 500_000_000.0m;
             await DBCache.Put<Group>(Vooperia.Id, Vooperia);
             await VooperDB.Instance.Groups.AddAsync(Vooperia);
         }
 
-        string[] districtids = new []{
+        string[] districtnames = new []{
             "ardenti-terra",
             "avalon",
             "kogi",
@@ -129,10 +195,28 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
             "thesonica",
             "voopmont"
         };
+        int[] districtids = new[] {
+            101,
+            102,
+            103,
+            104,
+            105,
+            106,
+            107,
+            108,
+            109,
+            110,
+            111,
+            112,
+            113,
+            114,
+            115
+        };
 
-        foreach(string id in districtids) {
-            if (DBCache.FindEntity("g-"+id) is null) {
-                string name = id.Replace("-", " ");
+        int i = 0;
+        foreach(int id in districtids) {
+            if (DBCache.FindEntity(id) is null) {
+                string name = districtnames[i].Replace("-", " ");
                 string[] namesplit = name.Split(" ");
                 if (namesplit.Length == 2) {
                     // first part
@@ -144,8 +228,8 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
                 else {
                     name = $"{Char.ToUpper(namesplit[0][0])}{namesplit[0].Substring(1, namesplit[0].Length-1)}";
                 }
-                Group district = new Group(name, "g-vooperia");
-                district.Id = "g-"+id;
+                Group district = new Group(name, 100);
+                district.Id = id;
                 district.Credits = 100_000.0m;
 
 
@@ -156,11 +240,13 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
                     GroupId = district.Id
                 };
 
+                district_object.Modifiers = new();
                 await DBCache.Put<Group>(district.Id, district);
                 await VooperDB.Instance.Groups.AddAsync(district);
                 await DBCache.Put<District>(district_object.Id, district_object);
                 await VooperDB.Instance.Districts.AddAsync(district_object);
             }
+            i += 1;
         }
        
         await VooperDB.Instance.SaveChangesAsync();

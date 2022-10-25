@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace SV2.Database.Models.Government;
 
 public enum MinisterType
@@ -8,8 +10,9 @@ public enum MinisterType
 
 public class Minister
 {
-    [GuidID]
-    public string UserId { get; set; }
+    [Key]
+    public long Id { get; set; }
+    public long UserId { get; set; }
 
     public MinisterType Type { get; set; }
 }

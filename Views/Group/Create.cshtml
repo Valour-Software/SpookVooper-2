@@ -26,7 +26,7 @@
                     <div class="form-group">
                         <label asp-for="DistrictId"></label>
                         <br />
-                        <select class="form-control" asp-for="DistrictId" asp-items="DBCache.GetAll<District>().Select(x => new SelectListItem() { Text = x.Name, Value = x.Id})"></select>
+                        <select class="form-control" asp-for="DistrictId" asp-items="DBCache.GetAll<District>().Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString()})"></select>
                     </div>
                     <div class="form-group">
                         <label asp-for="Description"></label>

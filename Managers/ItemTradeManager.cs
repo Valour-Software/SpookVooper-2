@@ -16,7 +16,7 @@ namespace SV2.Managers;
 
 public static class ItemTradeManager
 {
-    static public HashSet<string> ActiveSvids = new();
+    static public HashSet<long> ActiveSvids = new();
 
     static public ConcurrentQueue<ItemTrade> itemTradeQueue = new();
 

@@ -7,11 +7,9 @@ namespace SV2.Database.Models.Forums;
 public class ForumComment
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
-    [EntityId]
-    public string AuthorId { get; set; }
+    public long AuthorId { get; set; }
     
     [NotMapped]
     public IEntity Author {
@@ -24,15 +22,13 @@ public class ForumComment
     public string Content { get; set; }
 
     // the id of the post that this comment was made on
-    [GuidID]
-    public string PostedOnId { get; set; }
+    public long PostedOnId { get; set; }
     
     [ForeignKey("PostId")]
     public ForumPost PostedOn { get; set; }
 
     // the id of the comment that this comment was made on
-    [GuidID]
-    public string? CommentedOnId { get; set; }
+    public long? CommentedOnId { get; set; }
     
     [ForeignKey("CommentedOnId")]
     public ForumComment CommentedOn { get; set; }

@@ -13,11 +13,9 @@ public enum BuildInModifierTypes
 public class Recipe : IHasOwner
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
-    [EntityId]
-    public string OwnerId { get; set; }
+    public long OwnerId { get; set; }
 
     [NotMapped]
     public IEntity Owner { 
@@ -26,7 +24,10 @@ public class Recipe : IHasOwner
         }
     }
 
+    [Column(TypeName = "jsonb")]
     public KeyValuePair<string, int> Output { get; set; }
+
+    [Column(TypeName = "jsonb")]
     public Dictionary<string, int> Inputs { get; set; }
 
     public string Name { get; set; }

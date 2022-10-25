@@ -13,11 +13,9 @@ public enum ForumCategory
 public class ForumPost
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
-    [EntityId]
-    public string AuthorId { get; set; }
+    public long AuthorId { get; set; }
     
     [NotMapped]
     public IEntity Author {

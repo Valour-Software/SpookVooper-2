@@ -10,8 +10,7 @@ namespace SV2.Database.Models.Factories;
 public class Factory : IHasOwner, IBuilding
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
     [VarChar(64)]
     public string? Name { get; set; }
@@ -19,8 +18,7 @@ public class Factory : IHasOwner, IBuilding
     [VarChar(1024)]
     public string? Description { get; set; }
 
-    [EntityId]
-    public string OwnerId { get; set; }
+    public long OwnerId { get; set; }
 
     [NotMapped]
     public IEntity Owner { 
@@ -29,16 +27,18 @@ public class Factory : IHasOwner, IBuilding
         }
     }
 
-    [VarChar(256)]
-    public string? RecipeName { get; set; }
+    public long? RecipeId { get; set; }
     
     [NotMapped]
     public Recipe? recipe {
         get {
-            return DBCache.Get<Recipe>(RecipeName);
+            if (RecipeId is null)
+                return null;
+            return DBCache.Get<Recipe>((long)RecipeId);
         }
     }
-    public string? EmployeeId { get; set; }
+
+    public long? EmployeeId { get; set; }
 
     // effects production speed, grows over time, min value is 10%
     public double Quantity { get; set; }
@@ -70,8 +70,7 @@ public class Factory : IHasOwner, IBuilding
         }
     }
 
-    [GuidID]
-    public string ProvinceId { get; set; } 
+    public long ProvinceId { get; set; } 
 
     [NotMapped]
     public Province Province {
@@ -99,10 +98,10 @@ public class Factory : IHasOwner, IBuilding
         
     }
 
-    public Factory(string ownerid, string provinceid)
+    public Factory(long ownerid, long provinceid)
     {
         // why so many variables
-        Id = Guid.NewGuid().ToString();
+        Id = IdManagers.FactoryIdGenerator.Generate();
         OwnerId = ownerid;
         ProvinceId = provinceid;
         Quantity = 0.1;
@@ -121,7 +120,7 @@ public class Factory : IHasOwner, IBuilding
     public async Task Tick(List<TradeItem> tradeItems)
     {
 
-        if (RecipeName is null) {
+        if (RecipeId is null) {
             return;
         }
 
@@ -183,13 +182,13 @@ public class Factory : IHasOwner, IBuilding
 
         string output = recipe.Output.Key;
         // find the tradeitem
-        item = tradeItems.FirstOrDefault(x => x.Definition.Name == output && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
+        item = tradeItems.FirstOrDefault(x => x.Definition.Name == output && x.Definition.OwnerId == 100 && x.OwnerId == OwnerId);
         if (item is null) {
             item = new()
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = IdManagers.ItemIdGenerator.Generate(),
                 OwnerId = OwnerId,
-                Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == output && x.OwnerId == "g-vooperia")!.Id,
+                Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == output && x.OwnerId == 100)!.Id,
                 Amount = 0
             };
             await DBCache.Put<TradeItem>(item.Id, item);
@@ -205,7 +204,7 @@ public class Factory : IHasOwner, IBuilding
         }
         foreach(string Resource in recipe.Inputs.Keys) 
         {
-            item = tradeItems.FirstOrDefault(x => x.Definition.Name == Resource && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
+            item = tradeItems.FirstOrDefault(x => x.Definition.Name == Resource && x.Definition.OwnerId == 100 && x.OwnerId == OwnerId);
             if (item is null) {
                 return;
             }
@@ -217,7 +216,7 @@ public class Factory : IHasOwner, IBuilding
         foreach(string Resource in recipe.Inputs.Keys) 
         {
             // find the tradeitem
-            item = tradeItems.FirstOrDefault(x => x.Definition.Name == Resource && x.Definition.OwnerId == "g-vooperia" && x.OwnerId == OwnerId);
+            item = tradeItems.FirstOrDefault(x => x.Definition.Name == Resource && x.Definition.OwnerId == 100 && x.OwnerId == OwnerId);
             int amountNeeded = (int)(recipe.Inputs[Resource]*wholerate/Efficiency);
             item.Amount -= amountNeeded;
         }

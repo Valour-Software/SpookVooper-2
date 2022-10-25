@@ -15,7 +15,7 @@ namespace SV2.API
             app.MapGet   ("api/eco/transaction/send", SendTransaction);
         }
 
-        private static async Task SendTransaction(HttpContext ctx, VooperDB db, string fromid, string toid, string apikey, decimal amount, string detail, TransactionType trantype)
+        private static async Task SendTransaction(HttpContext ctx, VooperDB db, long fromid, long toid, string apikey, decimal amount, string detail, TransactionType trantype)
         {
             IEntity? fromentity = IEntity.Find(fromid);
             if (fromentity == null)

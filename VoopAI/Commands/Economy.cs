@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Valour.Net;
-using Valour.Net.Models;
 using Valour.Net.ModuleHandling;
 using Valour.Net.CommandHandling;
 using Valour.Net.CommandHandling.Attributes;
@@ -22,7 +21,7 @@ class EconomyCommands : CommandModuleBase
     [Alias("bal")]
     public async Task Balance(CommandContext ctx) 
     {
-        User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.User_Id);
+        User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (user is null) {
             await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
             return;
@@ -30,29 +29,30 @@ class EconomyCommands : CommandModuleBase
         await ctx.ReplyAsync($"{ctx.Member.Nickname}'s balance: ¢{Math.Round(user.Credits, 2)}");
     }
 
-    [Command("money")]
+    [Command("addmoney")]
     public async Task CreateAccount(CommandContext ctx, decimal amount) 
     {
-        if (ctx.Member.User_Id != 735182334984193) {
+        if (ctx.Member.UserId != 12201879245422592) {
             await ctx.ReplyAsync("Only Jacob can use this command!");
             return;
         }
-        User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.User_Id);
+        User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (user is not null) {
             user.Credits += amount;
         }
+        await ctx.ReplyAsync($"Added ¢{amount} to Jacob's balance.");
     }
 
     [Command("pay")]
     public async Task Pay(CommandContext ctx, decimal amount, PlanetMember member) 
     {
-        User? from = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.User_Id);
+        User? from = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (from is null) {
             await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
             return;
         }
 
-        User? to = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == member.User_Id);
+        User? to = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == member.UserId);
         if (from is null) {
             await ctx.ReplyAsync("The user you are trying to send credits to lacks a SV account!");
             return;
@@ -64,7 +64,7 @@ class EconomyCommands : CommandModuleBase
     [Command("pay")]
     public async Task Pay(CommandContext ctx, decimal amount, PlanetMember member, [Remainder] string groupname) 
     {
-        User? fromuser = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.User_Id);
+        User? fromuser = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (fromuser is null) {
             await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
             return;
@@ -81,7 +81,7 @@ class EconomyCommands : CommandModuleBase
             return;
         }
 
-        User? to = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == member.User_Id);
+        User? to = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == member.UserId);
         if (to is null) {
             await ctx.ReplyAsync("The user you are trying to send credits to lacks a SV account!");
             return;
@@ -93,7 +93,7 @@ class EconomyCommands : CommandModuleBase
     [Command("pay")]
     public async Task Pay(CommandContext ctx, decimal amount, [Remainder] string groupname) 
     {
-        User? fromuser = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.User_Id);
+        User? fromuser = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (fromuser is null) {
             await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
             return;
@@ -136,7 +136,7 @@ class EconomyCommands : CommandModuleBase
     [Command("forceubiupdate")]
     public async Task forceubiupdate(CommandContext ctx) 
     {
-        if (ctx.Member.User_Id != 735182334984193) {
+        if (ctx.Member.UserId != 12201879245422592) {
             await ctx.ReplyAsync("Only Jacob can use this command!");
             return;
         }
@@ -144,13 +144,10 @@ class EconomyCommands : CommandModuleBase
 
         foreach(UBIPolicy policy in UBIPolicies) {
             List<User> effected = DBCache.GetAll<User>().ToList();
-            string fromId = "";
-            if (policy.DistrictId != null) {
+            long fromId = 100;
+            if (policy.DistrictId != 100) {
                 effected = effected.Where(x => x.DistrictId == policy.DistrictId).ToList();
-                fromId = "g-"+policy.DistrictId;
-            }
-            else {
-                fromId = "g-vooperia";
+                fromId = policy.DistrictId;
             }
             if (policy.ApplicableRank != null) {
                 effected = effected.Where(x => x.Rank == policy.ApplicableRank).ToList();

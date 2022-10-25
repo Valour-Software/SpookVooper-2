@@ -25,7 +25,7 @@ namespace SV2.Controllers
             return View();
         }
 
-        public IActionResult View(string id)
+        public IActionResult View(long id)
         {
             Group? group = Group.Find(id);
             return View(group);
@@ -75,7 +75,7 @@ namespace SV2.Controllers
             return Redirect($"/group/view/{group.Id}");
         }
 
-        public IActionResult Edit(string id)
+        public IActionResult Edit(long id)
         {
             Group? group = Group.Find(id);
             return View(group);

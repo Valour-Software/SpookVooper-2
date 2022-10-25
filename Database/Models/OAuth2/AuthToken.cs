@@ -8,11 +8,9 @@ public class AuthToken
     /// </summary>
     public string Id { get; set; }
 
-    [GuidID]
-    public string AppId { get; set; }
+    public long AppId { get; set; }
 
-    [EntityId]
-    public string UserId { get; set; }
+    public long UserId { get; set; }
     public string Scope { get; set; }
     public DateTime Time { get; set; }
 }

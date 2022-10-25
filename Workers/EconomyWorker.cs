@@ -33,7 +33,7 @@ namespace SV2.Workers
                             foreach(GroupRole role in roles) {
                                 if (role.Salary > 0.1m) {
                                     TaxCreditPolicy taxcredit = DBCache.GetAll<TaxCreditPolicy>().FirstOrDefault(x => x.DistrictId == role.Group.DistrictId && x.taxCreditType == TaxCreditType.Employee);
-                                    foreach(String Id in role.Members) {
+                                    foreach(long Id in role.Members) {
                                         Transaction tran = new Transaction(role.GroupId, Id, role.Salary, TransactionType.Paycheck, $"{role.Name} Salary");
                                         TaskResult result = await tran.Execute();
                                         if (!result.Succeeded) {
@@ -56,13 +56,10 @@ namespace SV2.Workers
                                     continue;
                                 }
                                 List<User> effected = DBCache.GetAll<User>().ToList();
-                                string fromId = "";
+                                long fromId = 100;
                                 if (policy.DistrictId != null) {
                                     effected = effected.Where(x => x.DistrictId == policy.DistrictId).ToList();
-                                    fromId = "g-"+policy.DistrictId;
-                                }
-                                else {
-                                    fromId = "g-vooperia";
+                                    fromId = policy.DistrictId;
                                 }
                                 if (policy.ApplicableRank != null) {
                                     effected = effected.Where(x => x.Rank == policy.ApplicableRank).ToList();

@@ -10,8 +10,7 @@ namespace SV2.Database.Models.Groups;
 public class GroupRole
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
     [VarChar(64)]
     public string Name { get; set; }
@@ -19,14 +18,13 @@ public class GroupRole
     // this role's permission value
     public ulong PermissionValue { get; set; }
 
-    public List<String> Members { get; set; }
+    public List<long> Members { get; set; }
 
     // Hexcode for role color (ex: #ffffff)
     public string Color { get; set; }
 
     // The group this role belongs to
-    [EntityId]
-    public string GroupId { get; set; }
+    public long GroupId { get; set; }
 
     [NotMapped]
     public Group Group { 
@@ -42,7 +40,7 @@ public class GroupRole
     public static GroupRole Default = new GroupRole()
     {
         Color = "",
-        GroupId = "",
+        GroupId = 0,
         Name = "Default Role",
         Authority = int.MinValue,
         PermissionValue = 0
@@ -70,9 +68,9 @@ public class GroupRole
         return strings;
     }
 
-    public GroupRole(string name, string groupid, decimal salary, int authority)
+    public GroupRole(string name, long groupid, decimal salary, int authority)
     {
-        Id = Guid.NewGuid().ToString();
+        Id = IdManagers.GroupRoleIdGenerator.Generate();
         Name = name;
         PermissionValue = 0;
         Members = new();

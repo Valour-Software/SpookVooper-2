@@ -13,12 +13,13 @@ public enum EntityType
 {
     User,
     Group,
+    Corporation,
     CreditAccount
 }
 
 public interface IHasOwner
 {
-    public string OwnerId { get; set; }
+    public long OwnerId { get; set; }
     public IEntity Owner { get;}
 }
 
@@ -28,8 +29,7 @@ public interface IEntity
     // x-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
     // ex: u-c60c6bd8-0409-4cbd-8bb8-3c87e24c55f8
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
     [VarChar(64)]
     public string Name { get; set; }
@@ -45,9 +45,11 @@ public interface IEntity
     public string Api_Key { get; set; }
     public string Image_Url { get; set; }
 
-    [EntityId]
-    public string? DistrictId { get; set; }
-    public static IEntity? Find(string Id)
+    public long DistrictId { get; set; }
+
+    public EntityType entityType { get; }
+
+    public static IEntity? Find(long Id)
     {
         return DBCache.FindEntity(Id);
     }
@@ -71,12 +73,15 @@ public interface IEntity
 
         // do district level taxes
         List<TaxPolicy> policies = new();
-        switch (Id.Substring(0, 1))
+        switch (entityType)
         {
-            case "g":
+            case EntityType.Group:
+                policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList();
+                break;
+            case EntityType.Corporation:
                 policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList();
                 break;
-            case "u":
+            case EntityType.User:
                 policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList();
                 break;
         }
@@ -91,20 +96,24 @@ public interface IEntity
         }
 
         if (totaldue > 0.01m) {
-            Transaction taxtrans = new Transaction(Id, DistrictId!, totaldue, TransactionType.TaxPayment, $"Income Tax Payment");
+            Transaction taxtrans = new Transaction(Id, DistrictId, totaldue, TransactionType.TaxPayment, $"Income Tax Payment");
             taxtrans.NonAsyncExecute(true);
         }
 
         amount = TaxAbleCredits-(CreditSnapshots.TakeLast(7).Sum()/7);
         totaldue = 0.0m;
 
-        switch (Id.Substring(0, 1))
+        // now do imperial level taxes
+        switch (entityType)
         {
-            case "g":
-                policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == null && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList();
+            case EntityType.Group:
+                policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == 100 && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList();
                 break;
-            case "u":
-                policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == null && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList();
+            case EntityType.Corporation:
+                policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == 100 && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList();
+                break;
+            case EntityType.User:
+                policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == 100 && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList();
                 break;
         }
 
@@ -119,12 +128,12 @@ public interface IEntity
             }
         }
         if (totaldue > 0.01m) {
-            Transaction taxtrans = new Transaction(Id, "g-vooperia", totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{amount} income");
+            Transaction taxtrans = new Transaction(Id, DistrictId!, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{amount} income");
             taxtrans.NonAsyncExecute(true);
         }
 
         // do district level balance tx
-        TaxPolicy _policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == DistrictId && x.taxType == TaxType.UserBalance);
+        TaxPolicy? _policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == DistrictId && x.taxType == TaxType.UserBalance);
         if (_policy is not null) {
             totaldue = _policy.GetTaxAmount(Credits);
             if (totaldue > 0.01m) {

@@ -24,17 +24,14 @@ public enum TransactionType
 public class Transaction
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
     public decimal Credits { get; set; }
 
     public DateTime Time { get; set; }
 
-    [EntityId]
-    public string FromId { get; set; }
+    public long FromId { get; set; }
 
-    [EntityId]
-    public string ToId { get; set; }
+    public long ToId { get; set; }
     public TransactionType transactionType { get; set; }
 
     [VarChar(1024)]
@@ -57,9 +54,9 @@ public class Transaction
         
     }
 
-    public Transaction(string fromId, string toId, decimal credits, TransactionType TransactionType, string details)
+    public Transaction(long fromId, long toId, decimal credits, TransactionType TransactionType, string details)
     {
-        Id = Guid.NewGuid().ToString();
+        Id = IdManagers.TransactionIdGenerator.Generate();
         Credits = credits;
         FromId = fromId;
         ToId = toId;
@@ -166,25 +163,25 @@ public class Transaction
                 if (amount == 0.0m) {
                     continue;
                 }
-                if (policy.DistrictId is null) {
-                    string _FromId = FromId;
+                if (policy.DistrictId == 100) {
+                    long _FromId = FromId;
                     if (policy.taxType == TaxType.Sales || policy.taxType == TaxType.Transactional || policy.taxType == TaxType.Payroll) {
                         _FromId = ToId;
                     }
-                    Transaction taxtrans = new Transaction(_FromId, "g-vooperia", amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
+                    Transaction taxtrans = new Transaction(_FromId, 100, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
                     policy.Collected += amount;
                     totaltaxpaid += amount;
                     taxtrans.NonAsyncExecute(true);
                 }
                 else {
                     if (policy.DistrictId == fromEntity.DistrictId && policy.taxType != TaxType.Sales && policy.taxType != TaxType.Payroll && policy.taxType != TaxType.Transactional) {
-                        Transaction taxtrans = new Transaction(FromId, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
+                        Transaction taxtrans = new Transaction(FromId, policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
                         taxtrans.NonAsyncExecute(true);
                     }
                     else if (policy.DistrictId == toEntity.DistrictId){
-                        Transaction taxtrans = new Transaction(toEntity.Id, "g-"+policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
+                        Transaction taxtrans = new Transaction(toEntity.Id, policy.DistrictId, amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
                         taxtrans.NonAsyncExecute(true);

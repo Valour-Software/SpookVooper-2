@@ -46,13 +46,13 @@
                     <div class="form-group">
                         <label asp-for="GroupType"></label>
                         <br />
-                        <select class="form-control" asp-for="GroupType" asp-items="Enum.GetValues(typeof(GroupTypes)).OfType<string>().Select(x => new SelectListItem() { Text = x.ToString(), Value = x.ToString()})" disabled></select>
+                        <select class="form-control" value="@Model.GroupType.ToString()" disabled></select>
                         @Html.HiddenFor(x => x.GroupType)
                     </div>
                     <div class="form-group">
                         <label asp-for="DistrictId"></label>
                         <br />
-                        <select class="form-control" asp-for="DistrictId" asp-items="DBCache.GetAll<District>().Select(x => new SelectListItem() { Text = x.Name, Value = x.Id})"></select>
+                        <select class="form-control" asp-for="DistrictId" asp-items="DBCache.GetAll<District>().Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString()})"></select>
                     </div>
                     @if (Model.HasPermission(user, GroupPermissions.Edit))
                     {

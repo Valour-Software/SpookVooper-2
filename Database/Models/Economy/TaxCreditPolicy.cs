@@ -14,15 +14,15 @@ public enum TaxCreditType
 public class TaxCreditPolicy
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
     [VarChar(64)]
     public string Name { get; set; }
     public decimal Rate { get; set; }
+
     // should be set to Null if this is a Imperial Tax Credit
-    [EntityId]
-    public string? DistrictId { get; set; }
+
+    public long DistrictId { get; set; }
     public TaxCreditType taxCreditType { get; set; }
     // amount this tax credit has paid in the current month
     public decimal Paid { get; set; }

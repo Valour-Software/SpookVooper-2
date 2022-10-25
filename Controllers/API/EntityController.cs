@@ -14,7 +14,7 @@ namespace SV2.API
             app.MapGet   ("api/entity/{svid}/credits", GetCredits);
         }
 
-        private static async Task GetName(HttpContext ctx, VooperDB db, string svid)
+        private static async Task GetName(HttpContext ctx, VooperDB db, long svid)
         {
             IEntity? entity = IEntity.Find(svid);
             if (entity == null)
@@ -27,7 +27,7 @@ namespace SV2.API
             await ctx.Response.WriteAsync(entity.Name);
         }
 
-        private static async Task GetCredits(HttpContext ctx, VooperDB db, string svid)
+        private static async Task GetCredits(HttpContext ctx, VooperDB db, long svid)
         {
             IEntity? account = IEntity.Find(svid);
             if (account == null)

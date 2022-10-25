@@ -9,11 +9,9 @@ namespace SV2.Database.Models.Items;
 public class TradeItem : IHasOwner
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
-    [EntityId]
-    public string OwnerId { get; set; }
+    public long OwnerId { get; set; }
 
     [NotMapped]
     public IEntity Owner { 
@@ -22,8 +20,7 @@ public class TradeItem : IHasOwner
         }
     }
     
-    [GuidID]
-    public string Definition_Id { get; set; }
+    public long Definition_Id { get; set; }
     
     [NotMapped]
     public TradeItemDefinition Definition { 
@@ -53,11 +50,9 @@ public class BuiltinModifier
 public class TradeItemDefinition : IHasOwner
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
-    [EntityId]
-    public string OwnerId { get; set; }
+    public long OwnerId { get; set; }
 
     [NotMapped]
     public IEntity Owner { 
@@ -84,9 +79,9 @@ public class TradeItemDefinition : IHasOwner
 
     }
 
-    public TradeItemDefinition(string ownerid, string name)
+    public TradeItemDefinition(long ownerid, string name)
     {
-        Id = Guid.NewGuid().ToString();
+        Id = IdManagers.TradeItemDefinitionIdGenerator.Generate();
         OwnerId = ownerid;
         Name = name;
         Created = DateTime.UtcNow;

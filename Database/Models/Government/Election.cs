@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-using SV2.Helpers;
-
 namespace SV2.Database.Models.Government;
 
 public enum ElectionType
@@ -26,12 +24,10 @@ public class ResultData
 
 public class Election
 {
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
     // District the election is for
-    [VarChar(64)]
-    public string? DistrictId { get; set; }
+    public long DistrictId { get; set; }
 
     [NotMapped]
     public District District {
@@ -47,8 +43,7 @@ public class Election
     public DateTime End_Date { get; set; }
 
     // The resulting winner of the election
-    [EntityId]
-    public string? WinnerId { get; set; }
+    public long WinnerId { get; set; }
 
     [NotMapped]
     public User Winner { 
@@ -57,8 +52,8 @@ public class Election
         }
     }
 
-    [Column(TypeName = "CHAR(38)[]")]
-    public List<string> ChoiceIds { get; set; }
+    [Column(TypeName = "bigint[]")]
+    public List<long> ChoiceIds { get; set; }
 
     // False if the election has been ended
     [NotMapped]
@@ -73,7 +68,7 @@ public class Election
 
     public string GetElectionTitle()
     {
-        if (District is not null) {
+        if (DistrictId != 100) {
             return $"The {District.Name} Senate Election";
         }
 
@@ -92,9 +87,9 @@ public class Election
 
     }
 
-    public Election(DateTime start_date, DateTime end_date, List<string> choiceids, string? districtid, ElectionType type)
+    public Election(DateTime start_date, DateTime end_date, List<long> choiceids, long districtid, ElectionType type)
     {
-        Id = Guid.NewGuid().ToString();
+        Id = IdManagers.ElectionIdGenerator.Generate();
         DistrictId = districtid;
         Start_Date = start_date;
         End_Date = end_date;

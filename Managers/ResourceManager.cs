@@ -43,11 +43,6 @@ public class ConsumerGood
     public double PopConsumptionRate { get; set; }
 }
 
-public class ConsumerGoodGroup
-{
-    public List<ConsumerGood> ConsumerGoods { get; set; }
-}
-
 public class Material_Group
 {
     public string Name { get; set; }
@@ -60,7 +55,7 @@ public class TopLevelResources
     public List<BaseRecipe> Recipes { get; set; }
     
     [JsonPropertyName("Consumer Goods")]
-    public ConsumerGoodGroup ConsumerGoodGroup { get; set; }
+    public List<ConsumerGood> ConsumerGoods { get; set; }
 }
 
 public static class ResourceManager 
@@ -85,11 +80,12 @@ public static class ResourceManager
 
         foreach(string Resource in Resources)
         {
-            TradeItemDefinition? def = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.OwnerId == "g-vooperia" && x.Name == Resource);
+            TradeItemDefinition? def = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.OwnerId == 100 && x.Name == Resource);
 
             if (def is null) {
                 // now we need to create a definition for this resource
-                def = new TradeItemDefinition("g-vooperia", Resource);
+                def = new TradeItemDefinition(100, Resource);
+                def.BuiltinModifiers = new();
 
                 await DBCache.Put<TradeItemDefinition>(def.Id, def);
                 await VooperDB.Instance.TradeItemDefinitions.AddAsync(def);

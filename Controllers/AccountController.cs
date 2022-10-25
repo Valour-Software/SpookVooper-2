@@ -3,6 +3,7 @@ using SV2.Models;
 using SV2.Managers;
 using SV2.Database.Models.Users;
 using System.Diagnostics;
+using SV2.Models.Manage;
 
 namespace SV2.Controllers
 {
@@ -21,13 +22,18 @@ namespace SV2.Controllers
         public async Task<IActionResult> Manage()
         {
             User? user = UserManager.GetUser(HttpContext);
+            UserManageModel userManageModel = new()
+            {
+                Id = user.Id,
+                Name = user.Name,
+            };
 
             if (user is null) 
             {
                 return Redirect("/account/login");
             }
 
-            return View(user);
+            return View(userManageModel);
         }
 
         public async Task<IActionResult> ViewAPIKey()
@@ -50,9 +56,9 @@ namespace SV2.Controllers
 
         public IActionResult Entered()
         {
-            string svid = UserManager.GetSvidFromSession(HttpContext);
+            long svid = UserManager.GetSvidFromSession(HttpContext);
             Console.WriteLine(HttpContext.Session.GetString("code"));
-            HttpContext.Response.Cookies.Append("svid", svid);
+            HttpContext.Response.Cookies.Append("svid", svid.ToString());
             return Redirect("/");
         }
 

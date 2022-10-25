@@ -28,8 +28,7 @@ public enum GroupFlag
 public class Group : IHasOwner, IEntity
 {
     [Key]
-    [EntityId]
-    public string Id { get; set; }
+    public long Id { get; set; }
 
     [VarChar(64)]
     public string Name { get; set; }
@@ -40,13 +39,12 @@ public class Group : IHasOwner, IEntity
     [VarChar(512)]
     public string? Image_Url { get; set; }
     
-    [EntityId]
-    public string? DistrictId { get; set;}
+    public long DistrictId { get; set;}
     public decimal Credits { get; set;}
     public decimal TaxAbleCredits { get; set; }
     public List<decimal>? CreditSnapshots { get; set;}
 
-    public List<string> MembersIds { get; set; }
+    public List<long> MembersIds { get; set; }
     
     [JsonIgnore]
     [VarChar(36)]
@@ -56,6 +54,13 @@ public class Group : IHasOwner, IEntity
     public List<GroupFlag> Flags { get; set; }
     // if the group is open to the public
     public bool Open { get; set; }
+    public EntityType entityType {
+        get {
+            if (GroupType == GroupTypes.Corporation)
+                return EntityType.Corporation;
+            return EntityType.Group;
+        }
+    }
 
     public bool IsInGroup(User user)
     {
@@ -67,8 +72,7 @@ public class Group : IHasOwner, IEntity
         return MembersIds.Select(x => User.Find(x));
     }
     
-    [EntityId]
-    public string OwnerId { get; set; }
+    public long OwnerId { get; set; }
 
     [NotMapped]
 
@@ -83,9 +87,9 @@ public class Group : IHasOwner, IEntity
         
     }
 
-    public Group(string name, string ownerId)
+    public Group(string name, long ownerId)
     {
-        Id = "g-"+Guid.NewGuid().ToString();
+        Id = IdManagers.GroupIdGenerator.Generate();
         Name = name;
         Api_Key = Guid.NewGuid().ToString();
         Credits = 0.0m;
@@ -153,7 +157,7 @@ public class Group : IHasOwner, IEntity
 
     }
 
-    public static Group? Find(string Id)
+    public static Group? Find(long Id)
     {
         return DBCache.Get<Group>(Id);
     }

@@ -9,7 +9,7 @@ public static class DBCache
     /// <summary>
     /// The high level cache object which contains the lower level caches
     /// </summary>
-    public static Dictionary<Type, ConcurrentDictionary<string, object>> HCache = new();
+    public static Dictionary<Type, ConcurrentDictionary<long, object>> HCache = new();
 
     public static IEnumerable<T> GetAll<T>() where T : class
     {
@@ -25,7 +25,7 @@ public static class DBCache
     /// <summary>
     /// Returns true if the cache contains the item
     /// </summary>
-    public static bool Contains<T>(string Id) where T : class
+    public static bool Contains<T>(long Id) where T : class
     {
         var type = typeof(T);
 
@@ -38,7 +38,7 @@ public static class DBCache
     /// <summary>
     /// Places an item into the cache
     /// </summary>
-    public static async Task Put<T>(string Id, T? obj) where T : class
+    public static async Task Put<T>(long Id, T? obj) where T : class
     {
         // Empty object is ignored
         if (obj == null)
@@ -49,7 +49,7 @@ public static class DBCache
 
         // If there isn't a cache for this type, create one
         if (!HCache.ContainsKey(type))
-            HCache.Add(type, new ConcurrentDictionary<string, object>());
+            HCache.Add(type, new ConcurrentDictionary<long, object>());
 
         if (!HCache[type].ContainsKey(Id)) {
             HCache[type][Id] = obj;
@@ -59,7 +59,7 @@ public static class DBCache
     /// <summary>
     /// Returns the item for the given id, or null if it does not exist
     /// </summary>
-    public static T? Get<T>(string Id) where T : class
+    public static T? Get<T>(long Id) where T : class
     {
         var type = typeof(T);
 
@@ -70,20 +70,28 @@ public static class DBCache
         return null;
     }
 
-    public static IEntity? FindEntity(string Id)
+    public static T? Get<T>(long? Id) where T : class
     {
-        if (Id is null) {
+        if (Id is null)
             return null;
-        }
-        switch (Id.Substring(0, 1))
-        {
-            case "g":
-                return Get<Group>(Id);
-            case "u":
-                return Get<User>(Id);
-            default:
-                return null;
-        }
+        var type = typeof(T);
+
+        if (HCache.ContainsKey(type))
+            if (HCache[type].ContainsKey((long)Id)) 
+                return HCache[type][(long)Id] as T;
+
+        return null;
+    }
+
+    public static IEntity? FindEntity(long Id)
+    {
+        var group = Get<Group>(Id);
+        if (group is not null)
+            return group;
+        var user = Get<User>(Id);
+        if (user is not null)
+            return user;
+        return null;
     }
 
     public static async Task LoadAsync()

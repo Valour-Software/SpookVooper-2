@@ -7,15 +7,12 @@ namespace SV2.Database.Models.Forums;
 public class ForumLike
 {
     [Key]
-    [GuidID]
-    public string Id { get; set; }
+    public long Id {get; set; }
 
-    [GuidID]
-    public string PostId { get; set; }
+    public long PostId { get; set; }
 
     [ForeignKey("PostId")]
     public ForumPost Post { get; set ;}
     
-    [EntityId]
-    public string AddedById { get; set; }
+    public long AddedById { get; set; }
 }

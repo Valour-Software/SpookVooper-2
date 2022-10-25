@@ -19,14 +19,12 @@ public enum TerrainType
 public class Province
 {
     [Key]
-    [GuidID]
-    public string Id { get; set;}
+    public long Id {get; set; }
 
     [VarChar(64)]
     public string? Name { get; set;}
 
-    [EntityId]
-    public string DistrictId { get; set; }
+    public long DistrictId { get; set; }
     
     [NotMapped]
     public District Owner { 
