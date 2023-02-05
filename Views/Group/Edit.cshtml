@@ -76,9 +76,9 @@
                     @if (Model.OwnerId == user.Id)
                     {
                         <div class="form-group">
-                            <label asp-for="Image_Url"></label>
-                            <input asp-for="Image_Url" class="form-control" />
-                            <span asp-validation-for="Image_Url" class="text-danger"></span>
+                            <label asp-for="ImageUrl"></label>
+                            <input asp-for="ImageUrl" class="form-control" />
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <input type="checkbox" asp-for="Open" class="form-check-inline" />
@@ -90,12 +90,12 @@
                     else
                     {
                         <div class="form-group">
-                            <label asp-for="Image_Url"></label>
-                            <input asp-for="Image_Url" class="form-control" disabled />
-                            <span asp-validation-for="Image_Url" class="text-danger"></span>
+                            <label asp-for="ImageUrl"></label>
+                            <input asp-for="ImageUrl" class="form-control" disabled />
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
                         </div>
 
-                        @Html.HiddenFor(x => x.Image_Url)
+                        @Html.HiddenFor(x => x.ImageUrl)
                     }
                 </div>
 
@@ -109,7 +109,7 @@
                             {
                                 <div class="col-6 srow">
                                     <div class="p-1">
-                                        <img class="smallpfp" style="margin-left: 10px; margin-right:10px; float:right" src="@member.Image_Url" />
+                                        <img class="smallpfp" style="margin-left: 10px; margin-right:10px; float:right" src="@member.ImageUrl" />
                                     </div>
                                     <a asp-controller="User" asp-action="Info" asp-route-id="@member.Id">
                                         <p class="forumtable-text">@member.Name</p>

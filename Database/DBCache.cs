@@ -88,9 +88,11 @@ public static class DBCache
         var group = Get<Group>(Id);
         if (group is not null)
             return group;
+
         var user = Get<User>(Id);
         if (user is not null)
             return user;
+
         return null;
     }
 

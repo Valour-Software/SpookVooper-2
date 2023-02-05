@@ -195,8 +195,8 @@ public class Transaction
 
         if (transactionType == TransactionType.ItemTrade || transactionType == TransactionType.Paycheck || transactionType == TransactionType.Payment || transactionType == TransactionType.StockTrade)
         {
-            fromEntity.TaxAbleCredits -= Credits;
-            toEntity.TaxAbleCredits += Credits;
+            fromEntity.TaxAbleBalance -= Credits;
+            toEntity.TaxAbleBalance += Credits;
         }
 
         VooperDB.Instance.Transactions.AddAsync(this);

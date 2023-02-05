@@ -45,7 +45,7 @@ namespace SV2.Controllers
                 return Redirect("/account/login");
             }
 
-            return View((object)user.Api_Key);
+            return View((object)user.ApiKey);
         }
 
         public IActionResult Logout()

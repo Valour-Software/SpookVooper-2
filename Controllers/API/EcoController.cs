@@ -36,7 +36,7 @@ namespace SV2.API
             // check if the apikey matches the fromentity.Apikey
             // TODO: add checking for oauth key
             
-            if (fromentity.Api_Key != apikey) {
+            if (fromentity.ApiKey != apikey) {
                 ctx.Response.StatusCode = 401;
                 await ctx.Response.WriteAsync($"Invalid api key!");
                 return;

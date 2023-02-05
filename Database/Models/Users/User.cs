@@ -109,7 +109,7 @@ public class User : BaseEntity
 
     public bool HasPermissionWithKey(string apikey, GroupPermission permission)
     {
-        if (apikey == Api_Key) {
+        if (apikey == ApiKey) {
             return true;
         }
         return false;
@@ -133,7 +133,7 @@ public class User : BaseEntity
         Messages = 0;
         PostLikes = 0;
         CommentLikes = 0;
-        Api_Key = Guid.NewGuid().ToString();
+        ApiKey = Guid.NewGuid().ToString();
         Credits = 0.0m;
         CreditSnapshots = new();
         Rank = Rank.Unranked;

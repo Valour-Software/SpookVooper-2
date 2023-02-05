@@ -75,7 +75,7 @@ public class Group : BaseEntity, IHasOwner
     {
         Id = IdManagers.GroupIdGenerator.Generate();
         Name = name;
-        Api_Key = Guid.NewGuid().ToString();
+        ApiKey = Guid.NewGuid().ToString();
         Credits = 0.0m;
         CreditSnapshots = new();
         OwnerId = ownerId;
@@ -103,7 +103,7 @@ public class Group : BaseEntity, IHasOwner
 
     public bool HasPermissionWithKey(string apikey, GroupPermission permission)
     {
-        if (apikey == Api_Key) {
+        if (apikey == ApiKey) {
             return true;
         }
         

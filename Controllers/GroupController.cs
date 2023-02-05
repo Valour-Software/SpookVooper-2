@@ -65,7 +65,7 @@ namespace SV2.Controllers
             group.Description = model.Description;
             group.GroupType = model.GroupType;
             group.DistrictId = model.DistrictId;
-            group.Image_Url = model.Image_Url;
+            group.ImageUrl = model.ImageUrl;
             group.OwnerId = user.Id;
 
             await DBCache.Put<Group>(group.Id, group);
@@ -128,7 +128,7 @@ namespace SV2.Controllers
             if (prevgroup.OwnerId == user.Id)
             {
                 prevgroup.Name = model.Name;
-                prevgroup.Image_Url = model.Image_Url;
+                prevgroup.ImageUrl = model.ImageUrl;
                 prevgroup.Open = model.Open;
                 prevgroup.DistrictId = model.DistrictId;
                 prevgroup.Description = model.Description;

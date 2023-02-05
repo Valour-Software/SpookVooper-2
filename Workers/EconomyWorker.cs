@@ -89,7 +89,7 @@ namespace SV2.Workers
                                     if (entity.CreditSnapshots is null) {
                                         entity.CreditSnapshots = new();
                                     }
-                                    entity.CreditSnapshots.Add(entity.TaxAbleCredits);
+                                    entity.CreditSnapshots.Add(entity.TaxAbleBalance);
                                     await entity.DoIncomeTax();
                                 }
                             }

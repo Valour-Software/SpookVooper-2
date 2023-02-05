@@ -47,8 +47,11 @@ public class TaxPolicy
     // if a sales tax has a min of $1 and a max of $3 then
     // If I sell a apple for $2, then $1 will be subjected to the Rate
     // If I sell a apple for $4, then $2 will be subjected to the Rate
+    [DecimalType]
     public decimal Minimum { get; set; }
+
     // the max amount after which the tax no longer has effect
+    [DecimalType]
     public decimal Maximum { get; set; }
     // amount this tax has collected in the current month
     public decimal Collected { get; set; }
@@ -65,7 +68,7 @@ public class TaxPolicy
         if (Maximum != 0.0m) {
             amount = Math.Min(Maximum, amount);
         }
-        return amount * (Rate / 100.0m);
+        return (amount - Minimum) * (Rate / 100.0m);
     }
 
     public decimal GetTaxAmountForResource(decimal amount) {

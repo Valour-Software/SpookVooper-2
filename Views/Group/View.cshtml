@@ -5,8 +5,8 @@
     <meta name="keywords" content="Group, SpookVooper, @Model.Name">
     <meta property="og:description" content="@Model.Description">
     <meta property="og:url" content="https://spookvooper.com/Group/View?groupid=@Model.Id">
-    <meta property="og:image" content="@Model.Image_Url">
-    <meta name="twitter:image" content="@Model.Image_Url">
+    <meta property="og:image" content="@Model.ImageUrl">
+    <meta name="twitter:image" content="@Model.ImageUrl">
 </head>
 
 
@@ -142,7 +142,7 @@
                         {
                             <div class="col-6 memberbox">
                                 <div class="m-2">
-                                    <img class="memberpfp" src="@member.Image_Url" />
+                                    <img class="memberpfp" src="@member.ImageUrl" />
                                 </div>
                                 <a asp-controller="User" asp-action="Info" asp-route-svid="@member.Id">
                                     <p class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(member).Color">@member.Name</p>
