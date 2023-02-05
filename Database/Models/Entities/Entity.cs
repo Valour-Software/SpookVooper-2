@@ -92,7 +92,7 @@ public abstract class BaseEntity
         }
         if (totaldue > 0.1m) {
             Transaction taxtrans = new Transaction(Id, DistrictId, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - TaxAbleBalanceYesterday} of income.");
-            await taxtrans.Execute(true);
+            taxtrans.NonAsyncExecute(true);
         }
 
         amount = TaxAbleBalance-TaxAbleBalanceYesterday;
@@ -118,7 +118,7 @@ public abstract class BaseEntity
         }
         if (totaldue > 0.1m) {
             Transaction taxtrans = new Transaction(Id, DistrictId!, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - TaxAbleBalanceYesterday} of income.");
-            await taxtrans.Execute(true);
+            taxtrans.NonAsyncExecute(true);
         }
 
         // do district level balance tx
@@ -127,7 +127,7 @@ public abstract class BaseEntity
             totaldue = _policy.GetTaxAmount(Credits);
             if (totaldue > 0.1m) {
                 Transaction taxtrans = new(Id, DistrictId!, totaldue, TransactionType.TaxPayment, $"Balance Tax Payment tax id: {_policy.Id}");
-                await taxtrans.Execute(true);
+                taxtrans.NonAsyncExecute(true);
                 _policy.Collected += totaldue;
             }
         }
