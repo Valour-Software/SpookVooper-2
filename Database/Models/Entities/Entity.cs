@@ -5,6 +5,7 @@ using SV2.Database.Models.Users;
 using SV2.Database.Models.Permissions;
 using SV2.Database.Models.Economy;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SV2.Database.Models.Entities;
 
@@ -51,6 +52,9 @@ public abstract class BaseEntity
     public string? ImageUrl { get; set; }
 
     public long DistrictId { get; set; }
+
+    [NotMapped]
+    public District District => DBCache.Get<District>(DistrictId)!;
 
     public virtual EntityType EntityType { get; }
 

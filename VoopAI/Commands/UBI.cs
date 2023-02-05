@@ -17,29 +17,6 @@ namespace SV2.VoopAI.Commands;
 
 class UBICommands : CommandModuleBase
 {
-    public static string GetRankColor(Rank? rank)
-    {
-        if (rank is null) {
-            return "ffffff";
-        }
-        switch(rank)
-        {
-            case Rank.Spleen:
-                return "414aff";
-            case Rank.Crab:
-                return "e05151";
-            case Rank.Gaty:
-                return "00ff23";
-            case Rank.Corgi:
-                return "b400ff";
-            case Rank.Oof:
-                return "f1ff00";
-            case Rank.Unranked:
-                return "ffffff";
-        }
-        return "ffffff";
-    }
-
     [Interaction(EmbedIteractionEventType.FormSubmitted)]
     public async Task ChangeUBIInteraction(InteractionContext ctx)
     {
@@ -94,7 +71,7 @@ class UBICommands : CommandModuleBase
             }
             else {
                 rankname = policy.ApplicableRank.ToString()!;
-                rankcolor = GetRankColor(policy.ApplicableRank);
+                rankcolor = VoopAI.GetRankColor(policy.ApplicableRank);
             }
             embed.AddText(rankname).WithStyles(new TextColor(rankcolor));
             embed.AddText(text:$"¢{Math.Round(policy.Rate)} daily");

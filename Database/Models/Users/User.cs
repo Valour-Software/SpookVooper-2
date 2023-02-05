@@ -5,6 +5,7 @@ using SV2.Database.Models.Entities;
 using SV2.Database.Models.Permissions;
 using Valour.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace SV2.Database.Models.Users;
 
@@ -59,8 +60,10 @@ public class SVUser : BaseEntity
 
     public void NewMessage(PlanetMessage msg)
     {
-        if (LastSentMessage.AddSeconds(60) < DateTime.UtcNow)
+        if (LastActiveMinute.AddSeconds(60) < DateTime.UtcNow)
         {
+            if (PointsThisMinute <= 3)
+                PointsThisMinute += 3;
             double xpgain = (Math.Log10(PointsThisMinute) - 1) * 3;
             xpgain = Math.Max(0.2, xpgain);
             MessageXp += (float)xpgain;
@@ -79,10 +82,10 @@ public class SVUser : BaseEntity
         // each char grants 1 point
         Points += (short)Content.Length;
 
-        // if there is media then add 100 points
-        if (Content.Contains("https://vmps.valour.gg"))
+        // if there is media then add 150 points
+        if (msg.AttachmentsData.Contains("https://cdn.valour.gg/content/"))
         {
-            Points += 100;
+            Points += 150;
         }
 
         PointsThisMinute += Points;
@@ -168,5 +171,22 @@ public class SVUser : BaseEntity
         }
 
         return groups;
+    }
+
+    public async Task CheckRoles(PlanetMember member)
+    {
+        var roles = await member.GetRolesAsync();
+        // check rank role
+        var rankname = Rank.ToString();
+        if (!roles.Any(x => x.Name == rankname))
+            await member.Node.PostAsync($"api/members/{member.Id}/roles/{VoopAI.VoopAI.RankRoleIds[rankname]}", null);
+        if (roles.Any(x => VoopAI.VoopAI.RankNames.Contains(x.Name) && x.Name != rankname))
+            await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{VoopAI.VoopAI.RankRoleIds[rankname]}");
+
+        var districtrole = VoopAI.VoopAI.DistrictRoles[District.Name + " District"];
+        if (!roles.Any(x => x.Id == districtrole.Id))
+            await member.Node.PostAsync($"api/members/{member.Id}/roles/{districtrole.Id}", null);
+        if (roles.Any(x => VoopAI.VoopAI.DistrictRoles.ContainsKey(x.Name) && x.Id != districtrole.Id))
+            await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{districtrole.Id}");
     }
 }

@@ -56,11 +56,11 @@ namespace SV2.Workers
                                 }
                                 List<SVUser> effected = DBCache.GetAll<SVUser>().ToList();
                                 long fromId = 100;
-                                if (policy.DistrictId != null) {
+                                if (policy.DistrictId != 100) {
                                     effected = effected.Where(x => x.DistrictId == policy.DistrictId).ToList();
                                     fromId = policy.DistrictId;
                                 }
-                                if (policy.ApplicableRank != null) {
+                                if (policy.ApplicableRank is not null) {
                                     effected = effected.Where(x => x.Rank == policy.ApplicableRank).ToList();
                                 }
                                 foreach(SVUser user in effected) {
