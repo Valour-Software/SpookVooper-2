@@ -17,7 +17,7 @@ namespace SV2.API
 
         private static async Task SendTransaction(HttpContext ctx, VooperDB db, long fromid, long toid, string apikey, decimal amount, string detail, TransactionType trantype)
         {
-            IEntity? fromentity = IEntity.Find(fromid);
+            BaseEntity? fromentity = BaseEntity.Find(fromid);
             if (fromentity == null)
             {
                 ctx.Response.StatusCode = 401;
@@ -25,7 +25,7 @@ namespace SV2.API
                 return;
             }
 
-            IEntity? toentity = IEntity.Find(toid);
+            BaseEntity? toentity = BaseEntity.Find(toid);
             if (toentity == null)
             {
                 ctx.Response.StatusCode = 401;

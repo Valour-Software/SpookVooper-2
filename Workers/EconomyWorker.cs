@@ -82,9 +82,9 @@ namespace SV2.Workers
 
                             if (DateTime.UtcNow.Hour == 1) {
                                 // every day, update credit snapchats
-                                List<IEntity> entities = DBCache.GetAll<User>().ToList<IEntity>();
+                                List<BaseEntity> entities = DBCache.GetAll<User>().ToList<BaseEntity>();
                                 entities.AddRange(DBCache.GetAll<Group>());
-                                foreach(IEntity entity in entities)
+                                foreach(BaseEntity entity in entities)
                                 {
                                     if (entity.CreditSnapshots is null) {
                                         entity.CreditSnapshots = new();

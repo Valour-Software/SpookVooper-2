@@ -20,7 +20,7 @@ public class StockOffer : IHasOwner
     public long OwnerId { get; set; }
 
     [NotMapped]
-    public IEntity Owner { get; set; }
+    public BaseEntity Owner { get; set; }
     
     // The ticker of the stock in this offer
     [VarChar(4)]

@@ -70,7 +70,7 @@ public class GroupRole
 
     public GroupRole(string name, long groupid, decimal salary, int authority)
     {
-        Id = IdManagers.GroupRoleIdGenerator.Generate();
+        Id = IdManagers.GeneralIdGenerator.Generate();
         Name = name;
         PermissionValue = 0;
         Members = new();

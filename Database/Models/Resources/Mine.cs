@@ -20,9 +20,9 @@ public class Mine : IHasOwner, IBuilding
     public long OwnerId { get; set; }
 
     [NotMapped]
-    public IEntity Owner { 
+    public BaseEntity Owner { 
         get {
-            return IEntity.Find(OwnerId)!;
+            return BaseEntity.Find(OwnerId)!;
         }
     }
 
@@ -127,7 +127,7 @@ public class Mine : IHasOwner, IBuilding
         if (item is null) {
             item = new()
             {
-                Id = IdManagers.ItemTradeIdGenerator.Generate(),
+                Id = IdManagers.GeneralIdGenerator.Generate(),
                 OwnerId = OwnerId,
                 Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == ResourceName && x.OwnerId == 100)!.Id,
                 Amount = 0

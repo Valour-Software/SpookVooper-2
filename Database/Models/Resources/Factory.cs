@@ -21,9 +21,9 @@ public class Factory : IHasOwner, IBuilding
     public long OwnerId { get; set; }
 
     [NotMapped]
-    public IEntity Owner { 
+    public BaseEntity Owner { 
         get {
-            return IEntity.Find(OwnerId)!;
+            return BaseEntity.Find(OwnerId)!;
         }
     }
 
@@ -101,7 +101,7 @@ public class Factory : IHasOwner, IBuilding
     public Factory(long ownerid, long provinceid)
     {
         // why so many variables
-        Id = IdManagers.FactoryIdGenerator.Generate();
+        Id = IdManagers.GeneralIdGenerator.Generate();
         OwnerId = ownerid;
         ProvinceId = provinceid;
         Quantity = 0.1;
@@ -186,7 +186,7 @@ public class Factory : IHasOwner, IBuilding
         if (item is null) {
             item = new()
             {
-                Id = IdManagers.ItemIdGenerator.Generate(),
+                Id = IdManagers.GeneralIdGenerator.Generate(),
                 OwnerId = OwnerId,
                 Definition_Id = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Name == output && x.OwnerId == 100)!.Id,
                 Amount = 0

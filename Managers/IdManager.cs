@@ -4,18 +4,11 @@ namespace SV2.Managers;
 
 public static class IdManagers
 {
-    public static IdManager TransactionIdGenerator = new(0);
-    public static IdManager ItemTradeIdGenerator = new(1);
-    public static IdManager UBIPolicyIdGenerator = new(2);
-    public static IdManager TaxPolicyIdGenerator = new(3);
-    public static IdManager UserIdGenerator = new(4);
-    public static IdManager GroupIdGenerator = new(5);
-    public static IdManager TradeItemDefinitionIdGenerator = new(6);
-    public static IdManager GroupRoleIdGenerator = new(7);
-    public static IdManager ItemIdGenerator = new(8);
-    public static IdManager ElectionIdGenerator = new(9);
-    public static IdManager FactoryIdGenerator = new(10);
-    public static IdManager MineIdGenerator = new(11);
+    public static IdManager GeneralIdGenerator = new(1);
+
+    // seperate generators so that we can have a united entity table and that requires having different ids per entity
+    public static IdManager UserIdGenerator = new(0);
+    public static IdManager GroupIdGenerator = new(1);
 }
 
 public class IdManager

@@ -11,3 +11,11 @@ public class VarChar : ColumnAttribute
         TypeName = $"VARCHAR({length})";
     }
 }
+
+public class BigInt : ColumnAttribute
+{
+    public BigInt()
+    {
+        TypeName = "BIGINT";
+    }
+}

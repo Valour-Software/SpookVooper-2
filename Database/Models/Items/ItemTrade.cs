@@ -48,7 +48,7 @@ public class ItemTrade
 
     public ItemTrade(long fromId, long toId, int amount, long definition_id, string details)
     {
-        Id = IdManagers.ItemTradeIdGenerator.Generate();
+        Id = IdManagers.GeneralIdGenerator.Generate();
         Amount = amount;
         FromId = fromId;
         ToId = toId;
@@ -90,8 +90,8 @@ public class ItemTrade
             return new TaskResult(false, "Amount must be above 0");
         }
 
-        IEntity? fromEntity = IEntity.Find(FromId);
-        IEntity? toEntity = IEntity.Find(ToId);
+        BaseEntity? fromEntity = BaseEntity.Find(FromId);
+        BaseEntity? toEntity = BaseEntity.Find(ToId);
 
         if (fromEntity == null) { return new TaskResult(false, $"Failed to find sender {FromId}."); }
         if (toEntity == null) { return new TaskResult(false, $"Failed to find reciever {ToId}."); }
@@ -118,7 +118,7 @@ public class ItemTrade
         {
             toitem = new()
             {
-                Id = IdManagers.ItemIdGenerator.Generate(),
+                Id = IdManagers.GeneralIdGenerator.Generate(),
                 OwnerId = ToId,
                 Definition_Id = Definition_Id,
                 Amount = 0

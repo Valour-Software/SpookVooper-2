@@ -83,7 +83,7 @@ public static class DBCache
         return null;
     }
 
-    public static IEntity? FindEntity(long Id)
+    public static BaseEntity? FindEntity(long Id)
     {
         var group = Get<Group>(Id);
         if (group is not null)

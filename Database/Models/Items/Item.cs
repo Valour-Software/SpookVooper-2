@@ -14,9 +14,9 @@ public class TradeItem : IHasOwner
     public long OwnerId { get; set; }
 
     [NotMapped]
-    public IEntity Owner { 
+    public BaseEntity Owner { 
         get {
-            return IEntity.Find(OwnerId)!;
+            return BaseEntity.Find(OwnerId)!;
         }
     }
     
@@ -55,9 +55,9 @@ public class TradeItemDefinition : IHasOwner
     public long OwnerId { get; set; }
 
     [NotMapped]
-    public IEntity Owner { 
+    public BaseEntity Owner { 
         get {
-            return IEntity.Find(OwnerId)!;
+            return BaseEntity.Find(OwnerId)!;
         }
     }
     // for example SV would have a "Tank" definition owned by SV, in which case "Tank" would be the name
@@ -81,7 +81,7 @@ public class TradeItemDefinition : IHasOwner
 
     public TradeItemDefinition(long ownerid, string name)
     {
-        Id = IdManagers.TradeItemDefinitionIdGenerator.Generate();
+        Id = IdManagers.GeneralIdGenerator.Generate();
         OwnerId = ownerid;
         Name = name;
         Created = DateTime.UtcNow;

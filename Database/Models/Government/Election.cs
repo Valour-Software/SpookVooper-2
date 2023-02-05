@@ -89,7 +89,7 @@ public class Election
 
     public Election(DateTime start_date, DateTime end_date, List<long> choiceids, long districtid, ElectionType type)
     {
-        Id = IdManagers.ElectionIdGenerator.Generate();
+        Id = IdManagers.GeneralIdGenerator.Generate();
         DistrictId = districtid;
         Start_Date = start_date;
         End_Date = end_date;

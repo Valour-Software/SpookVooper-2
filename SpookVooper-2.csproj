@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0-rc.2.22472.11" />
     <PackageReference Include="Npgsql" Version="7.0.0-rc.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0-rc.2" />
-	<PackageReference Include="Valour.Net" Version="0.6.5" />
+	<PackageReference Include="Valour.Net" Version="0.6.5.2" />
     <PackageReference Include="westwind.aspnetcore.markdown" Version="3.9.2" />
 	<PackageReference Include="Valour.Api" Version="0.1.5.6" />
   </ItemGroup>

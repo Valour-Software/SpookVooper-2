@@ -16,20 +16,11 @@ public enum Rank
     Unranked = 6
 }
 
-public class User : IEntity
+public class User : BaseEntity
 {
-    [Key]
-    public long Id { get; set; }
-
-    [Column(TypeName = "bigint")]
-
+    [BigInt]
     public long ValourId { get; set; }
 
-    [VarChar(64)]
-    public string Name { get; set; }
-
-    [VarChar(1024)]
-    public string? Description { get; set; }
     public int ForumXp { get; set;}
     public float MessageXp { get; set;}
     public int CommentLikes { get; set;}
@@ -44,40 +35,17 @@ public class User : IEntity
     public int TotalPoints { get; set; }
     public int TotalChars { get; set; }
     public DateTime LastActiveMinute { get; set; }
-
     public DateTime Joined { get; set;}
-
-    [JsonIgnore]
-    [VarChar(36)]
-    public string Api_Key { get; set; }
-    public decimal Credits { get; set;}
-    public decimal TaxAbleCredits { get; set; }
-    public List<decimal>? CreditSnapshots { get; set;}
     public Rank Rank { get; set;}
-
     // the datetime that this user created their account
     public DateTime Created { get; set; }
 
     public DateTime LastSentMessage { get; set; }
 
-    [VarChar(128)]
-    public string? Image_Url { get; set; }
-
     [NotMapped]
-    public float Xp
-    {
-        get
-        {
-            return MessageXp + ForumXp;
-        }
-    }
+    public float Xp => MessageXp + ForumXp;
 
-    public long DistrictId { get; set;}
-    public EntityType entityType {
-        get {
-            return EntityType.User;
-        }
-    }
+    public override EntityType EntityType => EntityType.User;
 
     public static string RemoveWhitespace(string input)
     {
@@ -147,7 +115,7 @@ public class User : IEntity
         return false;
     }
 
-    public bool HasPermission(IEntity entity, GroupPermission permission)
+    public bool HasPermission(BaseEntity entity, GroupPermission permission)
     {
         if (entity.Id == Id) {
             return true;

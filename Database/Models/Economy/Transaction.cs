@@ -56,7 +56,7 @@ public class Transaction
 
     public Transaction(long fromId, long toId, decimal credits, TransactionType TransactionType, string details)
     {
-        Id = IdManagers.TransactionIdGenerator.Generate();
+        Id = IdManagers.GeneralIdGenerator.Generate();
         Credits = credits;
         FromId = fromId;
         ToId = toId;
@@ -102,8 +102,8 @@ public class Transaction
             return new TaskResult(false, $"An entity cannot send credits to itself.");
         }
 
-        IEntity? fromEntity = IEntity.Find(FromId);
-        IEntity? toEntity = IEntity.Find(ToId);
+        BaseEntity? fromEntity = BaseEntity.Find(FromId);
+        BaseEntity? toEntity = BaseEntity.Find(ToId);
 
         if (fromEntity == null) { return new TaskResult(false, $"Failed to find sender {FromId}."); }
         if (toEntity == null) { return new TaskResult(false, $"Failed to find reciever {ToId}."); }

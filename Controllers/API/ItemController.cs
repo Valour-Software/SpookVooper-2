@@ -62,7 +62,7 @@ namespace SV2.API
             }
 
             // get Entity with the api key
-            IEntity? entity = IEntity.FindByApiKey(apikey);
+            BaseEntity? entity = BaseEntity.FindByApiKey(apikey);
 
             if (entity is null) {
                 ctx.Response.StatusCode = 401;
@@ -70,7 +70,7 @@ namespace SV2.API
                 return;
             }
 
-            IEntity? fromentity = IEntity.Find(fromid);
+            BaseEntity? fromentity = BaseEntity.Find(fromid);
             if (fromentity is null) {
                 ctx.Response.StatusCode = 401;
                 await ctx.Response.WriteAsync($"Could not find entity with svid {fromid}!");
@@ -94,7 +94,7 @@ namespace SV2.API
 
             // find toentity
 
-            IEntity? toentity = IEntity.Find(toid);
+            BaseEntity? toentity = BaseEntity.Find(toid);
 
             if (entity is null) {
                 ctx.Response.StatusCode = 401;

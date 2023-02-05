@@ -12,9 +12,9 @@ public class ForumComment
     public long AuthorId { get; set; }
     
     [NotMapped]
-    public IEntity Author {
+    public BaseEntity Author {
         get {
-            return IEntity.Find(AuthorId)!;
+            return BaseEntity.Find(AuthorId)!;
         }
     }
 

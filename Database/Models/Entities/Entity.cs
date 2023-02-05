@@ -20,14 +20,11 @@ public enum EntityType
 public interface IHasOwner
 {
     public long OwnerId { get; set; }
-    public IEntity Owner { get;}
+    public BaseEntity Owner { get;}
 }
 
-public interface IEntity
+public abstract class BaseEntity
 {
-    // the id will be in the following format:
-    // x-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-    // ex: u-c60c6bd8-0409-4cbd-8bb8-3c87e24c55f8
     [Key]
     public long Id {get; set; }
 
@@ -47,9 +44,9 @@ public interface IEntity
 
     public long DistrictId { get; set; }
 
-    public EntityType entityType { get; }
+    public virtual EntityType EntityType { get; }
 
-    public static IEntity? Find(long Id)
+    public static BaseEntity? Find(long Id)
     {
         return DBCache.FindEntity(Id);
     }
@@ -73,7 +70,7 @@ public interface IEntity
 
         // do district level taxes
         List<TaxPolicy> policies = new();
-        switch (entityType)
+        switch (EntityType)
         {
             case EntityType.Group:
                 policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList();
@@ -104,7 +101,7 @@ public interface IEntity
         totaldue = 0.0m;
 
         // now do imperial level taxes
-        switch (entityType)
+        switch (EntityType)
         {
             case EntityType.Group:
                 policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == 100 && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList();
@@ -145,10 +142,14 @@ public interface IEntity
 
     }
 
-    public bool HasPermission(IEntity entity, GroupPermission permission);
-    public static IEntity? FindByApiKey(string apikey)
+    public bool HasPermission(BaseEntity entity, GroupPermission permission)
     {
-        IEntity? entity = DBCache.GetAll<Group>().FirstOrDefault(x => x.Api_Key == apikey);
+        return false;
+    }
+
+    public static BaseEntity? FindByApiKey(string apikey)
+    {
+        BaseEntity? entity = DBCache.GetAll<Group>().FirstOrDefault(x => x.Api_Key == apikey);
         if (entity is null) {
             entity = DBCache.GetAll<User>().FirstOrDefault(x => x.Api_Key == apikey);
         }

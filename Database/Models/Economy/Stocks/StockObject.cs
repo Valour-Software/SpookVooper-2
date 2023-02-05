@@ -14,9 +14,9 @@ public class StockObject : IHasOwner
     public long OwnerId { get; set; }
     
     [NotMapped]
-    public IEntity Owner {
+    public BaseEntity Owner {
         get {
-            return IEntity.Find(OwnerId)!;
+            return BaseEntity.Find(OwnerId)!;
         }
     }
 

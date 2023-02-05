@@ -82,7 +82,7 @@ namespace SV2.Controllers
                     oldpol.Rate = pol.Rate;
                 }
                 else {
-                    pol.Id = IdManagers.UBIPolicyIdGenerator.Generate();
+                    pol.Id = IdManagers.GeneralIdGenerator.Generate();
                     pol.DistrictId = model.DistrictId;
                     await DBCache.Put<UBIPolicy>(pol.Id, pol);
                     await VooperDB.Instance.UBIPolicies.AddAsync(pol);
@@ -103,7 +103,7 @@ namespace SV2.Controllers
                     oldpol.Maximum = pol.Maximum;
                 }
                 else {
-                    pol.Id = IdManagers.TaxPolicyIdGenerator.Generate();
+                    pol.Id = IdManagers.GeneralIdGenerator.Generate();
                     pol.DistrictId = model.DistrictId;
                     await DBCache.Put<TaxPolicy>(pol.Id, pol);
                     await VooperDB.Instance.TaxPolicies.AddAsync(pol);

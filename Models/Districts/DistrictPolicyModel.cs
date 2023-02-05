@@ -32,7 +32,7 @@ public class DistrictPolicyModel
         else {
             pol.ApplicableRank = rank;
         }
-        pol.Id = IdManagers.UBIPolicyIdGenerator.Generate();
+        pol.Id = IdManagers.GeneralIdGenerator.Generate();
 
         UBIPolicy? oldpol = DBCache.GetAll<UBIPolicy>().FirstOrDefault(x => x.DistrictId == DistrictId && x.ApplicableRank == rank);
         if (oldpol is not null) {
@@ -45,7 +45,7 @@ public class DistrictPolicyModel
     public void AddTaxPolicy(long DistrictId, TaxType type, decimal min = 0.0m, decimal max = 99999999.0m)
     {
         TaxPolicy pol = new();
-        pol.Id = IdManagers.TaxPolicyIdGenerator.Generate();
+        pol.Id = IdManagers.GeneralIdGenerator.Generate();
         pol.DistrictId = DistrictId;
         pol.Rate = 0.0m;
         pol.taxType = type;

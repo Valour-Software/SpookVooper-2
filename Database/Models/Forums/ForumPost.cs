@@ -18,9 +18,9 @@ public class ForumPost
     public long AuthorId { get; set; }
     
     [NotMapped]
-    public IEntity Author {
+    public BaseEntity Author {
         get {
-            return IEntity.Find(AuthorId)!;
+            return BaseEntity.Find(AuthorId)!;
         }
     }
     public ForumCategory Category { get; set; }

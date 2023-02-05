@@ -16,7 +16,7 @@ namespace SV2.API
 
         private static async Task GetName(HttpContext ctx, VooperDB db, long svid)
         {
-            IEntity? entity = IEntity.Find(svid);
+            BaseEntity? entity = BaseEntity.Find(svid);
             if (entity == null)
             {
                 ctx.Response.StatusCode = 401;
@@ -29,7 +29,7 @@ namespace SV2.API
 
         private static async Task GetCredits(HttpContext ctx, VooperDB db, long svid)
         {
-            IEntity? account = IEntity.Find(svid);
+            BaseEntity? account = BaseEntity.Find(svid);
             if (account == null)
             {
                 ctx.Response.StatusCode = 401;

@@ -25,37 +25,21 @@ public enum GroupFlag
     News
 }
 
-public class Group : IHasOwner, IEntity
+public class Group : BaseEntity, IHasOwner
 {
-    [Key]
-    public long Id { get; set; }
-
-    [VarChar(64)]
-    public string Name { get; set; }
-
-    [VarChar(2048)]
-    public string? Description { get; set; }
-
-    [VarChar(512)]
-    public string? Image_Url { get; set; }
-    
-    public long DistrictId { get; set;}
-    public decimal Credits { get; set;}
-    public decimal TaxAbleCredits { get; set; }
-    public List<decimal>? CreditSnapshots { get; set;}
-
-    public List<long> MembersIds { get; set; }
-    
-    [JsonIgnore]
-    [VarChar(36)]
-    public string Api_Key { get; set; }
     public GroupTypes GroupType { get; set; }
-    // will be use the PostgreSQL Array datatype
+
+    // use the PostgreSQL Array datatype
     public List<GroupFlag> Flags { get; set; }
+
     // if the group is open to the public
     public bool Open { get; set; }
-    public EntityType entityType {
-        get {
+
+    public List<long> MembersIds { get; set; }
+
+    public override EntityType EntityType {
+        get 
+        {
             if (GroupType == GroupTypes.Corporation)
                 return EntityType.Corporation;
             return EntityType.Group;
@@ -76,9 +60,9 @@ public class Group : IHasOwner, IEntity
 
     [NotMapped]
 
-    public IEntity Owner { 
+    public BaseEntity Owner { 
         get {
-            return IEntity.Find(OwnerId)!;
+            return BaseEntity.Find(OwnerId)!;
         }
     }
 
@@ -101,7 +85,7 @@ public class Group : IHasOwner, IEntity
         MembersIds = new() {OwnerId};
     }
 
-    public GroupRole? GetHighestRole(IEntity user) 
+    public GroupRole? GetHighestRole(BaseEntity user) 
     {
         GroupRole? role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(user.Id)).OrderByDescending(x => x.Authority).FirstOrDefault();
         if (role is null)
@@ -111,7 +95,7 @@ public class Group : IHasOwner, IEntity
         return role;
     }
 
-    public GroupRole GetHighestRoleWithPermission(IEntity user, GroupPermission permission) 
+    public GroupRole GetHighestRoleWithPermission(BaseEntity user, GroupPermission permission) 
     {
         GroupRole role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(user.Id) && HasPermission(user, permission)).OrderByDescending(x => x.Authority).First();
         return role;
@@ -128,7 +112,7 @@ public class Group : IHasOwner, IEntity
         
     }
 
-    public bool HasPermission(IEntity entity, GroupPermission permission)
+    public bool HasPermission(BaseEntity entity, GroupPermission permission)
     {
         if (entity.Id == OwnerId) {
             return true;

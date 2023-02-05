@@ -19,9 +19,9 @@ public interface IBuilding
 
     public long OwnerId { get; set; }
 
-    public IEntity Owner { 
+    public BaseEntity Owner { 
         get {
-            return IEntity.Find(OwnerId)!;
+            return BaseEntity.Find(OwnerId)!;
         }
     }
 
