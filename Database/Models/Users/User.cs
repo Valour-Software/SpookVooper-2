@@ -67,6 +67,7 @@ public class SVUser : BaseEntity
             ActiveMinutes += 1;
             PointsThisMinute = 0;
             LastSentMessage = DateTime.UtcNow;
+            LastActiveMinute = DateTime.UtcNow;
         }
 
         string Content = RemoveWhitespace(msg.Content);
@@ -141,6 +142,7 @@ public class SVUser : BaseEntity
         CreditSnapshots = new();
         Rank = Rank.Unranked;
         Created = DateTime.UtcNow;
+        Joined = DateTime.UtcNow;
     }
 
     public async Task<IEnumerable<Group>> GetJoinedGroupsAsync()

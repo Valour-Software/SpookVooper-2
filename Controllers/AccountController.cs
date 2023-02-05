@@ -17,6 +17,12 @@ namespace SV2.Controllers
     public class AccountController : Controller
     {
         private static List<string> OAuthStates = new();
+
+#if DEBUG
+        private static string Redirecturl = "https://localhost:7186/callback";
+#else
+        private static string Redirecturl = "https://dev.spookvooper.com/callback";
+#endif
         private readonly ILogger<AccountController> _logger;
         
         [TempData]
@@ -77,7 +83,7 @@ namespace SV2.Controllers
             if (!OAuthStates.Contains(state))
                 return Forbid();
 
-            var url = $"api/oauth/token?client_id={ValourConfig.instance.OAuthClientId}&client_secret={ValourConfig.instance.OAuthClientSecret}&grant_type=authorization_code&code={code}&redirect_uri={HttpUtility.UrlEncode("https://localhost:7186/callback")}&state={state}";
+            var url = $"api/oauth/token?client_id={ValourConfig.instance.OAuthClientId}&client_secret={ValourConfig.instance.OAuthClientSecret}&grant_type=authorization_code&code={code}&redirect_uri={HttpUtility.UrlEncode(Redirecturl)}&state={state}";
 
 
             var result = await ValourClient.GetJsonAsync<Valour.Api.Models.AuthToken>(url);
@@ -98,6 +104,8 @@ namespace SV2.Controllers
                 await dbctx.SaveChangesAsync();
             }
 
+            user.ImageUrl = valouruser.PfpUrl;
+
             HttpContext.Response.Cookies.Append("svid", user.Id.ToString());
             return Redirect("/");
         }
@@ -106,11 +114,10 @@ namespace SV2.Controllers
         {
             var oauthstate = Guid.NewGuid().ToString();
 
-            var redirecturl = "https://localhost:7186/callback";
             AuthorizeModel model = new()
             {
                 ClientId = ValourConfig.instance.OAuthClientId,
-                RedirectUri = HttpUtility.UrlEncode("https://localhost:7186/callback"),
+                RedirectUri = HttpUtility.UrlEncode(Redirecturl),
                 UserId = ValourNetClient.BotId,
                 ResponseType = "",
                 Scope = UserPermissions.Minimum.Value,
@@ -119,7 +126,7 @@ namespace SV2.Controllers
             };
 
             string url = $"https://app.valour.gg/authorize?client_id={ValourConfig.instance.OAuthClientId}";
-            url += $"&response_type=code&redirect_uri={HttpUtility.UrlEncode(redirecturl)}&state={oauthstate}";
+            url += $"&response_type=code&redirect_uri={HttpUtility.UrlEncode(Redirecturl)}&state={oauthstate}";
             OAuthStates.Add(oauthstate);
             return Redirect(url);
             //Console.WriteLine(oauthstate);

@@ -1,0 +1,124 @@
+﻿@model SV2.Models.Government.GovernmentIndexModel;
+
+@{
+    ViewData["Title"] = "Government";
+}
+
+<head>
+    <meta property="og:title" content="SpookVooper: Government">
+    <meta property="og:description" content="The government of the Great nation Vooperia!">
+    <meta property="og:url" content="https://spookvooper.com/Government/Index">
+</head>
+
+<div class="container vw-100">
+    <div class="col-12">
+        <h1 style="text-align:center" class="display-4">The Vooperian Government</h1>
+        <br />
+
+        @if (Model.Emperor != null)
+        {
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4 col-sm-offset-4">
+                    <div>
+                        <h2 style="text-align:center">Emperor @Model.Emperor.Name</h2>
+                        <br />
+                        <img class="govpfp" style="width:128px;height:128px;" src="@Model.Emperor.ImageUrl" />
+                    </div>
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+
+            <hr />
+            <br />
+        }
+
+        @if (Model.CFV != null)
+        {
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4 col-sm-offset-4">
+                    <div>
+                        <h2 style="text-align:center">Chief Financier of Vooperia @Model.CFV.Name</h2>
+                        <br />
+                        <img class="govpfp" style="box-shadow: 0px 0px 0px 7px #1cbabd; width:128px;height:128px;" src="@Model.CFV.ImageUrl" />
+                    </div>
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+
+            <hr />
+            <br />
+        }
+
+        @if (Model.Chancellor != null)
+        {
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4 col-sm-offset-4">
+                    <div>
+                        <h2 style="text-align:center">Prime Minister @Model.Chancellor.Name</h2>
+                        <br />
+                        <img class="govpfp" style="box-shadow: 0px 0px 0px 7px #03A1A4; width:128px;height:128px" src="@Model.Chancellor.ImageUrl" />
+                    </div>
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+
+
+            <hr />
+            <br />
+        }
+
+        @* This area creates the justices *@
+        <h2 style="text-align:center">Justices</h2>
+        <br />
+        <div class="d-flex justify-content-center flex-wrap">
+            @foreach (var user in Model.Justices)
+            {
+                <div class="p-2">
+                    <div style="width:150px">
+                        <img class="govpfp" src="/media/unity-256.png" />
+                        <h4 style="text-align:center; overflow-wrap:break-word;">@user.Name</h4>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <hr />
+        <br />
+        <h2 style="text-align:center">Senators</h2>
+        <br />
+        @* This area creates the senate pictures *@
+        <div class="d-flex justify-content-center flex-wrap">
+
+            @{
+                foreach (var senator in Model.Senators)
+                {
+                //var Party = user.GetDiscordRoles().FirstOrDefault(r => r.Name.ToLower().Contains("party"));
+
+                    <div class="p-2">
+                        <div style="width:150px">
+                            <img class="govpfp" style="box-shadow: 0px 0px 0px 7px #1bf278; width:128px;height:128px" src="@senator.User.ImageUrl" />
+                            <hr />
+                            <p class="text-center">@senator.District.Name</p>
+                            <h4 style="text-align:center; overflow-wrap:break-word;">@senator.User.Name</h4>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <br />
+
+        @* This area creates the dot diagram *@
+
+        <div class="d-flex justify-content-center flex-wrap">
+            @foreach (var seanator in Model.Senators)
+            {
+                <div class="p-1">
+                    <span class="dot" style="background-color: #1bf278;"></span>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -32,7 +32,7 @@ public class AccountCommands : CommandModuleBase
         {
             user.NewMessage(ctx.Message);
 
-            user.ImageUrl = (await ctx.Member.GetUserAsync()).PfpUrl;
+            user.ImageUrl = await ctx.Member.GetPfpUrlAsync();
         }
     }
 
