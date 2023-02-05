@@ -10,11 +10,11 @@ namespace SV2.Database.Models.Groups;
 public class GroupRole
 {
     [Key]
-    public long Id {get; set; }
+    public long Id { get; set; }
 
     [VarChar(64)]
     public string Name { get; set; }
-    
+
     // this role's permission value
     public ulong PermissionValue { get; set; }
 
@@ -27,12 +27,14 @@ public class GroupRole
     public long GroupId { get; set; }
 
     [NotMapped]
-    public Group Group { 
-        get {
+    public Group Group
+    {
+        get
+        {
             return DBCache.Get<Group>(GroupId)!;
         }
     }
-    
+
     // Salary for role, paid every hour
     public decimal Salary { get; set; }
     public int Authority { get; set; }
@@ -51,17 +53,18 @@ public class GroupRole
 
     }
 
-    public IEnumerable<User> GetMembers()
+    public IEnumerable<SVUser> GetMembers()
     {
-        return DBCache.GetAll<User>().Where(x => Members.Contains(x.Id));
+        return DBCache.GetAll<SVUser>().Where(x => Members.Contains(x.Id));
     }
 
-    public List<String> GetPermissions()
+    public List<string> GetPermissions()
     {
-        List<String> strings = new();
-        foreach(GroupPermission perm in Enum.GetValues(typeof(GroupPermissions)))
+        List<string> strings = new();
+        foreach (GroupPermission perm in Enum.GetValues(typeof(GroupPermissions)))
         {
-            if ((perm.Value & PermissionValue) == perm.Value) {
+            if ((perm.Value & PermissionValue) == perm.Value)
+            {
                 strings.Add(perm.Name);
             }
         }

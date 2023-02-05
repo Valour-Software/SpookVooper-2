@@ -20,7 +20,7 @@ namespace SV2.Controllers
         public IActionResult View(long Id)
         {
             District district = DBCache.Get<District>(Id);
-            User? user = UserManager.GetUser(HttpContext);
+            SVUser? user = UserManager.GetUser(HttpContext);
 
             if (user is null) 
             {
@@ -33,7 +33,7 @@ namespace SV2.Controllers
         public IActionResult EditPolicies(long Id)
         {
             District district = DBCache.Get<District>(Id);
-            User? user = UserManager.GetUser(HttpContext);
+            SVUser? user = UserManager.GetUser(HttpContext);
 
             if (user is null) 
             {
@@ -56,7 +56,7 @@ namespace SV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPolicies(DistrictPolicyModel model)
         {
-            User? user = UserManager.GetUser(HttpContext);
+            SVUser? user = UserManager.GetUser(HttpContext);
 
             if (user is null) 
             {
@@ -84,7 +84,7 @@ namespace SV2.Controllers
                 else {
                     pol.Id = IdManagers.GeneralIdGenerator.Generate();
                     pol.DistrictId = model.DistrictId;
-                    await DBCache.Put<UBIPolicy>(pol.Id, pol);
+                    DBCache.Put(pol.Id, pol);
                     await VooperDB.Instance.UBIPolicies.AddAsync(pol);
                 }
             }
@@ -105,7 +105,7 @@ namespace SV2.Controllers
                 else {
                     pol.Id = IdManagers.GeneralIdGenerator.Generate();
                     pol.DistrictId = model.DistrictId;
-                    await DBCache.Put<TaxPolicy>(pol.Id, pol);
+                    DBCache.Put(pol.Id, pol);
                     await VooperDB.Instance.TaxPolicies.AddAsync(pol);
                 }
             }

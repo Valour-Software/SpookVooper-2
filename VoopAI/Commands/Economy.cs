@@ -3,15 +3,13 @@ using Valour.Net;
 using Valour.Net.ModuleHandling;
 using Valour.Net.CommandHandling;
 using Valour.Net.CommandHandling.Attributes;
-using Valour.Api.Items.Messages;
-using Valour.Api.Items.Planets.Members;
-using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Permissions;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Users;
 using System.Linq;
 using SV2.Web;
+using Valour.Api.Models;
 
 namespace SV2.VoopAI.Commands;
 
@@ -21,7 +19,7 @@ class EconomyCommands : CommandModuleBase
     [Alias("bal")]
     public async Task Balance(CommandContext ctx) 
     {
-        User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
+        SVUser? user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (user is null) {
             await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
             return;
@@ -36,7 +34,7 @@ class EconomyCommands : CommandModuleBase
             await ctx.ReplyAsync("Only Jacob can use this command!");
             return;
         }
-        User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
+        SVUser? user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (user is not null) {
             user.Credits += amount;
         }
@@ -46,13 +44,13 @@ class EconomyCommands : CommandModuleBase
     [Command("pay")]
     public async Task Pay(CommandContext ctx, decimal amount, PlanetMember member) 
     {
-        User? from = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
+        SVUser? from = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (from is null) {
             await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
             return;
         }
 
-        User? to = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == member.UserId);
+        SVUser? to = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == member.UserId);
         if (from is null) {
             await ctx.ReplyAsync("The user you are trying to send credits to lacks a SV account!");
             return;
@@ -64,7 +62,7 @@ class EconomyCommands : CommandModuleBase
     [Command("pay")]
     public async Task Pay(CommandContext ctx, decimal amount, PlanetMember member, [Remainder] string groupname) 
     {
-        User? fromuser = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
+        SVUser? fromuser = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (fromuser is null) {
             await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
             return;
@@ -81,7 +79,7 @@ class EconomyCommands : CommandModuleBase
             return;
         }
 
-        User? to = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == member.UserId);
+        SVUser? to = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == member.UserId);
         if (to is null) {
             await ctx.ReplyAsync("The user you are trying to send credits to lacks a SV account!");
             return;
@@ -93,7 +91,7 @@ class EconomyCommands : CommandModuleBase
     [Command("pay")]
     public async Task Pay(CommandContext ctx, decimal amount, [Remainder] string groupname) 
     {
-        User? fromuser = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
+        SVUser? fromuser = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (fromuser is null) {
             await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
             return;
@@ -143,7 +141,7 @@ class EconomyCommands : CommandModuleBase
         List<UBIPolicy>? UBIPolicies = DBCache.GetAll<UBIPolicy>().ToList();
 
         foreach(UBIPolicy policy in UBIPolicies) {
-            List<User> effected = DBCache.GetAll<User>().ToList();
+            var effected = DBCache.GetAll<SVUser>().ToList();
             long fromId = 100;
             if (policy.DistrictId != 100) {
                 effected = effected.Where(x => x.DistrictId == policy.DistrictId).ToList();
@@ -152,7 +150,7 @@ class EconomyCommands : CommandModuleBase
             if (policy.ApplicableRank != null) {
                 effected = effected.Where(x => x.Rank == policy.ApplicableRank).ToList();
             }
-            foreach(User user in effected) {
+            foreach(var user in effected) {
                 Transaction tran = new Transaction(fromId, user.Id, policy.Rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
                 TaskResult result = await tran.Execute();
                 if (!result.Succeeded) {

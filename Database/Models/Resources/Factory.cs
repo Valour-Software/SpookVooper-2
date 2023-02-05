@@ -4,119 +4,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Items;
 using SV2.Managers;
+using SV2.Database.Managers;
 
 namespace SV2.Database.Models.Factories;
 
-public class Factory : IHasOwner, IBuilding
+public class Factory : ProducingBuilding
 {
-    [Key]
-    public long Id {get; set; }
-
-    [VarChar(64)]
-    public string? Name { get; set; }
-
-    [VarChar(1024)]
-    public string? Description { get; set; }
-
-    public long OwnerId { get; set; }
-
-    [NotMapped]
-    public BaseEntity Owner { 
-        get {
-            return BaseEntity.Find(OwnerId)!;
-        }
-    }
-
-    public long? RecipeId { get; set; }
-    
-    [NotMapped]
-    public Recipe? recipe {
-        get {
-            if (RecipeId is null)
-                return null;
-            return DBCache.Get<Recipe>((long)RecipeId);
-        }
-    }
-
-    public long? EmployeeId { get; set; }
-
-    // effects production speed, grows over time, min value is 10%
-    public double Quantity { get; set; }
-
-    // base is 1x
-    public double QuantityGrowthRate { get; set; }
-
-
-    public double QuantityCap { get; set; }
-
-    public double Efficiency { get; set; }
-
-    // default is 1, size directly increases output, but harms efficiency
-    // max value is 10, and at 10, it costs 4x more input to produce the same output
-
-    public int Size { get; set; }
-
-    public int HoursSinceChangedProductionRecipe { get; set; }
-
-    // every tick (1 hour), Age increases by 1
-    public int Age { get; set; }
-
-    public double LeftOver { get; set; }
-
-    [NotMapped]
-    public BuildingType buildingType { 
-        get {
-            return BuildingType.Factory;
-        }
-    }
-
-    public long ProvinceId { get; set; } 
-
-    [NotMapped]
-    public Province Province {
-        get {
-            return DBCache.Get<Province>(ProvinceId)!;
-        }
-    }
-
-    public string GetProduction()
-    {
-        if (recipe is null)
-        {
-            return "";
-        }
-        string output = "";
-        output += $"{recipe.Output.Key}, ";
-        if (output != "") {
-            output = output.Substring(0, output.Length-2);
-        }
-        return output;
-    }
-
-    public Factory()
-    {
-        
-    }
-
-    public Factory(long ownerid, long provinceid)
-    {
-        // why so many variables
-        Id = IdManagers.GeneralIdGenerator.Generate();
-        OwnerId = ownerid;
-        ProvinceId = provinceid;
-        Quantity = 0.1;
-        QuantityCap = 1;
-        QuantityGrowthRate = 1;
-        Efficiency = 1;
-        Size = 1;
-        HoursSinceChangedProductionRecipe = 1;
-        Age = 1;
-    }
+    public override BuildingType BuildingType { get => BuildingType.Factory; set => BuildingType = value; }
 
     /// <summary>
     /// This function is called every IRL hour
     /// </summary>
-
     public async Task Tick(List<TradeItem> tradeItems)
     {
 
@@ -125,59 +23,35 @@ public class Factory : IHasOwner, IBuilding
         }
 
         // TODO: when we add district stats (industal stat, etc) update this
-        double rate = Size;
 
-        if (EmployeeId != null) {
-            // 2.5x production boost if this factory has an employee
-            rate *= 2.5;
-        };
+        double rate = 1;
+
+        rate *= Size;
+
+        rate *= Recipe.PerHour;
+
+        rate *= Defines.NProduction["BASE_FACTORY_THROUGHPUT"];
 
         // ((A2^1.2/1.6)-1)/1000
 
-        // ex:
-        // 10 days : 1% lost
-        // 100 days: 15.8% lost
-        // 300 days: 58.8% lost
+        if (Quantity <= 0.01)
+            Quantity = 0.01;
 
-        double AgeProductionLost = ( (Math.Pow(Age, 1.2) / 1.6)-1 ) / 1000;
-
-        rate *= 1-AgeProductionLost;
-
-        // tick Quantity system
-
-        // ex:
-        // 3 days : 26.24%
-        // 11 days: 57.28%
-        // 32 days: 82.78% 
-
-        QuantityCap = 1+Province.Owner.GetModifier(DistrictModifierType.FactoryQuantityCap);
-
-        if (Quantity < QuantityCap) {
-            HoursSinceChangedProductionRecipe += 1;
-            double days = HoursSinceChangedProductionRecipe/24;
-            double newQuantity = Math.Max(QuantityCap, Math.Log10( Math.Pow(days, 20) / 40));
-            newQuantity = Math.Min(0.1+Province.Owner.GetModifier(DistrictModifierType.FactoryBaseQuantity), newQuantity);
-            newQuantity *= QuantityGrowthRate*Province.Owner.GetModifier(DistrictModifierType.FactoryQuantityGrowthRateFactor);
-
-            Quantity = newQuantity;
+        if (Quantity < QuantityCap)
+        {
+            double quantitychange = Defines.NProduction["BASE_QUANTITY_GROWTH_RATE"] / 24;
+            quantitychange *= (QuantityCap * QuantityCap) / Quantity;
+            Quantity += quantitychange * QuantityGrowthRateFactor;
         }
 
         rate *= Quantity;
 
-        rate *= recipe.HourlyProduction;
+        rate *= ProductionFactor;
 
-        // apply district modifers
-        rate *= Province.Owner.GetModifier(DistrictModifierType.FactorySpeedFactor);
+        if (EmployeeId is not null)
+            rate *= 2.5;
 
-        // update Efficiency
-
-        Efficiency = 1;
-        // apply size debuff to Efficiency
-        // we subtract 0.4 since at size 1 there is no debuff
-        Efficiency += Size*0.4-0.4;
-
-        Efficiency *= Province.Owner.GetModifier(DistrictModifierType.FactoryEfficiencyFactor);
-
+        /*
         TradeItem? item = null;
 
         string output = recipe.Output.Key;
@@ -221,6 +95,6 @@ public class Factory : IHasOwner, IBuilding
             item.Amount -= amountNeeded;
         }
         item.Amount += wholerate;
+        */
     }
-
 }

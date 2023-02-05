@@ -24,6 +24,6 @@ public class DecimalType : ColumnAttribute
 {
     public DecimalType(int precision = 10)
     {
-        TypeName = $"NUMERIC(15, {precision})";
+        TypeName = $"NUMERIC(30, {precision})";
     }
 }

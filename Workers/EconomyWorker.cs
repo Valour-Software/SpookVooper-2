@@ -1,5 +1,4 @@
 using SV2.Database;
-using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Users;
 using SV2.Web;
@@ -55,7 +54,7 @@ namespace SV2.Workers
                                 {
                                     continue;
                                 }
-                                List<User> effected = DBCache.GetAll<User>().ToList();
+                                List<SVUser> effected = DBCache.GetAll<SVUser>().ToList();
                                 long fromId = 100;
                                 if (policy.DistrictId != null) {
                                     effected = effected.Where(x => x.DistrictId == policy.DistrictId).ToList();
@@ -64,7 +63,7 @@ namespace SV2.Workers
                                 if (policy.ApplicableRank != null) {
                                     effected = effected.Where(x => x.Rank == policy.ApplicableRank).ToList();
                                 }
-                                foreach(User user in effected) {
+                                foreach(SVUser user in effected) {
                                     decimal rate = policy.Rate;
 
                                     // if the user has joined less than 4 weeks ago
@@ -82,7 +81,7 @@ namespace SV2.Workers
 
                             if (DateTime.UtcNow.Hour == 1) {
                                 // every day, update credit snapchats
-                                List<BaseEntity> entities = DBCache.GetAll<User>().ToList<BaseEntity>();
+                                List<BaseEntity> entities = DBCache.GetAll<SVUser>().ToList<BaseEntity>();
                                 entities.AddRange(DBCache.GetAll<Group>());
                                 foreach(BaseEntity entity in entities)
                                 {

@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SV2.Database.Models.Users;
-using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Items;
 using SV2.Database.Models.Factories;
@@ -124,7 +123,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     /// <summary>
     /// Table for SV2 users
     /// </summary>
-    public DbSet<User> Users { get; set; }
+    public DbSet<SVUser> Users { get; set; }
 
     /// <summary>
     /// Table for SV2 groups
@@ -147,6 +146,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<ItemTrade> ItemTrades { get; set; }
     public DbSet<Minister> Ministers { get; set; }
+    public DbSet<DistrictStaticModifier> DistrictStaticModifiers { get; set; }
 
     public VooperDB(DbContextOptions options)
     {
@@ -155,6 +155,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
 
     public static async Task Startup() 
     {
+        using var dbctx = DbFactory.CreateDbContext();
         await DBCache.LoadAsync();
 
         //List<string> cands = new List<string>() {
@@ -173,9 +174,9 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
             Group Vooperia = new Group("Vooperia", 100);
             Vooperia.Id = 100;
             Vooperia.GroupType = GroupTypes.NonProfit;
-            Vooperia.Credits = 500_000_000.0m;
-            await DBCache.Put<Group>(Vooperia.Id, Vooperia);
-            await VooperDB.Instance.Groups.AddAsync(Vooperia);
+            Vooperia.Credits = 1_500_000.0m;
+            DBCache.Put(Vooperia.Id, Vooperia);
+            await dbctx.Groups.AddAsync(Vooperia);
         }
 
         string[] districtnames = new []{
@@ -228,9 +229,13 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
                 else {
                     name = $"{Char.ToUpper(namesplit[0][0])}{namesplit[0].Substring(1, namesplit[0].Length-1)}";
                 }
-                Group district = new Group(name, 100);
-                district.Id = id;
-                district.Credits = 100_000.0m;
+
+                // owner is Vooperia
+                Group district = new(name, 100)
+                {
+                    Id = id,
+                    Credits = 300_000.0m
+                };
 
 
                 District district_object = new()
@@ -241,14 +246,14 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
                 };
 
                 district_object.Modifiers = new();
-                await DBCache.Put<Group>(district.Id, district);
-                await VooperDB.Instance.Groups.AddAsync(district);
-                await DBCache.Put<District>(district_object.Id, district_object);
-                await VooperDB.Instance.Districts.AddAsync(district_object);
+                DBCache.Put(district.Id, district);
+                await dbctx.Groups.AddAsync(district);
+                DBCache.Put(district_object.Id, district_object);
+                await dbctx.Districts.AddAsync(district_object);
             }
             i += 1;
         }
        
-        await VooperDB.Instance.SaveChangesAsync();
+        await dbctx.SaveChangesAsync();
     }
 }

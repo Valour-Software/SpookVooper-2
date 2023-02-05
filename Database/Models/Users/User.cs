@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Permissions;
+using Valour.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace SV2.Database.Models.Users;
 
@@ -16,7 +18,8 @@ public enum Rank
     Unranked = 6
 }
 
-public class User : BaseEntity
+[Table("users")]
+public class SVUser : BaseEntity
 {
     [BigInt]
     public long ValourId { get; set; }
@@ -97,14 +100,14 @@ public class User : BaseEntity
         return true;
     }
 
-    public static User? FindByName(string name)
+    public static SVUser? FindByName(string name)
     {
-        return DBCache.GetAll<User>().FirstOrDefault(x => x.Name == name);
+        return DBCache.GetAll<SVUser>().FirstOrDefault(x => x.Name == name);
     }
     
-    public static User? Find(long Id)
+    public static SVUser? Find(long Id)
     {
-        return DBCache.Get<User>(Id);
+        return DBCache.Get<SVUser>(Id);
     }
 
     public bool HasPermissionWithKey(string apikey, GroupPermission permission)
@@ -123,7 +126,7 @@ public class User : BaseEntity
         return false;
     }
 
-    public User(string name, long valourId)
+    public SVUser(string name, long valourId)
     {
         Id = IdManagers.UserIdGenerator.Generate();
         ValourId = valourId;
@@ -138,5 +141,30 @@ public class User : BaseEntity
         CreditSnapshots = new();
         Rank = Rank.Unranked;
         Created = DateTime.UtcNow;
+    }
+
+    public async Task<IEnumerable<Group>> GetJoinedGroupsAsync()
+    {
+        using var dbctx = VooperDB.DbFactory.CreateDbContext();
+        var groups = await dbctx.Groups.Where(x => x.MembersIds.Contains(Id)).ToListAsync();
+
+        return groups;
+    }
+
+    public async Task<IEnumerable<Group>> GetOwnedGroupsAsync()
+    {
+        List<Group> groups = new List<Group>();
+
+        using var dbctx = VooperDB.DbFactory.CreateDbContext();
+
+        var topGroups = await dbctx.Groups.Where(x => x.OwnerId == Id).ToListAsync();
+
+        foreach (Group group in topGroups)
+        {
+            groups.Add(group);
+            groups.AddRange(await group.GetOwnedGroupsAsync());
+        }
+
+        return groups;
     }
 }

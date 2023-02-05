@@ -3,8 +3,8 @@ using Valour.Net;
 using Valour.Net.ModuleHandling;
 using Valour.Net.CommandHandling;
 using Valour.Net.CommandHandling.Attributes;
-using Valour.Api.Items.Messages;
-using Valour.Api.Items.Messages.Embeds;
+using Valour.Api.Models.Messages;
+using Valour.Api.Models.Messages.Embeds;
 using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Districts;
@@ -23,7 +23,7 @@ class DistrictCommands : CommandModuleBase
         [Command("budget")]
         public async Task CreateGroup(CommandContext ctx, [Remainder] string districtName)
         {
-            User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
+            SVUser? user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
             if (user is null)
             {
                 await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");

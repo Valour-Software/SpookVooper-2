@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -10,15 +10,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EFCore.NamingConventions" Version="7.0.0-rc.2" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="7.0.0-rc.2.22476.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.0-rc.2.22476.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0-rc.2.22472.11" />
-    <PackageReference Include="Npgsql" Version="7.0.0-rc.2" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0-rc.2" />
-	<PackageReference Include="Valour.Net" Version="0.6.5.2" />
+    <PackageReference Include="EFCore.NamingConventions" Version="7.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="7.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="7.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.2" />
+    <PackageReference Include="Npgsql" Version="7.0.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1" />
+	<PackageReference Include="Valour.Net" Version="0.6.7.5" />
     <PackageReference Include="westwind.aspnetcore.markdown" Version="3.9.2" />
-	<PackageReference Include="Valour.Api" Version="0.1.5.6" />
+	<PackageReference Include="Valour.Api" Version="0.1.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Lua\Scripting\" />
+    <Folder Include="NonDBO\" />
   </ItemGroup>
 
 </Project>

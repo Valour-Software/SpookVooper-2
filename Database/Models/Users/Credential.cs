@@ -10,7 +10,7 @@ namespace SV2.Database.Models.Users;
 public class Credential
 {
     [ForeignKey("User_Id")]
-    public virtual User User { get; set; }
+    public virtual SVUser User { get; set; }
 
     /// <summary>
     /// The ID of this credential

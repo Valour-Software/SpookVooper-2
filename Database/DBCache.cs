@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using SV2.Database.Models.Factories;
 
 namespace SV2.Database;
 
@@ -38,7 +39,7 @@ public static class DBCache
     /// <summary>
     /// Places an item into the cache
     /// </summary>
-    public static async Task Put<T>(long Id, T? obj) where T : class
+    public static void Put<T>(long Id, T? obj) where T : class
     {
         // Empty object is ignored
         if (obj == null)
@@ -89,7 +90,7 @@ public static class DBCache
         if (group is not null)
             return group;
 
-        var user = Get<User>(Id);
+        var user = Get<SVUser>(Id);
         if (user is not null)
             return user;
 
@@ -98,69 +99,73 @@ public static class DBCache
 
     public static async Task LoadAsync()
     {
+        using var dbctx = VooperDB.DbFactory.CreateDbContext();
         //#if !DEBUG
 
-        List<Task> tasks = new();
-        foreach(Group group in VooperDB.Instance.Groups) {
-            tasks.Add(DBCache.Put<Group>(group.Id, group));
+        foreach (Group group in dbctx.Groups) {
+            DBCache.Put<Group>(group.Id, group);
         }
-        foreach(User user in VooperDB.Instance.Users) {
-            tasks.Add(DBCache.Put<User>(user.Id, user));
+        foreach(SVUser user in dbctx.Users) {
+            DBCache.Put<SVUser>(user.Id, user);
         }
-        foreach(TaxPolicy policy in VooperDB.Instance.TaxPolicies) {
-            tasks.Add(DBCache.Put<TaxPolicy>(policy.Id, policy));
+        foreach(TaxPolicy policy in dbctx.TaxPolicies) {
+            DBCache.Put<TaxPolicy>(policy.Id, policy);
         }
-        foreach(TradeItem item in VooperDB.Instance.TradeItems) {
-            tasks.Add(DBCache.Put<TradeItem>(item.Id, item));
+        foreach(TradeItem item in dbctx.TradeItems) {
+            DBCache.Put<TradeItem>(item.Id, item);
         }
-        foreach(TradeItemDefinition definition in VooperDB.Instance.TradeItemDefinitions) {
-            tasks.Add(DBCache.Put<TradeItemDefinition>(definition.Id, definition));
+        foreach(TradeItemDefinition definition in dbctx.TradeItemDefinitions) {
+            DBCache.Put<TradeItemDefinition>(definition.Id, definition);
         }
-        foreach(Factory factory in VooperDB.Instance.Factories) {
-            tasks.Add(DBCache.Put<Factory>(factory.Id, factory));
+        foreach(Factory factory in dbctx.Factories) {
+            DBCache.Put<Factory>(factory.Id, factory);
         }
-        foreach(UBIPolicy policy in VooperDB.Instance.UBIPolicies) {
-            tasks.Add(DBCache.Put<UBIPolicy>(policy.Id, policy));
+        foreach(UBIPolicy policy in dbctx.UBIPolicies) {
+            DBCache.Put<UBIPolicy>(policy.Id, policy);
         }
-        foreach(District district in VooperDB.Instance.Districts) {
-            tasks.Add(DBCache.Put<District>(district.Id, district));
+        foreach(District district in dbctx.Districts) {
+            DBCache.Put<District>(district.Id, district);
         }
-        foreach(GroupRole role in VooperDB.Instance.GroupRoles) {
-            tasks.Add(DBCache.Put<GroupRole>(role.Id, role));
+        foreach(GroupRole role in dbctx.GroupRoles) {
+            DBCache.Put<GroupRole>(role.Id, role);
         }
-        foreach(Election election in VooperDB.Instance.Elections) {
-            tasks.Add(DBCache.Put<Election>(election.Id, election));
+        foreach(Election election in dbctx.Elections) {
+            DBCache.Put<Election>(election.Id, election);
         }
-        foreach(Vote vote in VooperDB.Instance.Votes) {
-            tasks.Add(DBCache.Put<Vote>(vote.Id, vote));
+        foreach(Vote vote in dbctx.Votes) {
+            DBCache.Put<Vote>(vote.Id, vote);
         }
-        foreach(Province province in VooperDB.Instance.Provinces) {
-            tasks.Add(DBCache.Put<Province>(province.Id, province));
+        foreach(Province province in dbctx.Provinces) {
+            DBCache.Put<Province>(province.Id, province);
         }
-        foreach(Recipe recipe in VooperDB.Instance.Recipes) {
-            tasks.Add(DBCache.Put<Recipe>(recipe.Id, recipe));
+        foreach(Recipe recipe in dbctx.Recipes) {
+            DBCache.Put<Recipe>(recipe.Id, recipe);
         }
-        foreach(Minister minister in VooperDB.Instance.Ministers) {
-            tasks.Add(DBCache.Put<Minister>(minister.UserId, minister));
+        foreach(Minister minister in dbctx.Ministers) {
+            DBCache.Put<Minister>(minister.UserId, minister);
         }
-        await Task.WhenAll(tasks);
+        foreach (Minister minister in dbctx.Ministers)
+        {
+            DBCache.Put<Minister>(minister.UserId, minister);
+        }
 
         //#endif
     }
 
     public static async Task SaveAsync()
     {
-        VooperDB.Instance.Groups.UpdateRange(GetAll<Group>());
-        VooperDB.Instance.Users.UpdateRange(GetAll<User>());
-        VooperDB.Instance.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
-        VooperDB.Instance.TradeItems.UpdateRange(GetAll<TradeItem>());
-        VooperDB.Instance.TradeItemDefinitions.UpdateRange(GetAll<TradeItemDefinition>());
-        VooperDB.Instance.Factories.UpdateRange(GetAll<Factory>());
-        VooperDB.Instance.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
-        VooperDB.Instance.Districts.UpdateRange(GetAll<District>());
-        VooperDB.Instance.Provinces.UpdateRange(GetAll<Province>());
-        VooperDB.Instance.Recipes.UpdateRange(GetAll<Recipe>());
-        VooperDB.Instance.Ministers.UpdateRange(GetAll<Minister>());
-        await VooperDB.Instance.SaveChangesAsync();
+        using var dbctx = VooperDB.DbFactory.CreateDbContext();
+        dbctx.Groups.UpdateRange(GetAll<Group>());
+        dbctx.Users.UpdateRange(GetAll<SVUser>());
+        dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
+        dbctx.TradeItems.UpdateRange(GetAll<TradeItem>());
+        dbctx.TradeItemDefinitions.UpdateRange(GetAll<TradeItemDefinition>());
+        dbctx.Factories.UpdateRange(GetAll<Factory>());
+        dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
+        dbctx.Districts.UpdateRange(GetAll<District>());
+        dbctx.Provinces.UpdateRange(GetAll<Province>());
+        dbctx.Recipes.UpdateRange(GetAll<Recipe>());
+        dbctx.Ministers.UpdateRange(GetAll<Minister>());
+        await dbctx.SaveChangesAsync();
     }
 }

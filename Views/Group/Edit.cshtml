@@ -2,10 +2,10 @@
 
 @{
     ViewData["Title"] = "Group Admin";
-}
 
-@{
-    User user = UserManager.GetUser(Context)!;
+    SVUser user = UserManager.GetUser(Context)!;
+    if (user is null)
+        Context.Response.Redirect("/Account/Login");
 }
 
 <div class="container vw-100">
@@ -105,7 +105,7 @@
                     <br />
                     <div class="container">
                         <div class="row">
-                            @foreach (User member in Model.GetMembers())
+                            @foreach (SVUser member in Model.GetMembers())
                             {
                                 <div class="col-6 srow">
                                     <div class="p-1">

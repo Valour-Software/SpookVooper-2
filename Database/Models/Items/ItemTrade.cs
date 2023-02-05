@@ -73,7 +73,7 @@ public class ItemTrade
         ItemTradeManager.itemTradeQueue.Enqueue(this);
     }
 
-    public async Task<TaskResult> ExecuteFromManager(bool Force = false)
+    public async Task<TaskResult> ExecuteFromManager(VooperDB dbctx, bool Force = false)
     {
 
         while (TransactionManager.ActiveSvids.Contains(FromId) || TransactionManager.ActiveSvids.Contains(ToId))
@@ -123,9 +123,9 @@ public class ItemTrade
                 Definition_Id = Definition_Id,
                 Amount = 0
             };
-            await DBCache.Put<TradeItem>(toitem.Id, toitem);
-            await VooperDB.Instance.TradeItems.AddAsync(toitem);
-            await VooperDB.Instance.SaveChangesAsync();
+            DBCache.Put(toitem.Id, toitem);
+            dbctx.TradeItems.Add(toitem);
+            await dbctx.SaveChangesAsync();
         }
 
         // do tariffs

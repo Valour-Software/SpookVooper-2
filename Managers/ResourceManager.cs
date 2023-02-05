@@ -17,6 +17,7 @@ public class BaseRecipe
     public KeyValuePair<string, decimal> Output { get; set; }
     public string Name { get; set; }
     public List<ModifierLevelDefinition>? Modifiers { get; set; }
+    public double PerHour { get; set; }
 }
 
 public class ModifierLevelDefinition
@@ -61,10 +62,26 @@ public class TopLevelResources
 public static class ResourceManager 
 {
     static public List<string> Resources = new();
-    static public List<BaseRecipe> Recipes = new();
     static public List<Material_Group> Material_Groups = new();
     static public List<ConsumerGood> ConsumerGoods = new();
     static public List<ModifierLevelDefinition> ModifierLevelDefinitions = new();
+    static public Dictionary<string, BaseRecipe> Recipes = new();
+
+    public static List<string> GetFilePaths(string path)
+    {
+        if (path.Contains("/"))
+        {
+            return Directory.GetFiles(path).ToList();
+        }
+        try
+        {
+            return Directory.GetFiles($"../../../../Database/Managers/Data/{path}").ToList();
+        }
+        catch
+        {
+            return Directory.GetFiles($"../Database/Managers/Data/{path}").ToList();
+        }
+    }
 
     public static async Task Load()
     {
@@ -74,7 +91,7 @@ public static class ResourceManager
 
         Resources = toplevelresource.Material_Groups.SelectMany(x => x.Materials).ToList();
 
-        Recipes = toplevelresource.Recipes;
+        //Recipes = toplevelresource.Recipes;
 
         // need to create item definitions
 
@@ -87,7 +104,7 @@ public static class ResourceManager
                 def = new TradeItemDefinition(100, Resource);
                 def.BuiltinModifiers = new();
 
-                await DBCache.Put<TradeItemDefinition>(def.Id, def);
+                DBCache.Put(def.Id, def);
                 await VooperDB.Instance.TradeItemDefinitions.AddAsync(def);
             }
         }

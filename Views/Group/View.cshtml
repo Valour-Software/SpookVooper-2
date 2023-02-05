@@ -15,7 +15,7 @@
 
     ViewData["Title"] = Model.Name;
 
-    User user = UserManager.GetUser(Context)!;
+    SVUser user = UserManager.GetUser(Context)!;
 
     // Add auth for roles later
     //if (user != null && Model.own == user.Id)
@@ -47,7 +47,14 @@
 
             @if (Model.DistrictId != 100)
             {
-                <p class="m-2" style="text-align:center; font-size:x-large">District: @District.Find(Model.DistrictId).Name</p>
+                @if (Model.DistrictId == 0)
+                {
+                    <p class="m-2" style="text-align:center; font-size:x-large">District: @Model.Name</p>
+                }
+                else
+                {
+                    <p class="m-2" style="text-align:center; font-size:x-large">District: @District.Find(Model.DistrictId).Name</p>
+                }
             }
             else
             {
@@ -138,7 +145,7 @@
                 <br />
                 <div class="container">
                     <div class="row">
-                        @foreach (User member in Model.GetMembers())
+                        @foreach (SVUser member in Model.GetMembers())
                         {
                             <div class="col-6 memberbox">
                                 <div class="m-2">

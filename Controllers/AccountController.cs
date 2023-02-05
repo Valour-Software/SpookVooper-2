@@ -4,11 +4,19 @@ using SV2.Managers;
 using SV2.Database.Models.Users;
 using System.Diagnostics;
 using SV2.Models.Manage;
+using Valour.Shared.Models;
+using SV2.VoopAI;
+using Valour.Shared.Authorization;
+using Valour.Api.Client;
+using Westwind.AspNetCore.Markdown.Utilities;
+using System.Web;
+using System.Text.Json;
 
 namespace SV2.Controllers
 {
     public class AccountController : Controller
     {
+        private static List<string> OAuthStates = new();
         private readonly ILogger<AccountController> _logger;
         
         [TempData]
@@ -21,7 +29,7 @@ namespace SV2.Controllers
 
         public async Task<IActionResult> Manage()
         {
-            User? user = UserManager.GetUser(HttpContext);
+            SVUser? user = UserManager.GetUser(HttpContext);
             UserManageModel userManageModel = new()
             {
                 Id = user.Id,
@@ -38,7 +46,7 @@ namespace SV2.Controllers
 
         public async Task<IActionResult> ViewAPIKey()
         {
-            User? user = UserManager.GetUser(HttpContext);
+            SVUser? user = UserManager.GetUser(HttpContext);
 
             if (user is null) 
             {
@@ -56,17 +64,72 @@ namespace SV2.Controllers
 
         public IActionResult Entered()
         {
+            
             long svid = UserManager.GetSvidFromSession(HttpContext);
             Console.WriteLine(HttpContext.Session.GetString("code"));
             HttpContext.Response.Cookies.Append("svid", svid.ToString());
             return Redirect("/");
         }
 
-        public IActionResult Login()
+        [Route("/callback")]
+        public async Task<IActionResult> Callback(string code, string state)
         {
-            string Code = UserManager.GetCode(HttpContext);
-            Console.WriteLine(HttpContext.Session.Id);
-            return View((Object)Code);
+            if (!OAuthStates.Contains(state))
+                return Forbid();
+
+            var url = $"api/oauth/token?client_id={ValourConfig.instance.OAuthClientId}&client_secret={ValourConfig.instance.OAuthClientSecret}&grant_type=authorization_code&code={code}&redirect_uri={HttpUtility.UrlEncode("https://localhost:7186/callback")}&state={state}";
+
+
+            var result = await ValourClient.GetJsonAsync<Valour.Api.Models.AuthToken>(url);
+            //Console.WriteLine(result.Data);
+            if (!result.Success)
+                Console.WriteLine(result.Message);
+            var token = result.Data;
+            var valouruser = await Valour.Api.Models.User.FindAsync(token.UserId);
+
+            var user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == token.UserId);
+            if (user is null)
+            {
+                using var dbctx = VooperDB.DbFactory.CreateDbContext();
+                user = new SVUser(valouruser.Name, valouruser.Id);
+                DBCache.Put(user.Id, user);
+
+                dbctx.Users.Add(user);
+                await dbctx.SaveChangesAsync();
+            }
+
+            HttpContext.Response.Cookies.Append("svid", user.Id.ToString());
+            return Redirect("/");
+        }
+
+        public async Task<IActionResult> Login()
+        {
+            var oauthstate = Guid.NewGuid().ToString();
+
+            var redirecturl = "https://localhost:7186/callback";
+            AuthorizeModel model = new()
+            {
+                ClientId = ValourConfig.instance.OAuthClientId,
+                RedirectUri = HttpUtility.UrlEncode("https://localhost:7186/callback"),
+                UserId = ValourNetClient.BotId,
+                ResponseType = "",
+                Scope = UserPermissions.Minimum.Value,
+                Code = "",
+                State = oauthstate
+            };
+
+            string url = $"https://app.valour.gg/authorize?client_id={ValourConfig.instance.OAuthClientId}";
+            url += $"&response_type=code&redirect_uri={HttpUtility.UrlEncode(redirecturl)}&state={oauthstate}";
+            OAuthStates.Add(oauthstate);
+            return Redirect(url);
+            //Console.WriteLine(oauthstate);
+
+           // var result = await ValourClient.PostAsyncWithResponse<string>($"api/oauth/authorize", model);
+           // if (!result.Success)
+           //     Console.WriteLine(result.Message);
+            //var url = result.Data;
+           // OAuthStates.Add(oauthstate);
+            //return Redirect(url);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

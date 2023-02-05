@@ -2,7 +2,6 @@
 using SV2.Models;
 using SV2.Managers;
 using SV2.Database.Models.Users;
-using SV2.Database.Models.Groups;
 using SV2.Database.Models.Permissions;
 using System.Diagnostics;
 
@@ -33,7 +32,7 @@ namespace SV2.Controllers
 
         public IActionResult Create()
         {
-            User? user = UserManager.GetUser(HttpContext);
+            SVUser? user = UserManager.GetUser(HttpContext);
 
             if (user is null) 
             {
@@ -47,12 +46,11 @@ namespace SV2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Group model)
         {
-            User? user = UserManager.GetUser(HttpContext);
-
+            SVUser? user = UserManager.GetUser(HttpContext);
             if (user is null) 
-            {
                 return Redirect("/account/login");
-            }
+
+            using var dbctx = VooperDB.DbFactory.CreateDbContext();
 
             model.Name = model.Name.Trim();
 
@@ -68,9 +66,9 @@ namespace SV2.Controllers
             group.ImageUrl = model.ImageUrl;
             group.OwnerId = user.Id;
 
-            await DBCache.Put<Group>(group.Id, group);
-            await VooperDB.Instance.Groups.AddAsync(group);
-            await VooperDB.Instance.SaveChangesAsync();
+            DBCache.Put(group.Id, group);
+            dbctx.Groups.Add(group);
+            await dbctx.SaveChangesAsync();
 
             return Redirect($"/group/view/{group.Id}");
         }
@@ -79,6 +77,11 @@ namespace SV2.Controllers
         {
             Group? group = Group.Find(id);
             return View(group);
+        }
+
+        public async Task<IActionResult> MyGroups()
+        {
+            return View();
         }
 
         [HttpPost]
@@ -90,7 +93,7 @@ namespace SV2.Controllers
             //    return View(model);
             //}
 
-            User? user = UserManager.GetUser(HttpContext);
+            SVUser? user = UserManager.GetUser(HttpContext);
 
             if (user is null) 
             {

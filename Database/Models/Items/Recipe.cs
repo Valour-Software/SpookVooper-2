@@ -18,11 +18,7 @@ public class Recipe : IHasOwner
     public long OwnerId { get; set; }
 
     [NotMapped]
-    public BaseEntity Owner { 
-        get {
-            return BaseEntity.Find(OwnerId)!;
-        }
-    }
+    public BaseEntity Owner => BaseEntity.Find(OwnerId)!;
 
     [Column(TypeName = "jsonb")]
     public KeyValuePair<string, int> Output { get; set; }
@@ -37,7 +33,7 @@ public class Recipe : IHasOwner
 
     public BaseRecipe baseRecipe {
         get {
-            return ResourceManager.Recipes.FirstOrDefault(x => x.Name == BaseRecipeName)!;
+            return null;// ResourceManager.Recipes.FirstOrDefault(x => x.Name == BaseRecipeName)!;
         }
     }
 }

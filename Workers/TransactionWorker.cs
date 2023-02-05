@@ -10,12 +10,15 @@ namespace SV2.Workers
     {
         private readonly IServiceScopeFactory _scopeFactory;
         public readonly ILogger<EconomyWorker> _logger;
+        private static VooperDB dbctx;
+        private static DateTime LastTime = DateTime.UtcNow;
 
         public TransactionWorker(ILogger<EconomyWorker> logger,
                             IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
+            dbctx = VooperDB.DbFactory.CreateDbContext();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -28,7 +31,7 @@ namespace SV2.Workers
                     {
                         try
                         {
-                            if (!(await TransactionManager.Run()))
+                            if (!(await TransactionManager.Run(dbctx)))
                             {
                                 await Task.Delay(1);
                             }
@@ -37,6 +40,11 @@ namespace SV2.Workers
                         {
                             Console.WriteLine("FATAL TRANSACTION WORKER ERROR:");
                             Console.WriteLine(e.Message);
+                        }
+                        if (TransactionManager.transactionQueue.IsEmpty || (DateTime.UtcNow - LastTime).TotalMinutes >= 1)
+                        {
+                            await dbctx.SaveChangesAsync();
+                            LastTime = DateTime.UtcNow;
                         }
                     }
                 });

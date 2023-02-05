@@ -95,7 +95,7 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="SearchDropdown">
                                 @{
-                                    User? user = UserManager.GetUser(Context);
+                                    SVUser? user = UserManager.GetUser(Context);
                                     //if (User != null) { user = await userManager.GetUserAsync(User); }
 
                                     if (user is not null)

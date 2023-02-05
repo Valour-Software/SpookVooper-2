@@ -3,7 +3,6 @@ using Valour.Net;
 using Valour.Net.ModuleHandling;
 using Valour.Net.CommandHandling;
 using Valour.Net.CommandHandling.Attributes;
-using Valour.Api.Items.Messages;
 using SV2.Database.Models.Groups;
 using SV2.Database.Models.Districts;
 using SV2.Database.Models.Economy;
@@ -11,6 +10,8 @@ using SV2.Database.Models.Users;
 using SV2.Database.Models.Entities;
 using System.Linq;
 using SV2.Web;
+using Valour.Api.Models.Messages.Embeds;
+using Valour.Api.Models.Messages.Embeds.Styles.Basic;
 
 namespace SV2.VoopAI.Commands;
 
@@ -95,7 +96,7 @@ class UBICommands : CommandModuleBase
                 rankname = policy.ApplicableRank.ToString()!;
                 rankcolor = GetRankColor(policy.ApplicableRank);
             }
-            embed.AddText(text:rankname, textColor: rankcolor);
+            embed.AddText(rankname).WithStyles(new TextColor(rankcolor));
             embed.AddText(text:$"¢{Math.Round(policy.Rate)} daily");
         }
         await ctx.ReplyAsync(embed);

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Permissions;
 using SV2.Database.Models.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace SV2.Database.Models.Groups;
 
@@ -13,7 +14,7 @@ public enum GroupTypes
     // a corporation is a company that is listed on SVSE or a company on a private stock exchange that the CFV has determined is a corporation
     Corporation,
     NonProfit,
-    PoliticalParty, 
+    PoliticalParty,
     District
 }
 
@@ -37,8 +38,9 @@ public class Group : BaseEntity, IHasOwner
 
     public List<long> MembersIds { get; set; }
 
-    public override EntityType EntityType {
-        get 
+    public override EntityType EntityType
+    {
+        get
         {
             if (GroupType == GroupTypes.Corporation)
                 return EntityType.Corporation;
@@ -46,29 +48,31 @@ public class Group : BaseEntity, IHasOwner
         }
     }
 
-    public bool IsInGroup(User user)
+    public bool IsInGroup(SVUser user)
     {
         return MembersIds.Contains(user.Id);
     }
 
-    public IEnumerable<User> GetMembers()
+    public IEnumerable<SVUser> GetMembers()
     {
-        return MembersIds.Select(x => User.Find(x));
+        return MembersIds.Select(x => SVUser.Find(x));
     }
-    
+
     public long OwnerId { get; set; }
 
     [NotMapped]
 
-    public BaseEntity Owner { 
-        get {
+    public BaseEntity Owner
+    {
+        get
+        {
             return BaseEntity.Find(OwnerId)!;
         }
     }
 
     public Group()
     {
-        
+
     }
 
     public Group(string name, long ownerId)
@@ -82,10 +86,10 @@ public class Group : BaseEntity, IHasOwner
         Open = false;
         Flags = new();
         GroupType = GroupTypes.Company;
-        MembersIds = new() {OwnerId};
+        MembersIds = new() { OwnerId };
     }
 
-    public GroupRole? GetHighestRole(BaseEntity user) 
+    public GroupRole? GetHighestRole(BaseEntity user)
     {
         GroupRole? role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(user.Id)).OrderByDescending(x => x.Authority).FirstOrDefault();
         if (role is null)
@@ -95,7 +99,7 @@ public class Group : BaseEntity, IHasOwner
         return role;
     }
 
-    public GroupRole GetHighestRoleWithPermission(BaseEntity user, GroupPermission permission) 
+    public GroupRole GetHighestRoleWithPermission(BaseEntity user, GroupPermission permission)
     {
         GroupRole role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(user.Id) && HasPermission(user, permission)).OrderByDescending(x => x.Authority).First();
         return role;
@@ -103,22 +107,24 @@ public class Group : BaseEntity, IHasOwner
 
     public bool HasPermissionWithKey(string apikey, GroupPermission permission)
     {
-        if (apikey == ApiKey) {
+        if (apikey == ApiKey)
+        {
             return true;
         }
-        
+
         // add oauth key handling
         return false;
-        
+
     }
 
     public bool HasPermission(BaseEntity entity, GroupPermission permission)
     {
-        if (entity.Id == OwnerId) {
+        if (entity.Id == OwnerId)
+        {
             return true;
         }
 
-        foreach(GroupRole role in DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(entity.Id)).OrderByDescending(x => x.Authority))
+        foreach (GroupRole role in DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(entity.Id)).OrderByDescending(x => x.Authority))
         {
             PermissionCode code = new PermissionCode(role.PermissionValue, permission.Value);
             PermissionState state = code.GetState(permission);
@@ -139,6 +145,23 @@ public class Group : BaseEntity, IHasOwner
 
         return false;
 
+    }
+
+    public async Task<IEnumerable<Group>> GetOwnedGroupsAsync()
+    {
+        List<Group> groups = new List<Group>();
+
+        using var dbctx = VooperDB.DbFactory.CreateDbContext();
+
+        var topGroups = await dbctx.Groups.Where(x => x.OwnerId == Id).ToListAsync();
+
+        foreach (Group group in topGroups)
+        {
+            groups.Add(group);
+            groups.AddRange(await group.GetOwnedGroupsAsync());
+        }
+
+        return groups;
     }
 
     public static Group? Find(long Id)

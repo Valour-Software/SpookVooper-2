@@ -3,13 +3,12 @@ using Valour.Net;
 using Valour.Net.ModuleHandling;
 using Valour.Net.CommandHandling;
 using Valour.Net.CommandHandling.Attributes;
-using Valour.Api.Items.Messages;
-using Valour.Api.Items.Messages.Embeds;
 using SV2.Database.Models.Groups;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Users;
 using System.Linq;
 using SV2.Web;
+using Valour.Api.Models.Messages.Embeds;
 
 namespace SV2.VoopAI.Commands;
 
@@ -42,16 +41,19 @@ public class CreateCommands : CommandModuleBase
         [Command("account")]
         public async Task _CreateAccount(CommandContext ctx)
         {
-            User? _user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
+            SVUser? _user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
             if (_user is not null)
             {
                 await ctx.ReplyAsync("You already have a SV account!");
                 return;
             }
-            User user = new User(ctx.Member.Nickname, ctx.Member.UserId);
-            await DBCache.Put<User>(user.Id, user);
-            await VooperDB.Instance.Users.AddAsync(user);
-            await VooperDB.Instance.SaveChangesAsync();
+            using var dbctx = VooperDB.DbFactory.CreateDbContext();
+
+            SVUser user = new SVUser(ctx.Member.Nickname, ctx.Member.UserId);
+            DBCache.Put(user.Id, user);
+
+            dbctx.Users.Add(user);
+            await dbctx.SaveChangesAsync();
             await ctx.ReplyAsync("Successfully created SV account.");
         }
     }

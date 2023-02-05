@@ -25,17 +25,13 @@ public class Province
     public string? Name { get; set;}
 
     public long DistrictId { get; set; }
-    
-    [NotMapped]
-    public District Owner { 
-        get {
-            return DBCache.Get<District>(DistrictId)!;
-        }
-    }
 
-    public IEnumerable<IBuilding> GetBuildings()
+    [ForeignKey(nameof(DistrictId))]
+    public District District { get; set; }
+
+    public IEnumerable<BuildingBase> GetBuildings()
     {
-        List<IBuilding> buildings = new();
+        List<BuildingBase> buildings = new();
         buildings.AddRange(DBCache.GetAll<Factory>().Where(x => x.ProvinceId == Id));
         buildings.AddRange(DBCache.GetAll<Mine>().Where(x => x.ProvinceId == Id));
         return buildings;

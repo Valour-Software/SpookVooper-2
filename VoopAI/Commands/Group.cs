@@ -3,14 +3,13 @@ using Valour.Net;
 using Valour.Net.ModuleHandling;
 using Valour.Net.CommandHandling;
 using Valour.Net.CommandHandling.Attributes;
-using Valour.Api.Items.Messages;
-using SV2.Database.Models.Groups;
-using Valour.Api.Items.Planets.Members;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Permissions;
 using SV2.Database.Models.Users;
 using System.Linq;
 using SV2.Web;
+using Valour.Api.Models.Messages.Embeds;
+using Valour.Api.Models.Messages.Embeds.Styles.Basic;
 
 namespace SV2.VoopAI.Commands;
 
@@ -19,7 +18,7 @@ class GroupCommands : CommandModuleBase
     [Command("groups")]
     public async Task GroupsOwned(CommandContext ctx)
     {
-        User? _user = DBCache.GetAll<User>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
+        SVUser? _user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (_user is null)
         {
             await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
@@ -75,10 +74,10 @@ class GroupCommands : CommandModuleBase
                 if (role.Salary > 0.0m) {
                     extra += $" (¢{Math.Round(role.Salary*24.0m,2)} daily)";
                 }
-                embed.AddText(text:role.Name+extra, textColor:role.Color);
+                embed.AddText(text:role.Name+extra).WithStyles(new TextColor(role.Color));
                 string members = "";
                 foreach(long userid in role.Members) {
-                    members += $"{DBCache.Get<User>(userid).Name}, ";
+                    members += $"{DBCache.Get<SVUser>(userid).Name}, ";
                 }
                 if (members != "") {
                     members = members.Substring(0, members.Length-2);

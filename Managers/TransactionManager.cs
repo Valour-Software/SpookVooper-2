@@ -19,8 +19,9 @@ public static class TransactionManager
     static public HashSet<long> ActiveSvids = new();
 
     static public ConcurrentQueue<Transaction> transactionQueue = new();
+    static public VooperDB TransactionVooperDB;
 
-    static public async Task<bool> Run()
+    static public async Task<bool> Run(VooperDB dbctx)
     {
         if (transactionQueue.IsEmpty) return false;
 
@@ -29,7 +30,7 @@ public static class TransactionManager
 
         if (!dequeued) return false;
 
-        TaskResult result = await tran.ExecuteFromManager();
+        TaskResult result = await tran.ExecuteFromManager(dbctx);
 
         tran.Result = result;
 

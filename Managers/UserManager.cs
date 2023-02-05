@@ -17,14 +17,14 @@ public static class UserManager
     static List<string> LoginCodes = new();
     static Dictionary<string, long> SessionIdsToSvids = new();
 
-    public static User? GetUser(HttpContext ctx)
+    public static SVUser? GetUser(HttpContext ctx)
     {
         string? d = null;
         ctx.Request.Cookies.TryGetValue("svid", out d);
         if (d is null) {
             return null;
         }
-        return DBCache.Get<User>(long.Parse(d!));
+        return DBCache.Get<SVUser>(long.Parse(d!));
     }
     
     public static void AddLogin(string code, long id)

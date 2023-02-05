@@ -12,10 +12,10 @@ public enum ElectionType
 
 public class ResultData
 {
-    public User Candidate { get; set; }
+    public SVUser Candidate { get; set; }
     public int Votes { get; set; }
 
-    public ResultData(User cand, int votes)
+    public ResultData(SVUser cand, int votes)
     {
         this.Candidate = cand;
         this.Votes = votes;
@@ -46,9 +46,9 @@ public class Election
     public long WinnerId { get; set; }
 
     [NotMapped]
-    public User Winner { 
+    public SVUser Winner { 
         get {
-            return DBCache.Get<User>(WinnerId)!;
+            return DBCache.Get<SVUser>(WinnerId)!;
         }
     }
 

@@ -27,11 +27,11 @@
         @{
             if (Model is not null)
             {
-                User? senator = null;
+                SVUser? senator = null;
                 if (Model.SenatorId is not null) {
-                    senator = DBCache.Get<User>(Model.SenatorId);
+                    senator = DBCache.Get<SVUser>(Model.SenatorId);
                 }
-                User? user = UserManager.GetUser(Context);
+                SVUser? user = UserManager.GetUser(Context);
 
                 if (user != null && senator != null && (senator.Id == user.Id || user.Name == "SpikeViper"))
                 {
@@ -103,7 +103,7 @@
                     </div>
                 }
 
-                int population = DBCache.GetAll<User>().Count(x => x.DistrictId == Model.Id);
+                int population = DBCache.GetAll<SVUser>().Count(x => x.DistrictId == Model.Id);
 
                 <div class="p-2 align-self-center" style="text-align:center">
                     <h3>Population: @population</h3>

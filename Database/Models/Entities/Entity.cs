@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using SV2.Database.Models.Users;
-using SV2.Database.Models.Groups;
 using SV2.Database.Models.Permissions;
 using SV2.Database.Models.Economy;
 using System.Threading.Tasks;
@@ -32,7 +31,7 @@ public abstract class BaseEntity
     public string Name { get; set; }
 
     [VarChar(512)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [DecimalType]
     public decimal Credits { get; set;}
@@ -49,7 +48,7 @@ public abstract class BaseEntity
     [JsonIgnore]
     [VarChar(36)]
     public string ApiKey { get; set; }
-    public string ImageUrl { get; set; }
+    public string? ImageUrl { get; set; }
 
     public long DistrictId { get; set; }
 
@@ -143,7 +142,7 @@ public abstract class BaseEntity
     {
         BaseEntity? entity = DBCache.GetAll<Group>().FirstOrDefault(x => x.ApiKey == apikey);
         if (entity is null) {
-            entity = DBCache.GetAll<User>().FirstOrDefault(x => x.ApiKey == apikey);
+            entity = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ApiKey == apikey);
         }
         return entity;
     }

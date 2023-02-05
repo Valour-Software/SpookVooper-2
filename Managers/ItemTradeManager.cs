@@ -20,7 +20,7 @@ public static class ItemTradeManager
 
     static public ConcurrentQueue<ItemTrade> itemTradeQueue = new();
 
-    static public async Task<bool> Run()
+    static public async Task<bool> Run(VooperDB dbctx)
     {
         if (itemTradeQueue.IsEmpty) return false;
 
@@ -29,7 +29,7 @@ public static class ItemTradeManager
 
         if (!dequeued) return false;
 
-        TaskResult result = await trade.ExecuteFromManager();
+        TaskResult result = await trade.ExecuteFromManager(dbctx);
 
         trade.Result = result;
 

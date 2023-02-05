@@ -15,12 +15,6 @@ global using SV2.Database.Models.OAuth2;
 global using SV2.Models.Districts;
 global using SV2.Managers;
 global using SV2.Database.Models.Districts.Modifiers;
-global using Valour.Api.Items.Planets;
-global using Valour.Api.Items.Planets.Members;
-global using Valour.Api.Items.Channels;
-global using Valour.Api.Items.Messages;
-global using Valour.Api.Items.Messages.Embeds.Items;
-global using Valour.Api.Items.Messages.Embeds;
 global using System.Net.Http.Json;
 global using Valour.Net.Client;
 using Microsoft.EntityFrameworkCore.Design;
@@ -32,6 +26,7 @@ using SV2.Managers;
 using SV2.VoopAI;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Builder;
 
 await VoopAI.Main();
 
@@ -98,10 +93,26 @@ builder.Services.AddHostedService<TransactionWorker>();
 
 builder.Services.AddDataProtection().PersistKeysToDbContext<VooperDB>();
 
-builder.Services.AddSession(options =>
+builder.Services.AddAuthentication()
+    .AddCookie(options =>
     {
-        options.IdleTimeout = TimeSpan.FromDays(90);
+        options.LoginPath = "/Account/Login";
+        options.Cookie.MaxAge = TimeSpan.FromDays(90);
     });
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.Expiration = TimeSpan.FromDays(150);
+    options.SlidingExpiration = true;
+});
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(90);
+    options.Cookie.MaxAge = TimeSpan.FromDays(90);
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 

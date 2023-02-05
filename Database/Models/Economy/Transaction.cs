@@ -18,7 +18,9 @@ public enum TransactionType
     Payment = 5,
     // only issued by governmental bodies
     TaxCreditPayment = 6,
-    TaxPayment = 7
+    TaxPayment = 7,
+    FreeMoney = 8,
+    LoanRepayment = 9
 }
 
 public class Transaction
@@ -81,7 +83,7 @@ public class Transaction
         TransactionManager.transactionQueue.Enqueue(this);
     }
 
-    public async Task<TaskResult> ExecuteFromManager(bool Force = false)
+    public async Task<TaskResult> ExecuteFromManager(VooperDB dbctx, bool Force = false)
     {
 
         while (TransactionManager.ActiveSvids.Contains(FromId) || TransactionManager.ActiveSvids.Contains(ToId))
@@ -199,7 +201,7 @@ public class Transaction
             toEntity.TaxAbleBalance += Credits;
         }
 
-        VooperDB.Instance.Transactions.AddAsync(this);
+        dbctx.Transactions.Add(this);
 
         TransactionManager.ActiveSvids.Remove(FromId);
         TransactionManager.ActiveSvids.Remove(ToId);
