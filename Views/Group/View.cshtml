@@ -1,4 +1,4 @@
-@model Group
+@model SV2.Database.Models.Groups.Group
 
 <head>
     <meta property="og:title" content="@Model.Name">
@@ -145,14 +145,14 @@
                 <br />
                 <div class="container">
                     <div class="row">
-                        @foreach (SVUser member in Model.GetMembers())
+                        @foreach (BaseEntity entity in Model.GetMembers())
                         {
                             <div class="col-6 memberbox">
                                 <div class="m-2">
-                                    <img class="memberpfp" src="@member.ImageUrl" />
+                                    <img class="memberpfp" src="@entity.ImageUrl" />
                                 </div>
-                                <a asp-controller="User" asp-action="Info" asp-route-svid="@member.Id">
-                                    <p class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(member).Color">@member.Name</p>
+                                <a asp-controller="User" asp-action="Info" asp-route-svid="@entity.Id">
+                                    <p class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(entity).Color">@entity.Name</p>
                                 </a>
                             </div>
                         }

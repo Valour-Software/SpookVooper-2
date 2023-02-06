@@ -1,4 +1,4 @@
-@model District
+@model SV2.Database.Models.Districts.District
 
 @{ 
     if (Model != null)
@@ -27,13 +27,9 @@
         @{
             if (Model is not null)
             {
-                SVUser? senator = null;
-                if (Model.SenatorId is not null) {
-                    senator = DBCache.Get<SVUser>(Model.SenatorId);
-                }
                 SVUser? user = UserManager.GetUser(Context);
 
-                if (user != null && senator != null && (senator.Id == user.Id || user.Name == "SpikeViper"))
+                if (user != null && Model.Senator != null && (Model.Senator.UserId == user.Id || user.ValourId == 12200448886571008))
                 {
                     <a asp-route-id="@Model.Name" asp-action="Edit" asp-controller="District" class="btn btn-primary">Modify</a>
                 }
@@ -57,16 +53,13 @@
 
                 <br />
 
-                if (senator != null)
+                if (Model.Senator is not null)
                 {
                     <div class="p-2 align-self-center" style="text-align:center">
 
                         @{
                             string senateName = "None.";
-                            if (senator != null)
-                            {
-                                senateName = senator.Name;
-                            }
+                            senateName = Model.Senator.User.Name;
                         }
 
                         <h2>Elected Senator: @senateName</h2>
@@ -75,7 +68,7 @@
                                 <div class="col-sm-4"></div>
                                 <div class="col-sm-4 col-sm-offset-4">
                                     <div>
-                                        @if (senator != null)
+                                        @if (Model.Senator is not null)
                                         {
                                             // TODO: add getting party using a party system that we will create
                                             //var party = senator.GetParty();
@@ -87,7 +80,7 @@
                                             //}
 
                                             <br />
-                                            <img class="govpfp" style="box-shadow: 0px 0px 0px 7px #{@color};" src="@senator.ImageUrl" />
+                                            <img class="govpfp" style="box-shadow: 0px 0px 0px 7px #{@color};" src="@Model.Senator.User.ImageUrl" />
                                         }
                                     </div>
                                 </div>

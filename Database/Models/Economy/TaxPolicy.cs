@@ -14,19 +14,16 @@ public enum TaxType
     Payroll = 5,
     UserBalance = 6,
     UserWealth = 7,
+    ResourceMined = 8,
+    GroupBalance = 9,
+    GroupWealth = 10,
+    ImportTariff = 11,
+    ExportTariff = 12,
     // only the imperial government can use this one
-    Inactivity = 8,
-    None = 9,
-    PersonalIncome = 10,
-    CorporateIncome = 11,
-    GroupIncome = 12,
-    ResourceMined = 13,
-    GroupBalance = 14,
-    GroupWealth = 15,
-    
-    // tariffs are taxed at per resource traded not % of value traded
-    ImportTariff = 16,
-    ExportTariff = 17
+    Inactivity = 12,
+    PersonalIncome = 13,
+    CorporateIncome = 14,
+    GroupIncome = 15,
 }
 
 public class TaxPolicy

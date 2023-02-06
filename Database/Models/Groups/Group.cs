@@ -53,9 +53,9 @@ public class Group : BaseEntity, IHasOwner
         return MembersIds.Contains(user.Id);
     }
 
-    public IEnumerable<SVUser> GetMembers()
+    public IEnumerable<BaseEntity> GetMembers()
     {
-        return MembersIds.Select(x => SVUser.Find(x));
+        return MembersIds.Select(x => BaseEntity.Find(x));
     }
 
     public long OwnerId { get; set; }
@@ -89,9 +89,9 @@ public class Group : BaseEntity, IHasOwner
         MembersIds = new() { OwnerId };
     }
 
-    public GroupRole? GetHighestRole(BaseEntity user)
+    public GroupRole? GetHighestRole(BaseEntity entity)
     {
-        GroupRole? role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(user.Id)).OrderByDescending(x => x.Authority).FirstOrDefault();
+        GroupRole? role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(entity.Id)).OrderByDescending(x => x.Authority).FirstOrDefault();
         if (role is null)
         {
             return GroupRole.Default;

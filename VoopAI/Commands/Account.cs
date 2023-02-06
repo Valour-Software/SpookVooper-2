@@ -36,23 +36,6 @@ public class AccountCommands : CommandModuleBase
         }
     }
 
-    [Command("login")]
-    public async Task Login(CommandContext ctx, string code)
-    {
-        SVUser? user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
-        if (user is null)
-        {
-            using var dbctx = VooperDB.DbFactory.CreateDbContext();
-            user = new SVUser(ctx.Member.Nickname, ctx.Member.UserId);
-            DBCache.Put(user.Id, user);
-
-            dbctx.Users.Add(user);
-            await dbctx.SaveChangesAsync();
-        }
-        UserManager.AddLogin(code, user!.Id);
-        await ctx.ReplyAsync("Successfully logged you in! Please go back to the login page and click 'Entered'");
-    }
-
     [Command("svid")]
     public async Task ViewSVID(CommandContext ctx) 
     {

@@ -66,11 +66,11 @@ namespace SV2.Workers
                                 foreach(SVUser user in effected) {
                                     decimal rate = policy.Rate;
 
-                                    // if the user has joined less than 4 weeks ago
-                                    if (DateTime.UtcNow.Subtract(user.Joined).Days <= 28) {
-                                        decimal increase = 2.0m;
+                                    // if the user has joined less than 6 weeks ago
+                                    if (DateTime.UtcNow.Subtract(user.Joined).Days <= 42) {
+                                        decimal increase = 3.0m;
                                         if (DateTime.UtcNow.Subtract(user.Joined).Days >= 7) {
-                                            increase -= Math.Min(0, DateTime.UtcNow.Subtract(user.Joined).Days-7)/21*2;
+                                            increase -= Math.Min(0, DateTime.UtcNow.Subtract(user.Joined).Days-7)/35*3;
                                         }
                                         rate *= increase+1;
                                     }

@@ -53,10 +53,7 @@ public class GroupRole
 
     }
 
-    public IEnumerable<SVUser> GetMembers()
-    {
-        return DBCache.GetAll<SVUser>().Where(x => Members.Contains(x.Id));
-    }
+    public IEnumerable<BaseEntity> GetMembers() => Members.Select(x => BaseEntity.Find(x));
 
     public List<string> GetPermissions()
     {

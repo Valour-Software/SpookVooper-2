@@ -50,6 +50,7 @@ public class CreateCommands : CommandModuleBase
             using var dbctx = VooperDB.DbFactory.CreateDbContext();
 
             SVUser user = new SVUser(ctx.Member.Nickname, ctx.Member.UserId);
+            user.ImageUrl = (await ctx.Member.GetUserAsync()).PfpUrl;
             DBCache.Put(user.Id, user);
 
             dbctx.Users.Add(user);

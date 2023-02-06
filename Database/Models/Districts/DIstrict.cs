@@ -31,13 +31,22 @@ public class District
     public List<City> Cities { get; set; }
 
     [NotMapped]
-    public long TotalPopulation => Cities.Sum(x => x.Population);
+    public long TotalPopulation
+    {
+        get
+        {
+            if (Cities is not null)
+                return Cities.Sum(x => x.Population);
+            return 0;
+        }
+    }
 
     public Group Group => DBCache.Get<Group>(GroupId)!;
 
     public long GroupId { get; set; }
 
-    public long? SenatorId { get; set;}
+    [NotMapped]
+    public Senator Senator => DBCache.Get<Senator>(Id);
 
     public long? GovernorId { get; set;}
 

@@ -91,17 +91,14 @@ public class DistrictPolicyModel
 
             // do personal tax brackets
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 AddTaxPolicy(district.Id, TaxType.PersonalIncome);
             }
 
-
-           
-
             // do corporate tax brackets
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 AddTaxPolicy(district.Id, TaxType.CorporateIncome);
             }

@@ -8,13 +8,16 @@ namespace SV2.Controllers
     public class DistrictController : Controller
     {
         private readonly ILogger<DistrictController> _logger;
+        private readonly VooperDB _dbctx;
         
         [TempData]
         public string StatusMessage { get; set; }
 
-        public DistrictController(ILogger<DistrictController> logger)
+        public DistrictController(ILogger<DistrictController> logger,
+            VooperDB dbctx)
         {
             _logger = logger;
+            _dbctx = dbctx;
         }
 
         public IActionResult View(long Id)
@@ -85,7 +88,7 @@ namespace SV2.Controllers
                     pol.Id = IdManagers.GeneralIdGenerator.Generate();
                     pol.DistrictId = model.DistrictId;
                     DBCache.Put(pol.Id, pol);
-                    await VooperDB.Instance.UBIPolicies.AddAsync(pol);
+                    _dbctx.UBIPolicies.Add(pol);
                 }
             }
             
@@ -106,11 +109,11 @@ namespace SV2.Controllers
                     pol.Id = IdManagers.GeneralIdGenerator.Generate();
                     pol.DistrictId = model.DistrictId;
                     DBCache.Put(pol.Id, pol);
-                    await VooperDB.Instance.TaxPolicies.AddAsync(pol);
+                    _dbctx.TaxPolicies.Add(pol);
                 }
             }
 
-            await VooperDB.Instance.SaveChangesAsync();
+            await _dbctx.SaveChangesAsync();
 
             StatusMessage = $"Successfully edited policies.";
             return Redirect($"/District/EditPolicies?Id={district.Id}");
