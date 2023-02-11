@@ -167,6 +167,8 @@ public static class DBCache
         {
             DBCache.Put<Minister>(minister.UserId, minister);
         }
+        foreach (var _obj in dbctx.Senators)
+            Put(_obj.DistrictId, _obj);
 
         //#endif
     }
@@ -185,6 +187,7 @@ public static class DBCache
         dbctx.Provinces.UpdateRange(GetAll<Province>());
         dbctx.Recipes.UpdateRange(GetAll<Recipe>());
         dbctx.Ministers.UpdateRange(GetAll<Minister>());
+        dbctx.Senators.UpdateRange(GetAll<Senator>());
         await dbctx.SaveChangesAsync();
     }
 }

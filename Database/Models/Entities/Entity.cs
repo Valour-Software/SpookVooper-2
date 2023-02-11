@@ -51,7 +51,7 @@ public abstract class BaseEntity
     public string ApiKey { get; set; }
     public string? ImageUrl { get; set; }
 
-    public long DistrictId { get; set; }
+    public long? DistrictId { get; set; }
 
     [NotMapped]
     public District District => DBCache.Get<District>(DistrictId)!;
@@ -76,31 +76,38 @@ public abstract class BaseEntity
 
         decimal totaldue = 0.0m;
 
-        // do district level taxes
-        List<TaxPolicy> policies = EntityType switch
-        {
-            EntityType.Group => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList(),
-            EntityType.Corporation => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList(),
-            EntityType.User => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList()
-        };
+        List<TaxPolicy> policies = null;
 
-        foreach(TaxPolicy policy in policies)
+        if (DistrictId is not null)
         {
-            var _amount = policy.GetTaxAmount(amount);
-            totaldue += _amount;
-            policy.Collected += _amount;
-            toprocess -= policy.Maximum;
-            if (amount <= 0.0m) 
-                break;
-        }
-        if (totaldue > 0.1m) {
-            Transaction taxtrans = new Transaction(Id, DistrictId, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - TaxAbleBalanceYesterday} of income.");
-            taxtrans.NonAsyncExecute(true);
-        }
 
-        amount = TaxAbleBalance-TaxAbleBalanceYesterday;
-        toprocess = amount;
-        totaldue = 0.0m;
+            // do district level taxes
+            policies = EntityType switch
+            {
+                EntityType.Group => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList(),
+                EntityType.Corporation => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList(),
+                EntityType.User => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList()
+            };
+
+            foreach (TaxPolicy policy in policies)
+            {
+                var _amount = policy.GetTaxAmount(amount);
+                totaldue += _amount;
+                policy.Collected += _amount;
+                toprocess -= policy.Maximum;
+                if (amount <= 0.0m)
+                    break;
+            }
+            if (totaldue > 0.1m)
+            {
+                Transaction taxtrans = new Transaction(Id, (long)DistrictId, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - TaxAbleBalanceYesterday} of income.");
+                taxtrans.NonAsyncExecute(true);
+            }
+
+            amount = TaxAbleBalance - TaxAbleBalanceYesterday;
+            toprocess = amount;
+            totaldue = 0.0m;
+        }
 
         // now do imperial level taxes
         policies = EntityType switch
@@ -120,7 +127,7 @@ public abstract class BaseEntity
                 break;
         }
         if (totaldue > 0.1m) {
-            Transaction taxtrans = new Transaction(Id, DistrictId!, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - TaxAbleBalanceYesterday} of income.");
+            Transaction taxtrans = new Transaction(Id, 100, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - TaxAbleBalanceYesterday} of income.");
             taxtrans.NonAsyncExecute(true);
         }
 
@@ -129,7 +136,7 @@ public abstract class BaseEntity
         if (_policy is not null) {
             totaldue = _policy.GetTaxAmount(Credits);
             if (totaldue > 0.1m) {
-                Transaction taxtrans = new(Id, DistrictId!, totaldue, TransactionType.TaxPayment, $"Balance Tax Payment tax id: {_policy.Id}");
+                Transaction taxtrans = new(Id, (long)DistrictId, totaldue, TransactionType.TaxPayment, $"Balance Tax Payment tax id: {_policy.Id}");
                 taxtrans.NonAsyncExecute(true);
                 _policy.Collected += totaldue;
             }
@@ -149,5 +156,14 @@ public abstract class BaseEntity
             entity = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ApiKey == apikey);
         }
         return entity;
+    }
+
+    public string GetPfpUrl()
+    {
+        if (ImageUrl is null || ImageUrl.Length == 0 || ImageUrl == " ")
+        {
+            return "/media/unity-128.png";
+        }
+        return ImageUrl;
     }
 }

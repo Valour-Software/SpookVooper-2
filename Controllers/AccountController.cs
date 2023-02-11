@@ -8,7 +8,6 @@ using Valour.Shared.Models;
 using SV2.VoopAI;
 using Valour.Shared.Authorization;
 using Valour.Api.Client;
-using Westwind.AspNetCore.Markdown.Utilities;
 using System.Web;
 using System.Text.Json;
 

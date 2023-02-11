@@ -35,4 +35,6 @@ public class ForumPost
 
     [InverseProperty("Post")]
     public List<ForumLike> Likes { get; set; }
+
+    public bool Removed { get; set; }
 }

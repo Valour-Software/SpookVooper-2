@@ -1,4 +1,4 @@
-@model SV2.Database.Models.Groups.Group
+@model Group
 
 <head>
     <meta property="og:title" content="@Model.Name">
@@ -45,16 +45,9 @@
                 </div>
             </div>
 
-            @if (Model.DistrictId != 100)
+            @if (Model.DistrictId is not null)
             {
-                @if (Model.DistrictId == 0)
-                {
-                    <p class="m-2" style="text-align:center; font-size:x-large">District: @Model.Name</p>
-                }
-                else
-                {
-                    <p class="m-2" style="text-align:center; font-size:x-large">District: @District.Find(Model.DistrictId).Name</p>
-                }
+                <p class="m-2" style="text-align:center; font-size:x-large">District: @Model.District.Name</p>
             }
             else
             {

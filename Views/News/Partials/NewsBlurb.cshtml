@@ -27,7 +27,7 @@
             <a asp-controller="News" asp-action="View" asp-route-postid="@Model.Id"><h4>@Model.Title</h4></a>
             <h6>
                 by
-                <a asp-controller="User" asp-action="Info" asp-route-svid="@Model.AuthorId">
+                <a asp-controller="User" asp-action="Info" asp-route-id="@Model.AuthorId">
                     <i style="color:white">
                         @author.Name
                     </i>

@@ -1,0 +1,135 @@
+﻿@model SV2.Models.Leaderboard.LeaderboardIndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container vw-100">
+    <div class="col-12">
+        <div class="d-flex">
+            <div class="p-1 align-self-start flex-grow-1">
+                <h1>Leaderboard</h1>
+            </div>
+            @if (Model.Page != 0)
+            {
+                <div class="p-2 align-self-end">
+                    <a asp-action="Index" asp-controller="Leaderboard" asp-route-id="@(Model.Page - 1)" class="btn btn-primary" style="white-space:nowrap">Last</a>
+                </div>
+            }
+            @if ((Model.Page + 1) * Model.Amount < Model.Users.Count() - 1)
+            {
+                <div class="p-2 align-self-end">
+                    <a asp-action="Index" asp-controller="Leaderboard" asp-route-id="@(Model.Page + 1)" class="btn btn-primary" style="white-space:nowrap">Next</a>
+                </div>
+            }
+        </div>
+
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Pfp
+                    </th>
+                    <th>
+                        Total XP
+                    </th>
+                    <th>
+                        Username
+                    </th>
+                    <th>
+                        Valour Message Xp
+                    </th>
+                    <th>
+                        Valour Messages
+                    </th>
+                    <th>
+                        Post Likes
+                    </th>
+                    <th>
+                        Comment Likes
+                    </th>
+                    <th>
+                        Credits
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @{
+                    var thisUser = UserManager.GetUser(Context);
+                    int start = Model.Page * 25;
+                }
+
+                @for (int i = start; i < start + Model.Amount; i++)
+                {
+                    if (i > Model.Users.Count() - 1)
+                    {
+                        break;
+                    }
+
+                    var item = Model.Users[i];
+
+                    bool isUser = ((thisUser != null) && (thisUser.Id == item.Id));
+
+                    var style = isUser ? "font-weight:bold;" : "";
+
+                    //if (rank != null)
+                    //{
+                    //    style += $"background-color:rgba({rank.Color.R},{rank.Color.G},{rank.Color.B},0.1);";
+                    //}
+
+                    <tr style="@style">
+                        <td>
+                            <img class="govpfp" src="@item.GetPfpUrl()" style="width:32px; height: 32px;"/>
+                        </td>
+                        <td>
+                            @item.Xp
+                        </td>
+                        <td>
+                            <a asp-controller="User" asp-action="Info" asp-route-svid="@item.Id" style="text-decoration: none;">
+                                @item.Name
+                            </a>
+                        </td>
+                        <td>
+                            @item.MessageXp
+                        </td>
+                        <td>
+                            @item.Messages
+                        </td>
+                        <td>
+                            @item.PostLikes
+                        </td>
+                        <td>
+                            @item.CommentLikes
+                        </td>
+                        <td>
+                            @item.Credits
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+        <div class="d-flex">
+            <div class="p-1 align-self-start flex-grow-1">
+                <h1></h1>
+            </div>
+            @if (Model.Page != 0)
+            {
+                <div class="p-2 align-self-end">
+                    <a asp-action="Index" asp-controller="Leaderboard" asp-route-id="@(Model.Page - 1)" class="btn btn-primary" style="white-space:nowrap">Last</a>
+                </div>
+            }
+            @if ((Model.Page + 1) * Model.Amount < Model.Users.Count() - 1)
+            {
+                <div class="p-2 align-self-end">
+                    <a asp-action="Index" asp-controller="Leaderboard" asp-route-id="@(Model.Page + 1)" class="btn btn-primary" style="white-space:nowrap">Next</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

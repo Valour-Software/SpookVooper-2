@@ -32,8 +32,9 @@ public class NewsController : SVController
     [HttpGet("/News/ViewPost/{id}")]
     public async Task<IActionResult> ViewPost(long id)
     {
-        var post = await _dbctx.NewsPosts.FirstOrDefaultAsync(x => x.Id == id);
-
+        var post = await _dbctx.NewsPosts.FirstOrDefaultAsync(x => x.Id == id)!;
+        post.ViewCount += 1;
+        await _dbctx.SaveChangesAsync();
         return View(post);
     }
 

@@ -34,4 +34,6 @@ public class NewsPost
     [MaxLength(50, ErrorMessage = "Tags should be under 50 characters.")]
     [RegularExpression("^[a-zA-Z0-9, ]*$", ErrorMessage = "Please use only letters, numbers, and commas.")]
     public string Tags { get; set; }
+
+    public long ViewCount { get; set; } = 0;
 }
