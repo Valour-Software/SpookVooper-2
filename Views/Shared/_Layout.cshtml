@@ -100,7 +100,7 @@
 
                                     if (user is not null)
                                     {
-                                        <a class="dropdown-item" asp-controller="Manage" asp-action="Index">My Account</a>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Manage">My Account</a>
                                         <a class="dropdown-item" asp-controller="User" asp-action="Info" asp-route-svid="@user.Id">My Page</a>
                                     }
                                     else

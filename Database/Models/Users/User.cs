@@ -98,9 +98,8 @@ public class SVUser : BaseEntity
     public bool IsMinister(MinisterType ministertype)
     {
         Minister? minister = DBCache.GetAll<Minister>().FirstOrDefault(x => x.UserId == Id && x.Type == ministertype);
-        if (minister is null) {
+        if (minister is null)
             return false;
-        }
         return true;
     }
 

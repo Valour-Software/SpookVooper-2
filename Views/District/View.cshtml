@@ -140,7 +140,7 @@
                 if (Model.Description != null)
                 {
                     <h1 style="text-align:left">Description</h1>
-                    <p class="p" style="font-size:large">@Html.Raw(@Westwind.AspNetCore.Markdown.Markdown.Parse(Model.Description, sanitizeHtml: true))</p>
+                    <p class="p" style="font-size:large">@Html.Raw(MarkdownManager.GetHtml(Model.Description))</p>
                 }
 
                 <br />

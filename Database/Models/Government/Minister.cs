@@ -5,7 +5,8 @@ namespace SV2.Database.Models.Government;
 public enum MinisterType
 {
     ImperialElectionMinister = 1,
-    ChiefFinancierofVooperia = 2
+    ChiefFinancierofVooperia = 2,
+    MinisterofJournalism = 3
 }
 
 public class Minister

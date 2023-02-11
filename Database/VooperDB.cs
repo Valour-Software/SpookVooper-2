@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal;
 using System.Text;
+using SV2.Database.Models.News;
 
 /*  Valour - A free and secure chat client
  *  Copyright (C) 2021 Vooper Media LLC
@@ -148,6 +149,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<Minister> Ministers { get; set; }
     public DbSet<DistrictStaticModifier> DistrictStaticModifiers { get; set; }
     public DbSet<Senator> Senators { get; set; }
+    public DbSet<NewsPost> NewsPosts { get; set; }
 
     public VooperDB(DbContextOptions options)
     {

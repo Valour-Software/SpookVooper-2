@@ -1,0 +1,32 @@
+﻿@using Microsoft.EntityFrameworkCore
+@inject VooperDB dbctx
+
+@{
+    ViewData["Title"] = "Vooperia News";
+
+    // Get latest news
+    var latestNews = await dbctx.NewsPosts.OrderByDescending(x => x.Timestamp).Take(10).ToListAsync();
+}
+
+<head>
+    <meta property="og:title" content="Vooperia News">
+    <meta name="keywords" content="News, SpookVooper, Updates">
+    <meta property="og:description" content="The home for breaking and current news in Vooperia">
+    <meta property="og:url" content="https://spookvooper.com/News/Index">
+</head>
+
+
+<!-- Main row for page -->
+<div class="d-flex flex-row align-content-center" style="width:100%">
+    <!-- Leftmost column -->
+    <div class="p-4 flex-shrink-1 ml-auto"></div>
+    <!-- Center column -->
+    <div class="p-4" style="width:80em;margin-left: auto;margin-right: auto;">
+        @foreach (NewsPost post in latestNews)
+        {
+            @await Html.PartialAsync("Partials/NewsBlurb.cshtml", post)
+        }
+    </div>
+    <!-- Rightmost column -->
+    <div class="p-4 flex-shrink-1 mr-auto"></div>
+</div>
