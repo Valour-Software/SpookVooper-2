@@ -5,6 +5,7 @@ using System.Diagnostics;
 
 namespace SV2.Controllers
 {
+    [Route("/District")]
     public class DistrictController : Controller
     {
         private readonly ILogger<DistrictController> _logger;
@@ -20,9 +21,10 @@ namespace SV2.Controllers
             _dbctx = dbctx;
         }
 
-        public IActionResult View(long Id)
+        [HttpGet("View/{name}")]
+        public IActionResult View(string name)
         {
-            District district = DBCache.Get<District>(Id);
+            District district = DBCache.GetAll<District>().FirstOrDefault(x => x.Name == name);
             SVUser? user = UserManager.GetUser(HttpContext);
 
             if (user is null) 

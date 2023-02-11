@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "Government";
+}
+<body>
+    <div class="container-fluid w-100">
+
+        <h1 style="text-align:center">Select a District</h1>
+        <br />
+        <hr />
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div style="position:relative; width:95vw; margin-left:auto; margin-right:auto;">
+                    <img class="img-fluid" src="~/media/map/VooperiaPol_Small.jpg" style="position:absolute; top:0px; left:0px;" />
+
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                         viewBox="0 0 4338.5 2844.4" style="position:absolute; top:0px; left:0px;">
+                        <style type="text/css">
+                            .cls-9 {
+                                fill: transparent;
+                                stroke: #000000;
+                                stroke-miterlimit: 10;
+                            }
+
+                                .cls-9:hover {
+                                    fill: #ff1F2033;
+                                }
+
+                                .cls-9:active {
+                                    fill: #00ff2033;
+                                }
+                        </style>
+                        <g id="Districts">
+
+                            <a asp-route-id="Landing Cove" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Landing_Cove" data-name="Landing Cove" class="cls-9" points="0.5 1384.17 793.51 1355.77 1071.33 1142.35 1140.48 1422.72 1256.51 1786.82 827.33 2184.81 789.86 2844.94 0.5 2844.94 0.5 1384.17" />
+                            </a>
+                            <a asp-route-id="Old King Peninsula" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Old_King_Peninsula" data-name="Old King Peninsula" class="cls-9" points="827.33 2184.81 790.34 2844.94 1773.7 2844.94 2022.76 2247.4 1993.59 1786.82 1256.51 1786.82 827.33 2184.81" />
+                            </a>
+                            <a asp-route-id="The Netherlands" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Netherlands" class="cls-9" points="1194.68 1592.81 1256.51 1786.82 1993.59 1786.82 1980.01 1572.34 1661.09 1355.77 1194.68 1592.81" />
+                            </a>
+                            <a asp-route-id="New Spudland" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="New_Spudland" data-name="New Spudland" class="cls-9" points="1194.68 1592.81 1140.48 1422.72 1071.33 1142.35 1200.59 1043.05 1661.09 1355.77 1194.68 1592.81" />
+                            </a>
+                            <a asp-route-id="Voopmont" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Voopmont" class="cls-9" points="0.5 1384.17 793.51 1355.77 1200.59 1043.05 1194.68 532.66 1408.82 0.5 0.5 0.5 0.5 1384.17" />
+                            </a>
+                            <a asp-route-id="Vooperia City" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Vooperia_City" data-name="Vooperia City" class="cls-9" points="1354.18 1147.36 1661.09 1355.77 1853.58 990.26 1549.67 815.98 1354.18 1147.36" />
+                            </a>
+                            <a asp-route-id="New Yam" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="New_Yam" data-name="New Yam" class="cls-9" points="1408.82 0.5 1194.68 532.66 1200.59 1043.05 1354.18 1147.36 1549.67 815.98 1853.58 990.26 2073.4 572.87 2091.68 0.5 1408.82 0.5" />
+                            </a>
+                            <a asp-route-id="Corgi" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Corgi" class="cls-9" points="1853.58 990.26 1661.09 1355.77 1870.35 1497.88 2040.45 1376.43 2396.51 1280.43 2371.84 1231.52 1853.58 990.26" />
+                            </a>
+                            <a asp-route-id="Queensland" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Queensland" class="cls-9" points="1773.7 2844.94 2022.76 2247.4 1980.01 1572.34 1870.35 1497.88 2040.45 1376.43 2396.51 1280.43 2568.37 1621.26 2893.05 1729.16 2768.17 2097.42 3212.74 2568.68 3221.83 2844.94 1773.7 2844.94" />
+                            </a>
+                            <a asp-route-id="San Vooperisco" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="San_Vooperisco" data-name="San Vooperisco" class="cls-9" points="1853.58 990.26 2371.84 1231.52 2578.2 970.2 2604.4 865.43 2073.4 572.87 1853.58 990.26" />
+                            </a>
+                            <a asp-route-id="Medievala" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Medievala" class="cls-9" points="2091.68 0.5 2073.4 572.87 2604.4 865.43 3274.16 1043.05 3244.34 0.5 2091.68 0.5" />
+                            </a>
+                            <a asp-route-id="Old Yam" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Old_Yam" data-name="Old Yam" class="cls-9" points="2604.4 865.43 2990.92 967.94 2940.97 1109.36 2819.12 1245.91 2835.55 1422.41 2727.08 1674 2568.37 1621.26 2371.84 1231.52 2578.2 970.2 2604.4 865.43" />
+                            </a>
+                            <a asp-route-id="New Vooperis" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="New_Vooperis" data-name="New Vooperis" class="cls-9" points="2727.08 1674 2893.05 1729.16 3297.81 1368.49 3802.95 1337.57 4338.95 1623.64 4338.95 529.62 4153.1 559.67 3910.53 930.17 3535.21 930.66 3274.16 1043.05 2990.92 967.94 2940.97 1109.36 2819.12 1245.91 2835.55 1422.41 2727.08 1674" />
+                            </a>
+                            <a asp-route-id="Servers Past" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Servers_Past" data-name="Servers Past" class="cls-9" points="3802.95 1337.57 3297.81 1368.49 2893.05 1729.16 2768.17 2097.42 3212.74 2568.68 3286.2 2275.79 3403.22 2132.26 3472.06 1991.4 3618.49 2000.45 3685.8 1853.95 3929.81 1575.79 4077.66 1484.18 3802.95 1337.57" />
+                            </a>
+                            <a asp-route-id="Los Vooperis" asp-action="View" asp-controller="District" class="btn btn-primary">
+                                <polygon id="Los_Vooperis" data-name="Los Vooperis" class="cls-9" points="4338.95 1623.64 4338.95 2844.94 3221.83 2844.94 3212.74 2568.68 3286.2 2275.79 3403.22 2132.26 3472.06 1991.4 3618.49 2000.45 3685.61 1854.17 3929.81 1575.79 4077.66 1484.18 4338.95 1623.64" />
+                            </a>
+                            <polygon id="Tsunamic" class="cls-9" points="4338.95 529.62 4153.1 559.67 3910.53 930.17 3535.21 930.66 3274.16 1043.05 3244.34 0.5 4338.95 0.5 4338.95 529.62" />
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height:150vh"></div>
+</body>

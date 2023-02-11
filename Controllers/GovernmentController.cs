@@ -35,6 +35,11 @@ public class GovernmentController : Controller
         return View(model);
     }
 
+    public async Task<IActionResult> Map()
+    {
+        return View();
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
