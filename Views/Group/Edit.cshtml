@@ -114,7 +114,7 @@
                                     </a>
                                 </div>
                                 <div class="col-6 srow">
-                                    <a asp-action="ViewMemberRoles" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-userid="@member.Id" class="btn btn-outline-primary">Roles</a>
+                                    <a asp-action="ViewMemberRoles" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-targetid="@member.Id" class="btn btn-outline-primary">Roles</a>
                                     @if (Model.HasPermission(user, GroupPermissions.ManageMembership))
                                     {
                                         <a asp-action="ManageUser" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-userid="@member.Id" asp-route-operation="kick" class="btn btn-outline-warning">Kick</a>

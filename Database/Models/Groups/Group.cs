@@ -184,14 +184,18 @@ public class Group : BaseEntity, IHasOwner
 
         List<GroupRole> roles = GetMemberRoles(target);
 
-        if (roles == null || roles.Count == 0)
+        if (roles is null || roles.Count == 0)
             return int.MinValue;
 
         return roles.Max(r => r.Authority);
     }
 
-    public TaskResult AddEntityToRole(BaseEntity target, GroupRole role)
+    public TaskResult AddEntityToRole(BaseEntity caller, BaseEntity target, GroupRole role)
     {
+        // Validate arguments
+        TaskResult validate = CommonValidation(caller, target, GroupPermissions.ManageRoles);
+        if (!validate.Succeeded) { return validate; }
+
         // Authority check
         if (role.Authority > GetAuthority(target))
             return new TaskResult(false, $"{role.Name} has more authority than you!");
@@ -209,8 +213,12 @@ public class Group : BaseEntity, IHasOwner
         return new(true, $"Successfully added {target.Name} to {role.Name}");
     }
 
-    public TaskResult RemoveEntityFromRole(BaseEntity target, GroupRole role)
+    public TaskResult RemoveEntityFromRole(BaseEntity caller, BaseEntity target, GroupRole role)
     {
+        // Validate arguments
+        TaskResult validate = CommonValidation(caller, target, GroupPermissions.ManageRoles);
+        if (!validate.Succeeded) { return validate; }
+
         // Authority check
         if (role.Authority > GetAuthority(target))
             return new TaskResult(false, $"{role.Name} has more authority than you!");
@@ -226,5 +234,26 @@ public class Group : BaseEntity, IHasOwner
 
         role.MembersIds.Remove(target.Id);
         return new(true, $"Successfully removed {target.Name} from {role.Name}");
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="caller">The entity who is trying to execute this operation</param>
+    /// <param name="target">The entity we are doing an operation on</param>
+    /// <param name="permission">The permission that the <paramref name="caller"/> is required to have</param>
+    /// <returns></returns>
+    public TaskResult CommonValidation(BaseEntity caller, BaseEntity target, GroupPermission permission)
+    {
+        if (caller is null)
+            return new TaskResult(false, $"Error: Please log in!");
+
+        if (target is null)
+            return new TaskResult(false, $"Error: Target user does not exist!");
+
+        if (HasPermission(caller, permission))
+            return new TaskResult(false, $"Error: You don't have permission to do that!");
+
+        return new TaskResult(true, $"Validated!");
     }
 }

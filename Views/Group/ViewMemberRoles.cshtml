@@ -1,7 +1,7 @@
 ﻿@model SV2.Models.Groups.ViewMemberRolesModel
 
 @{
-    ViewData["Title"] = $"{Model.Target}'s Roles in {Model.Group.Name}";
+    ViewData["Title"] = $"{Model.Target.Name}'s Roles in {Model.Group.Name}";
 
     SVUser user = UserManager.GetUser(Context)!;
 }
@@ -19,17 +19,19 @@
         {
             <h3 style="text-align:center">@ViewData["Title"]</h3>
             <div class="row srow">
-                @foreach (GroupRole role in Model.Group.GetRoleList().AsEnumerable().Where(r => r.HasRole(user).Result))
+                @foreach (GroupRole role in Model.Group.Roles.Where(x => x.MembersIds.Contains(user.Id)))
                 {
-                <div class="col-6">
-                    <h4>@role.Name</h4>
-                </div>
-                <div class="col-6">
-                    @if (await Model.Group.HasPermission(user, "removerole"))
-                    {
-                        <a asp-action="ManageUser" asp-controller="Group" asp-route-groupid="@Model.Group.Id" asp-route-userid="@Model.Target.Id" asp-route-operation="@($"removerole|{role.RoleId}")" class="btn btn-outline-primary">Remove</a>
-                    }
-                </div>
+                    <div class="col-6">
+                        <h4>@role.Name</h4>
+                    </div>
+                    <div class="col-6">
+                        @if (Model.Group.HasPermission(user, GroupPermissions.ManageRoles))
+                        {
+                            <a asp-action="RemoveEntityFromRole" asp-controller="Group" asp-route-groupid="@Model.Group.Id" asp-route-targetid="@Model.Target.Id" asp-route-roleid="@role.Id" class="btn btn-outline-primary">
+                                Remove
+                            </a>
+                        }
+                    </div>
                 }
             </div>
 
@@ -37,17 +39,19 @@
 
             <h2 style="text-align:center">Other roles</h2>
             <div class="row srow">
-                @foreach (GroupRole role in Model.Group.GetRoleList().AsEnumerable().Where(r => !r.HasRole(user).Result))
+                @foreach (GroupRole role in Model.Group.Roles.Where(x => x.MembersIds.Contains(user.Id)))
                 {
-                <div class="col-6">
-                    <h4>@role.Name</h4>
-                </div>
-                <div class="col-6">
-                    @if (await Model.Group.HasPermission(user, "addrole"))
-                    {
-                        <a asp-action="ManageUser" asp-controller="Group" asp-route-groupid="@Model.Group.Id" asp-route-userid="@Model.Target.Id" asp-route-operation="@($"addrole|{role.RoleId}")" class="btn btn-outline-warning">Add</a>
-                    }
-                </div>
+                    <div class="col-6">
+                        <h4>@role.Name</h4>
+                    </div>
+                    <div class="col-6">
+                        @if (Model.Group.HasPermission(user, GroupPermissions.ManageRoles))
+                        {
+                            <a asp-action="AddEntityToRole" asp-controller="Group" asp-route-groupid="@Model.Group.Id" asp-route-targetid="@Model.Target.Id" asp-route-roleid="@role.Id" class="btn btn-outline-warning">
+                                Add
+                            </a>
+                        }
+                    </div>
                 }
             </div>
         }
