@@ -18,7 +18,7 @@ public class GroupRole
     // this role's permission value
     public ulong PermissionValue { get; set; }
 
-    public List<long> Members { get; set; }
+    public List<long> MembersIds { get; set; }
 
     // Hexcode for role color (ex: #ffffff)
     public string Color { get; set; }
@@ -26,18 +26,15 @@ public class GroupRole
     // The group this role belongs to
     public long GroupId { get; set; }
 
-    [NotMapped]
-    public Group Group
-    {
-        get
-        {
-            return DBCache.Get<Group>(GroupId)!;
-        }
-    }
-
     // Salary for role, paid every hour
     public decimal Salary { get; set; }
     public int Authority { get; set; }
+
+    [NotMapped]
+    public IEnumerable<BaseEntity> GetMembers => MembersIds.Select(x => BaseEntity.Find(x));
+
+    [NotMapped]
+    public Group Group => DBCache.Get<Group>(GroupId)!;
 
     public static GroupRole Default = new GroupRole()
     {
@@ -52,8 +49,6 @@ public class GroupRole
     {
 
     }
-
-    public IEnumerable<BaseEntity> GetMembers() => Members.Select(x => BaseEntity.Find(x));
 
     public List<string> GetPermissions()
     {
@@ -73,7 +68,7 @@ public class GroupRole
         Id = IdManagers.GeneralIdGenerator.Generate();
         Name = name;
         PermissionValue = 0;
-        Members = new();
+        MembersIds = new();
         Color = "ffffff";
         GroupId = groupid;
         Salary = salary;

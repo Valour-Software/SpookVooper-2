@@ -32,7 +32,7 @@ namespace SV2.Workers
                             foreach(GroupRole role in roles) {
                                 if (role.Salary > 0.1m) {
                                     TaxCreditPolicy taxcredit = DBCache.GetAll<TaxCreditPolicy>().FirstOrDefault(x => x.DistrictId == role.Group.DistrictId && x.taxCreditType == TaxCreditType.Employee);
-                                    foreach(long Id in role.Members) {
+                                    foreach(long Id in role.MembersIds) {
                                         Transaction tran = new Transaction(role.GroupId, Id, role.Salary, TransactionType.Paycheck, $"{role.Name} Salary");
                                         TaskResult result = await tran.Execute();
                                         if (!result.Succeeded) {

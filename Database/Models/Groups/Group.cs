@@ -5,6 +5,8 @@ using SV2.Database.Models.Entities;
 using SV2.Database.Models.Permissions;
 using SV2.Database.Models.Users;
 using Microsoft.EntityFrameworkCore;
+using SV2.Web;
+using Valour.Api.Models;
 
 namespace SV2.Database.Models.Groups;
 
@@ -48,26 +50,21 @@ public class Group : BaseEntity, IHasOwner
         }
     }
 
-    public bool IsInGroup(SVUser user)
-    {
-        return MembersIds.Contains(user.Id);
-    }
+    [NotMapped]
+    public IEnumerable<BaseEntity> Members => MembersIds.Select(x => BaseEntity.Find(x));
 
-    public IEnumerable<BaseEntity> GetMembers()
-    {
-        return MembersIds.Select(x => BaseEntity.Find(x));
-    }
+    [NotMapped]
+    public IEnumerable<GroupRole> Roles => DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id).ToList();
 
     public long OwnerId { get; set; }
 
     [NotMapped]
 
-    public BaseEntity Owner
+    public BaseEntity Owner => BaseEntity.Find(OwnerId)!;
+
+    public bool IsInGroup(SVUser user)
     {
-        get
-        {
-            return BaseEntity.Find(OwnerId)!;
-        }
+        return MembersIds.Contains(user.Id);
     }
 
     public Group()
@@ -91,7 +88,7 @@ public class Group : BaseEntity, IHasOwner
 
     public GroupRole? GetHighestRole(BaseEntity entity)
     {
-        GroupRole? role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(entity.Id)).OrderByDescending(x => x.Authority).FirstOrDefault();
+        GroupRole? role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.MembersIds.Contains(entity.Id)).OrderByDescending(x => x.Authority).FirstOrDefault();
         if (role is null)
         {
             return GroupRole.Default;
@@ -101,7 +98,7 @@ public class Group : BaseEntity, IHasOwner
 
     public GroupRole GetHighestRoleWithPermission(BaseEntity user, GroupPermission permission)
     {
-        GroupRole role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(user.Id) && HasPermission(user, permission)).OrderByDescending(x => x.Authority).First();
+        GroupRole role = DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.MembersIds.Contains(user.Id) && HasPermission(user, permission)).OrderByDescending(x => x.Authority).First();
         return role;
     }
 
@@ -124,11 +121,12 @@ public class Group : BaseEntity, IHasOwner
             return true;
         }
 
-        foreach (GroupRole role in DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.Members.Contains(entity.Id)).OrderByDescending(x => x.Authority))
+        foreach (GroupRole role in DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.MembersIds.Contains(entity.Id)).OrderByDescending(x => x.Authority))
         {
             PermissionCode code = new PermissionCode(role.PermissionValue, permission.Value);
             PermissionState state = code.GetState(permission);
 
+            // this should NEVER happen
             if (state == PermissionState.Undefined)
             {
                 continue;
@@ -167,5 +165,66 @@ public class Group : BaseEntity, IHasOwner
     public static Group? Find(long Id)
     {
         return DBCache.Get<Group>(Id);
+    }
+
+    public List<GroupRole> GetMemberRoles(BaseEntity entity)
+    {
+        List<GroupRole> roles = new();
+        roles.AddRange(Roles.Where(x => x.MembersIds.Contains(entity.Id)));
+        return roles;
+    }
+
+    public int GetAuthority(BaseEntity target)
+    {
+        if (target is null)
+            return int.MinValue;
+
+        if (OwnerId == target.Id)
+            return int.MaxValue;
+
+        List<GroupRole> roles = GetMemberRoles(target);
+
+        if (roles == null || roles.Count == 0)
+            return int.MinValue;
+
+        return roles.Max(r => r.Authority);
+    }
+
+    public TaskResult AddEntityToRole(BaseEntity target, GroupRole role)
+    {
+        // Authority check
+        if (role.Authority > GetAuthority(target))
+            return new TaskResult(false, $"{role.Name} has more authority than you!");
+
+        if (role is null)
+            return new TaskResult(false, "Error: The role value was empty.");
+
+        if (Roles.Any(x => x.MembersIds.Contains(target.Id)))
+            return new TaskResult(false, "Error: The entity already has this role.");
+
+        if (role.GroupId != Id)
+            return new TaskResult(false, "Error: The role does not belong to this group!");
+
+        role.MembersIds.Add(target.Id);
+        return new(true, $"Successfully added {target.Name} to {role.Name}");
+    }
+
+    public TaskResult RemoveEntityFromRole(BaseEntity target, GroupRole role)
+    {
+        // Authority check
+        if (role.Authority > GetAuthority(target))
+            return new TaskResult(false, $"{role.Name} has more authority than you!");
+
+        if (role is null)
+            return new TaskResult(false, "Error: The role value was empty.");
+
+        if (!Roles.Any(x => x.MembersIds.Contains(target.Id)))
+            return new TaskResult(false, "Error: The entity does has this role.");
+
+        if (role.GroupId != Id)
+            return new TaskResult(false, "Error: The role does not belong to this group!");
+
+        role.MembersIds.Remove(target.Id);
+        return new(true, $"Successfully removed {target.Name} from {role.Name}");
     }
 }

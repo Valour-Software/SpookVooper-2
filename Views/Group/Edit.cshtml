@@ -4,8 +4,6 @@
     ViewData["Title"] = "Group Admin";
 
     SVUser user = UserManager.GetUser(Context)!;
-    if (user is null)
-        Context.Response.Redirect("/Account/Login");
 }
 
 <div class="container vw-100">
@@ -105,7 +103,7 @@
                     <br />
                     <div class="container">
                         <div class="row">
-                            @foreach (SVUser member in Model.GetMembers())
+                            @foreach (SVUser member in Model.Members)
                             {
                                 <div class="col-6 srow">
                                     <div class="p-1">
@@ -165,7 +163,7 @@
                 <a>@role.Name</a>
             </div>
             <div class="col-3">
-                <p>Members: @role.GetMembers().Count()</p>
+                <p>Members: @role.MembersIds.Count()</p>
             </div>
             <div class="col-3">
                 <p>Perms: @role.GetPermissions()</p>

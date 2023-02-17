@@ -76,7 +76,7 @@ class GroupCommands : CommandModuleBase
                 }
                 embed.AddText(text:role.Name+extra).WithStyles(new TextColor(role.Color));
                 string members = "";
-                foreach(long userid in role.Members) {
+                foreach(long userid in role.MembersIds) {
                     members += $"{DBCache.Get<SVUser>(userid).Name}, ";
                 }
                 if (members != "") {
