@@ -59,10 +59,11 @@ public class GroupController : SVController
 
         model.Name = model.Name.Trim();
 
-        if (DBCache.GetAll<Group>().Any(x => x.Name == model.Name)) {
-            StatusMessage = $"Error: Name {model.Name} is already taken!";
-            return Redirect($"/group/create");
-        }
+        if (DBCache.GetAll<Group>().Any(x => x.Name == model.Name))
+            return RedirectBack($"Error: Name {model.Name} is already taken!");
+        
+        if (DBCache.GetAll<Group>().Count(x => x.OwnerId == user.Id) > 15)
+            return RedirectBack($"You can not own more than 15 groups!");
 
         Group group = new Group(model.Name, user.Id);
         group.Description = model.Description;

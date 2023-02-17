@@ -1,6 +1,7 @@
-﻿@model CreateRoleModel
+﻿@model SV2.Models.Groups.CreateRoleModel
 @{
     ViewData["Title"] = "Add Role";
+    Group group = DBCache.Get<Group>(Model.GroupId);
 }
 
 <div class="container vw-100">
@@ -114,11 +115,7 @@
                         <span asp-description-for="Plots" class="form-text" style="color:#888888" />
                         <span asp-validation-for="Plots" class="text-danger"></span>
                     </div>
-
-                    @{
-                        Group group = await context.Groups.FindAsync(Model.GroupId);
-                    }
-                    @if (group.Group_Category == Group.GroupTypes.News)
+                    @if (group.Flags.Contains(GroupFlag.News))
                     {
                         <div class="form-group">
                             <input type="checkbox" asp-for="News" class="form-check-inline" />

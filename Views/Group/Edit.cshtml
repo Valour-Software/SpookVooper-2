@@ -169,7 +169,7 @@
                 <p>Perms: @role.GetPermissions()</p>
             </div>
             <div class="col-3">
-                @if (Model.HasPermission(user, GroupPermissions.ManageRoles))
+                @if (Model.HasPermission(user, GroupPermissions.CreateRole))
                 {
                     <a asp-action="CreateRole" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-roleid="@role.Id" class="btn btn-outline-warning">Edit</a>
                     <a asp-action="DeleteRole" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-roleid="@role.Id" class="btn btn-outline-danger">Delete</a>

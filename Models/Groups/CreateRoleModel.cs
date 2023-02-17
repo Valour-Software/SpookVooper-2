@@ -45,39 +45,30 @@ public class CreateRoleModel
         "as there are no limits to the roles created. This also lets you set the default role.")]
     public bool CreateRole { get; set; }
 
-    [Display(Name = "Add To Role", Description = "The ability to add a user to a role.")]
+    [Display(Name = "Create Role", Description = "The ability to delete a role. This is a most powerful and dangerous permission")]
+    public bool DeleteRole { get; set; }
+
+    [Display(Name = "Add To Role", Description = "The ability to add a entity to a role.")]
     public bool AddRole { get; set; }
 
-    [Display(Name = "Remove From Role", Description = "The ability to remove a user from a role.")]
+    [Display(Name = "Remove From Role", Description = "The ability to remove a entity from a role.")]
     public bool RemoveRole { get; set; }
 
-    [Display(Name = "Invite", Description = "The ability to invite a user to the group.")]
-    public bool Invite { get; set; }
+    [Display(Name = "Manage Invites", Description = "The ability to invite a entity to the group, and remove invites.")]
+    public bool ManageInvites { get; set; }
 
-    [Display(Name = "Uninvite", Description = "The ability to remove invites.")]
-    public bool Uninvite { get; set; }
-
-    [Display(Name = "Kick", Description = "The ability to kick a user from the group.")]
-    public bool Kick { get; set; }
-
-    [Display(Name = "Ban", Description = "The ability to ban a user from the group, and to unban users.")]
-    public bool Ban { get; set; }
+    [Display(Name = "Manage Membership", Description = "The ability to kick or ban a entity from the group.")]
+    public bool ManageMembership { get; set; }
 
     [Display(Name = "Edit", Description = "The ability to get onto the 'Edit' page of a group. This doesn't mean you get " +
         "permissions for everything in Edit!")]
     public bool Edit { get; set; }
-
-    [Display(Name = "Description", Description = "The ability to set the description of the group.")]
-    public bool Description { get; set; }
 
     [Display(Name = "Post", Description = "The ability to post in a group's category.")]
     public bool Post { get; set; }
 
     [Display(Name = "Economy", Description = "The ability to use group finances.")]
     public bool Eco { get; set; }
-
-    [Display(Name = "Plot Management", Description = "The ability to purchase and modify group plots [Nerdcraft].")]
-    public bool Plots { get; set; }
 
     [Display(Name = "News", Description = "The ability to post news stories.")]
     public bool News { get; set; }
@@ -88,27 +79,23 @@ public class CreateRoleModel
         {
             Color = role.Color,
             GroupId = role.GroupId,
-            RoleId = role.RoleId,
-            Weight = role.Weight,
+            RoleId = role.Id,
+            Authority = role.Authority,
             Name = role.Name,
             Salary = role.Salary
         };
 
-        model.CreateRole = role.Permissions.Contains("createrole|");
-        model.AddRole = role.Permissions.Contains("addrole|");
-        model.RemoveRole = role.Permissions.Contains("removerole|");
-        model.Invite = role.Permissions.Contains("addinvite|");
-        model.Uninvite = role.Permissions.Contains("uninvite|");
-        model.Kick = role.Permissions.Contains("kick|");
-        model.Ban = role.Permissions.Contains("ban|");
-        model.Edit = role.Permissions.Contains("edit|");
-        model.Description = role.Permissions.Contains("description|");
-        model.Post = role.Permissions.Contains("post|");
-        model.Eco = role.Permissions.Contains("eco|");
-        model.Plots = role.Permissions.Contains("plot|");
-        model.Plots = role.Permissions.Contains("news|");
+        model.CreateRole = role.HasPermission(GroupPermissions.CreateRole);
+        model.DeleteRole = role.HasPermission(GroupPermissions.DeleteRole);
+        model.AddRole = role.HasPermission(GroupPermissions.AddMembersToRoles);
+        model.RemoveRole = role.HasPermission(GroupPermissions.RemoveMembersFromRoles);
+        model.ManageInvites = role.HasPermission(GroupPermissions.ManageInvites);
+        model.ManageMembership = role.HasPermission(GroupPermissions.ManageMembership);
+        model.Edit = role.HasPermission(GroupPermissions.Edit);
+        model.Post = role.HasPermission(GroupPermissions.Post);;
+        model.Eco = role.HasPermission(GroupPermissions.Eco);
+        model.News = role.HasPermission(GroupPermissions.News);
 
         return model;
     }
-}
 }

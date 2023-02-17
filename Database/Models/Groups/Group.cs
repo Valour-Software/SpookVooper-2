@@ -78,6 +78,8 @@ public class Group : BaseEntity, IHasOwner
         Name = name;
         ApiKey = Guid.NewGuid().ToString();
         Credits = 0.0m;
+        TaxAbleBalance = 0.0m;
+        TaxAbleBalanceYesterday = 0.0m;
         CreditSnapshots = new();
         OwnerId = ownerId;
         Open = false;
@@ -193,7 +195,7 @@ public class Group : BaseEntity, IHasOwner
     public TaskResult AddEntityToRole(BaseEntity caller, BaseEntity target, GroupRole role)
     {
         // Validate arguments
-        TaskResult validate = CommonValidation(caller, target, GroupPermissions.ManageRoles);
+        TaskResult validate = CommonValidation(caller, target, GroupPermissions.AddMembersToRoles);
         if (!validate.Succeeded) { return validate; }
 
         // Authority check
@@ -216,7 +218,7 @@ public class Group : BaseEntity, IHasOwner
     public TaskResult RemoveEntityFromRole(BaseEntity caller, BaseEntity target, GroupRole role)
     {
         // Validate arguments
-        TaskResult validate = CommonValidation(caller, target, GroupPermissions.ManageRoles);
+        TaskResult validate = CommonValidation(caller, target, GroupPermissions.RemoveMembersFromRoles);
         if (!validate.Succeeded) { return validate; }
 
         // Authority check

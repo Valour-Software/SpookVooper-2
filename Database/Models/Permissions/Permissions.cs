@@ -16,11 +16,15 @@ public static class GroupPermissions
         Permissions = new GroupPermission[]
         {
                 FullControl,
-                ManageRoles,
+                CreateRole,
+                AddMembersToRoles,
+                RemoveMembersFromRoles,
                 ManageInvites,
                 ManageMembership,
                 Post,
-                Eco
+                Eco,
+                Edit,
+                News
         };
     }
 
@@ -30,13 +34,16 @@ public static class GroupPermissions
     // Every subsequent permission has double the value (the next bit)
     // An update should NEVER change the order or value of old permissions
     // As that would be a massive security issue
-    public static readonly GroupPermission ManageRoles = new GroupPermission(0x01, "Manage Roles", "Allows members to manage roles below their authority.");
-    public static readonly GroupPermission ManageInvites = new GroupPermission(0x02, "Manage Invites", "Allows members to manage invites.");
-    public static readonly GroupPermission ManageMembership = new GroupPermission(0x04, "Manage Membership", "Allows members to kick or ban users from the group which are below their authority.");
-    public static readonly GroupPermission Post = new GroupPermission(0x8, "Post", "Allows members to post as this group. For example to make group forum posts or post new articles.");
-    public static readonly GroupPermission Eco = new GroupPermission(0x10, "Eco", "Allows members to send transactions, trade stocks, etc as this group.");
-    public static readonly GroupPermission Edit = new GroupPermission(0x20, "Edit", "Allows members to edit details about this group.");
-    public static readonly GroupPermission News = new GroupPermission(0x20, "News", "Allows members to post news under this group.");
+    public static readonly GroupPermission CreateRole = new GroupPermission(0x01, "Create Roles", "Allows members to create roles.");
+    public static readonly GroupPermission DeleteRole = new GroupPermission(0x02, "Delete Roles", "Allows members to delete roles.");
+    public static readonly GroupPermission AddMembersToRoles = new GroupPermission(0x04, "Add To Role", "Allows members to add entities to roles.");
+    public static readonly GroupPermission RemoveMembersFromRoles = new GroupPermission(0x08, "Remove From Role", "Allows members to remove entities from roles.");
+    public static readonly GroupPermission ManageInvites = new GroupPermission(0x10, "Manage Invites", "Allows members to manage invites.");
+    public static readonly GroupPermission ManageMembership = new GroupPermission(0x20, "Manage Membership", "Allows members to kick or ban users from the group.");
+    public static readonly GroupPermission Post = new GroupPermission(0x40, "Post", "Allows members to post as this group. For example to make group forum posts or post new articles.");
+    public static readonly GroupPermission Eco = new GroupPermission(0x80, "Eco", "Allows members to send transactions, trade stocks, etc as this group.");
+    public static readonly GroupPermission Edit = new GroupPermission(0x100, "Edit", "Allows members to edit details about this group.");
+    public static readonly GroupPermission News = new GroupPermission(0x200, "News", "Allows members to post news under this group.");
 }
 
 public class GroupPermission : Permission
