@@ -7,6 +7,11 @@ NMilitary = {
 
 }
 
+NDistrict = {
+    DISTRICT_FUNDING_BASE = 15750
+    DISTRICT_FUNDING_PER_CITIZEN = 550 
+}
+
 NProduction = {
     BASE_FACTORY_THROUGHPUT = 1.2
     BASE_MINE_THROUGHPUT = 1.2

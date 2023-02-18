@@ -27,6 +27,9 @@ using SV2.VoopAI;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Builder;
+using SV2.Database.Managers;
+
+Defines.Load();
 
 await VoopAI.Main();
 

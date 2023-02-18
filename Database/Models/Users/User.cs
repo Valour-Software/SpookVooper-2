@@ -46,10 +46,18 @@ public class SVUser : BaseEntity
 
     public DateTime LastSentMessage { get; set; }
 
+    public DateTime LastMoved { get; set; }
+
     [NotMapped]
     public float Xp => MessageXp + ForumXp;
 
     public override EntityType EntityType => EntityType.User;
+
+    public async ValueTask<List<PlanetRole>> GetValourRolesAsync()
+    {
+        var member = await PlanetMember.FindAsyncByUser(ValourId, VoopAI.VoopAI.PlanetId);
+        return await member.GetRolesAsync();
+    }
 
     public static string RemoveWhitespace(string input)
     {
@@ -147,6 +155,7 @@ public class SVUser : BaseEntity
         Rank = Rank.Unranked;
         Created = DateTime.UtcNow;
         Joined = DateTime.UtcNow;
+        LastMoved = DateTime.UtcNow.AddDays(-100);
     }
 
     public async Task<IEnumerable<Group>> GetJoinedGroupsAsync()

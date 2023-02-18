@@ -17,6 +17,7 @@ public static class GroupPermissions
         {
                 FullControl,
                 CreateRole,
+                DeleteRole,
                 AddMembersToRoles,
                 RemoveMembersFromRoles,
                 ManageInvites,

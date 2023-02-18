@@ -7,6 +7,7 @@
     <RootNamespace>SV2</RootNamespace>
     <EnablePreviewFeatures>True</EnablePreviewFeatures>
     <Version>0.0.1</Version>
+	<AssemblyName>SV2</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

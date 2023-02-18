@@ -62,6 +62,10 @@ public abstract class BaseEntity
 
     public async Task DoIncomeTax()
     {
+        // districts do not pay income tax
+        if (EntityType == EntityType.Group && DBCache.Get<District>(Id) is not null)
+            return;
+
         if (TaxAbleBalance <= 0.0m)
             return;
 

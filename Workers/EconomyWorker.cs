@@ -1,7 +1,10 @@
+using IdGen;
 using SV2.Database;
+using SV2.Database.Managers;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Users;
 using SV2.Web;
+using System.Data;
 
 namespace SV2.Workers
 {
@@ -27,11 +30,20 @@ namespace SV2.Workers
                     {
                         try
                         {
+                            // do district funding
+                            foreach(var district in DBCache.GetAll<District>())
+                            {
+                                decimal amount = (decimal)Defines.NDistrict[NDistrict.DISTRICT_FUNDING_BASE];
+                                amount += (decimal)((double)district.Citizens.Count * Defines.NDistrict[NDistrict.DISTRICT_FUNDING_PER_CITIZEN]);
+                                Transaction tran = new Transaction(100, district.GroupId, amount/30/24, TransactionType.FreeMoney, $"Imperial District Funding");
+                                TaskResult result = await tran.Execute();
+                            }
                             List<GroupRole>? roles = DBCache.GetAll<GroupRole>().ToList();
 
                             foreach(GroupRole role in roles) {
                                 if (role.Salary > 0.1m) {
                                     TaxCreditPolicy taxcredit = DBCache.GetAll<TaxCreditPolicy>().FirstOrDefault(x => x.DistrictId == role.Group.DistrictId && x.taxCreditType == TaxCreditType.Employee);
+                                    decimal amount = 0.00m;
                                     foreach(long Id in role.MembersIds) {
                                         Transaction tran = new Transaction(role.GroupId, Id, role.Salary, TransactionType.Paycheck, $"{role.Name} Salary");
                                         TaskResult result = await tran.Execute();
@@ -40,9 +52,13 @@ namespace SV2.Workers
                                             break;
                                         }
                                         if (taxcredit is not null) {
-                                            Transaction TaxCreditTran = new Transaction(taxcredit.DistrictId!, role.GroupId, role.Salary*taxcredit.Rate, TransactionType.TaxCreditPayment, $"Employee Tax Credit Payment");
-                                            TaxCreditTran.NonAsyncExecute();
+                                            amount += role.Salary;
                                         }
+                                    }
+                                    if (taxcredit is not null && amount > 0.00m)
+                                    {
+                                        Transaction TaxCreditTran = new Transaction(taxcredit.DistrictId!, role.GroupId, amount * taxcredit.Rate, TransactionType.TaxCreditPayment, $"Employee Tax Credit Payment");
+                                        TaxCreditTran.NonAsyncExecute();
                                     }
                                 }  
                             }
@@ -108,7 +124,11 @@ namespace SV2.Workers
                     _logger.LogInformation("Economy Worker running at: {time}", DateTimeOffset.Now);
                     // for right now, just save cache to database every 2 minutes
                     await DBCache.SaveAsync();
+#if DEBUG
+                    await Task.Delay(10_000, stoppingToken);
+#else
                     await Task.Delay(120_000, stoppingToken);
+#endif
                 }
 
                 _logger.LogInformation("Economy Worker task stopped at: {time}", DateTimeOffset.Now);

@@ -8,7 +8,9 @@ namespace SV2.Database.Managers;
 
 public enum NDistrict
 {
-    BASE_MOBILIZATION_SPEED
+    BASE_MOBILIZATION_SPEED,
+    DISTRICT_FUNDING_BASE,
+    DISTRICT_FUNDING_PER_CITIZEN
 }
 
 public enum NPops
@@ -97,7 +99,7 @@ public class Define<T> where T : struct
 
 public static class Defines
 {
-    public static Define<NDistrict> NDistricts = new();
+    public static Define<NDistrict> NDistrict = new();
     public static Define<NPops> NPops = new();
     public static Define<NProduction> NProduction = new();
     public static Define<Military> NMilitary = new();
@@ -113,11 +115,11 @@ public static class Defines
             string text = "";
             try
             {
-                text = File.ReadAllText("../../../../Database/Managers/Data/Defines.lua");
+                text = File.ReadAllText("../../../../Managers/Data/Defines.lua");
             }
             catch
             {
-                text = File.ReadAllText("../Database/Managers/Data/Defines.lua");
+                text = File.ReadAllText("Managers/Data/Defines.lua");
             }
             //var data  = LuaHandler.PreProcessLua(text);
             //File.WriteAllText("../../../../Database/LuaDump.lua", text);
@@ -125,7 +127,7 @@ public static class Defines
 
             var table = (LuaTable)lua["NDistrict"];
             foreach (string key in table.Keys)
-                NDistricts[Enum.Parse<NDistrict>(key)] = Convert.ToDouble(table[key]);
+                NDistrict[Enum.Parse<NDistrict>(key)] = Convert.ToDouble(table[key]);
 
             table = (LuaTable)lua["NPops"];
             foreach (string key in table.Keys)

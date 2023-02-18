@@ -6,6 +6,7 @@ using Valour.Api.Models;
 using Valour.Shared.Authorization;
 using Valour.Api.Models.Messages.Embeds.Styles;
 using System.Xml.Linq;
+using Valour.Api.Client;
 
 namespace SV2.VoopAI;
 class VoopAI
@@ -81,7 +82,7 @@ class VoopAI
         return "ffffff";
     }
 
-    public static PlanetRole CreateRole(string name, byte r, byte g, byte b)
+    public static async Task<PlanetRole> CreateRoleAsync(string name, byte r, byte g, byte b)
     {
         return new PlanetRole()
         {
@@ -96,6 +97,7 @@ class VoopAI
             Red = r,
             Green = g,
             Blue = b,
+            Position = (await ValourCache.Get<Planet>(PlanetId).GetRolesAsync()).Count+1
         };
     }
 
@@ -109,7 +111,7 @@ class VoopAI
             if (!RankRoleIds.ContainsKey(name))
             {
                 var color = new Color(GetRankColor(Enum.Parse<Rank>(name)));
-                var role = CreateRole(name, color.Red, color.Green, color.Blue);
+                var role = await CreateRoleAsync(name, color.Red, color.Green, color.Blue);
                 var result = await Valour.Api.Items.Item.CreateAsync(role);
             }
         }
@@ -120,7 +122,7 @@ class VoopAI
         {
             if (!RankRoleIds.ContainsKey(name + " District"))
             {
-                var role = CreateRole(name + " District", 255, 255, 255);
+                var role = await CreateRoleAsync(name + " District", 255, 255, 255);
                 var result = await Valour.Api.Items.Item.CreateAsync(role);
             }
         }

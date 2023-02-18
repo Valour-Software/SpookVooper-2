@@ -2,17 +2,18 @@
 using SV2.Models;
 using SV2.Managers;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Valour.Api.Models;
+using SV2.Helpers;
+using SV2.Extensions;
 
 namespace SV2.Controllers
 {
-    [Route("/District")]
-    public class DistrictController : Controller
+    public class DistrictController : SVController
     {
         private readonly ILogger<DistrictController> _logger;
         private readonly VooperDB _dbctx;
-        
-        [TempData]
-        public string StatusMessage { get; set; }
 
         public DistrictController(ILogger<DistrictController> logger,
             VooperDB dbctx)
@@ -21,7 +22,7 @@ namespace SV2.Controllers
             _dbctx = dbctx;
         }
 
-        [HttpGet("View/{name}")]
+        [HttpGet("/District/View/{name}")]
         public IActionResult View(string name)
         {
             District district = DBCache.GetAll<District>().FirstOrDefault(x => x.Name == name);
@@ -119,6 +120,30 @@ namespace SV2.Controllers
 
             StatusMessage = $"Successfully edited policies.";
             return Redirect($"/District/EditPolicies?Id={district.Id}");
+        }
+
+        [UserRequired]
+        [HttpGet]
+        public IActionResult MoveDistrict(long id)
+        {
+            District district = DBCache.Get<District>(id);
+
+            if (district is null)
+                return RedirectBack($"Error: Could not find {district.Name}!");
+
+            SVUser user = HttpContext.GetUser();
+
+            var daysWaited = Math.Round(DateTime.Now.Subtract(user.LastMoved).TotalDays, 0);
+
+            if (daysWaited < 60)
+                return RedirectBack($"Error: You must wait another {60 - daysWaited} days to move again!");
+
+            user.DistrictId = district.Id;
+
+            if (user.DistrictId is not null)
+                user.LastMoved = DateTime.UtcNow;
+
+            return RedirectBack($"You have moved to {district.Name}!");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

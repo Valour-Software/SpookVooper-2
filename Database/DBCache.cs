@@ -177,6 +177,7 @@ public static class DBCache
     {
         using var dbctx = VooperDB.DbFactory.CreateDbContext();
         dbctx.Groups.UpdateRange(GetAll<Group>());
+        dbctx.GroupRoles.UpdateRange(GetAll<GroupRole>());
         dbctx.Users.UpdateRange(GetAll<SVUser>());
         dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
         dbctx.TradeItems.UpdateRange(GetAll<TradeItem>());
