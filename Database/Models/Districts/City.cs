@@ -12,25 +12,30 @@ public class City
     [ForeignKey(nameof(DistrictId))]
     public District District { get; set; }
 
+    public long ProvinceId { get; set; }
+
+    [ForeignKey(nameof(ProvinceId))]
+    public Province Province { get; set; }
+
     public long Population { get; set; }
 
     public int BuildingSlots { get; set; }
 
-    [NotMapped]
+    //[NotMapped]
     // this is generated upon server start
-    public List<DistrictModifier> Modifiers { get; set; }
+    //public List<DistrictModifier> Modifiers { get; set; }
 
-    public DistrictModifier GetModifier(DistrictModifierType type) => Modifiers.First(x => x.ModifierType == type);
+    //public DistrictModifier GetModifier(DistrictModifierType type) => Modifiers.First(x => x.ModifierType == type);
 
     public async Task HourlyTick()
     {
         double BirthRate = Defines.NCity["BASE_BIRTH_RATE"];
-        BirthRate += GetModifier(DistrictModifierType.MonthlyBirthRate).Amount;
-        BirthRate *= GetModifier(DistrictModifierType.MonthlyBirthRateFactor).Amount + 1;
+        BirthRate += District.GetModifier(DistrictModifierType.MonthlyBirthRate).Amount;
+        BirthRate *= District.GetModifier(DistrictModifierType.MonthlyBirthRateFactor).Amount + 1;
 
         double DeathRate = Defines.NCity["BASE_DEATH_RATE"];
-        DeathRate += GetModifier(DistrictModifierType.MonthlyDeathRate).Amount;
-        DeathRate *= GetModifier(DistrictModifierType.MonthlyDeathRateFactor).Amount + 1;
+        DeathRate += District.GetModifier(DistrictModifierType.MonthlyDeathRate).Amount;
+        DeathRate *= District.GetModifier(DistrictModifierType.MonthlyDeathRateFactor).Amount + 1;
 
         double PopulationGrowth = BirthRate * Population;
         PopulationGrowth -= DeathRate * Population;
@@ -39,5 +44,8 @@ public class City
         // get hourly rate
         PopulationGrowth = PopulationGrowth / 30 / 24;
         Population += (long)Math.Ceiling(PopulationGrowth);
+
+        // update building slot count
+        BuildingSlots = (int)(Defines.NCity["BASE_BUILDING_SLOTS"] + Math.Ceiling((Math.Pow(Population, Defines.NCity["BUILDING_SLOTS_POPULATION_EXPONENT"]) / Defines.NCity["BUILDING_SLOTS_FACTOR"])));
     }
 }

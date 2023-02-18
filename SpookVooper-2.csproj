@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <Folder Include="Lua\Scripting\" />
-    <Folder Include="NonDBO\" />
   </ItemGroup>
 
 </Project>

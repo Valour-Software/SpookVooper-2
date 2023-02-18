@@ -31,6 +31,9 @@ public class District
     public List<City> Cities { get; set; }
 
     [NotMapped]
+    public List<SVUser> Citizens => DBCache.GetAll<SVUser>().Where(x => x.DistrictId == Id).ToList();
+
+    [NotMapped]
     public long TotalPopulation
     {
         get
@@ -55,6 +58,26 @@ public class District
 
     [Column(TypeName = "jsonb")]
     public List<DistrictModifier> Modifiers { get; set; }
+
+    [NotMapped]
+    [JsonIgnore]
+    public string Color => Name switch
+    {
+        "Lanatia" => "F4B7FD",
+        "New Vooperis" => "FEEAB7",
+        "Avalon" => "CAFDB8",
+        "Elysian Katonia" => "B8B7FD",
+        "Ardenti Terra" => "B7BCFC",
+        "Kogi" => "B6EEFD",
+        "Landing Cove" => "FDB7B7",
+        "New Avalon" => "D3FCB6",
+        "New Spudland" => "EAB7FC",
+        "Novastella" => "B7FDE5",
+        "Old King" => "C0FDB7",
+        "San Vooperisco" => "FAFDB8",
+        "Thesonica" => "FDD9B7",
+        "Voopmont" => "FFFFFF",
+    };
 
     public static District Find(long id)
     {
