@@ -141,7 +141,6 @@ public abstract class BaseEntity
                 _policy.Collected += totaldue;
             }
         }
-
     }
 
     public bool HasPermission(BaseEntity entity, GroupPermission permission)

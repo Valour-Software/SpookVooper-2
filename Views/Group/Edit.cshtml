@@ -160,7 +160,7 @@
         @foreach (GroupRole role in DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Model.Id).OrderByDescending(x => x.Authority))
         {
             <div class="col-3">
-                <a>@role.Name</a>
+                <a style="color: #@role.Color">@role.Name</a>
             </div>
             <div class="col-3">
                 <p>Members: @role.MembersIds.Count()</p>

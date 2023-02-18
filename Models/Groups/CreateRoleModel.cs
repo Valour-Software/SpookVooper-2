@@ -45,7 +45,7 @@ public class CreateRoleModel
         "as there are no limits to the roles created. This also lets you set the default role.")]
     public bool CreateRole { get; set; }
 
-    [Display(Name = "Create Role", Description = "The ability to delete a role. This is a most powerful and dangerous permission")]
+    [Display(Name = "Delete Role", Description = "The ability to delete a role. This is a most powerful and dangerous permission")]
     public bool DeleteRole { get; set; }
 
     [Display(Name = "Add To Role", Description = "The ability to add a entity to a role.")]

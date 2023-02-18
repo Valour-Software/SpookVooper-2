@@ -253,7 +253,7 @@ public class Group : BaseEntity, IHasOwner
         if (target is null)
             return new TaskResult(false, $"Error: Target user does not exist!");
 
-        if (HasPermission(caller, permission))
+        if (!HasPermission(caller, permission))
             return new TaskResult(false, $"Error: You don't have permission to do that!");
 
         return new TaskResult(true, $"Validated!");

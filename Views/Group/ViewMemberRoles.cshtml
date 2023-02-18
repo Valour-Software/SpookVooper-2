@@ -11,6 +11,10 @@
 
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
+        <a asp-controller="Group" asp-action="Edit" asp-route-id="@Model.Group.Id">
+            <button class="btn btn-primary">Go Back</button>
+        </a>
+
         @if (Model == null)
         {
             <h1>Role not found!</h1>
@@ -39,7 +43,7 @@
 
             <h2 style="text-align:center">Other roles</h2>
             <div class="row srow">
-                @foreach (GroupRole role in Model.Group.Roles.Where(x => x.MembersIds.Contains(user.Id)))
+                @foreach (GroupRole role in Model.Group.Roles.Where(x => !x.MembersIds.Contains(user.Id)))
                 {
                     <div class="col-6">
                         <h4>@role.Name</h4>

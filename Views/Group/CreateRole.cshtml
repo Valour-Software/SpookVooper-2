@@ -1,8 +1,14 @@
 ﻿@model SV2.Models.Groups.CreateRoleModel
 @{
     ViewData["Title"] = "Add Role";
-    Group group = DBCache.Get<Group>(Model.GroupId);
+    Group group = DBCache.Get<Group>(Model.GroupId)!;
 }
+
+<style>
+    .form-text {
+        display: block;
+    }
+</style>
 
 <div class="container vw-100">
     <div class="col-12">
@@ -28,10 +34,10 @@
                         <span asp-validation-for="Color" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Weight"></label>
-                        <span asp-description-for="Weight" class="form-text" style="color:#888888" />
-                        <input asp-for="Weight" class="form-control" />
-                        <span asp-validation-for="Weight" class="text-danger"></span>
+                        <label asp-for="Authority"></label>
+                        <span asp-description-for="Authority" class="form-text" style="color:#888888" />
+                        <input asp-for="Authority" class="form-control" />
+                        <span asp-validation-for="Authority" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Salary"></label>
@@ -50,6 +56,12 @@
                         <span asp-validation-for="CreateRole" class="text-danger"></span>
                     </div>
                     <div class="form-group">
+                        <input type="checkbox" asp-for="DeleteRole" class="form-check-inline" />
+                        <label asp-for="DeleteRole"></label>
+                        <span asp-description-for="DeleteRole" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="DeleteRole" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
                         <input type="checkbox" asp-for="AddRole" class="form-check-inline" />
                         <label asp-for="AddRole"></label>
                         <span asp-description-for="AddRole" class="form-text" style="color:#888888" />
@@ -62,40 +74,22 @@
                         <span asp-validation-for="RemoveRole" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <input type="checkbox" asp-for="Invite" class="form-check-inline" />
-                        <label asp-for="Invite"></label>
-                        <span asp-description-for="Invite" class="form-text" style="color:#888888" />
-                        <span asp-validation-for="Invite" class="text-danger"></span>
+                        <input type="checkbox" asp-for="ManageInvites" class="form-check-inline" />
+                        <label asp-for="ManageInvites"></label>
+                        <span asp-description-for="ManageInvites" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="ManageInvites" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <input type="checkbox" asp-for="Uninvite" class="form-check-inline" />
-                        <label asp-for="Uninvite"></label>
-                        <span asp-description-for="Uninvite" class="form-text" style="color:#888888" />
-                        <span asp-validation-for="Uninvite" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="checkbox" asp-for="Kick" class="form-check-inline" />
-                        <label asp-for="Kick"></label>
-                        <span asp-description-for="Kick" class="form-text" style="color:#888888" />
-                        <span asp-validation-for="Kick" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="checkbox" asp-for="Ban" class="form-check-inline" />
-                        <label asp-for="Ban"></label>
-                        <span asp-description-for="Ban" class="form-text" style="color:#888888" />
-                        <span asp-validation-for="Ban" class="text-danger"></span>
+                        <input type="checkbox" asp-for="ManageMembership" class="form-check-inline" />
+                        <label asp-for="ManageMembership"></label>
+                        <span asp-description-for="ManageMembership" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="ManageMembership" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <input type="checkbox" asp-for="Edit" class="form-check-inline" />
                         <label asp-for="Edit"></label>
                         <span asp-description-for="Edit" class="form-text" style="color:#888888" />
                         <span asp-validation-for="Edit" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="checkbox" asp-for="Description" class="form-check-inline" />
-                        <label asp-for="Description"></label>
-                        <span asp-description-for="Description" class="form-text" style="color:#888888" />
-                        <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <input type="checkbox" asp-for="Post" class="form-check-inline" />
@@ -108,12 +102,6 @@
                         <label asp-for="Eco"></label>
                         <span asp-description-for="Eco" class="form-text" style="color:#888888" />
                         <span asp-validation-for="Eco" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="checkbox" asp-for="Plots" class="form-check-inline" />
-                        <label asp-for="Plots"></label>
-                        <span asp-description-for="Plots" class="form-text" style="color:#888888" />
-                        <span asp-validation-for="Plots" class="text-danger"></span>
                     </div>
                     @if (group.Flags.Contains(GroupFlag.News))
                     {

@@ -16,7 +16,7 @@ public class GroupRole
     public string Name { get; set; }
 
     // this role's permission value
-    public ulong PermissionValue { get; set; }
+    public long PermissionValue { get; set; }
 
     public List<long> MembersIds { get; set; }
 
@@ -50,17 +50,21 @@ public class GroupRole
 
     }
 
-    public List<string> GetPermissions()
+    public string GetPermissions()
     {
-        List<string> strings = new();
-        foreach (GroupPermission perm in Enum.GetValues(typeof(GroupPermissions)))
+        string output = "";
+        bool First = true;
+        foreach (GroupPermission perm in GroupPermissions.Permissions)
         {
             if ((perm.Value & PermissionValue) == perm.Value)
             {
-                strings.Add(perm.Name);
+                if (!First)
+                    output += ", ";
+                output += perm.Name;
+                First = false;
             }
         }
-        return strings;
+        return output;
     }
 
     public GroupRole(string name, long groupid, decimal salary, int authority)

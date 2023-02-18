@@ -9,19 +9,20 @@ using SV2.Extensions;
 using Microsoft.AspNetCore.Identity;
 using SV2.Models.Groups;
 using Valour.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SV2.Controllers;
 
 public class GroupController : SVController
 {
     private readonly ILogger<GroupController> _logger;
-    
-    [TempData]
-    public string StatusMessage { get; set; }
 
-    public GroupController(ILogger<GroupController> logger)
+    private readonly VooperDB _dbctx;
+
+    public GroupController(ILogger<GroupController> logger, VooperDB dbctx)
     {
         _logger = logger;
+        _dbctx = dbctx;
     }
 
     public IActionResult Index()
@@ -92,6 +93,7 @@ public class GroupController : SVController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [UserRequired]
     public IActionResult Edit(Group model)
     {
         //if (!ModelState.IsValid)
@@ -99,12 +101,7 @@ public class GroupController : SVController
         //    return View(model);
         //}
 
-        SVUser? user = UserManager.GetUser(HttpContext);
-
-        if (user is null) 
-        {
-            return Redirect("/account/login");
-        }
+        SVUser user = HttpContext.GetUser();
 
         Group prevgroup = Group.Find(model.Id)!;
 
@@ -114,9 +111,10 @@ public class GroupController : SVController
             return RedirectToAction("Index", controllerName: "Home");
         }
 
-        if (model.Name != prevgroup.Name) 
+        if (model.Name != prevgroup.Name)
         {
-            if (DBCache.GetAll<Group>().Any(x => x.Name == model.Name)) {
+            if (DBCache.GetAll<Group>().Any(x => x.Name == model.Name))
+            {
                 StatusMessage = $"Error: Name {model.Name} is already taken!";
                 return Redirect($"/group/edit/{prevgroup.Id}");
             }
@@ -146,6 +144,99 @@ public class GroupController : SVController
         StatusMessage = $"Successfully edited {prevgroup.Name}!";
 
         return Redirect($"/group/view/{prevgroup.Id}");
+    }
+
+    [HttpGet]
+    [UserRequired]
+    public async Task<IActionResult> CreateRole(long groupid, long roleid)
+    {
+        Group group = Group.Find(groupid);
+
+        var user = HttpContext.GetUser();
+
+        if (!group.HasPermission(user, GroupPermissions.CreateRole))
+            return RedirectBack("You lack the CreateRole permission!");
+
+        GroupRole role = DBCache.Get<GroupRole>(roleid);
+
+        CreateRoleModel model;
+
+        if (role is null)
+        {
+            model = new CreateRoleModel()
+            {
+                GroupId = group.Id
+            };
+        }
+        else
+        {
+            model = CreateRoleModel.FromExisting(role);
+        }
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [UserRequired]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateRole(CreateRoleModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        Group group = Group.Find(model.GroupId);
+        var user = HttpContext.GetUser();
+
+        if (!group.HasPermission(user, GroupPermissions.CreateRole))
+            return RedirectBack("You lack the CreateRole permission!");
+
+        long permcode = 0;
+
+        if (model.CreateRole) { permcode |= GroupPermissions.CreateRole.Value; }
+        if (model.DeleteRole) { permcode |= GroupPermissions.DeleteRole.Value; }
+        if (model.RemoveRole) { permcode |= GroupPermissions.RemoveMembersFromRoles.Value; }
+        if (model.AddRole) { permcode |= GroupPermissions.AddMembersToRoles.Value; }
+        if (model.ManageInvites) { permcode |= GroupPermissions.ManageInvites.Value; }
+        if (model.ManageMembership) { permcode |= GroupPermissions.ManageMembership.Value; }
+        if (model.Edit) { permcode |= GroupPermissions.Edit.Value; }
+        if (model.Post) { permcode |= GroupPermissions.Post.Value; }
+        if (model.Eco) { permcode |= GroupPermissions.Eco.Value; }
+        if (model.News) { permcode |= GroupPermissions.News.Value; }
+
+        if (model.RoleId == 0)
+            model.RoleId = IdManagers.GeneralIdGenerator.Generate();
+
+        GroupRole role = DBCache.Get<GroupRole>(model.RoleId);
+
+        if (role is null)
+        {
+            role = new GroupRole()
+            {
+                Name = model.Name,
+                Color = model.Color,
+                GroupId = model.GroupId,
+                PermissionValue = permcode,
+                Id = model.RoleId,
+                Authority = model.Authority,
+                Salary = model.Salary,
+                MembersIds = new()
+            };
+            DBCache.Put(role.Id, role);
+            _dbctx.GroupRoles.Add(role);
+            await _dbctx.SaveChangesAsync();
+        }
+
+        else
+        {
+            role.Name = model.Name;
+            role.Color = model.Color;
+            role.Salary = model.Salary;
+            role.PermissionValue = permcode;
+            role.Authority = model.Authority;
+        }
+
+        StatusMessage = $"Successfully created role {role.Name}";
+        return Redirect($"/group/edit/{group.Id}");
     }
 
     [UserRequired]

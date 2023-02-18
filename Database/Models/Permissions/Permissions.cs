@@ -48,7 +48,7 @@ public static class GroupPermissions
 
 public class GroupPermission : Permission
 {
-    public GroupPermission(ulong value, string name, string description) : base(value, name, description)
+    public GroupPermission(long value, string name, string description) : base(value, name, description)
     {
     }
 }
@@ -62,7 +62,7 @@ public class Permission
     /// <summary>
     /// Permission node to have complete control
     /// </summary>
-    public const ulong FULL_CONTROL = ulong.MaxValue;
+    public const long FULL_CONTROL = long.MaxValue;
 
     /// <summary>
     /// The name of this permission
@@ -77,12 +77,12 @@ public class Permission
     /// <summary>
     /// The value of this permission
     /// </summary>
-    public ulong Value { get; set; }
+    public long Value { get; set; }
 
     /// <summary>
     /// Initializes the permission
     /// </summary>
-    public Permission(ulong value, string name, string description)
+    public Permission(long value, string name, string description)
     {
         this.Name = name;
         this.Description = description;
@@ -92,7 +92,7 @@ public class Permission
     /// <summary>
     /// Returns whether the given code includes the given permission
     /// </summary>
-    public static bool HasPermission(ulong code, Permission permission)
+    public static bool HasPermission(long code, Permission permission)
     {
         // Case if full control is granted
         if (code == FULL_CONTROL) return true;
@@ -104,9 +104,9 @@ public class Permission
     /// <summary>
     /// Creates and returns a permission code from given permissions 
     /// </summary>
-    public static ulong CreateCode(params Permission[] permissions)
+    public static long CreateCode(params Permission[] permissions)
     {
-        ulong code = 0x00;
+        long code = 0x00;
 
         foreach (Permission permission in permissions)
         {
@@ -136,10 +136,10 @@ public struct PermissionCode
     // If the mask but is 1, then if the code bit is 1 it is true. Otherwise it is false.
     // This basically compresses 64 booleans (64 bytes) into 2 ulongs (16 bytes)
 
-    public ulong Code { get; set; }
-    public ulong Mask { get; set; }
+    public long Code { get; set; }
+    public long Mask { get; set; }
 
-    public PermissionCode(ulong code, ulong mask)
+    public PermissionCode(long code, long mask)
     {
         this.Code = code;
         this.Mask = mask;
