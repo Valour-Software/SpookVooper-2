@@ -134,8 +134,6 @@
 
                 <br />
                 <br />
-                <br />
-                <br />
 
                 if (Model.Description != null)
                 {
@@ -143,8 +141,40 @@
                     <p class="p" style="font-size:large">@Html.Raw(MarkdownManager.GetHtml(Model.Description))</p>
                 }
 
-                <br />
-                <hr />
+                <center>
+                    <div class="window" id="window">
+                        @{
+                            SV2.Models.Map.DistrictMap mapdata = MapController.DistrictMaps.First(x => x.DistrictId == Model.Id);
+                        }
+                        <svg id="svg" viewBox="@(mapdata.LowestXPos-10) @(mapdata.LowestYPos) @((mapdata.HighestXPos-mapdata.LowestXPos)+30) @((mapdata.HighestYPos-mapdata.LowestYPos)+25)"
+                             style="/* transform: scale(0.75);transform-origin: 50% 0%; */width: 75%;height: 75%;">
+                            <style>
+                                path {
+                                    fill: white;
+                                    stroke: black;
+                                    stroke-width: 0.5px;
+                                }
+
+                                path:hover {
+                                    filter: brightness(0.75);
+                                }
+                            </style>
+                            @foreach (var province in mapdata.Provinces)
+                            {
+                                <a href="/Province/View/@province.Id">
+                                    @if (false)
+                                    {
+                                        <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;stroke: #@province.District.Color !important" class="province"></path>
+                                    }
+                                    else
+                                    {
+                                        <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;" class="province"></path>
+                                    }
+                                </a>
+                            }
+                        </svg>
+                    </div>
+                </center>
             } 
             else
             {

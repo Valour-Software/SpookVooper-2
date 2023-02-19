@@ -9,3 +9,13 @@ public class MapState
     public string D { get; set; }
     public bool IsOcean { get; set; }
 }
+
+public class DistrictMap
+{
+    public long DistrictId { get; set; }
+    public int LowestXPos { get; set; }
+    public int LowestYPos { get; set; }
+    public int HighestXPos { get; set; }
+    public int HighestYPos { get; set; }
+    public List<MapState> Provinces { get; set; }
+}

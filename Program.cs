@@ -152,4 +152,6 @@ app.MapControllerRoute(
 await VooperDB.Startup();
 await ResourceManager.Load();
 
+MapController.LoadMap();
+
 app.Run();
