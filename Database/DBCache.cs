@@ -157,7 +157,9 @@ public static class DBCache
         foreach(Province province in dbctx.Provinces) {
             DBCache.Put<Province>(province.Id, province);
         }
-        foreach(Recipe recipe in dbctx.Recipes) {
+        foreach (var _obj in dbctx.Cities)
+            DBCache.Put(_obj.Id, _obj);
+        foreach (Recipe recipe in dbctx.Recipes) {
             DBCache.Put<Recipe>(recipe.Id, recipe);
         }
         foreach(Minister minister in dbctx.Ministers) {
@@ -186,6 +188,7 @@ public static class DBCache
         dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
         dbctx.Districts.UpdateRange(GetAll<District>());
         dbctx.Provinces.UpdateRange(GetAll<Province>());
+        dbctx.Cities.UpdateRange(GetAll<City>());
         dbctx.Recipes.UpdateRange(GetAll<Recipe>());
         dbctx.Ministers.UpdateRange(GetAll<Minister>());
         dbctx.Senators.UpdateRange(GetAll<Senator>());

@@ -8,6 +8,9 @@ public class MapState
 
     public string D { get; set; }
     public bool IsOcean { get; set; }
+
+    public int XPos { get; set; }
+    public int YPos { get; set; }
 }
 
 public class DistrictMap

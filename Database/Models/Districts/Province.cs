@@ -29,6 +29,17 @@ public class Province
     [ForeignKey(nameof(DistrictId))]
     public District District { get; set; }
 
+    public long? CityId { get; set; }
+
+    public City? City
+    {
+        get
+        {
+            if (CityId is null) return null;
+            return DBCache.Get<City>(CityId);
+        }
+    }
+
     public IEnumerable<BuildingBase> GetBuildings()
     {
         List<BuildingBase> buildings = new();

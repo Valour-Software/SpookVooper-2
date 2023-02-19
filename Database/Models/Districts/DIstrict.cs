@@ -27,8 +27,8 @@ public class District
     [InverseProperty("District")]
     public List<Province> Provinces { get; set; }
 
-    [InverseProperty("District")]
-    public List<City> Cities { get; set; }
+    [NotMapped]
+    public List<City> Cities => DBCache.GetAll<City>().Where(x => x.DistrictId == Id).ToList();
 
     [NotMapped]
     public List<SVUser> Citizens => DBCache.GetAll<SVUser>().Where(x => x.DistrictId == Id).ToList();

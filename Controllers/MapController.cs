@@ -25,6 +25,7 @@ public class MapController : Controller
 
     public static void LoadMap()
     {
+        using var dbctx = VooperDB.DbFactory.CreateDbContext();
         string data = System.IO.File.ReadAllText("Managers/Data/dystopia.json");
         var mapdata = JsonSerializer.Deserialize<MapDataJson>(data);
 
@@ -91,6 +92,8 @@ public class MapController : Controller
                 var posinfo = state.D.Split(" ");
                 int xpos = (int)double.Parse(posinfo[1]);
                 int ypos = (int)double.Parse(posinfo[2]);
+                state.XPos = xpos;
+                state.YPos = ypos;
 
                 if (districtmapdata.LowestXPos > xpos)
                     districtmapdata.LowestXPos = xpos;
@@ -122,11 +125,33 @@ public class MapController : Controller
                     HighestXPos = 0,
                 };
 
-                districtmapdata.Provinces.Add(districtstate);
+                districtmapdata.Provinces.Add(state);
 
                 DistrictMaps.Add(districtmapdata);
             }
+
+            var dbprovince = DBCache.Get<Province>(state.Id);
+            if (dbprovince is null)
+            {
+                var district = DBCache.Get<District>(state.DistrictId);
+                dbprovince = new()
+                {
+                    DistrictId = state.DistrictId,
+                    Id = state.Id,
+                    Name = $"Province {state.Id}"
+                };
+                DBCache.Put(dbprovince.Id, dbprovince);
+                dbctx.Provinces.Add(dbprovince);
+                //district.Provinces.Add(dbprovince);
+            }
+            else
+            {
+                dbprovince.DistrictId = districtstate.DistrictId;
+                dbprovince.District = districtstate.District;
+            }
         }
+        dbctx.SaveChanges();
+
         MapStates = _mapStates;
     }
 

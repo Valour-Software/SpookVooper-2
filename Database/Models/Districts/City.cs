@@ -1,23 +1,27 @@
 ﻿using SV2.Database.Managers;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SV2.Database.Models.Districts;
 
 public class City
 {
+    [Key]
     public long Id { get; set; }
     public string Name { get; set; }
     public long DistrictId { get; set; }
 
-    [ForeignKey(nameof(DistrictId))]
-    public District District { get; set; }
+    [NotMapped]
+    public District District => DBCache.Get<District>(DistrictId);
 
     public long ProvinceId { get; set; }
 
-    [ForeignKey(nameof(ProvinceId))]
-    public Province Province { get; set; }
+    [NotMapped]
+    public Province Province => DBCache.Get<Province>(ProvinceId);
 
     public long Population { get; set; }
+
+    public bool IsCapitalCity { get; set; }
 
     public int BuildingSlots { get; set; }
 
