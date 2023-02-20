@@ -6,7 +6,7 @@ namespace SV2.Database.Models.Districts.Modifiers;
 /// </summary>
 public enum DistrictModifierType 
 {
-    MiningProductionFactor,
+    MiningThroughputFactor,
     SmeltingEfficiency,
     MonthlyBirthRate,
     MonthlyDeathRate,
@@ -14,13 +14,13 @@ public enum DistrictModifierType
     MonthlyDeathRateFactor,
     MineQuantityCap,
     MineQuantityGrowthRateFactor,
-    MineProductionFactor,
+    MineThroughputFactor,
     FarmQuantityCap,
     FarmQuantityGrowthRateFactor,
-    FarmProductionFactor,
+    FarmThroughputFactor,
     FactoryQuantityCap,
     FactoryQuantityGrowthRateFactor,
-    FactoryProductionFactor,
+    FactoryThroughputFactor,
     FactoryEfficiencyFactor,
     FactoryEfficiency,
     PopulationGrowthFactor,
@@ -34,5 +34,7 @@ public enum DistrictModifierType
     ArmyMoraleFactor,
     DivisionXpGainFactor,
     RecruitmentCenterManpowerFactor,
-    AllProducingBuildingThroughputFactor
+    AllProducingBuildingThroughputFactor,
+    BuildingSlotsFactor,
+    BuildingSlotsExponent
 }

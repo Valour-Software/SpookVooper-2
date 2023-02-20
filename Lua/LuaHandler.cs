@@ -8,6 +8,8 @@ using Valour.Api.Nodes;
 using Microsoft.CodeAnalysis;
 using SV2.Database.Models.Buildings;
 using System.Data;
+using SV2.NonDBO;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace SV2.Scripting.Parser;
 
@@ -193,33 +195,62 @@ public static class LuaHandler
         }
     }
 
-    // to be used when we get Valour Items system working
-    /* 
-public static void HandleRecipeFile(string content)
+    public static List<SyntaxModifierNode> HandleModifierNodes(LuaTable table)
     {
-        foreach (var (table, name) in HandleFile(content))
+        var nodes = new List<SyntaxModifierNode>();
+        foreach (string key in table.Keys)
         {
-            var recipe = new BaseRecipe()
+            var levels = key.Split(".").ToList();
+            var node = new SyntaxModifierNode();
+            if (node.DistrictModifierType is not null)
             {
-                Name = name,
-                Perhour = Convert.ToDecimal(table["perhour"])
-            };
-
-            var inputs = (LuaTable)table["inputs"];
-            if (inputs is not null)
-            {
-                foreach (string input in inputs.Keys)
+                node.DistrictModifierType = levels[0] switch
                 {
-                    recipe.Inputs[input.ToTitleCase()] = Convert.ToDecimal(inputs[input]);
-                }
+                    "district" => levels[1] switch
+                    {
+                        "provinces" => levels[2] switch
+                        {
+                            "buildingslotsfactor" => DistrictModifierType.BuildingSlotsFactor,
+                            "buildingslotsexponent" => DistrictModifierType.BuildingSlotsExponent
+                        }
+                    }
+                };
             }
-            var outputs = (LuaTable)table["outputs"];
-            foreach (string output in outputs.Keys)
+            else
             {
-                recipe.Outputs[output.ToTitleCase()] = Convert.ToDecimal(outputs[output]);
+                node.ProvinceModifierType = levels[0] switch
+                {
+                    "provinces" => levels[1] switch
+                    {
+                        "fertilelandfactor" => ProvinceModifierType.FertileLandFactor,
+                        "farms" => levels[2] switch
+                        {
+                            "farmingthroughputfactor" => ProvinceModifierType.FarmThroughputFactor
+                        },
+                        "buildingslotsfactor" => ProvinceModifierType.BuildingSlotsFactor,
+                        "buildingslotsexponent" => ProvinceModifierType.BuildingSlotsExponent
+                    }
+                };
             }
-            ResourceManager.Recipes[recipe.Name] = recipe;
+
+            table[key].Name = "base";
+            var temptable = new LuaTable();
+            temptable.Items["base"] = table[key];
+
+            node.Value = HandleSyntaxExpression(temptable).Body.First();
+
+            nodes.Add(node);
         }
+
+        //var body = HandleSyntaxExpression(table).Body;
+        //int i = 0;
+        // foreach (var node in nodes)
+        // {
+        //     node.Value = body[i];
+        //    i++;
+        //}
+
+        return nodes;
     }
 
     public static ExpressionNode HandleSyntaxExpression(LuaTable table, string parentname = null)
@@ -295,6 +326,50 @@ public static void HandleRecipeFile(string content)
             }
         }
         return expr;
+    }
+
+    public static void HandleProvinceDevelopmentStagesFile(string content)
+    {
+        foreach (var (table, key) in HandleFile(content))
+        {
+            var stage = new ProvinceDevelopmentStage()
+            {
+                Id = key,
+                Name = table["name"].Value,
+                DevelopmentLevelNeeded = Convert.ToInt32(table["development_value_required"].Value),
+                ModifierNodes = HandleModifierNodes((LuaTable)((LuaTable)table)["modifiers"])
+            };
+            GameDataManager.ProvinceDevelopmentStages[stage.Id] = stage;
+        }
+    }
+
+    // to be used when we get Valour Items system working
+    /* 
+    public static void HandleRecipeFile(string content)
+    {
+        foreach (var (table, name) in HandleFile(content))
+        {
+            var recipe = new BaseRecipe()
+            {
+                Name = name,
+                Perhour = Convert.ToDecimal(table["perhour"])
+            };
+
+            var inputs = (LuaTable)table["inputs"];
+            if (inputs is not null)
+            {
+                foreach (string input in inputs.Keys)
+                {
+                    recipe.Inputs[input.ToTitleCase()] = Convert.ToDecimal(inputs[input]);
+                }
+            }
+            var outputs = (LuaTable)table["outputs"];
+            foreach (string output in outputs.Keys)
+            {
+                recipe.Outputs[output.ToTitleCase()] = Convert.ToDecimal(outputs[output]);
+            }
+            ResourceManager.Recipes[recipe.Name] = recipe;
+        }
     }
 
     public static void HandleBuildingFile(string content)

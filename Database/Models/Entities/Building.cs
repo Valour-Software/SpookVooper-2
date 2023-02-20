@@ -61,8 +61,8 @@ public abstract class ProducingBuilding : BuildingBase
         get
         {
             double eff = 1.00 - ((Size * Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]) - Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]);
-            eff += District.GetModifier(DistrictModifierType.FactoryEfficiency).Amount;
-            eff *= 1 + District.GetModifier(DistrictModifierType.FactoryEfficiencyFactor).Amount;
+            eff += District.GetModifierValue(DistrictModifierType.FactoryEfficiency);
+            eff *= 1 + District.GetModifierValue(DistrictModifierType.FactoryEfficiencyFactor);
             return eff;
         }
     }
@@ -78,18 +78,18 @@ public abstract class ProducingBuilding : BuildingBase
     }
 
     [NotMapped]
-    public double ProductionFactor
+    public double ThroughputFactor
     {
         get
         {
             var basevalue = BuildingType switch
             {
-                BuildingType.Farm => 1 + District.GetModifier(DistrictModifierType.FarmProductionFactor).Amount,
-                BuildingType.Mine => 1 + District.GetModifier(DistrictModifierType.MineProductionFactor).Amount,
-                BuildingType.Factory => 1 + District.GetModifier(DistrictModifierType.FactoryProductionFactor).Amount,
+                BuildingType.Farm => 1 + District.GetModifierValue(DistrictModifierType.FarmThroughputFactor),
+                BuildingType.Mine => 1 + District.GetModifierValue(DistrictModifierType.MineThroughputFactor),
+                BuildingType.Factory => 1 + District.GetModifierValue(DistrictModifierType.FactoryThroughputFactor),
                 _ => 0.00
             };
-            return basevalue * (District.GetModifier(DistrictModifierType.AllProducingBuildingThroughputFactor).Amount + 1.00);
+            return basevalue * (District.GetModifierValue(DistrictModifierType.AllProducingBuildingThroughputFactor) + 1.00);
         }
     }
 
@@ -101,9 +101,9 @@ public abstract class ProducingBuilding : BuildingBase
             string type = BuildingType.ToString().ToUpper();
             return Defines.NProduction[$"BASE_{type}_QUANTITY_CAP"] + BuildingType switch
             {
-                BuildingType.Farm => District.GetModifier(DistrictModifierType.FarmQuantityCap).Amount,
-                BuildingType.Mine => District.GetModifier(DistrictModifierType.MineQuantityCap).Amount,
-                BuildingType.Factory => District.GetModifier(DistrictModifierType.FactoryQuantityCap).Amount,
+                BuildingType.Farm => District.GetModifierValue(DistrictModifierType.FarmQuantityCap),
+                BuildingType.Mine => District.GetModifierValue(DistrictModifierType.MineQuantityCap),
+                BuildingType.Factory => District.GetModifierValue(DistrictModifierType.FactoryQuantityCap),
                 _ => 0.00
             };
         }
@@ -116,7 +116,7 @@ public abstract class ProducingBuilding : BuildingBase
         if (useQuantity)
             rate *= Quantity;
 
-        rate *= ProductionFactor;
+        rate *= ThroughputFactor;
         //rate *= Recipe.Perhour;
         return rate;
     }

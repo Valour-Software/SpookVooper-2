@@ -155,7 +155,8 @@ public static class DBCache
             DBCache.Put<Vote>(vote.Id, vote);
         }
         foreach(Province province in dbctx.Provinces) {
-            DBCache.Put<Province>(province.Id, province);
+            province.District = Get<District>(province.DistrictId);
+            Put<Province>(province.Id, province);
         }
         foreach (var _obj in dbctx.Cities)
             DBCache.Put(_obj.Id, _obj);

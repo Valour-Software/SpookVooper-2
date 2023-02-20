@@ -43,7 +43,7 @@ public class Mine : ProducingBuilding
 
         rate *= Quantity;
 
-        rate *= ProductionFactor;
+        rate *= ThroughputFactor;
 
         /*
 

@@ -48,14 +48,19 @@ public enum Military
 
 }
 
-public enum NCity
+public enum NProvince
 {
     BUILDING_SLOTS_FACTOR,
     BASE_BUILDING_SLOTS,
     BUILDING_SLOTS_POPULATION_EXPONENT,
     BASE_BIRTH_RATE,
     BASE_DEATH_RATE,
-    OVERPOPULATION_MODIFIER_EXPONENT
+    OVERPOPULATION_MODIFIER_EXPONENT,
+    BASE_POPULATION_MIN,
+    BASE_POPULATION_MAX,
+    DEVELOPMENT_POPULATION_EXPONENT,
+    DEVELOPMENT_POPULATION_FACTOR,
+    OVERPOPULATION_MODIFIER_BASE
 }
 
 public class Define<T> where T : struct
@@ -103,7 +108,7 @@ public static class Defines
     public static Define<NPops> NPops = new();
     public static Define<NProduction> NProduction = new();
     public static Define<Military> NMilitary = new();
-    public static Define<NCity> NCity = new();
+    public static Define<NProvince> NProvince = new();
 
     public static bool FirstUpdate = true;
 
@@ -133,9 +138,9 @@ public static class Defines
             foreach (string key in table.Keys)
                 NPops[Enum.Parse<NPops>(key)] = Convert.ToDouble(table[key]);
 
-            table = (LuaTable)lua["NCity"];
+            table = (LuaTable)lua["NProvince"];
             foreach (string key in table.Keys)
-                NCity[Enum.Parse<NCity>(key)] = Convert.ToDouble(table[key]);
+                NProvince[Enum.Parse<NProvince>(key)] = Convert.ToDouble(table[key]);
 
             table = (LuaTable)lua["NProduction"];
             foreach (string key in table.Keys)

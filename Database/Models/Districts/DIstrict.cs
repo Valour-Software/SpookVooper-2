@@ -21,6 +21,9 @@ public class District
     [VarChar(64)]
     public string? Name { get; set;}
 
+    [NotMapped]
+    public string ScriptName => Name.Replace(" ", "_");
+
     [VarChar(512)]
     public string? Description { get; set; }
 
@@ -38,8 +41,8 @@ public class District
     {
         get
         {
-            if (Cities is not null)
-                return Cities.Sum(x => x.Population);
+            if (Provinces is not null)
+                return Provinces.Sum(x => x.Population);
             return 0;
         }
     }
@@ -56,8 +59,8 @@ public class District
     [VarChar(128)]
     public string? FlagUrl { get; set; }
 
-    [Column(TypeName = "jsonb")]
-    public List<DistrictModifier> Modifiers { get; set; }
+    [NotMapped]
+    public Dictionary<DistrictModifierType, DistrictModifier> Modifiers = new();
 
     [NotMapped]
     [JsonIgnore]
@@ -84,5 +87,10 @@ public class District
         return DBCache.GetAll<District>().FirstOrDefault(x => x.Id == id)!;
     }
 
-    public DistrictModifier GetModifier(DistrictModifierType modifierType) => Modifiers.FirstOrDefault(x => x.ModifierType == modifierType)!;
+    public double GetModifierValue(DistrictModifierType modifierType)
+    {
+        if (!Modifiers.ContainsKey(modifierType))
+            return 0;
+        return Modifiers[modifierType].Amount;
+    }
 }

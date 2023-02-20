@@ -110,7 +110,7 @@ class VoopAI
         {
             if (!RankRoleIds.ContainsKey(name))
             {
-                var color = new Color(GetRankColor(Enum.Parse<Rank>(name)));
+                var color = new Valour.Api.Models.Messages.Embeds.Styles.Color(GetRankColor(Enum.Parse<Rank>(name)));
                 var role = await CreateRoleAsync(name, color.Red, color.Green, color.Blue);
                 var result = await Valour.Api.Items.Item.CreateAsync(role);
             }

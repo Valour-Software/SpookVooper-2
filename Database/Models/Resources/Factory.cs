@@ -46,7 +46,7 @@ public class Factory : ProducingBuilding
 
         rate *= Quantity;
 
-        rate *= ProductionFactor;
+        rate *= ThroughputFactor;
 
         if (EmployeeId is not null)
             rate *= 2.5;

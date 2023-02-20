@@ -152,6 +152,10 @@ app.MapControllerRoute(
 await VooperDB.Startup();
 await ResourceManager.Load();
 
-MapController.LoadMap();
+await GameDataManager.Load();
+
+ProvinceManager.LoadMap();
+
+ProvinceManager.HourlyTick();
 
 app.Run();

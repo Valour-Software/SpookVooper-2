@@ -8,7 +8,8 @@ namespace SV2.Scripting;
 
 public class SyntaxModifierNode : SyntaxNode
 {
-    public DistrictModifierType ModifierType { get; set; }
+    public DistrictModifierType? DistrictModifierType { get; set; }
+    public ProvinceModifierType? ProvinceModifierType { get; set; }
     public SyntaxNode Value { get; set; }
 
     public SyntaxModifierNode()
@@ -16,13 +17,13 @@ public class SyntaxModifierNode : SyntaxNode
         NodeType = NodeType.MODIFIER;
     }
 
-    public override decimal GetValue(District district)
+    public override decimal GetValue(ExecutionState state)
     {
-        return Value.GetValue(district);
+        return Value.GetValue(state);
     }
 
-    public decimal GetValue(District district, decimal scaleby)
+    public decimal GetValue(ExecutionState state, decimal scaleby)
     {
-        return GetValue(district) * scaleby;
+        return GetValue(state) * scaleby;
     }
 }
