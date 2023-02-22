@@ -27,8 +27,7 @@ public abstract class BuildingBase : IHasOwner, ITickable
     public string RecipeId { get; set; }
     public abstract BuildingType BuildingType { get; set; }
     public string Name { get; set; }
-    public string Description { get; set; }
-    public long? CityId { get; set; }
+    public string? Description { get; set; }
     public long ProvinceId { get; set; }
     public long OwnerId { get; set; }
     public BaseEntity Owner => BaseEntity.Find(OwnerId)!;
@@ -38,9 +37,6 @@ public abstract class BuildingBase : IHasOwner, ITickable
 
     [NotMapped]
     public BaseRecipe Recipe => ResourceManager.Recipes[RecipeId];
-
-    [NotMapped]
-    public City? City => DBCache.Get<City>(CityId)!;
 
     [NotMapped]
     public LuaBuilding Building => BuildingManager.BaseBuildingObjs[Name];
@@ -56,6 +52,7 @@ public abstract class ProducingBuilding : BuildingBase
     public long? EmployeeId { get; set; }
     public double Quantity { get; set; }
 
+    [NotMapped]
     public double Efficiency
     {
         get
@@ -89,7 +86,16 @@ public abstract class ProducingBuilding : BuildingBase
                 BuildingType.Factory => 1 + District.GetModifierValue(DistrictModifierType.FactoryThroughputFactor),
                 _ => 0.00
             };
-            return basevalue * (District.GetModifierValue(DistrictModifierType.AllProducingBuildingThroughputFactor) + 1.00);
+            basevalue *= BuildingType switch
+            {
+                BuildingType.Farm => 1 + Province.GetModifierValue(ProvinceModifierType.FarmThroughputFactor),
+                BuildingType.Mine => 1 + Province.GetModifierValue(ProvinceModifierType.MineThroughputFactor),
+                BuildingType.Factory => 1 + Province.GetModifierValue(ProvinceModifierType.FactoryThroughputFactor),
+                _ => 0.00
+            };
+            basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;
+            basevalue *= District.GetModifierValue(DistrictModifierType.AllProducingBuildingThroughputFactor) + 1.00;
+            return basevalue;
         }
     }
 

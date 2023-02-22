@@ -36,8 +36,6 @@ NProduction = {
     BASE_FARM_QUANTITY_GROWTH_RATE_FACTOR = 1.5
 
     BASE_QUANTITY_GROWTH_RATE = 0.005
-
-    BASE_MAX_SIZE = 10
 }
 
 NProvince = {

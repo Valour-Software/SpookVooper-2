@@ -299,4 +299,5 @@ public enum ProvinceModifierType
     FactoryThroughputFactor = 12,
     FactoryEfficiencyFactor = 13,
     FactoryEfficiency = 14,
+    AllProducingBuildingThroughputFactor = 15
 }

@@ -5,7 +5,7 @@ recipe_iron_mining_base = {
     outputs = {
 		iron_ore = 1
 	}
-	perhour = 10
+	perhour = 20
     editable = false
 }
 
@@ -16,7 +16,7 @@ recipe_copper_mining_base = {
 	outputs = {
 		iron_ore = 1
 	}
-	perhour = 0.15
+	perhour = 5
     editable = false
 }
 
@@ -27,7 +27,7 @@ recipe_bauxite_mining_base = {
 	outputs = {
 		bauxite = 1
 	}
-	perhour = 0.75
+	perhour = 1.5
     editable = false
 }
 
@@ -38,6 +38,6 @@ recipe_coal_mining_base = {
 	outputs = {
 		coal = 1
 	}
-	perhour = 1.75
+	perhour = 3.5
     editable = false
 }
