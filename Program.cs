@@ -86,6 +86,8 @@ catch (Exception e)
 
 VooperDB.RawSqlQuery<string>(sql, null, true);
 
+await DBCache.LoadAsync();
+
 builder.Services.AddDbContextPool<VooperDB>(options =>
 {
     options.UseNpgsql(VooperDB.ConnectionString, options => options.EnableRetryOnFailure());
@@ -93,6 +95,7 @@ builder.Services.AddDbContextPool<VooperDB>(options =>
 
 builder.Services.AddHostedService<EconomyWorker>();
 builder.Services.AddHostedService<TransactionWorker>();
+builder.Services.AddHostedService<DistrictUpdateWorker>();
 
 builder.Services.AddDataProtection().PersistKeysToDbContext<VooperDB>();
 
@@ -155,7 +158,5 @@ await ResourceManager.Load();
 await GameDataManager.Load();
 
 ProvinceManager.LoadMap();
-
-ProvinceManager.HourlyTick();
 
 app.Run();

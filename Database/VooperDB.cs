@@ -160,7 +160,6 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public static async Task Startup() 
     {
         using var dbctx = DbFactory.CreateDbContext();
-        await DBCache.LoadAsync();
 
         //List<string> cands = new List<string>() {
         //    "u-3bfaf0da-05db-4b4d-b77e-78d2faca261a", 
@@ -184,15 +183,15 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
         }
 
         string[] districtnames = new []{
-            "ardenti-terra",
-            "avalon",
-            "kogi",
+            //"ardenti-terra",
+            //"avalon",
+            //"kogi",
             "elysian-katonia",
             "lanatia",
             "landing-cove",
-            "los-vooperis",
+            //"los-vooperis",
             "new-avalon",
-            "new-spudland",
+            //"new-spudland",
             "new-vooperis",
             "novastella",
             "old-king",
@@ -201,15 +200,15 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
             "voopmont"
         };
         int[] districtids = new[] {
-            101,
-            102,
-            103,
+            //101,
+            //102,
+           // 103,
             104,
             105,
             106,
-            107,
+           // 107,
             108,
-            109,
+            //109,
             110,
             111,
             112,

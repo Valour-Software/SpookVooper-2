@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Economy;
 using Microsoft.EntityFrameworkCore;
+using SV2.Database.Managers;
 
 namespace SV2.Database.Models.Districts;
 
@@ -16,10 +17,10 @@ public class DistrictModifier
 public class District
 {
     [Key]
-    public long Id {get; set; }
+    public long Id { get; set; }
 
     [VarChar(64)]
-    public string? Name { get; set;}
+    public string? Name { get; set; }
 
     [NotMapped]
     public string ScriptName => Name.Replace(" ", "_");
@@ -27,7 +28,7 @@ public class District
     [VarChar(512)]
     public string? Description { get; set; }
 
-    [InverseProperty("District")]
+    [NotMapped]
     public List<Province> Provinces { get; set; }
 
     [NotMapped]
@@ -54,7 +55,7 @@ public class District
     [NotMapped]
     public Senator Senator => DBCache.Get<Senator>(Id);
 
-    public long? GovernorId { get; set;}
+    public long? GovernorId { get; set; }
 
     [VarChar(128)]
     public string? FlagUrl { get; set; }
@@ -92,5 +93,55 @@ public class District
         if (!Modifiers.ContainsKey(modifierType))
             return 0;
         return Modifiers[modifierType].Amount;
+    }
+
+    [NotMapped]
+    public List<Province> ProvincesByDevelopmnet { get; set; }
+
+    public void HourlyTick()
+    {
+        double totalattractionpoints = Provinces.Sum(x => Math.Pow(x.MigrationAttraction, 1.025));
+
+        // do migration
+        // this was very "fun" to code
+        //double totalmigration = Provinces.Sum(x => x.Population) * Defines.NProvince[NProvince.BASE_MIGRATION_RATE] / 30 / 24;
+
+        double totalmigration = 0;
+        foreach (var province in Provinces)
+        {
+            double amountleavingmuit = 1;
+            if (province.RankByDevelopment <= 15)
+                amountleavingmuit = 1 - (Math.Pow(17 - province.RankByDevelopment, 0.15) - 1);
+            var migration = province.Population * Defines.NProvince[NProvince.BASE_MIGRATION_RATE];
+            totalmigration += migration*amountleavingmuit;
+        }
+
+        totalmigration = totalmigration / 30 / 24;
+
+        double migrantsperattraction = totalmigration / totalattractionpoints;
+
+        long totalchange = 0;
+        foreach(var province in Provinces)
+        {
+            double amountleavingmuit = 1;
+            if (province.RankByDevelopment <= 15)
+                amountleavingmuit = 1 - (Math.Pow(17 - province.RankByDevelopment, 0.15) - 1);
+
+            double leaving = -(province.Population * Defines.NProvince[NProvince.BASE_MIGRATION_RATE] / 30 / 24);
+            leaving *= amountleavingmuit;
+
+            double netchange = leaving;
+            netchange += Math.Pow(province.MigrationAttraction, 1.025) * migrantsperattraction;
+
+            province.Population += (int)netchange;
+
+            province.MonthlyEstimatedMigrants = (int)(netchange * 30 * 24);
+            totalchange += province.MonthlyEstimatedMigrants;
+            if (province.District.Id == 110) {
+                //Console.WriteLine($"{province.Name} has attraction of {province.MigrationAttraction}: {Math.Round(netchange, 2)}");
+            }
+        }
+        if (Id == 110)
+            Console.WriteLine($"Total Net Change from Migration in New Vooperis: {totalchange:n0}");
     }
 }

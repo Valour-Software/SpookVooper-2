@@ -7,6 +7,7 @@ using SV2.NonDBO;
 using SV2.Scripting;
 using SV2.Managers;
 using SV2.Scripting.LuaObjects;
+using SV2.Database.Models.Users;
 
 namespace SV2.Database.Models.Districts;
 
@@ -31,7 +32,7 @@ public class Province
 
     public long DistrictId { get; set; }
 
-    [ForeignKey(nameof(DistrictId))]
+    [NotMapped]
     public District District { get; set; }
 
     public long? CityId { get; set; }
@@ -105,7 +106,11 @@ public class Province
     /// </summary>
     public int DevelopmentValue { get; set; }
 
+    public int BaseDevelopmentValue { get; set; }
+
     public int LastTickDevelopmentValue { get; set; }
+
+    public int MigrationAttraction { get; set; }
 
     [NotMapped]
     public ProvinceDevelopmentStage CurrentDevelopmentStage { get; set; }
@@ -118,6 +123,12 @@ public class Province
 
     [NotMapped]
     public ProvinceMetadata Metadata => ProvinceManager.ProvincesMetadata[Id];
+
+    [NotMapped]
+    public int MonthlyEstimatedMigrants { get; set; }
+
+    [NotMapped]
+    public int RankByDevelopment { get; set; }
 
     public Province() { }
 
@@ -138,7 +149,10 @@ public class Province
 
     public double GetOverpopulationModifier()
     {
-        var rate = Math.Pow(Population, Defines.NProvince[NProvince.OVERPOPULATION_MODIFIER_EXPONENT]) / 100.0;
+        var exponent = Defines.NProvince[NProvince.OVERPOPULATION_MODIFIER_EXPONENT];
+        exponent += GetModifierValue(ProvinceModifierType.OverPopulationModifierExponent);
+        exponent += District.GetModifierValue(DistrictModifierType.OverPopulationModifierExponent);
+        var rate = Math.Pow(Population, exponent) / 100.0;
         rate += Defines.NProvince[NProvince.OVERPOPULATION_MODIFIER_BASE];
         if (rate > 0)
             return rate;
@@ -164,24 +178,69 @@ public class Province
         return PopulationGrowth;
     }
 
+    public int GetMigrationAttraction()
+    {
+        double attraction = Defines.NProvince[NProvince.BASE_MIGRATION_ATTRACTION];
+        attraction += Math.Max(Math.Pow(DevelopmentValue, Defines.NProvince[NProvince.MIGRATION_DEVELOPMENT_EXPONENT]) / Defines.NProvince[NProvince.MIGRATION_DEVELOPMENT_DIVISOR] + Defines.NProvince[NProvince.MIGRATION_DEVELOPMENT_BASE], 0);
+        attraction += Math.Max(Math.Pow(BuildingSlots, Defines.NProvince[NProvince.MIGRATION_BUILDINGSLOTS_EXPONENT]) / Defines.NProvince[NProvince.MIGRATION_BUILDINGSLOTS_DIVISOR] + Defines.NProvince[NProvince.MIGRATION_BUILDINGSLOTS_BASE], 0);
+
+        // apply bonuses based on ranking by dev value
+        if (District.ProvincesByDevelopmnet[14].DevelopmentValue <= DevelopmentValue)
+        {
+            int rank = District.ProvincesByDevelopmnet.IndexOf(this);
+            //attraction *= (Math.Pow(15 - rank, 1.9) / 75) + 1.2;
+            //attraction *= Math.Max(Math.Pow(15 - rank, 0.62) / 1.6, 1.25);
+            //attraction *= (1 - (Math.Pow(16 - rank, 0.2) - 1)) * 5;
+            //attraction *= (1 - (Math.Pow(16 - rank, 0.15) - 1)) * 5;
+            attraction += 3;
+            attraction *= 1.15;
+        }
+
+        if (Id != 384) Name = $"{RankByDevelopment + 1}th ranked";
+
+        attraction *= GetModifierValue(ProvinceModifierType.MigrationAttractionFactor) + 1;
+
+        if (GetOverpopulationModifier() > 0.25)
+        {
+            var muit = (GetOverpopulationModifier() - 0.25) * 3;
+            muit = Math.Min(muit, 0.6);
+            attraction *= muit;
+        }
+
+        return (int)attraction;
+    }
+
     public void HourlyTick()
     {
+        if (Population < 2500) Population = 2500;
         // update modifiers now
         UpdateModifiers();
 
         DevelopmentValue = (int)(Math.Floor(Math.Pow(Population, Defines.NProvince[NProvince.DEVELOPMENT_POPULATION_EXPONENT])) * Defines.NProvince[NProvince.DEVELOPMENT_POPULATION_FACTOR]);
+        
+        BaseDevelopmentValue = DevelopmentValue;
+        bool hasdonecoastalbonus = false;
 
-        if (DevelopmentValue < 90)
+        foreach (var id in Metadata.Adjacencies)
         {
-            foreach (var id in Metadata.Adjacencies)
+            var _metadata = ProvinceManager.ProvincesMetadata[id];
+            if (_metadata.TerrianType == "ocean" && hasdonecoastalbonus) continue;
+
+            if (_metadata.TerrianType == "ocean" && !hasdonecoastalbonus)
             {
-                var adj_province = DBCache.Get<Province>(id);
-                if (adj_province is null) continue;
-                DevelopmentValue += (int)(adj_province.LastTickDevelopmentValue * 0.14);
+                DevelopmentValue += (int)Defines.NProvince[NProvince.DEVELOPMENT_COASTAL_BONUS];
+                DevelopmentValue += (int)(Defines.NProvince[NProvince.DEVELOPMENT_COASTAL_FACTOR] * BaseDevelopmentValue);
+                hasdonecoastalbonus = true;
             }
+            var adj_province = DBCache.Get<Province>(id);
+            if (adj_province is null || BaseDevelopmentValue > adj_province.BaseDevelopmentValue) continue;
+
+            DevelopmentValue += (int)(adj_province.LastTickDevelopmentValue * 0.1);
         }
 
         LastTickDevelopmentValue = DevelopmentValue;
+
+        RankByDevelopment = District.ProvincesByDevelopmnet.IndexOf(this);
 
         int currenthighestvalue = 0;
         int index = 0;
@@ -189,6 +248,7 @@ public class Province
         ProvinceDevelopmentStage higheststage = stages[0];
         while (currenthighestvalue < DevelopmentValue)
         {
+            if (index > stages.Count - 1) break;
             var stage = stages[index];
             if (DevelopmentValue < stage.DevelopmentLevelNeeded || index > stages.Count - 1)
                 break;
@@ -204,7 +264,7 @@ public class Province
 
         CurrentDevelopmentStage = higheststage;
 
-        if (CurrentDevelopmentStage.Name == "City") Name = "New Vooperis City";
+        if (CurrentDevelopmentStage.Name == "City" && Id != 384) Name = "";
 
         // get hourly rate
         var PopulationGrowth = GetMonthlyPopulationGrowth() / 30 / 24;
@@ -226,6 +286,8 @@ public class Province
         buildingSlots_factor += District.GetModifierValue(DistrictModifierType.BuildingSlotsFactor);
 
         BuildingSlots = (int)(BuildingSlots * buildingSlots_factor);
+
+        MigrationAttraction = GetMigrationAttraction();
     }
 
     public void UpdateOrAddModifier(ProvinceModifierType type, double value)
@@ -288,20 +350,22 @@ public class StaticProvinceModifier
 /// </summary>
 public enum ProvinceModifierType
 {
-    BuildingSlots = 0,
-    BuildingSlotsFactor = 1,
-    BuildingSlotsExponent = 2,
-    FertileLandFactor = 3,
-    MineQuantityCap = 4,
-    MineQuantityGrowthRateFactor = 5,
-    MineThroughputFactor = 6,
-    FarmQuantityCap = 7,
-    FarmQuantityGrowthRateFactor = 8,
-    FarmThroughputFactor = 9,
-    FactoryQuantityCap = 10,
-    FactoryQuantityGrowthRateFactor = 11,
-    FactoryThroughputFactor = 12,
-    FactoryEfficiencyFactor = 13,
-    FactoryEfficiency = 14,
-    AllProducingBuildingThroughputFactor = 15
+    BuildingSlots,
+    BuildingSlotsFactor,
+    BuildingSlotsExponent,
+    FertileLandFactor,
+    MineQuantityCap,
+    MineQuantityGrowthRateFactor,
+    MineThroughputFactor,
+    FarmQuantityCap,
+    FarmQuantityGrowthRateFactor,
+    FarmThroughputFactor,
+    FactoryQuantityCap,
+    FactoryQuantityGrowthRateFactor,
+    FactoryThroughputFactor,
+    FactoryEfficiencyFactor,
+    FactoryEfficiency,
+    AllProducingBuildingThroughputFactor,
+    MigrationAttractionFactor,
+    OverPopulationModifierExponent
 }

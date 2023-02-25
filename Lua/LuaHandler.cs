@@ -211,7 +211,8 @@ public static class LuaHandler
                         "provinces" => levels[2] switch
                         {
                             "buildingslotsfactor" => DistrictModifierType.BuildingSlotsFactor,
-                            "buildingslotsexponent" => DistrictModifierType.BuildingSlotsExponent
+                            "buildingslotsexponent" => DistrictModifierType.BuildingSlotsExponent,
+                            "overpopulationmodifierexponent" => DistrictModifierType.OverPopulationModifierExponent
                         }
                     }
                 };
@@ -228,7 +229,9 @@ public static class LuaHandler
                             "farmingthroughputfactor" => ProvinceModifierType.FarmThroughputFactor
                         },
                         "buildingslotsfactor" => ProvinceModifierType.BuildingSlotsFactor,
-                        "buildingslotsexponent" => ProvinceModifierType.BuildingSlotsExponent
+                        "buildingslotsexponent" => ProvinceModifierType.BuildingSlotsExponent,
+                        "migrationattractionfactor" => ProvinceModifierType.MigrationAttractionFactor,
+                        "overpopulationmodifierexponent" => ProvinceModifierType.OverPopulationModifierExponent
                     }
                 };
             }

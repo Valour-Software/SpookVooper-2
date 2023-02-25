@@ -156,7 +156,7 @@ public static class DBCache
         }
         foreach(Province province in dbctx.Provinces) {
             province.District = Get<District>(province.DistrictId);
-            Put<Province>(province.Id, province);
+            Put(province.Id, province);
         }
         foreach (var _obj in dbctx.Cities)
             DBCache.Put(_obj.Id, _obj);
@@ -172,6 +172,11 @@ public static class DBCache
         }
         foreach (var _obj in dbctx.Senators)
             Put(_obj.DistrictId, _obj);
+
+        foreach (District district in GetAll<District>())
+        {
+            district.Provinces = GetAll<Province>().Where(x => x.DistrictId == district.Id).ToList();
+        }
 
         //#endif
     }

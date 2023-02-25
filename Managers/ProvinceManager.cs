@@ -43,8 +43,8 @@ public class ProvinceMetadata
     [JsonPropertyName("resources")]
     public Dictionary<string, long> Resources { get; set; }
 
-    [JsonPropertyName("terrain")]
-    public string TerrainType { get; set; }
+    [JsonPropertyName("terrian")]
+    public string TerrianType { get; set; }
 
     [JsonPropertyName("adjacencies")]
     public List<long> Adjacencies { get; set; }
@@ -62,13 +62,6 @@ public class ProvinceManager
         new(250, new(30, 255, 20)),
         new(500, new(0, 255, 0))
     };
-    public static void HourlyTick()
-    {
-        foreach (var province in DBCache.GetAll<Province>())
-        {
-            province.HourlyTick();
-        }
-    }
 
     public static void LoadMap()
     {

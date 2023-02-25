@@ -43,6 +43,7 @@ city = {
 	development_value_required = 120 -- ~3m population required
 	modifiers = {
 		provinces.buildingslotsfactor = 0.6
+		provinces.migrationattractionfactor = 0.05
 	}
 }
 
@@ -53,5 +54,6 @@ megacity = {
 		provinces.buildingslotsfactor = 1.25
 		-- give a small bonus
 		provinces.buildingslotsexponent = 0.005
+		provinces.migrationattractionfactor = 0.1
 	}
 }

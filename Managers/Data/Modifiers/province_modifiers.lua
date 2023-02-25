@@ -1,8 +1,9 @@
 vooperian_capital {
 	name = "Capital of the Vooperian Empire"
 	modifiers = {
-		province.buildingslots = 0.2
-		province.buildingslots_exponent = 0.03
+		province.buildingslotsfactor = 0.2
+		province.buildingslotsexponent = 0.03
+		province.overpopulationmodifierexponent = -0.01
 	}
 	stackable = false
 }
@@ -17,6 +18,7 @@ fertile_land_river_delta_area = {
 		-- of more than 4x other provinces
 		province.fertilelandfactor = 1
 		province.farms.farmingthroughputfactor = 0.75
+		province.overpopulationmodifierexponent = -0.01
 	}
 	stackable = false
 }

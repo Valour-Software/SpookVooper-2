@@ -45,13 +45,29 @@ NProvince = {
     BASE_BIRTH_RATE = 0.7
     BASE_DEATH_RATE = 0.3
     -- added to BASE_DEATH_RATE
-    OVERPOPULATION_MODIFIER_EXPONENT = 0.26 -- modifier value: (province.Population^0.26)/100
+    OVERPOPULATION_MODIFIER_EXPONENT = 0.26 -- modifier value: (province.Population^0.26)/100 - 0.15
     OVERPOPULATION_MODIFIER_BASE = -0.15
 
     -- used for randomizing province populations
     BASE_POPULATION_MIN = 500
-    BASE_POPULATION_MAX = 30000
+    BASE_POPULATION_MAX = 60000
 
     DEVELOPMENT_POPULATION_EXPONENT = 0.54
     DEVELOPMENT_POPULATION_FACTOR = 0.04
+    DEVELOPMENT_COASTAL_BONUS = 10
+    DEVELOPMENT_COASTAL_FACTOR = 0.05
+
+    -- migration stuff
+    BASE_MIGRATION_RATE = 0.275 -- monthly
+    BASE_MIGRATION_ATTRACTION = 2
+
+    -- the final formula for this is ((province.development^2)/250) - 10
+    MIGRATION_DEVELOPMENT_EXPONENT = 2
+    MIGRATION_DEVELOPMENT_DIVISOR = 250
+    MIGRATION_DEVELOPMENT_BASE = -5
+
+    -- the final formula for this is ((province.buildingslots^2)/3750) + 1.5
+    MIGRATION_BUILDINGSLOTS_EXPONENT = 2
+    MIGRATION_BUILDINGSLOTS_DIVISOR = 3750
+    MIGRATION_BUILDINGSLOTS_BASE = 1.5
 }

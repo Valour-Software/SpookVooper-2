@@ -203,7 +203,7 @@
                             {
                                 var dbprovince = DBCache.Get<Province>(province.Id);
                                 bool ShowCityCircle = false;
-                                if (dbprovince.CurrentDevelopmentStage.Name == "City")
+                                if (dbprovince.Id == 384) //(dbprovince.CurrentDevelopmentStage.Name == "City" || dbprovince.CurrentDevelopmentStage.Name == "Megacity") && dbprovince.Name != "")
                                 {
                                     ShowCityCircle = true;
                                 }
@@ -211,7 +211,7 @@
                                     @if (!Context.Request.QueryString.Value.Contains("devmapmode=true"))
                                     {
                                         <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;" class="province"></path>
-                                        if(dbprovince.CurrentDevelopmentStage.Name == "City")
+                                        if (ShowCityCircle)
                                         {
                                             <circle cx="@(province.XPos)" cy="@(province.YPos+8)" r="3" style="fill: black;" />
                                         }
@@ -219,7 +219,7 @@
                                     else
                                     {
                                         <path d="@province.D" id="@province.Id" style="fill:@dbprovince.GetDevelopmentColorForMap()" class="province"></path>
-                                        if(dbprovince.CurrentDevelopmentStage.Name == "City")
+                                        if (ShowCityCircle)
                                         {
                                             <circle cx="@(province.XPos)" cy="@(province.YPos+8)" r="3" style="fill: white;" />
                                         }

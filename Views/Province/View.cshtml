@@ -39,6 +39,10 @@
         .infobox-row-name {
             padding: 0 0.6em 0.2em 0.6em;
         }
+
+        .mergedrow th {
+            
+        }
     </style>
 </head>
 
@@ -143,6 +147,14 @@
                     {
                         <td class="infobox-row-value">@($"{(Math.Max(Model.GetMonthlyPopulationGrowth() * 1.1, 24*30)):n0}")</td>
                     }
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">Monthly (Est.) Migration</th>
+                    <td class="infobox-row-value">@($"{Model.MonthlyEstimatedMigrants:n0}")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Migration Attraction</th>
+                    <td class="infobox-row-value">@($"{Model.MigrationAttraction:n0}")</td>
                 </tr>
             </tbody>
         </table>

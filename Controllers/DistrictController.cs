@@ -26,12 +26,6 @@ namespace SV2.Controllers
         public IActionResult View(string name)
         {
             District district = DBCache.GetAll<District>().FirstOrDefault(x => x.Name == name);
-            SVUser? user = UserManager.GetUser(HttpContext);
-
-            if (user is null) 
-            {
-                return Redirect("/account/login");
-            }
 
             return View(district);
         }
