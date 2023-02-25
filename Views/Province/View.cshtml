@@ -125,7 +125,7 @@
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Building Slots Used</th>
-                    <td class="infobox-row-value">@($"{Model.GetBuildings().Count():n0}")</td>
+                    <td class="infobox-row-value">@($"{Model.GetBuildings().Sum(x => x.Size):n0}")</td>
                 </tr>
                 @if (Model.GetOverpopulationModifier() > 0.001)
                 {

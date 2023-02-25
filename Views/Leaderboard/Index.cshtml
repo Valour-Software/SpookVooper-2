@@ -85,29 +85,17 @@
                         <td>
                             <img class="govpfp" src="@item.GetPfpUrl()" style="width:32px; height: 32px;"/>
                         </td>
-                        <td>
-                            @item.Xp
-                        </td>
+                        <td>@($"{item.Xp:n0}")</td>
                         <td>
                             <a asp-controller="User" asp-action="Info" asp-route-svid="@item.Id" style="text-decoration: none;">
                                 @item.Name
                             </a>
                         </td>
-                        <td>
-                            @item.MessageXp
-                        </td>
-                        <td>
-                            @item.Messages
-                        </td>
-                        <td>
-                            @item.PostLikes
-                        </td>
-                        <td>
-                            @item.CommentLikes
-                        </td>
-                        <td>
-                            @item.Credits
-                        </td>
+                        <td>@($"{item.MessageXp:n0}")</td>
+                        <td>@($"{item.Messages:n0}")</td>
+                        <td>@($"{item.PostLikes:n0}")</td>
+                        <td>@($"{item.CommentLikes:n0}")</td>
+                        <td>@($"{item.Credits:n0}")</td>
                     </tr>
                 }
 

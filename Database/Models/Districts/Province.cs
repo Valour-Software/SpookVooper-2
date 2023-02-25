@@ -105,6 +105,8 @@ public class Province
     /// </summary>
     public int DevelopmentValue { get; set; }
 
+    public int LastTickDevelopmentValue { get; set; }
+
     [NotMapped]
     public ProvinceDevelopmentStage CurrentDevelopmentStage { get; set; }
 
@@ -175,9 +177,11 @@ public class Province
             {
                 var adj_province = DBCache.Get<Province>(id);
                 if (adj_province is null) continue;
-                DevelopmentValue += (int)(adj_province.DevelopmentValue * 0.12);
+                DevelopmentValue += (int)(adj_province.LastTickDevelopmentValue * 0.14);
             }
         }
+
+        LastTickDevelopmentValue = DevelopmentValue;
 
         int currenthighestvalue = 0;
         int index = 0;
