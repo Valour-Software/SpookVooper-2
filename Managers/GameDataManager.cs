@@ -1,13 +1,16 @@
 ﻿using SV2.NonDBO;
+using SV2.Scripting.LuaObjects;
 using SV2.Scripting.Parser;
 
 namespace SV2.Managers;
 
-public class GameDataManager
+public static class GameDataManager
 {
     public static Dictionary<string, ProvinceDevelopmentStage> ProvinceDevelopmentStages = new();
 
     public static Dictionary<string, LuaProvinceStaticModifier> BaseProvinceStaticModifers = new();
+
+    static public Dictionary<string, LuaBuilding> BaseBuildingObjs = new();
 
     public static async Task Load()
     {

@@ -116,6 +116,20 @@ public static class DBCache
         return null;
     }
 
+    public static BaseEntity? FindEntity(long? Id)
+    {
+        if (Id is null) return null;
+        var group = Get<Group>(Id);
+        if (group is not null)
+            return group;
+
+        var user = Get<SVUser>(Id);
+        if (user is not null)
+            return user;
+
+        return null;
+    }
+
     public static async Task LoadAsync()
     {
         using var dbctx = VooperDB.DbFactory.CreateDbContext();

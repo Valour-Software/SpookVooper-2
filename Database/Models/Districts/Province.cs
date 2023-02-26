@@ -43,6 +43,11 @@ public class Province
 
     public string? Description { get; set; }
 
+    public long? GovernorId { get; set; }
+
+    [NotMapped]
+    public BaseEntity? Governor => BaseEntity.Find(GovernorId);
+
     public City? City
     {
         get
@@ -141,6 +146,22 @@ public class Province
         Population = rnd.NextInt64(min, max);
     }
 
+    public bool CanEdit(BaseEntity entity)
+    {
+        if (entity.Id == District.GovernorId) return true;
+        if (Governor is not null)
+        {
+            if (Governor.EntityType == EntityType.User)
+                return GovernorId == entity.Id;
+            else
+            {
+                Group governorasgroup = (Group)Governor;
+                return governorasgroup.HasPermission(entity, GroupPermissions.ManageProvinces);
+            }
+        }
+        return false;
+    }
+
     public double GetModifierValue(ProvinceModifierType modifierType) {
         if (!Modifiers.ContainsKey(modifierType))
             return 0;
@@ -188,15 +209,9 @@ public class Province
         if (District.ProvincesByDevelopmnet[14].DevelopmentValue <= DevelopmentValue)
         {
             int rank = District.ProvincesByDevelopmnet.IndexOf(this);
-            //attraction *= (Math.Pow(15 - rank, 1.9) / 75) + 1.2;
-            //attraction *= Math.Max(Math.Pow(15 - rank, 0.62) / 1.6, 1.25);
-            //attraction *= (1 - (Math.Pow(16 - rank, 0.2) - 1)) * 5;
-            //attraction *= (1 - (Math.Pow(16 - rank, 0.15) - 1)) * 5;
             attraction += 3;
             attraction *= 1.15;
         }
-
-        if (Id != 384) Name = $"{RankByDevelopment + 1}th ranked";
 
         attraction *= GetModifierValue(ProvinceModifierType.MigrationAttractionFactor) + 1;
 
@@ -263,8 +278,6 @@ public class Province
         }
 
         CurrentDevelopmentStage = higheststage;
-
-        if (CurrentDevelopmentStage.Name == "City" && Id != 384) Name = "";
 
         // get hourly rate
         var PopulationGrowth = GetMonthlyPopulationGrowth() / 30 / 24;

@@ -39,10 +39,23 @@ public abstract class BuildingBase : IHasOwner, ITickable
     public BaseRecipe Recipe => ResourceManager.Recipes[RecipeId];
 
     [NotMapped]
-    public LuaBuilding Building => BuildingManager.BaseBuildingObjs[Name];
+    public LuaBuilding BuildingObj => GameDataManager.BaseBuildingObjs[Name];
 
     [NotMapped]
     public District District => DBCache.Get<District>(DistrictId)!;
+
+    public static BuildingBase Find(long? id)
+    {
+        if (id == null) return null;
+
+        BuildingBase obj = DBCache.Get<Factory>(id)!;
+        if (obj is not null) return obj;
+
+        obj = DBCache.Get<Mine>(id)!;
+        if (obj is not null) return obj;
+
+        return null;
+    }
 
     public async Task Tick() { }
 }

@@ -12,6 +12,7 @@ namespace SV2.API
         {
             app.MapGet   ("api/entity/{svid}/name", GetName);
             app.MapGet   ("api/entity/{svid}/credits", GetCredits);
+            app.MapGet   ("api/entity/search", Search);
         }
 
         private static async Task GetName(HttpContext ctx, VooperDB db, long svid)
@@ -40,5 +41,30 @@ namespace SV2.API
             await ctx.Response.WriteAsync(account.Credits.ToString());
         }
 
+        private static async Task<IEnumerable<BaseEntity>> Search(string name, int amount = 20)
+        {
+            List<BaseEntity> entities = new();
+
+            // Cap at 20
+            if (amount > 20)
+                amount = 20;
+
+            if (name == null)
+                return entities;
+
+            name = name.ToLower();
+
+            var users = DBCache.GetAll<SVUser>().Where(x => x.Name.ToLower().Contains(name));
+            var groups = DBCache.GetAll<Group>().Where(x => x.Name.ToLower().Contains(name));
+
+            entities.AddRange(users);
+            entities.AddRange(groups);
+
+            var top = entities.OrderBy(x => x.Name.ToLower().StartsWith(name.ToLower())).TakeLast(amount).ToList();
+
+            //snaps.Reverse();
+
+            return entities;
+        }
     }
 }

@@ -51,15 +51,17 @@ public class Group : BaseEntity, IHasOwner
     }
 
     [NotMapped]
+    [JsonIgnore]
     public IEnumerable<BaseEntity> Members => MembersIds.Select(x => BaseEntity.Find(x));
 
     [NotMapped]
+    [JsonIgnore]
     public IEnumerable<GroupRole> Roles => DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id).ToList();
 
     public long OwnerId { get; set; }
 
     [NotMapped]
-
+    [JsonIgnore]
     public BaseEntity Owner => BaseEntity.Find(OwnerId)!;
 
     public bool IsInGroup(SVUser user)

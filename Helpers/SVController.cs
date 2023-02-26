@@ -10,6 +10,8 @@ public abstract class SVController : Controller
     public IActionResult RedirectBack(string reason)
     {
         StatusMessage = reason;
-        return Redirect(Request.Headers["Referer"].ToString());
+        var url = Request.Headers["Referer"].ToString();
+        if (url == "") url = "/";
+        return Redirect(url);
     }
 }

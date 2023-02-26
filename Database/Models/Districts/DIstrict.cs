@@ -137,11 +137,6 @@ public class District
 
             province.MonthlyEstimatedMigrants = (int)(netchange * 30 * 24);
             totalchange += province.MonthlyEstimatedMigrants;
-            if (province.District.Id == 110) {
-                //Console.WriteLine($"{province.Name} has attraction of {province.MigrationAttraction}: {Math.Round(netchange, 2)}");
-            }
         }
-        if (Id == 110)
-            Console.WriteLine($"Total Net Change from Migration in New Vooperis: {totalchange:n0}");
     }
 }

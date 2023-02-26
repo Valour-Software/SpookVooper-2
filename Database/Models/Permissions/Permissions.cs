@@ -45,6 +45,8 @@ public static class GroupPermissions
     public static readonly GroupPermission Eco = new GroupPermission(0x80, "Eco", "Allows members to send transactions, trade stocks, etc as this group.");
     public static readonly GroupPermission Edit = new GroupPermission(0x100, "Edit", "Allows members to edit details about this group.");
     public static readonly GroupPermission News = new GroupPermission(0x200, "News", "Allows members to post news under this group.");
+    public static readonly GroupPermission ManageBuildingRequests = new GroupPermission(0x400, "Manage Building Requests", "Allows members to accept or deny building requests on provinces that this group has governorship over.");
+    public static readonly GroupPermission ManageProvinces = new GroupPermission(0x800, "Manage Provinces", "Allows members to edit provinces that this group has governorship over.");
 }
 
 public class GroupPermission : Permission

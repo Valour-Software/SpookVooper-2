@@ -32,6 +32,40 @@ public class ProvinceController : SVController
         return View(province);
     }
 
+    [HttpGet("/Province/Edit/{id}")]
+    public IActionResult Edit(long id)
+    {
+        if (!DBCache.HCache[typeof(Province)].TryGetValue(id, out object _obj))
+            return Redirect("/");
+        Province province = (Province)_obj;
+        SVUser? user = UserManager.GetUser(HttpContext);
+
+        if (user is null)
+            return Redirect("/account/login");
+        if (!province.CanEdit(user))
+            return RedirectBack("You lack permission to manage this province!");
+
+        return View(province);
+    }
+
+    [HttpGet("/Province/ChangeGovernor/{id}")]
+    public IActionResult ChangeGovernor(long id, long GovernorId)
+    {
+        Province? province = DBCache.Get<Province>(id);
+        if (province is null)
+            return Redirect("/");
+        SVUser? user = UserManager.GetUser(HttpContext);
+
+        if (user is null)
+            return Redirect("/account/login");
+        if (province.District.GovernorId != user.Id)
+            return RedirectBack("You must be governor of the district to change the governor of a province!");
+
+        province.GovernorId = GovernorId;
+
+        return RedirectBack($"Successfully changed the governorship of this province to {BaseEntity.Find(GovernorId).Name}");
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

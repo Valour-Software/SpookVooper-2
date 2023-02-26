@@ -203,7 +203,7 @@
                             {
                                 var dbprovince = DBCache.Get<Province>(province.Id);
                                 bool ShowCityCircle = false;
-                                if (dbprovince.Id == 384) //(dbprovince.CurrentDevelopmentStage.Name == "City" || dbprovince.CurrentDevelopmentStage.Name == "Megacity") && dbprovince.Name != "")
+                                if ((dbprovince.CurrentDevelopmentStage.Name == "City" || dbprovince.CurrentDevelopmentStage.Name == "Megacity") && dbprovince.Name != "")
                                 {
                                     ShowCityCircle = true;
                                 }

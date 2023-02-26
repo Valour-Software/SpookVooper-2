@@ -54,11 +54,14 @@ public abstract class BaseEntity
     public long? DistrictId { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public District District => DBCache.Get<District>(DistrictId)!;
 
     public virtual EntityType EntityType { get; }
 
     public static BaseEntity? Find(long Id) => DBCache.FindEntity(Id);
+
+    public static BaseEntity? Find(long? Id) => DBCache.FindEntity(Id);
 
     public async Task DoIncomeTax()
     {
