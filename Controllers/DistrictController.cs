@@ -85,7 +85,7 @@ namespace SV2.Controllers
                     pol.Id = IdManagers.GeneralIdGenerator.Generate();
                     pol.DistrictId = model.DistrictId;
                     DBCache.Put(pol.Id, pol);
-                    _dbctx.UBIPolicies.Add(pol);
+                    DBCache.dbctx.UBIPolicies.Add(pol);
                 }
             }
             
@@ -106,11 +106,11 @@ namespace SV2.Controllers
                     pol.Id = IdManagers.GeneralIdGenerator.Generate();
                     pol.DistrictId = model.DistrictId;
                     DBCache.Put(pol.Id, pol);
-                    _dbctx.TaxPolicies.Add(pol);
+                    DBCache.dbctx.TaxPolicies.Add(pol);
                 }
             }
 
-            await _dbctx.SaveChangesAsync();
+            //await _dbctx.SaveChangesAsync();
 
             StatusMessage = $"Successfully edited policies.";
             return Redirect($"/District/EditPolicies?Id={district.Id}");

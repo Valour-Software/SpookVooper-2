@@ -112,6 +112,17 @@
                     <td class="infobox-row-value">None</td>
                 </tr>
                 <tr class="mergedrow">
+                    <th class="infobox-row-name">Governor</th>
+                    @if (Model.Governor is null)
+                    {
+                        <td class="infobox-row-value">None</td>
+                    }
+                    else
+                    {
+                        <td class="infobox-row-value">@Model.Governor.Name</td>
+                    }
+                </tr>
+                <tr class="mergedrow">
                     <th class="infobox-row-name">Population</th>
                     <td class="infobox-row-value">@($"{Model.Population:n0}")</td>
                 </tr>
@@ -155,6 +166,14 @@
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Migration Attraction</th>
                     <td class="infobox-row-value">@($"{Model.MigrationAttraction:n0}")</td>
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">Base Property Tax</th>
+                    <td class="infobox-row-value">@($"¢{Model.BasePropertyTax:n0}")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Property Tax per Building Size</th>
+                    <td class="infobox-row-value">@($"¢{Model.PropertyTaxPerSize:n0}")</td>
                 </tr>
             </tbody>
         </table>

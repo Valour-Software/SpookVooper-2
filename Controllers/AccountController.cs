@@ -99,8 +99,8 @@ namespace SV2.Controllers
                 user = new SVUser(valouruser.Name, valouruser.Id);
                 DBCache.Put(user.Id, user);
 
-                dbctx.Users.Add(user);
-                await dbctx.SaveChangesAsync();
+                DBCache.dbctx.Users.Add(user);
+                //await dbctx.SaveChangesAsync();
             }
 
             user.ImageUrl = valouruser.PfpUrl;

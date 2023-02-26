@@ -26,12 +26,38 @@
         <hr />
         <br />
         <form method="post">
-            <div class="col-12 align-content-center text-center">
+            <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @Html.HiddenFor(x => x.Id)
                 <div class="row">
                     <h4>Province Info</h4>
 
                     <div asp-validation-summary="All" class="text-danger"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <br />
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <p>Property Taxes are paid to the Governor of a province, or to the District if the governor is not set</p>
+                <div class="form-group">
+                    <label>Base monthly property tax per building (not size!)</label>
+                    <input asp-for="BasePropertyTax" class="form-control"/>
+                    <span asp-validation-for="BasePropertyTax" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label>Monthly Property Tax per size (level) of a building (ex: a level 15 factory will pay 15x this tax monthly)</label>
+                    <input asp-for="PropertyTaxPerSize" class="form-control" />
+                    <span asp-validation-for="PropertyTaxPerSize" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
@@ -41,13 +67,13 @@
         </form>
         <br />
         <form method="get" action="/Province/ChangeGovernor/@Model.Id">
-            <div class="col-12 align-content-center text-center">
+            <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @if (Model.District.GovernorId == user.Id)
                 {
                     <p>Governor Entity's name</p>
                     <input data-val="true" data-val-required="The Id field is required." id="GovernorId" name="GovernorId" type="hidden" value="@Model.GovernorId">
                     <div class="input-group" style="max-width:700px;margin-left:auto;margin-right:auto;">
-                        <input style="margin-bottom:20px; display:inline-block; width:70%" id="user-input" class="form-control" value="@(Model.Governor?.Name ?? "")"/>
+                        <input style="margin-bottom:20px; display:inline-block; max-width:500px;" id="user-input" class="form-control" value="@(Model.Governor?.Name ?? "")"/>
                         <div class="input-group-append">
                             <button id="submit" class="btn btn-outline-warning" style="display:inline-block;margin-bottom:20px">Confirm</button>
                         </div>

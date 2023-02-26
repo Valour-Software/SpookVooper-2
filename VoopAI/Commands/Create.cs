@@ -53,8 +53,8 @@ public class CreateCommands : CommandModuleBase
             user.ImageUrl = (await ctx.Member.GetUserAsync()).PfpUrl;
             DBCache.Put(user.Id, user);
 
-            dbctx.Users.Add(user);
-            await dbctx.SaveChangesAsync();
+            DBCache.dbctx.Users.Add(user);
+            //await dbctx.SaveChangesAsync();
             await ctx.ReplyAsync("Successfully created SV account.");
         }
     }

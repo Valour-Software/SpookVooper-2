@@ -74,8 +74,8 @@ public class GroupController : SVController
         group.OwnerId = user.Id;
 
         DBCache.Put(group.Id, group);
-        dbctx.Groups.Add(group);
-        await dbctx.SaveChangesAsync();
+        DBCache.dbctx.Groups.Add(group);
+        //await dbctx.SaveChangesAsync();
 
         return Redirect($"/group/view/{group.Id}");
     }
@@ -222,8 +222,8 @@ public class GroupController : SVController
                 MembersIds = new()
             };
             DBCache.Put(role.Id, role);
-            _dbctx.GroupRoles.Add(role);
-            await _dbctx.SaveChangesAsync();
+            DBCache.dbctx.GroupRoles.Add(role);
+            //await _dbctx.SaveChangesAsync();
         }
 
         else

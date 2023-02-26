@@ -57,6 +57,53 @@ public class Province
         }
     }
 
+    /// <summary>
+    /// How "developed" this province is
+    /// </summary>
+    public int DevelopmentValue { get; set; }
+    public int BaseDevelopmentValue { get; set; }
+    public int LastTickDevelopmentValue { get; set; }
+    public int MigrationAttraction { get; set; }
+
+    /// <summary>
+    /// In monthly rate
+    /// </summary>
+    public double? BasePropertyTax { get; set; }
+
+    /// <summary>
+    /// In monthly rate
+    /// </summary>
+    public double? PropertyTaxPerSize { get; set; }
+
+    [NotMapped]
+    public ProvinceDevelopmentStage CurrentDevelopmentStage { get; set; }
+
+    [NotMapped]
+    public Dictionary<ProvinceModifierType, ProvinceModifier> Modifiers { get; set; }
+
+    [Column(TypeName = "jsonb")]
+    public List<StaticProvinceModifier> StaticProvinceModifiers { get; set; }
+
+    [NotMapped]
+    public ProvinceMetadata Metadata => ProvinceManager.ProvincesMetadata[Id];
+
+    [NotMapped]
+    public int MonthlyEstimatedMigrants { get; set; }
+
+    [NotMapped]
+    public int RankByDevelopment { get; set; }
+
+    public Province() { }
+
+    public Province(Random rnd)
+    {
+        StaticProvinceModifiers = new();
+        Modifiers = new();
+        long min = (long)Defines.NProvince[NProvince.BASE_POPULATION_MIN];
+        long max = (long)Defines.NProvince[NProvince.BASE_POPULATION_MAX];
+        Population = rnd.NextInt64(min, max);
+    }
+
     public string GetDevelopmentColorForMap()
     {
         DevelopmentMapColor currentmapcolor = null;
@@ -70,11 +117,11 @@ public class Province
             index += 1;
         }
 
-        Color color = new(0,0,0);
+        Color color = new(0, 0, 0);
         if (currentmapcolor is not null)
         {
             int diff = nextmapcolor.MaxValue - currentmapcolor.MaxValue;
-            float progress = ((float)(DevelopmentValue-currentmapcolor.MaxValue) / (float)diff);
+            float progress = ((float)(DevelopmentValue - currentmapcolor.MaxValue) / (float)diff);
             color = new()
             {
                 R = (int)(currentmapcolor.color.R * (1 - progress)),
@@ -104,46 +151,6 @@ public class Province
         buildings.AddRange(DBCache.GetAll<Factory>().Where(x => x.ProvinceId == Id));
         buildings.AddRange(DBCache.GetAll<Mine>().Where(x => x.ProvinceId == Id));
         return buildings;
-    }
-
-    /// <summary>
-    /// How "developed" this province is
-    /// </summary>
-    public int DevelopmentValue { get; set; }
-
-    public int BaseDevelopmentValue { get; set; }
-
-    public int LastTickDevelopmentValue { get; set; }
-
-    public int MigrationAttraction { get; set; }
-
-    [NotMapped]
-    public ProvinceDevelopmentStage CurrentDevelopmentStage { get; set; }
-
-    [NotMapped]
-    public Dictionary<ProvinceModifierType, ProvinceModifier> Modifiers { get; set; }
-
-    [Column(TypeName = "jsonb")]
-    public List<StaticProvinceModifier> StaticProvinceModifiers { get; set; }
-
-    [NotMapped]
-    public ProvinceMetadata Metadata => ProvinceManager.ProvincesMetadata[Id];
-
-    [NotMapped]
-    public int MonthlyEstimatedMigrants { get; set; }
-
-    [NotMapped]
-    public int RankByDevelopment { get; set; }
-
-    public Province() { }
-
-    public Province(Random rnd)
-    {
-        StaticProvinceModifiers = new();
-        Modifiers = new();
-        long min = (long)Defines.NProvince[NProvince.BASE_POPULATION_MIN];
-        long max = (long)Defines.NProvince[NProvince.BASE_POPULATION_MAX];
-        Population = rnd.NextInt64(min, max);
     }
 
     public bool CanEdit(BaseEntity entity)

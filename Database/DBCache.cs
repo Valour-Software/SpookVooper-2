@@ -12,6 +12,8 @@ public static class DBCache
     /// </summary>
     public static Dictionary<Type, ConcurrentDictionary<long, object>> HCache = new();
 
+    public static VooperDB dbctx { get; set; }
+
     public static IEnumerable<T> GetAll<T>() where T : class
     {
         var type = typeof(T);
@@ -132,58 +134,52 @@ public static class DBCache
 
     public static async Task LoadAsync()
     {
-        using var dbctx = VooperDB.DbFactory.CreateDbContext();
+        dbctx = VooperDB.DbFactory.CreateDbContext();
         //#if !DEBUG
 
         foreach (Group group in dbctx.Groups) {
-            DBCache.Put<Group>(group.Id, group);
+            Put(group.Id, group);
         }
         foreach(SVUser user in dbctx.Users) {
-            DBCache.Put<SVUser>(user.Id, user);
+            Put(user.Id, user);
         }
         foreach(TaxPolicy policy in dbctx.TaxPolicies) {
-            DBCache.Put<TaxPolicy>(policy.Id, policy);
+            Put(policy.Id, policy);
         }
         foreach(TradeItem item in dbctx.TradeItems) {
-            DBCache.Put<TradeItem>(item.Id, item);
+            Put(item.Id, item);
         }
         foreach(TradeItemDefinition definition in dbctx.TradeItemDefinitions) {
-            DBCache.Put<TradeItemDefinition>(definition.Id, definition);
+            Put(definition.Id, definition);
         }
         foreach(Factory factory in dbctx.Factories) {
-            DBCache.Put<Factory>(factory.Id, factory);
+            Put(factory.Id, factory);
         }
         foreach(UBIPolicy policy in dbctx.UBIPolicies) {
-            DBCache.Put<UBIPolicy>(policy.Id, policy);
+            Put(policy.Id, policy);
         }
         foreach(District district in dbctx.Districts) {
-            DBCache.Put<District>(district.Id, district);
+            Put(district.Id, district);
         }
         foreach(GroupRole role in dbctx.GroupRoles) {
-            DBCache.Put<GroupRole>(role.Id, role);
+            Put(role.Id, role);
         }
         foreach(Election election in dbctx.Elections) {
-            DBCache.Put<Election>(election.Id, election);
+            Put(election.Id, election);
         }
         foreach(Vote vote in dbctx.Votes) {
-            DBCache.Put<Vote>(vote.Id, vote);
+            Put(vote.Id, vote);
         }
         foreach(Province province in dbctx.Provinces) {
             province.District = Get<District>(province.DistrictId);
             Put(province.Id, province);
         }
         foreach (var _obj in dbctx.Cities)
-            DBCache.Put(_obj.Id, _obj);
-        foreach (Recipe recipe in dbctx.Recipes) {
-            DBCache.Put<Recipe>(recipe.Id, recipe);
-        }
-        foreach(Minister minister in dbctx.Ministers) {
-            DBCache.Put<Minister>(minister.UserId, minister);
-        }
-        foreach (Minister minister in dbctx.Ministers)
-        {
-            DBCache.Put<Minister>(minister.UserId, minister);
-        }
+            Put(_obj.Id, _obj);
+        foreach (Recipe recipe in dbctx.Recipes)
+            Put(recipe.Id, recipe);
+        foreach(Minister minister in dbctx.Ministers)
+            Put(minister.UserId, minister);
         foreach (var _obj in dbctx.Senators)
             Put(_obj.DistrictId, _obj);
 
@@ -197,21 +193,22 @@ public static class DBCache
 
     public static async Task SaveAsync()
     {
-        using var dbctx = VooperDB.DbFactory.CreateDbContext();
-        dbctx.Groups.UpdateRange(GetAll<Group>());
-        dbctx.GroupRoles.UpdateRange(GetAll<GroupRole>());
-        dbctx.Users.UpdateRange(GetAll<SVUser>());
-        dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
-        dbctx.TradeItems.UpdateRange(GetAll<TradeItem>());
-        dbctx.TradeItemDefinitions.UpdateRange(GetAll<TradeItemDefinition>());
-        dbctx.Factories.UpdateRange(GetAll<Factory>());
-        dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
-        dbctx.Districts.UpdateRange(GetAll<District>());
-        dbctx.Provinces.UpdateRange(GetAll<Province>());
-        dbctx.Cities.UpdateRange(GetAll<City>());
-        dbctx.Recipes.UpdateRange(GetAll<Recipe>());
-        dbctx.Ministers.UpdateRange(GetAll<Minister>());
-        dbctx.Senators.UpdateRange(GetAll<Senator>());
+        if (false) {
+            dbctx.Groups.UpdateRange(GetAll<Group>());
+            dbctx.GroupRoles.UpdateRange(GetAll<GroupRole>());
+            dbctx.Users.UpdateRange(GetAll<SVUser>());
+            dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
+            dbctx.TradeItems.UpdateRange(GetAll<TradeItem>());
+            dbctx.TradeItemDefinitions.UpdateRange(GetAll<TradeItemDefinition>());
+            dbctx.Factories.UpdateRange(GetAll<Factory>());
+            dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
+            dbctx.Districts.UpdateRange(GetAll<District>());
+            dbctx.Provinces.UpdateRange(GetAll<Province>());
+            dbctx.Cities.UpdateRange(GetAll<City>());
+            dbctx.Recipes.UpdateRange(GetAll<Recipe>());
+            dbctx.Ministers.UpdateRange(GetAll<Minister>());
+            dbctx.Senators.UpdateRange(GetAll<Senator>());
+        }
         await dbctx.SaveChangesAsync();
     }
 }
