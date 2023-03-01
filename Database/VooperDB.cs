@@ -132,7 +132,6 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<Group> Groups { get; set; }
 
     public DbSet<TaxPolicy> TaxPolicies { get; set; }
-    public DbSet<ForumPost> ForumPosts { get; set; }
     public DbSet<TradeItemDefinition> TradeItemDefinitions {get; set; }
     public DbSet<TradeItem> TradeItems { get; set; }
     public DbSet<Factory> Factories { get; set; }
