@@ -148,10 +148,8 @@ public class SVUser : BaseEntity
         PostLikes = 0;
         CommentLikes = 0;
         TaxAbleBalance = 0.00m;
-        TaxAbleBalanceYesterday = 0.00m;
         ApiKey = Guid.NewGuid().ToString();
         Credits = 500.0m;
-        CreditSnapshots = new();
         Rank = Rank.Unranked;
         Created = DateTime.UtcNow;
         Joined = DateTime.UtcNow;

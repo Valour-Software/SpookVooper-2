@@ -81,8 +81,6 @@ public class Group : BaseEntity, IHasOwner
         ApiKey = Guid.NewGuid().ToString();
         Credits = 0.0m;
         TaxAbleBalance = 0.0m;
-        TaxAbleBalanceYesterday = 0.0m;
-        CreditSnapshots = new();
         OwnerId = ownerId;
         Open = false;
         Flags = new();

@@ -3,7 +3,6 @@ global using SV2.Database.Models.Districts;
 global using SV2.Database.Models.Economy;
 global using SV2.Database.Models.Entities;
 global using SV2.Database.Models.Factories;
-global using SV2.Database.Models.Forums;
 global using SV2.Database.Models.Government;
 global using SV2.Database.Models.Groups;
 global using SV2.Database.Models.Items;

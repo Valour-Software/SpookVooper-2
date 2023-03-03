@@ -60,6 +60,10 @@ public class District
     [VarChar(128)]
     public string? FlagUrl { get; set; }
 
+    public double? BasePropertyTax { get; set; }
+
+    public double? PropertyTaxPerSize { get; set; }
+
     [NotMapped]
     public Dictionary<DistrictModifierType, DistrictModifier> Modifiers = new();
 

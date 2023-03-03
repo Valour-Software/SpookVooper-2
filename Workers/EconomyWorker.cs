@@ -5,6 +5,7 @@ using SV2.Database.Models.Economy;
 using SV2.Database.Models.Users;
 using SV2.Web;
 using System.Data;
+using System.Diagnostics;
 
 namespace SV2.Workers
 {
@@ -13,11 +14,15 @@ namespace SV2.Workers
         private readonly IServiceScopeFactory _scopeFactory;
         public readonly ILogger<EconomyWorker> _logger;
 
+        private readonly VooperDB _dbctx;
+
         public EconomyWorker(ILogger<EconomyWorker> logger,
-                            IServiceScopeFactory scopeFactory)
+                            IServiceScopeFactory scopeFactory,
+                            VooperDB dbctx)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
+            _dbctx = dbctx;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -99,13 +104,58 @@ namespace SV2.Workers
                                 // every day, update credit snapchats
                                 List<BaseEntity> entities = DBCache.GetAll<SVUser>().ToList<BaseEntity>();
                                 entities.AddRange(DBCache.GetAll<Group>());
+                                List<EntityBalanceRecord> records = new();
                                 foreach(BaseEntity entity in entities)
                                 {
-                                    if (entity.CreditSnapshots is null) {
-                                        entity.CreditSnapshots = new();
-                                    }
-                                    entity.CreditSnapshots.Add(entity.TaxAbleBalance);
-                                    await entity.DoIncomeTax();
+                                    records.Add(new() {
+                                        EntityId = entity.Id,
+                                        Time = DateTime.UtcNow,
+                                        Balance = entity.Credits,
+                                        TaxableBalance = entity.TaxAbleBalance
+                                    });
+                                    await entity.DoIncomeTax(_dbctx);
+                                }
+                                _dbctx.AddRange(records);
+                                await _dbctx.SaveChangesAsync();
+                            }
+
+                            Stopwatch sw = Stopwatch.StartNew();
+                            
+                            // entityid : dict<governorid, amount to pay>
+                            Dictionary<long, Dictionary<long, double>> propertytaxes = new();
+                            List<ProducingBuilding> buildings = DBCache.GetAll<Factory>().Select(x => (ProducingBuilding)x).ToList();
+                            buildings.AddRange(DBCache.GetAll<Mine>().Select(x => (ProducingBuilding)x).ToList());
+
+                            foreach (var building in buildings)
+                            {
+                                if (!propertytaxes.ContainsKey(building.OwnerId))
+                                    propertytaxes[building.OwnerId] = new();
+                                var entitytaxes = propertytaxes[building.OwnerId];
+                                var id = building.Province.GovernorId ?? building.DistrictId;
+                                if (!entitytaxes.ContainsKey(id))
+                                    entitytaxes[id] = 0.00;
+                                double amount = building.Province.BasePropertyTax ?? 0;
+                                amount += (building.Province.PropertyTaxPerSize ?? 0) * building.Size;
+                                entitytaxes[id] += amount;
+
+                                // now we do district property taxes
+                                if (!entitytaxes.ContainsKey(building.DistrictId))
+                                    entitytaxes[building.DistrictId] = 0.00;
+                                
+                                amount = building.District.BasePropertyTax ?? 0;
+                                amount += (building.District.PropertyTaxPerSize ?? 0) * building.Size;
+                                entitytaxes[building.DistrictId] += amount;
+                            }
+                            sw.Stop();
+                            Console.WriteLine($"Time took to determine property taxes: {(int)(sw.Elapsed.TotalMilliseconds)}ms");
+
+                            foreach((var entityid, var paymentpergovernorid) in propertytaxes) 
+                            {
+                                foreach (var governorid in paymentpergovernorid.Keys)
+                                {
+                                    if (paymentpergovernorid[governorid] <= 0) break;
+                                    Transaction tran = new Transaction(entityid, governorid, (decimal)(paymentpergovernorid[governorid]/30/24), TransactionType.TaxPayment, $"Property Tax Payment");
+                                    tran.NonAsyncExecute();
                                 }
                             }
 

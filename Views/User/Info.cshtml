@@ -97,68 +97,6 @@ else
                     <br />
                     <center><a asp-action="SetInfo" asp-controller="User" class="btn btn-primary">Modify</a></center>
                 }
-
-                <br />
-                <hr />
-
-                <h1>Recent Posts</h1>
-
-                var posts = await dbctx.ForumPosts.Where(p => !p.Removed && p.AuthorId == Model.Id).OrderBy(c => c.TimePosted).Take(5).ToListAsync();
-
-                for (int i = 0; i < 5; i++)
-                {
-                    if (i > posts.Count() - 1)
-                    {
-                        break;
-                    }
-
-                    ForumPost post = posts[i];
-
-                    <div class="d-flex flex-wrap srow">
-                        <div class="p-2" style="font-size:larger">
-                            💙 @post.Likes.Count
-                        </div>
-                        <div class="p-2" style="width:40%">
-
-                            <a style="font-size:larger" asp-controller="Forum" asp-action="ViewPost" asp-route-id="@post.Id">
-                                @StringHelper.FormatTitle(post.Title, 20)
-                            </a>
-                        </div>
-
-                        <div class="p-0 flex-grow-1">
-                            <div class="d-flex">
-                                @{
-                                    SVUser authorUser = DBCache.Get<SVUser>(post.AuthorId)!;
-                                    <div class="p-1">
-                                        <img class="smallpfp" style="margin-left: 10px; margin-right:10px; float:right" src="@authorUser.GetPfpUrl()" />
-                                    </div>
-                                    <a asp-controller="User" asp-action="Info" asp-route-id="@authorUser.Id">
-                                        <p class="forumtable-text">@authorUser.Name</p>
-                                    </a>
-                                }
-                            </div>
-                        </div>
-
-                        <div class="p-2" style="min-width:25%">
-                            <p style="word-break:break-all">
-                                @StringHelper.FormatTitle(post.Content, 30)
-                            </p>
-                        </div>
-                        <!--
-                            <div class="col-3">
-                                <p style="font-size:smaller">
-                        @post.Tags
-                                </p>
-                            </div>
-                        -->
-
-                    </div>
-
-
-
-
-
-                }
             }
             else
             {

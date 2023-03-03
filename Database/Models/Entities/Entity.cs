@@ -39,12 +39,6 @@ public abstract class BaseEntity
 
     [DecimalType]
     public decimal TaxAbleBalance { get; set;}
-
-    [DecimalType]
-    public decimal TaxAbleBalanceYesterday { get; set; }
-
-    // TODO: change this to use an actual db table
-    public List<decimal>? CreditSnapshots { get; set;}
     
     [JsonIgnore]
     [VarChar(36)]
@@ -63,7 +57,13 @@ public abstract class BaseEntity
 
     public static BaseEntity? Find(long? Id) => DBCache.FindEntity(Id);
 
-    public async Task DoIncomeTax()
+    public async Task<decimal> GetAvgTaxableBalance(VooperDB dbctx, int hours = 720)
+    {
+        DateTime timetocheck = DateTime.UtcNow.AddHours(-hours);
+        return await dbctx.EntityBalanceRecords.Where(x => x.EntityId == Id && x.Time > timetocheck).AverageAsync(x => x.TaxableBalance);
+    }
+
+    public async Task DoIncomeTax(VooperDB dbctx)
     {
         // districts do not pay income tax
         if (EntityType == EntityType.Group && DBCache.Get<District>(Id) is not null)
@@ -72,10 +72,13 @@ public abstract class BaseEntity
         if (TaxAbleBalance <= 0.0m)
             return;
 
-        if (CreditSnapshots is null)
-            CreditSnapshots = new();
+        DateTime timetocheck = DateTime.UtcNow.AddHours(-722);
+        var recordobj = await dbctx.EntityBalanceRecords.Where(x => x.EntityId == Id && x.Time > timetocheck).OrderByDescending(x => x.Time).LastOrDefaultAsync();
+        decimal taxablebalance30dago = 0.0m;
+        if (recordobj is not null)
+            taxablebalance30dago = recordobj.TaxableBalance;
 
-        decimal amount = TaxAbleBalance-TaxAbleBalanceYesterday;
+        decimal amount = await GetAvgTaxableBalance(dbctx)-taxablebalance30dago;
         var toprocess = amount;
 
         if (amount <= 0.0m)
@@ -107,11 +110,11 @@ public abstract class BaseEntity
             }
             if (totaldue > 0.1m)
             {
-                Transaction taxtrans = new Transaction(Id, (long)DistrictId, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - TaxAbleBalanceYesterday} of income.");
+                Transaction taxtrans = new Transaction(Id, (long)DistrictId, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
                 taxtrans.NonAsyncExecute(true);
             }
 
-            amount = TaxAbleBalance - TaxAbleBalanceYesterday;
+            amount = TaxAbleBalance - taxablebalance30dago;
             toprocess = amount;
             totaldue = 0.0m;
         }
@@ -134,7 +137,7 @@ public abstract class BaseEntity
                 break;
         }
         if (totaldue > 0.1m) {
-            Transaction taxtrans = new Transaction(Id, 100, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - TaxAbleBalanceYesterday} of income.");
+            Transaction taxtrans = new Transaction(Id, 100, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
             taxtrans.NonAsyncExecute(true);
         }
 

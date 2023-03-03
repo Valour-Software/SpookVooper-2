@@ -3,7 +3,6 @@ using SV2.Database.Models.Users;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Items;
 using SV2.Database.Models.Factories;
-using SV2.Database.Models.Forums;
 using SV2.Database.Models.Districts;
 using SV2.Database.Models.Government;
 using System;
@@ -150,6 +149,8 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<Senator> Senators { get; set; }
     public DbSet<NewsPost> NewsPosts { get; set; }
     public DbSet<City> Cities { get; set; }
+
+    public DbSet<EntityBalanceRecord> EntityBalanceRecords { get; set; }
 
     public VooperDB(DbContextOptions options)
     {
