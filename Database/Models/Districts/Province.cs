@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Managers;
 using SV2.NonDBO;
-using SV2.Scripting;
 using SV2.Managers;
 using SV2.Scripting.LuaObjects;
 using SV2.Database.Models.Users;
+using SV2.Scripting;
 
 namespace SV2.Database.Models.Districts;
 
@@ -145,6 +145,9 @@ public class Province
         return $"rgb({color.R}, {color.G}, {color.B})";
     }
 
+    [NotMapped]
+    public int BuildingSlotsUsed => GetBuildings().Where(x => x.BuildingObj.UseBuildingSlots).Count();
+
     public IEnumerable<BuildingBase> GetBuildings()
     {
         List<BuildingBase> buildings = new();
@@ -180,7 +183,8 @@ public class Province
         var exponent = Defines.NProvince[NProvince.OVERPOPULATION_MODIFIER_EXPONENT];
         exponent += GetModifierValue(ProvinceModifierType.OverPopulationModifierExponent);
         exponent += District.GetModifierValue(DistrictModifierType.OverPopulationModifierExponent);
-        var rate = Math.Pow(Population, exponent) / 100.0;
+        var population = Population - GetModifierValue(ProvinceModifierType.OverPopulationModifierPopulationBase);
+        var rate = Math.Pow(population, exponent) / 100.0;
         rate += Defines.NProvince[NProvince.OVERPOPULATION_MODIFIER_BASE];
         if (rate > 0)
             return rate;
@@ -387,5 +391,6 @@ public enum ProvinceModifierType
     FactoryEfficiency,
     AllProducingBuildingThroughputFactor,
     MigrationAttractionFactor,
-    OverPopulationModifierExponent
+    OverPopulationModifierExponent,
+    OverPopulationModifierPopulationBase
 }

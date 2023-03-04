@@ -17,12 +17,11 @@ namespace SV2.Workers
         private readonly VooperDB _dbctx;
 
         public EconomyWorker(ILogger<EconomyWorker> logger,
-                            IServiceScopeFactory scopeFactory,
-                            VooperDB dbctx)
+                            IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
-            _dbctx = dbctx;
+            _dbctx = VooperDB.DbFactory.CreateDbContext();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

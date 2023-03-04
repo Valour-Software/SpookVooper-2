@@ -1,0 +1,83 @@
+@model Province
+@using SV2.Scripting
+
+@{
+    ViewData["Title"] = "Province Builder";
+
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .buildings {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .building {
+        width: 300px;
+        height: 150px;
+        border-radius: 18px;
+        margin: 8px;
+        text-align: center;
+        background-color: rgba(0,0,0,0.3);
+    }
+    .resource-row {
+        width: 100%;
+    }
+
+    .buildingcosts {
+        flex-direction: column;
+        padding-left: 2px;
+        padding-right: 2px;
+        text-align: start;
+        margin-left: 20px;
+    }
+</style>
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h3 style="text-align:center">@ViewData["Title"]</h3>
+        <h2 style="text-align:center">The Province of @Model.Name</h2>
+
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+
+            </div>
+            <div class="col-4"></div>
+        </div>
+
+        <br />
+        <hr />
+        <br />
+        
+        <div class="buildings">
+            @foreach (var buildingobj in GameDataManager.BaseBuildingObjs.Values) 
+            {
+                <div class="building">
+                    <a asp-route-buildingid="@buildingobj.Name" asp-route-provinceid="@Model.Id" asp-action="Build" asp-controller="Building">
+                        <span>@buildingobj.PrintableName</span>
+                    </a>
+                    <br>
+                    <span>Costs to build</span>
+                    <br>
+                    <div class="buildingcosts">
+                        @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(Model.District, Model))) {
+                            <div class="resource-row">
+                                <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                                <span style="align-self: flex-end">@($"{amount:n0}")</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>

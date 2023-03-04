@@ -12,18 +12,14 @@ building_simple_factory = {
 	type = "Factory"
 }
 
-building_simple_factory = {
+building_advanced_factory = {
 	recipes = {
-		recipe_iron_smeltery_base,
-		recipe_steel_factory_base,
-		recipe_simple_components_factory_base,
 		recipe_advanced_components_factory_base
 	}
 	buildingcosts = {
-		steel = 17500,
-		simple_components = 12500,
-		advanced_components = 2500
+		steel = 27500,
+		simple_components = 17500,
+		advanced_components = 5000
 	}
-	maintenance_cost
 	type = "Factory"
 }

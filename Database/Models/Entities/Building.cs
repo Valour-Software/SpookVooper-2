@@ -2,6 +2,7 @@ using SV2.Database.Managers;
 using SV2.Scripting.LuaObjects;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using SV2.Scripting;
 
 namespace SV2.Database.Models.Buildings;
 
@@ -10,7 +11,8 @@ public enum BuildingType
     Mine = 0,
     Farm = 3,
     Factory = 1,
-    Recruitment_Center = 2
+    Recruitment_Center = 2,
+    Infrastructure = 4
 }
 
 public interface ITickable
@@ -70,9 +72,15 @@ public abstract class ProducingBuilding : BuildingBase
     {
         get
         {
-            double eff = 1.00 - ((Size * Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]) - Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]);
-            eff += District.GetModifierValue(DistrictModifierType.FactoryEfficiency);
-            eff *= 1 + District.GetModifierValue(DistrictModifierType.FactoryEfficiencyFactor);
+            double eff = 1.0;
+            if (BuildingObj.BaseEfficiency is not null)
+                eff = (double)BuildingObj.BaseEfficiency.GetValue(new ExecutionState(District, Province));
+
+            if (BuildingType == BuildingType.Factory) {
+                eff -= ((Size * Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]) - Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]);
+                eff += District.GetModifierValue(DistrictModifierType.FactoryEfficiency);
+                eff *= 1 + District.GetModifierValue(DistrictModifierType.FactoryEfficiencyFactor);
+            }
             return eff;
         }
     }

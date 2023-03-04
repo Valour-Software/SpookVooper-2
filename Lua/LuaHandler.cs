@@ -1,15 +1,15 @@
 ﻿using System.Globalization;
 using System.ComponentModel;
 using SV2.Managers;
-using SV2.Scripting;
 using Decimal = SV2.Scripting.Decimal;
 using System.Xml.Linq;
 using Valour.Api.Nodes;
-using Microsoft.CodeAnalysis;
 using SV2.Database.Models.Buildings;
 using System.Data;
 using SV2.NonDBO;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using SV2.Scripting.LuaObjects;
+using SV2.Scripting;
 
 namespace SV2.Scripting.Parser;
 
@@ -52,6 +52,12 @@ public class LuaTable : LuaObject
                 return null;
             return Items[key];
         }
+    }
+
+    public string GetValue(string key) {
+        var obj = this[key];
+        if (obj is null) return null;
+        return obj.Value;
     }
 }
 
@@ -228,10 +234,12 @@ public static class LuaHandler
                         {
                             "farmingthroughputfactor" => ProvinceModifierType.FarmThroughputFactor
                         },
+                        "buildingslots" => ProvinceModifierType.BuildingSlots,
                         "buildingslotsfactor" => ProvinceModifierType.BuildingSlotsFactor,
                         "buildingslotsexponent" => ProvinceModifierType.BuildingSlotsExponent,
                         "migrationattractionfactor" => ProvinceModifierType.MigrationAttractionFactor,
-                        "overpopulationmodifierexponent" => ProvinceModifierType.OverPopulationModifierExponent
+                        "overpopulationmodifierexponent" => ProvinceModifierType.OverPopulationModifierExponent,
+                        "overpopulationmodifierpopulationbase" => ProvinceModifierType.OverPopulationModifierPopulationBase
                     }
                 };
             }
@@ -256,7 +264,27 @@ public static class LuaHandler
         return nodes;
     }
 
-    public static ExpressionNode HandleSyntaxExpression(LuaTable table, string parentname = null)
+    public static DictNode HandleDictExpression(LuaTable table) 
+    {
+        DictNode dict = new();
+        foreach (var key in table.Keys) 
+        {
+            var obj = table[key];
+            if (obj.type == ObjType.LuaTable) {
+                LuaTable _table = new();
+                if (obj.Name == "add_locals")
+                    _table.Items[obj.Name] = obj;
+                else
+                    _table = (LuaTable)obj;
+                dict.Body[obj.Name] = HandleSyntaxExpression(_table);
+            }
+            else
+                dict.PermanentValues[obj.Name] = Convert.ToDecimal(obj.Value);
+        }
+        return dict;
+    }
+
+    public static ExpressionNode HandleSyntaxExpression(LuaTable table, string parentname = null, SyntaxNode parent = null)
     {
         var expr = new ExpressionNode();
         foreach (var key in table.Keys)
@@ -269,7 +297,7 @@ public static class LuaHandler
                 valuenode = new SystemVar() { Value = obj.Value };
             else if (obj.type == ObjType.LuaTable)
             {
-                if (!(parentname == "effects"))
+                if (!(parentname == "effects" || parentname == "add_locals"))
                 {
                     var node = new ExpressionNode();
                     node.Body = HandleSyntaxExpression((LuaTable)obj).Body;
@@ -287,13 +315,20 @@ public static class LuaHandler
                 expr.Body.Add(new Add() { Value = valuenode });
             else if (obj.Name == "factor")
                 expr.Body.Add(new Factor() { Value = valuenode });
+            else if (obj.Name == "get_local")
+                expr.Body.Add(new GetLocal() { Name = ((SystemVar)valuenode).Value });
             else if (obj.Name == "effects")
-                expr.Body.Add(new EffectBody { Body = exprnode.Body.Select(x => (IEffectNode)x).ToList() });
-            else if (obj.Name == "if")
+                expr.Body.Add(new EffectBody() { Body = exprnode.Body.Select(x => (IEffectNode)x).ToList() });
+            else if (obj.Name == "add_locals") 
             {
+                var node = new AddLocalsNode();
+                foreach (var item in exprnode.Body.Select(x => (LocalNode)x))
+                    node.Body[item.Name] = item.Value;
+                expr.Body.Add(node);
+            }
+            else if (obj.Name == "if") {
                 var iftable = (LuaTable)obj;
-                var ifstatement = new IfStatement()
-                {
+                var ifstatement = new IfStatement() {
                     Limit = (ConditionalStatement)exprnode.Body.FirstOrDefault(x => x.NodeType == NodeType.CONDITIONALSTATEMENT),
                     ValueNode = new()
                 };
@@ -301,8 +336,7 @@ public static class LuaHandler
                 if (iftable.Keys.Contains("effects"))
                     ifstatement.EffectNode = (EffectBody)exprnode.Body.FirstOrDefault(x => x.NodeType == NodeType.EFFECTBODY);
 
-                foreach (var node in exprnode.Body)
-                {
+                foreach (var node in exprnode.Body) {
                     if (node.NodeType == NodeType.CONDITIONALSTATEMENT || node.NodeType == NodeType.EFFECTBODY)
                         continue;
                     ifstatement.ValueNode.Body.Add(node);
@@ -310,14 +344,17 @@ public static class LuaHandler
 
                 expr.Body.Add(expr);
             }
-            else if (parentname == "effects")
-            {
+            else if (parentname == "add_locals") {
+                expr.Body.Add(new LocalNode() {
+                    Name = obj.Name,
+                    Value = HandleSyntaxExpression((LuaTable)obj)
+                });
+            }
+            else if (parentname == "effects") {
                 var effectbody_table = (LuaTable)obj;
 
-                if (obj.Name == "add_modifier")
-                {
-                    var addmodifiernode = new AddModifierNode()
-                    {
+                if (obj.Name == "add_modifier") {
+                    var addmodifiernode = new AddModifierNode() {
                         ModifierName = effectbody_table["name"].Value,
                         Decay = Convert.ToBoolean(effectbody_table["decay"].Value ?? "false"),
                         Duration = Convert.ToInt32(effectbody_table["duration"].Value ?? "0")
@@ -374,37 +411,28 @@ public static class LuaHandler
             ResourceManager.Recipes[recipe.Name] = recipe;
         }
     }
-
+    */
     public static void HandleBuildingFile(string content)
     {
         foreach (var (table, name) in HandleFile(content))
         {
-            var building = new Building()
+            var building = new LuaBuilding()
             {
                 Name = name,
-                BuildingCosts = new(),
                 Recipes = new(),
-                LandUsage = Convert.ToInt64(table["landusage"].Value)
+                OnlyGovernorCanBuild = Convert.ToBoolean(table.GetValue("onlygovernorcanbuild") ?? "false"),
+                UseBuildingSlots = Convert.ToBoolean(table.GetValue("usebuildingslots") ?? "true"),
+                BuildingCosts = HandleDictExpression((LuaTable)table["buildingcosts"])
             };
-            var recipes = (LuaTable)table["recipes"];
-            foreach (string recipe in recipes.Values.Select(x => x.Value))
-                building.Recipes.Add(ResourceManager.Recipes[recipe]);
 
-            var buildingcosts = (LuaTable)table["buildingcosts"];
-            if (buildingcosts is not null)
-            {
-                foreach (string input in buildingcosts.Keys)
-                {
-                    building.BuildingCosts[input.ToTitleCase()] = Convert.ToDecimal(buildingcosts[input]);
-                }
-            }
-            Console.WriteLine($"Loading Building: {name}");
-            foreach (string key in table.Keys)
-            {
-                Console.WriteLine($"{key}: {table[key]}");
-            }
+            //var recipes = (LuaTable)table["recipes"];
+            //foreach (string recipe in recipes.Values.Select(x => x.Value))
+            //    building.Recipes.Add(ResourceManager.Recipes[recipe]);
+            if (table["base_efficiency"] is not null)
+                building.BaseEfficiency = HandleSyntaxExpression((LuaTable)table["base_efficiency"]);
+
             building.type = Enum.Parse<BuildingType>(table["type"].Value);
-            ResourceManager.Buildings[building.Name] = building;
+            GameDataManager.BaseBuildingObjs[building.Name] = building;
         }
-    } */
+    }
 }

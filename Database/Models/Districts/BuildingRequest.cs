@@ -48,5 +48,5 @@ public class BuildingRequest
     /// <summary>
     /// The id of the entity who reviewed this request
     /// </summary>
-    public long ReviewerId { get; set; }
+    public long? ReviewerId { get; set; }
 }

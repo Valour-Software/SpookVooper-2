@@ -74,13 +74,13 @@
                         @Html.Raw(MarkdownManager.GetHtml(Model.Description))
                     </div>
                 }
-
-                if (user is not null && Model.District.GovernorId == user.Id)
-                {
-                    <center>
+                <center>
+                    @if (user is not null && Model.District.GovernorId == user.Id)
+                    {
                         <a asp-route-id="@Model.Id" asp-action="Edit" asp-controller="Province" class="btn btn-primary">Modify</a>
-                    </center>
-                }
+                    }
+                    <a asp-route-id="@Model.Id" asp-action="Build" asp-controller="Province" class="btn btn-primary">Build</a>
+                </center>
             } 
             else
             {

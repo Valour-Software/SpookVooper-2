@@ -98,7 +98,8 @@ public class ProvinceController : SVController
         oldprovince.BasePropertyTax = newprovince.BasePropertyTax;
         oldprovince.PropertyTaxPerSize = newprovince.PropertyTaxPerSize;
 
-        return RedirectBack("Successfully saved your changes.");
+        StatusMessage = "Successfully saved your changes.";
+        return Redirect($"/Province/View/{oldprovince.Id}");
     }
 
     [HttpGet("/Province/ChangeGovernor/{id}")]
@@ -116,6 +117,20 @@ public class ProvinceController : SVController
         province.GovernorId = GovernorId;
 
         return RedirectBack($"Successfully changed the governorship of this province to {BaseEntity.Find(GovernorId).Name}");
+    }
+
+    [HttpGet("/Province/Build/{id}")]
+    public IActionResult Build(long id) {
+        Province? province = DBCache.Get<Province>(id);
+        if (province is null)
+            return Redirect("/");
+
+        SVUser? user = UserManager.GetUser(HttpContext);
+
+        if (user is null)
+            return Redirect("/account/login");
+
+        return View(province);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

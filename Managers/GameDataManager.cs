@@ -15,5 +15,9 @@ public static class GameDataManager
     public static async Task Load()
     {
         LuaHandler.HandleProvinceDevelopmentStagesFile(File.ReadAllText("Managers/Data/ProvinceDevelopmentStages.lua"));
+
+        foreach (var path in ResourceManager.GetFilePaths("Buildings")) {
+            LuaHandler.HandleBuildingFile(File.ReadAllText(path));
+        }
     }
 }

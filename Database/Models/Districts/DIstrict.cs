@@ -17,15 +17,16 @@ public class DistrictModifier
 public class District
 {
     [Key]
+    [Column("id")]
     public long Id { get; set; }
 
-    [VarChar(64)]
+    [Column("name", TypeName = "VARCHAR(64)")]
     public string? Name { get; set; }
 
     [NotMapped]
     public string ScriptName => Name.Replace(" ", "_");
 
-    [VarChar(512)]
+    [Column("description", TypeName = "VARCHAR(512)")]
     public string? Description { get; set; }
 
     [NotMapped]
@@ -48,27 +49,31 @@ public class District
         }
     }
 
+    [NotMapped]
     public Group Group => DBCache.Get<Group>(GroupId)!;
 
+    [Column("groupid")]
     public long GroupId { get; set; }
 
     [NotMapped]
     public Senator Senator => DBCache.Get<Senator>(Id);
 
+    [Column("governorid")]
     public long? GovernorId { get; set; }
 
-    [VarChar(128)]
+    [Column("flagurl", TypeName = "VARCHAR(256)")]
     public string? FlagUrl { get; set; }
 
+    [Column("basepropertytax")]
     public double? BasePropertyTax { get; set; }
 
+    [Column("propertytaxpersize")]
     public double? PropertyTaxPerSize { get; set; }
 
     [NotMapped]
     public Dictionary<DistrictModifierType, DistrictModifier> Modifiers = new();
 
     [NotMapped]
-    [JsonIgnore]
     public string Color => Name switch
     {
         "Lanatia" => "F4B7FD",

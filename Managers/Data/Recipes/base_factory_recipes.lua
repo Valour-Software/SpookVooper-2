@@ -8,7 +8,6 @@ recipe_iron_smeltery_base = {
 	}
 	perhour = 50
     editable = false
-    simple = true
 }
 
 recipe_steel_factory_base = {
@@ -22,7 +21,6 @@ recipe_steel_factory_base = {
 	}
 	perhour = 3
     editable = false
-	simple = true
 }
 
 recipe_simple_components_factory_base = {
@@ -36,7 +34,6 @@ recipe_simple_components_factory_base = {
 	}
 	perhour = 6
     editable = false
-	simple = true
 }
 
 recipe_advanced_components_factory_base = {
@@ -50,5 +47,18 @@ recipe_advanced_components_factory_base = {
 	}
 	perhour = 1
     editable = false
-	simple = false
+}
+
+recipe_small_arms_factory_base = {
+	inputs = {
+		steel = 5
+	}
+	outputs = {
+		small_arms = 1
+	}
+	perhour = 1
+	editable = true
+	edits = {
+
+	}
 }

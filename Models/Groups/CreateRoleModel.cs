@@ -79,6 +79,9 @@ public class CreateRoleModel
     [Display(Name = "Manage Provinces", Description = "The ability to edit/manage provinces that this group has governorship over.")]
     public bool ManageProvinces { get; set; }
 
+    [Display(Name = "Build", Description = "The ability to submit building requests as this group.")]
+    public bool Build { get; set; }
+
     public static CreateRoleModel FromExisting(GroupRole role)
     {
         CreateRoleModel model = new CreateRoleModel()
@@ -103,6 +106,7 @@ public class CreateRoleModel
         model.News = role.HasPermission(GroupPermissions.News);
         model.ManageBuildingRequests = role.HasPermission(GroupPermissions.ManageBuildingRequests);
         model.ManageProvinces = role.HasPermission(GroupPermissions.ManageProvinces);
+        model.Build = role.HasPermission(GroupPermissions.Build);
 
         return model;
     }

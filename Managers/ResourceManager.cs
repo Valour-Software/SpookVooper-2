@@ -18,6 +18,7 @@ public class BaseRecipe
     public string Name { get; set; }
     public List<ModifierLevelDefinition>? Modifiers { get; set; }
     public double PerHour { get; set; }
+    public bool InputCostScalePerLevel { get; set; }
 }
 
 public class ModifierLevelDefinition
@@ -75,11 +76,11 @@ public static class ResourceManager
         }
         try
         {
-            return Directory.GetFiles($"../../../../Database/Managers/Data/{path}").ToList();
+            return Directory.GetFiles($"../../../Managers/Data/{path}").ToList();
         }
         catch
         {
-            return Directory.GetFiles($"../Database/Managers/Data/{path}").ToList();
+            return Directory.GetFiles($"Managers/Data/{path}").ToList();
         }
     }
 

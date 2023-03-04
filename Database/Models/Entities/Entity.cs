@@ -57,6 +57,16 @@ public abstract class BaseEntity
 
     public static BaseEntity? Find(long? Id) => DBCache.FindEntity(Id);
 
+    public async ValueTask<decimal> GetOwnershipOfResource(string resource) 
+    {
+        return 9999999999999999999999.99m;
+    }
+
+    public async ValueTask<bool> HasEnoughResource(string resource, decimal amount) 
+    {
+        return await GetOwnershipOfResource(resource) > amount;
+    }
+
     public async Task<decimal> GetAvgTaxableBalance(VooperDB dbctx, int hours = 720)
     {
         DateTime timetocheck = DateTime.UtcNow.AddHours(-hours);

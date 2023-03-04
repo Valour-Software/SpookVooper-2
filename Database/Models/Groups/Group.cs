@@ -119,8 +119,12 @@ public class Group : BaseEntity, IHasOwner
     public bool HasPermission(BaseEntity entity, GroupPermission permission)
     {
         if (entity.Id == OwnerId)
-        {
             return true;
+
+        if (Owner.EntityType == EntityType.Group || Owner.EntityType == EntityType.Corporation) {
+            Group group = (Group)Owner;
+            if (group.HasPermission(entity, permission))
+                return true;
         }
 
         foreach (GroupRole role in DBCache.GetAll<GroupRole>().Where(x => x.GroupId == Id && x.MembersIds.Contains(entity.Id)).OrderByDescending(x => x.Authority))

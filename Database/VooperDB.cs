@@ -149,7 +149,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<Senator> Senators { get; set; }
     public DbSet<NewsPost> NewsPosts { get; set; }
     public DbSet<City> Cities { get; set; }
-
+    public DbSet<BuildingRequest> BuildingRequests { get; set; }
     public DbSet<EntityBalanceRecord> EntityBalanceRecords { get; set; }
 
     public VooperDB(DbContextOptions options)

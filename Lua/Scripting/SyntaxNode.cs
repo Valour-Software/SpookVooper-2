@@ -1,29 +1,33 @@
 ﻿using System;
+using SV2.Scripting;
 
 namespace SV2.Scripting;
 
 public enum NodeType
 {
-	BASE,
-	ADD,
-	FACTOR,
-	DECIMAL,
-	SYSTEMVAR,
-	EXPRESSION,
-	IFSTATEMENT,
-	COMPARISON,
-	CONDITIONALSTATEMENT,
-	CONDITIONALLOGICBLOCK,
-	EFFECT,
-	EFFECTBODY,
-	MODIFIER
+    BASE,
+    ADD,
+    FACTOR,
+    DECIMAL,
+    SYSTEMVAR,
+    EXPRESSION,
+    IFSTATEMENT,
+    COMPARISON,
+    CONDITIONALSTATEMENT,
+    CONDITIONALLOGICBLOCK,
+    EFFECT,
+    EFFECTBODY,
+    MODIFIER,
+    DICTNODE,
+    ADDLOCALSNODE,
+    GETLOCAL
 }
 
 public class ExecutionState
 {
     public Dictionary<string, decimal> Locals { get; set; }
-	public District District { get; set; }
-	public Province? Province { get; set; }
+    public District District { get; set; }
+    public Province? Province { get; set; }
     public ExecutionState(District district, Province? province)
     {
         Locals = new();
@@ -246,7 +250,8 @@ public class SystemVar : SyntaxNode
             "province" => levels[1].ToLower() switch
             {
                 "population" => state.Province.Population,
-                "owner" => state.Province.District.Id
+                "owner" => state.Province.District.Id,
+                "totaloftype" => state.Province.GetBuildings().Count(x => x.BuildingObj.Name.ToLower() == levels[2])
             },
             _ => 0.00m
         };
@@ -280,7 +285,11 @@ public class ExpressionNode : SyntaxNode
                 case NodeType.FACTOR:
                     result *= node.GetValue(state);
                     break;
+                case NodeType.GETLOCAL:
+                    result = node.GetValue(state);
+                    break;
                 case NodeType.SYSTEMVAR:
+                    result = node.GetValue(state);
                     break;
                 default:
                     break;
@@ -289,4 +298,79 @@ public class ExpressionNode : SyntaxNode
 
         return result;
     }
+}
+
+public class DictNode : SyntaxNode
+{
+    public Dictionary<string, SyntaxNode> Body { get; set; }
+
+    public Dictionary<string, decimal> PermanentValues { get; set; }
+
+    public DictNode()
+    {
+        Body = new();
+        PermanentValues = new();
+        NodeType = NodeType.DICTNODE;
+    }
+
+    public override decimal GetValue(ExecutionState state) { return 0.00m; }
+
+    public Dictionary<string, decimal> Evaluate(ExecutionState state)
+    {
+        var data = new Dictionary<string, decimal>();
+        foreach ((var key, var value) in PermanentValues)
+            data[key] = value;
+        foreach ((var key, var valuenode) in Body) 
+        {
+            if (key == "add_locals") {
+                foreach (var _node in ((ExpressionNode)valuenode).Body) {
+                    var node = (AddLocalsNode)_node;
+                    node.Execute(state);
+                }
+            }
+                
+            else
+                data[key] = valuenode.GetValue(state);
+        }
+        return data;
+    }
+}
+
+public class GetLocal : SyntaxNode
+{
+    public string Name;
+    public GetLocal() {
+        NodeType = NodeType.GETLOCAL;
+    }
+
+    public override decimal GetValue(ExecutionState state) {
+        return state.Locals[Name];
+    }
+}
+
+public class AddLocalsNode : SyntaxNode 
+{
+    public Dictionary<string, SyntaxNode> Body { get; set; }
+
+    public AddLocalsNode() {
+        Body = new();
+        NodeType = NodeType.ADDLOCALSNODE;
+    }
+
+    public override decimal GetValue(ExecutionState state) { return 0.00m; }
+
+    public void Execute(ExecutionState state)
+    {
+        foreach ((var key, var valuenode) in Body) 
+        {
+            state.Locals[key] = valuenode.GetValue(state);
+        }
+    }
+}
+
+public class LocalNode : SyntaxNode 
+{
+    public string Name { get; set; }
+    public SyntaxNode Value { get; set; }
+    public override decimal GetValue(ExecutionState state) { return 0.00m; }
 }
