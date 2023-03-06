@@ -39,6 +39,7 @@ namespace SV2.Controllers
             {
                 Id = user.Id,
                 Name = user.Name,
+                user = user
             };
 
             if (user is null) 

@@ -13,12 +13,8 @@ public class ItemTrade
     public int Amount { get; set; }
     
     [NotMapped]
-    public TradeItemDefinition Definition {
-        get {
-            return DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.Id == Definition_Id)!;
-        }
-    }
-    public long Definition_Id { get; set; }
+    public ItemDefinition Definition => DBCache.Get<ItemDefinition>(DefinitionId)!;
+    public long DefinitionId { get; set; }
 
     public DateTime Time { get; set; }
 
@@ -46,14 +42,14 @@ public class ItemTrade
         
     }
 
-    public ItemTrade(long fromId, long toId, int amount, long definition_id, string details)
+    public ItemTrade(long fromId, long toId, int amount, long definitionid, string details)
     {
         Id = IdManagers.GeneralIdGenerator.Generate();
         Amount = amount;
         FromId = fromId;
         ToId = toId;
         Time = DateTime.UtcNow;
-        Definition_Id = definition_id;
+        DefinitionId = definitionid;
         Details = details;
     }
 
@@ -96,8 +92,8 @@ public class ItemTrade
         if (fromEntity == null) { return new TaskResult(false, $"Failed to find sender {FromId}."); }
         if (toEntity == null) { return new TaskResult(false, $"Failed to find reciever {ToId}."); }
 
-        TradeItem? fromitem = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.OwnerId == FromId && x.Definition_Id == Definition_Id);
-        TradeItem? toitem = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.OwnerId == ToId && x.Definition_Id == Definition_Id);
+        SVItemOwnership? fromitem = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.OwnerId == FromId && x.DefinitionId == DefinitionId);
+        SVItemOwnership? toitem = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.OwnerId == ToId && x.DefinitionId == DefinitionId);
 
         if (fromitem is null) {
             return new TaskResult(false, $"{fromEntity.Name} lacks any {Definition.Name} to give {Amount} to ¢{toEntity.Name}");
@@ -120,17 +116,17 @@ public class ItemTrade
             {
                 Id = IdManagers.GeneralIdGenerator.Generate(),
                 OwnerId = ToId,
-                Definition_Id = Definition_Id,
+                DefinitionId = DefinitionId,
                 Amount = 0
             };
             DBCache.Put(toitem.Id, toitem);
-            dbctx.TradeItems.Add(toitem);
+            dbctx.SVItemOwnerships.Add(toitem);
             await dbctx.SaveChangesAsync();
         }
 
         // do tariffs
 
-        if (ResourceManager.Resources.Contains(toitem.Definition.Name) && toitem.Definition.OwnerId == 100)
+        if (GameDataManager.Resources.ContainsKey(toitem.Definition.Name) && toitem.Definition.IsSVItem)
         {
             TaxPolicy? FromDistrictTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == fromEntity.DistrictId & (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));
             TaxPolicy? ToDistrictTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == toEntity.DistrictId & (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));

@@ -11,7 +11,7 @@ public class Mine : ProducingBuilding
 {
     public override BuildingType BuildingType { get => BuildingType.Factory; set => BuildingType = value; }
 
-    public async Task Tick(List<TradeItem> tradeItems)
+    public async Task Tick(List<SVItemOwnership> tradeItems)
     {
         // TODO: when we add district stats (industal stat, etc) update this
         

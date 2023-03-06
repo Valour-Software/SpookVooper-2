@@ -103,6 +103,24 @@
                         <span asp-description-for="Eco" class="form-text" style="color:#888888" />
                         <span asp-validation-for="Eco" class="text-danger"></span>
                     </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="ManageProvinces" class="form-check-inline" />
+                        <label asp-for="ManageProvinces"></label>
+                        <span asp-description-for="ManageProvinces" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="ManageProvinces" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="ManageBuildingRequests" class="form-check-inline" />
+                        <label asp-for="ManageBuildingRequests"></label>
+                        <span asp-description-for="ManageBuildingRequests" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="ManageBuildingRequests" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="Build" class="form-check-inline" />
+                        <label asp-for="Build"></label>
+                        <span asp-description-for="Build" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="Build" class="text-danger"></span>
+                    </div>
                     @if (group.Flags.Contains(GroupFlag.News))
                     {
                         <div class="form-group">

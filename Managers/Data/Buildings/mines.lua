@@ -8,7 +8,7 @@ building_iron_mine = {
 
     -- a province must contain this resource in order for this building
     -- to be able to be constructed
-    musthaveresource = "iron"
+    musthaveresource = "Iron"
 	type = "Mine"
 }
 
@@ -22,7 +22,7 @@ building_copper_mine = {
 
     -- a province must contain this resource in order for this building
     -- to be able to be constructed
-    musthaveresource = "copper"
+    musthaveresource = "Copper"
 	type = "Mine"
 }
 
@@ -36,7 +36,7 @@ building_bauxite_mine = {
 
     -- a province must contain this resource in order for this building
     -- to be able to be constructed
-    musthaveresource = "bauxite"
+    musthaveresource = "Bauxite"
 	type = "Mine"
 }
 
@@ -51,6 +51,6 @@ building_coal_mine = {
 
     -- a province must contain this resource in order for this building
     -- to be able to be constructed
-    musthaveresource = "coal"
+    musthaveresource = "Coal"
 	type = "Mine"
 }

@@ -15,7 +15,7 @@ public class Factory : ProducingBuilding
     /// <summary>
     /// This function is called every IRL hour
     /// </summary>
-    public async Task Tick(List<TradeItem> tradeItems)
+    public async Task Tick(List<SVItemOwnership> tradeItems)
     {
 
         if (RecipeId is null) {

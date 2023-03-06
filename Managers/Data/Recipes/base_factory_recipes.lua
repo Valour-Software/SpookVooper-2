@@ -1,4 +1,5 @@
 recipe_iron_smeltery_base = {
+	name = "Iron Smelting"
 	inputs = {
 		iron_ore = 1
 		tools = 0.005
@@ -10,7 +11,21 @@ recipe_iron_smeltery_base = {
     editable = false
 }
 
+recipe_copper_smeltery_base = {
+	name = "Copper Smelting"
+	inputs = {
+		copper_ore = 1
+		tools = 0.005
+	}
+	outputs = {
+		copper = 1
+	}
+	perhour = 50
+    editable = false
+}
+
 recipe_steel_factory_base = {
+	name = "Steel Production"
 	inputs = {
 		coal = 2
 		iron = 4
@@ -24,6 +39,7 @@ recipe_steel_factory_base = {
 }
 
 recipe_simple_components_factory_base = {
+	name = "Simple Components Production"
 	inputs = {
 		iron = 1
 		silicon = 1
@@ -37,6 +53,7 @@ recipe_simple_components_factory_base = {
 }
 
 recipe_advanced_components_factory_base = {
+	name = "Advanced Components Production"
 	inputs = {
 		simple_components = 4
 		steel = 4
@@ -50,6 +67,7 @@ recipe_advanced_components_factory_base = {
 }
 
 recipe_small_arms_factory_base = {
+	name = "Small Arms Production"
 	inputs = {
 		steel = 5
 	}
@@ -59,6 +77,13 @@ recipe_small_arms_factory_base = {
 	perhour = 1
 	editable = true
 	edits = {
-
+		attack = {
+			name = "Attack"
+			modifiers = {
+				item = {
+					item.attack = 1
+				}
+			}
+		}
 	}
 }

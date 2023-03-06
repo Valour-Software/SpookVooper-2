@@ -1,4 +1,5 @@
 recipe_iron_mining_base = {
+	name = "Iron Mining"
 	inputs = {
         tools = 0.01
     }
@@ -10,6 +11,7 @@ recipe_iron_mining_base = {
 }
 
 recipe_copper_mining_base = {
+	name = "Copper Mining"
     inputs = {
         tools = 0.01
     }
@@ -21,6 +23,7 @@ recipe_copper_mining_base = {
 }
 
 recipe_bauxite_mining_base = {
+	name = "Bauxite Mining"
     inputs = {
         tools = 0.01
     }
@@ -32,6 +35,7 @@ recipe_bauxite_mining_base = {
 }
 
 recipe_coal_mining_base = {
+	name = "Coal Mining"
     inputs = {
         tools = 0.01
     }

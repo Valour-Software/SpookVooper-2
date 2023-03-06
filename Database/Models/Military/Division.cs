@@ -25,9 +25,9 @@ public class DivisionEquipment
     
     [NotMapped]
     // the item that is currently selected to be used
-    public TradeItem tradeItem {
+    public SVItemOwnership tradeItem {
         get {
-            return DBCache.Get<TradeItem>(tradeItemId)!;
+            return DBCache.Get<SVItemOwnership>(tradeItemId)!;
         }
     }
 
@@ -141,8 +141,8 @@ public class Division : IHasOwner
         foreach(Regiment regiment in Regiments) 
         {
             string MainEquipmentNeeded = regiment.GetWeapon();
-            TradeItem EquipmentItem = Equipment.FirstOrDefault(x => x.ItemName == MainEquipmentNeeded).tradeItem;
-            attack += EquipmentItem.Definition.BuiltinModifiers.FirstOrDefault(x => x.ModifierType == BuildInModifierTypes.Attack)!.ModifierLevelDefinition.ModifierValue*regiment.Count;
+            SVItemOwnership EquipmentItem = Equipment.FirstOrDefault(x => x.ItemName == MainEquipmentNeeded).tradeItem;
+            //attack += EquipmentItem.Definition.BuiltinModifiers.FirstOrDefault(x => x.ModifierType == BuildInModifierTypes.Attack)!.ModifierLevelDefinition.ModifierValue*regiment.Count;
         }
         attack *= CombatEffectiveness;
         return attack;

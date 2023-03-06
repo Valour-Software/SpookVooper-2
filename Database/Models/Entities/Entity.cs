@@ -51,20 +51,61 @@ public abstract class BaseEntity
     [JsonIgnore]
     public District District => DBCache.Get<District>(DistrictId)!;
 
+    [NotMapped]
+    public Dictionary<long, SVItemOwnership> SVItemsOwnerships { get; set; }
+
     public virtual EntityType EntityType { get; }
 
     public static BaseEntity? Find(long Id) => DBCache.FindEntity(Id);
 
     public static BaseEntity? Find(long? Id) => DBCache.FindEntity(Id);
 
+    // these methods will simply call Valour.API methods once Valour adds the Community Item System
     public async ValueTask<decimal> GetOwnershipOfResource(string resource) 
     {
-        return 9999999999999999999999.99m;
+        var itemdefid = GameDataManager.ResourcesToItemDefinitions[resource].Id;
+        if (!SVItemsOwnerships.ContainsKey(itemdefid)) return 0.0m;
+        return SVItemsOwnerships[itemdefid].Amount;
     }
 
     public async ValueTask<bool> HasEnoughResource(string resource, decimal amount) 
     {
         return await GetOwnershipOfResource(resource) > amount;
+    }
+
+    public async ValueTask<bool> ChangeResourceAmount(string resource, int by) {
+        var itemdefid = GameDataManager.ResourcesToItemDefinitions[resource].Id;
+        SVItemOwnership ownership = null;
+        if (!SVItemsOwnerships.ContainsKey(itemdefid))
+            ownership = await CreateResourceOwnership(resource);
+        else
+            ownership = SVItemsOwnerships[itemdefid];
+        ownership.Amount += by;
+        return true;
+    }
+
+    public async ValueTask<SVItemOwnership> CreateResourceOwnership(string resource) {
+        var ownership = new SVItemOwnership() {
+            Id = IdManagers.GeneralIdGenerator.Generate(),
+            OwnerId = Id,
+            DefinitionId = GameDataManager.ResourcesToItemDefinitions[resource].Id,
+            Amount = 0
+        };
+        DBCache.Put(ownership.Id, ownership);
+        DBCache.dbctx.SVItemOwnerships.Add(ownership);
+        return ownership;
+    }
+
+    public double GetHourlyProductionOfResource(string resource) 
+    {
+        double total = 0;
+        List<ProducingBuilding> buildings = DBCache.GetAll<Factory>().Select(x => (ProducingBuilding)x).ToList();
+        buildings.AddRange(DBCache.GetAll<Mine>().Select(x => (ProducingBuilding)x).ToList());
+        foreach (var building in buildings) {
+            if (building.Recipe.Outputs.ContainsKey(resource))
+                total += building.GetHourlyProduction() * building.Recipe.Outputs[resource];
+        }
+        return total;
     }
 
     public async Task<decimal> GetAvgTaxableBalance(VooperDB dbctx, int hours = 720)

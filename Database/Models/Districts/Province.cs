@@ -156,6 +156,19 @@ public class Province
         return buildings;
     }
 
+    public bool CanManageBuildingRequests(BaseEntity entity) {
+        if (entity.Id == District.GovernorId) return true;
+        if (Governor is not null) {
+            if (Governor.EntityType == EntityType.User)
+                return GovernorId == entity.Id;
+            else {
+                Group governorasgroup = (Group)Governor;
+                return governorasgroup.HasPermission(entity, GroupPermissions.ManageBuildingRequests);
+            }
+        }
+        return false;
+    }
+
     public bool CanEdit(BaseEntity entity)
     {
         if (entity.Id == District.GovernorId) return true;

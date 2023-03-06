@@ -28,7 +28,7 @@ public abstract class BuildingBase : IHasOwner, ITickable
     public int Size { get; set; }
     public string RecipeId { get; set; }
     public abstract BuildingType BuildingType { get; set; }
-    public string Name { get; set; }
+    public string LuaBuildingObjId { get; set; }
     public string? Description { get; set; }
     public long ProvinceId { get; set; }
     public long OwnerId { get; set; }
@@ -38,10 +38,10 @@ public abstract class BuildingBase : IHasOwner, ITickable
     public Province Province => DBCache.Get<Province>(ProvinceId)!;
 
     [NotMapped]
-    public BaseRecipe Recipe => ResourceManager.Recipes[RecipeId];
+    public BaseRecipe Recipe => GameDataManager.BaseRecipeObjs[RecipeId];
 
     [NotMapped]
-    public LuaBuilding BuildingObj => GameDataManager.BaseBuildingObjs[Name];
+    public LuaBuilding BuildingObj => GameDataManager.BaseBuildingObjs[LuaBuildingObjId];
 
     [NotMapped]
     public District District => DBCache.Get<District>(DistrictId)!;
@@ -144,8 +144,12 @@ public abstract class ProducingBuilding : BuildingBase
             rate *= Quantity;
 
         rate *= ThroughputFactor;
-        //rate *= Recipe.Perhour;
+        rate *= Recipe.PerHour;
         return rate;
+    }
+
+    public double GetHourlyProduction(bool useQuantity = true) {
+        return GetProductionSpeed(useQuantity) * Size;
     }
 
     public double OutputPerHourPerSize(string resource)

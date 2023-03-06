@@ -57,22 +57,33 @@
         <div class="buildings">
             @foreach (var buildingobj in GameDataManager.BaseBuildingObjs.Values) 
             {
-                <div class="building">
-                    <a asp-route-buildingid="@buildingobj.Name" asp-route-provinceid="@Model.Id" asp-action="Build" asp-controller="Building">
-                        <span>@buildingobj.PrintableName</span>
-                    </a>
-                    <br>
-                    <span>Costs to build</span>
-                    <br>
-                    <div class="buildingcosts">
-                        @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(Model.District, Model))) {
-                            <div class="resource-row">
-                                <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
-                                <span style="align-self: flex-end">@($"{amount:n0}")</span>
+                if (!buildingobj.OnlyGovernorCanBuild || (buildingobj.OnlyGovernorCanBuild && Model.CanEdit(user)))
+                {
+                    if (buildingobj.MustHaveResource is null || (Model.Metadata.Resources.ContainsKey(buildingobj.MustHaveResource))) {
+                        <div class="building">
+                            <a asp-route-buildingid="@buildingobj.Name" asp-route-provinceid="@Model.Id" asp-action="Build" asp-controller="Building">
+                                <span>@buildingobj.PrintableName</span>
+                            </a>
+                            <br>
+                            <span>Costs to build</span>
+                            <br>
+                            <div class="buildingcosts">
+                                @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(Model.District, Model)))
+                                {
+                                    <div class="resource-row">
+                                        <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                                        <span style="align-self: flex-end">@(
+                            $"{amount:n0}"
+                            )</span>
+                                    </div>
+                                }
                             </div>
-                        }
-                    </div>
-                </div>
+                            @if (buildingobj.type == SV2.Database.Models.Buildings.BuildingType.Mine) {
+                                <span>Production: @Model.Metadata.Resources[buildingobj.MustHaveResource]</span>
+                            }
+                        </div>
+                    }
+                }
             }
         </div>
     </div>

@@ -227,7 +227,7 @@ public static class LuaHandler
             {
                 node.ProvinceModifierType = levels[0] switch
                 {
-                    "provinces" => levels[1] switch
+                    "province" => levels[1] switch
                     {
                         "fertilelandfactor" => ProvinceModifierType.FertileLandFactor,
                         "farms" => levels[2] switch
@@ -383,16 +383,41 @@ public static class LuaHandler
         }
     }
 
-    // to be used when we get Valour Items system working
-    /* 
+    public static void HandleResourcesFile(string content) {
+        foreach (var (__table, materialgroup) in HandleFile(content)) 
+        {
+            GameDataManager.ResourcesByMaterialGroup[materialgroup] = new();
+            var _table = (LuaTable)__table;
+            foreach (var key in _table.Keys) {
+                var table = _table[key];
+                var resource = new SVResource() {
+                    Name = key.ToTitleCase()
+                };
+                GameDataManager.ResourcesByMaterialGroup[materialgroup].Add(resource);
+                GameDataManager.Resources[resource.Name] = resource;
+                var itemdef = DBCache.GetAll<ItemDefinition>().FirstOrDefault(x => x.Name == resource.Name);
+                if (itemdef is null) {
+                    itemdef = new(100, resource.Name);
+                    DBCache.Put(itemdef.Id, itemdef);
+                    DBCache.dbctx.Add(itemdef);
+                }
+                resource.ItemDefinition = itemdef;
+                GameDataManager.ResourcesToItemDefinitions[resource.Name] = DBCache.GetAll<ItemDefinition>().First(x => x.Name == resource.Name);
+            }
+        }
+    }
+
     public static void HandleRecipeFile(string content)
     {
-        foreach (var (table, name) in HandleFile(content))
+        foreach (var (table, key) in HandleFile(content))
         {
             var recipe = new BaseRecipe()
             {
-                Name = name,
-                Perhour = Convert.ToDecimal(table["perhour"])
+                Id = key,
+                Name = table["name"].Value,
+                PerHour = Convert.ToDouble(table["perhour"].Value),
+                Editable = Convert.ToBoolean(table.GetValue("editable") ?? "false"),
+                Inputcost_Scaleperlevel = Convert.ToBoolean(table.GetValue("inputcost_scaleperlevel") ?? "true")
             };
 
             var inputs = (LuaTable)table["inputs"];
@@ -400,29 +425,33 @@ public static class LuaHandler
             {
                 foreach (string input in inputs.Keys)
                 {
-                    recipe.Inputs[input.ToTitleCase()] = Convert.ToDecimal(inputs[input]);
+                    recipe.Inputs[input.ToTitleCase()] = Convert.ToDouble(inputs[input]);
                 }
             }
             var outputs = (LuaTable)table["outputs"];
             foreach (string output in outputs.Keys)
             {
-                recipe.Outputs[output.ToTitleCase()] = Convert.ToDecimal(outputs[output]);
+                if (output == "modifiers") {
+                    recipe.ModifierNodes = HandleModifierNodes((LuaTable)outputs["modifiers"]);
+                }
+                else
+                    recipe.Outputs[output.ToTitleCase()] = Convert.ToDouble(outputs[output]);
             }
-            ResourceManager.Recipes[recipe.Name] = recipe;
+            GameDataManager.BaseRecipeObjs[recipe.Id] = recipe;
         }
     }
-    */
+
     public static void HandleBuildingFile(string content)
     {
         foreach (var (table, name) in HandleFile(content))
         {
-            var building = new LuaBuilding()
-            {
+            var building = new LuaBuilding() {
                 Name = name,
                 Recipes = new(),
                 OnlyGovernorCanBuild = Convert.ToBoolean(table.GetValue("onlygovernorcanbuild") ?? "false"),
                 UseBuildingSlots = Convert.ToBoolean(table.GetValue("usebuildingslots") ?? "true"),
-                BuildingCosts = HandleDictExpression((LuaTable)table["buildingcosts"])
+                BuildingCosts = HandleDictExpression((LuaTable)table["buildingcosts"]),
+                MustHaveResource = table.GetValue("musthaveresource")
             };
 
             //var recipes = (LuaTable)table["recipes"];

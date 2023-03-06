@@ -112,10 +112,13 @@ namespace SV2.Workers
                                         Balance = entity.Credits,
                                         TaxableBalance = entity.TaxAbleBalance
                                     });
-                                    await entity.DoIncomeTax(_dbctx);
                                 }
                                 _dbctx.AddRange(records);
                                 await _dbctx.SaveChangesAsync();
+
+                                foreach(BaseEntity entity in entities) {
+                                    await entity.DoIncomeTax(_dbctx);
+                                }
                             }
 
                             Stopwatch sw = Stopwatch.StartNew();
@@ -164,6 +167,9 @@ namespace SV2.Workers
                         {
                             Console.WriteLine("FATAL ECONOMY WORKER ERROR:");
                             Console.WriteLine(e.Message);
+                            Console.WriteLine(e.StackTrace);
+                            if (e.InnerException is not null)
+                                Console.WriteLine(e.InnerException);
                         }
                     }
                 });

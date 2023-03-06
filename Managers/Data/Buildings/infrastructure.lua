@@ -6,24 +6,24 @@ building_infrastructure = {
 		add_locals = {
 			cost_increase = {
 				base = province.totaloftype["building_infrastructure"]
-				factor = 0.5
+				factor = 0.4
 				add = 1
 			}
 		}
 		steel = {
-			base = 2500
+			base = 1000
 			factor = { 
 				get_local = "cost_increase"
 			}
 		}
 		simple_components = {
-			base = 3000
+			base = 500
 			factor = { 
 				get_local = "cost_increase"
 			}
 		}
 		advanced_components = {
-			base = 1250
+			base = 50
 			factor = { 
 				get_local = "cost_increase"
 			}
@@ -34,7 +34,7 @@ building_infrastructure = {
 		base = 1
 		divide = {
 			base = province.buildings.totaloftype["building_infrastructure"]
-			factor = 0.5
+			factor = 0.4
 			add = 1
 		}
 	}

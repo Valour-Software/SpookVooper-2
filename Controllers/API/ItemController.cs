@@ -20,7 +20,7 @@ namespace SV2.API
 
         private static async Task GetItemsFromDefinition(HttpContext ctx, VooperDB db, long definitionid)
         {
-            IEnumerable<TradeItem> definitions = DBCache.GetAll<TradeItem>().Where(x => x.Definition_Id == definitionid);
+            IEnumerable<SVItemOwnership> definitions = DBCache.GetAll<SVItemOwnership>().Where(x => x.DefinitionId == definitionid);
 
             await ctx.Response.WriteAsJsonAsync(definitions);
         }
@@ -28,7 +28,7 @@ namespace SV2.API
         private static async Task GetItem(HttpContext ctx, VooperDB db, long itemid)
         {
             // find Item
-            TradeItem? item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.Id == itemid);
+            SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.Id == itemid);
             if (item is null) {
                 ctx.Response.StatusCode = 401;
                 await ctx.Response.WriteAsync($"Could not find item with id {itemid}");
@@ -41,7 +41,7 @@ namespace SV2.API
         private static async Task GetOwner(HttpContext ctx, VooperDB db, long itemid)
         {
             // find Item
-            TradeItem? item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.Id == itemid);
+            SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.Id == itemid);
             if (item is null) {
                 ctx.Response.StatusCode = 401;
                 await ctx.Response.WriteAsync($"Could not find item with id {itemid}");
@@ -54,7 +54,7 @@ namespace SV2.API
         private static async Task Give(HttpContext ctx, VooperDB db, long itemid, string apikey, long fromid, long toid, int amount)
         {
             // find Item
-            TradeItem? item = DBCache.GetAll<TradeItem>().FirstOrDefault(x => x.Id == itemid);
+            SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.Id == itemid);
             if (item is null) {
                 ctx.Response.StatusCode = 401;
                 await ctx.Response.WriteAsync($"Could not find item with id {itemid}");
@@ -114,7 +114,7 @@ namespace SV2.API
                 FromId = fromid,
                 ToId = toid,
                 Time = DateTime.UtcNow,
-                Definition_Id = item.Definition_Id,
+                DefinitionId = item.DefinitionId,
                 Details = "Item Trade from API",
             };
 

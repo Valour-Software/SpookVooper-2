@@ -47,6 +47,11 @@
             </div>
         </div>
 
+        <br />
+        <br />
+
+        @await Html.PartialAsync("/Views/Shared/Components/ResourceOwnershipTable.cshtml", Model.user)
+
         @section Scripts {
             @await Html.PartialAsync("_ValidationScriptsPartial")
         }

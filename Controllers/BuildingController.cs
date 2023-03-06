@@ -39,6 +39,8 @@ public class BuildingController : SVController
 
         LuaBuilding luabuildingobj = GameDataManager.BaseBuildingObjs[buildingid];
 
+        //Console.WriteLine(GameDataManager.BaseRecipeObjs.FirstOrDefault());
+
         var user = HttpContext.GetUser();
 
         List<BaseEntity> canbuildas = new() { user };
@@ -56,8 +58,7 @@ public class BuildingController : SVController
     [UserRequired]
     [ValidateAntiForgeryToken]
     [HttpPost]
-    public IActionResult Build(CreateBuildingRequestModel model)
-    {
+    public IActionResult Build(CreateBuildingRequestModel model) {
         Province? province = DBCache.Get<Province>(model.ProvinceId);
         if (province is null)
             return Redirect("/");
@@ -76,23 +77,33 @@ public class BuildingController : SVController
             }
         }
 
-        var request = new BuildingRequest() {
-            Id = IdManagers.GeneralIdGenerator.Generate(),
-            RequesterId = model.BuildAsId,
-            ProvinceId = model.ProvinceId,
-            BuildingId = null,
-            BuildingObjId = model.BuildingId,
-            LevelsRequested = model.levelsToBuild,
-            Applied = DateTime.UtcNow,
-            Reviewed = false,
-            Granted = false
-        };
+        if (luabuildingobj.OnlyGovernorCanBuild) {
+            var buildas = BaseEntity.Find(model.BuildAsId);
+            var result = 
+            if (luabuildingobj)
+            StatusMessage = $"Successfully built {model.levelsToBuild} levels of {luabuildingobj.PrintableName}.";
+            return Redirect($"/Province/Build/{model.ProvinceId}");
+        }
 
-        _dbctx.BuildingRequests.Add(request);
-        _dbctx.SaveChangesAsync();
+        else {
+            var request = new BuildingRequest() {
+                Id = IdManagers.GeneralIdGenerator.Generate(),
+                RequesterId = model.BuildAsId,
+                ProvinceId = model.ProvinceId,
+                BuildingId = null,
+                BuildingObjId = model.BuildingId,
+                LevelsRequested = model.levelsToBuild,
+                Applied = DateTime.UtcNow,
+                Reviewed = false,
+                Granted = false
+            };
 
-        StatusMessage = "Successfully created and sent your building request.";
-        return RedirectToAction($"/Province/Build/{model.ProvinceId}");
+            _dbctx.BuildingRequests.Add(request);
+            _dbctx.SaveChangesAsync();
+
+            StatusMessage = "Successfully created and sent your building request.";
+            return Redirect($"/Province/Build/{model.ProvinceId}");
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

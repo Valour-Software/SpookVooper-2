@@ -14,6 +14,13 @@ public static class DBCache
 
     public static VooperDB dbctx { get; set; }
 
+    public static List<ProducingBuilding> GetAllProducingBuildings() 
+    {
+        List<ProducingBuilding> buildings = GetAll<Factory>().Select(x => (ProducingBuilding)x).ToList();
+        buildings.AddRange(GetAll<Mine>().Select(x => (ProducingBuilding)x).ToList());
+        return buildings;
+    }
+
     public static IEnumerable<T> GetAll<T>() where T : class
     {
         var type = typeof(T);
@@ -138,19 +145,15 @@ public static class DBCache
         //#if !DEBUG
 
         foreach (Group group in dbctx.Groups) {
+            group.SVItemsOwnerships = new();
             Put(group.Id, group);
         }
         foreach(SVUser user in dbctx.Users) {
+            user.SVItemsOwnerships = new();
             Put(user.Id, user);
         }
         foreach(TaxPolicy policy in dbctx.TaxPolicies) {
             Put(policy.Id, policy);
-        }
-        foreach(TradeItem item in dbctx.TradeItems) {
-            Put(item.Id, item);
-        }
-        foreach(TradeItemDefinition definition in dbctx.TradeItemDefinitions) {
-            Put(definition.Id, definition);
         }
         foreach(Factory factory in dbctx.Factories) {
             Put(factory.Id, factory);
@@ -188,6 +191,16 @@ public static class DBCache
             district.Provinces = GetAll<Province>().Where(x => x.DistrictId == district.Id).ToList();
         }
 
+        foreach (SVItemOwnership item in dbctx.SVItemOwnerships) 
+        {
+            var entity = FindEntity(item.OwnerId);
+            entity.SVItemsOwnerships[item.DefinitionId] = item;
+            Put(item.Id, item);
+        }
+        foreach (ItemDefinition definition in dbctx.ItemDefinitions) {
+            Put(definition.Id, definition);
+        }
+
         //#endif
     }
 
@@ -198,8 +211,8 @@ public static class DBCache
             dbctx.GroupRoles.UpdateRange(GetAll<GroupRole>());
             dbctx.Users.UpdateRange(GetAll<SVUser>());
             dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
-            dbctx.TradeItems.UpdateRange(GetAll<TradeItem>());
-            dbctx.TradeItemDefinitions.UpdateRange(GetAll<TradeItemDefinition>());
+            dbctx.SVItemOwnerships.UpdateRange(GetAll<SVItemOwnership>());
+            dbctx.ItemDefinitions.UpdateRange(GetAll<ItemDefinition>());
             dbctx.Factories.UpdateRange(GetAll<Factory>());
             dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
             dbctx.Districts.UpdateRange(GetAll<District>());

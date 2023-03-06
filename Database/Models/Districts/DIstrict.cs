@@ -78,13 +78,10 @@ public class District
     {
         "Lanatia" => "F4B7FD",
         "New Vooperis" => "FEEAB7",
-        "Avalon" => "CAFDB8",
         "Elysian Katonia" => "B8B7FD",
         "Ardenti Terra" => "B7BCFC",
-        "Kogi" => "B6EEFD",
         "Landing Cove" => "FDB7B7",
         "New Avalon" => "D3FCB6",
-        "New Spudland" => "EAB7FC",
         "Novastella" => "B7FDE5",
         "Old King" => "C0FDB7",
         "San Vooperisco" => "FAFDB8",

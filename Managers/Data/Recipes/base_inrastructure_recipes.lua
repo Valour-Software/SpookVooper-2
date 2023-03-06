@@ -1,4 +1,5 @@
 recipe_infrastructure_roads = {
+	name = "Road Infrastructure"
 	inputs = {
         tools = 0.05
         simple_components = 0.075
@@ -7,10 +8,8 @@ recipe_infrastructure_roads = {
     }
     outputs = {
 		modifiers = {
-			province = {
-				province.buildingslots = 1
-				province.overpopulationmodifierpopulationbase = -50000
-			}
+			province.buildingslots = 1
+			province.overpopulationmodifierpopulationbase = -50000
 		}
 	}
 	inputcost_scaleperlevel = false

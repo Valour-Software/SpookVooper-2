@@ -9,6 +9,8 @@ using SV2.Helpers;
 using SV2.Extensions;
 using SV2.Database.Managers;
 using SV2.Models.Provinces;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace SV2.Controllers;
 
@@ -43,6 +45,69 @@ public class ProvinceController : SVController
         var model = new BulkManageModel();
         model.Provinces = DBCache.GetAll<Province>().Where(x => x.CanEdit(user)).ToList();
         return View(model);
+    }
+
+    [HttpGet("/Province/BulkBuildingRequests")]
+    [UserRequired]
+    public async Task<IActionResult> BulkBuildingRequests(string filter, bool toggleonlyreviewed) {
+        var user = HttpContext.GetUser();
+
+        List<BuildingRequest> requests = new();
+        if (filter == "Provinces") {
+            var idscanmanage = DBCache.GetAll<Province>().Where(x => x.CanManageBuildingRequests(user)).Select(x => x.Id).ToList();
+            requests = await _dbctx.BuildingRequests.Where(x => x.Reviewed == toggleonlyreviewed && idscanmanage.Contains(x.ProvinceId)).ToListAsync();
+        }
+        else if (filter == "MyOwn") {
+            List<long> canbuildasids = new() { user.Id };
+            canbuildasids.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.Build)).Select(x => x.Id).ToList());
+            requests = await _dbctx.BuildingRequests.Where(x => x.Reviewed == toggleonlyreviewed && canbuildasids.Contains(x.RequesterId)).ToListAsync();
+        }
+        return View(requests);
+    }
+
+    [HttpPost("Province/BuildingRequest/Approve")]
+    [ValidateAntiForgeryToken]
+    [UserRequired]
+    public async Task<string> ApproveBuildingRequest(long id) 
+    {
+        var user = HttpContext.GetUser();
+        var request = await _dbctx.BuildingRequests.FindAsync(id);
+        if (request is null) {
+            return "Request not found";
+        }
+        if (!request.Province.CanManageBuildingRequests(user)) {
+            return "You lack permission!";
+        }
+
+        request.ActionTime = DateTime.UtcNow;
+        request.ReviewerId = user.Id;
+        request.Reviewed = true;
+        request.Granted = true;
+        await _dbctx.SaveChangesAsync();
+
+        return $"Approved request,{request.Id}";
+    }
+
+    [HttpPost("Province/BuildingRequest/Deny")]
+    [ValidateAntiForgeryToken]
+    [UserRequired]
+    public async Task<string> DenyBuildingRequest(long id) {
+        var user = HttpContext.GetUser();
+        var request = await _dbctx.BuildingRequests.FindAsync(id);
+        if (request is null) {
+            return "Request not found";
+        }
+        if (!request.Province.CanManageBuildingRequests(user)) {
+            return "You lack permission!";
+        }
+
+        request.ActionTime = DateTime.UtcNow;
+        request.ReviewerId = user.Id;
+        request.Reviewed = true;
+        request.Granted = false;
+        await _dbctx.SaveChangesAsync();
+
+        return $"Denied request,{request.Id}";
     }
 
     [HttpPost("/Province/BulkManage")]
@@ -102,7 +167,8 @@ public class ProvinceController : SVController
         return Redirect($"/Province/View/{oldprovince.Id}");
     }
 
-    [HttpGet("/Province/ChangeGovernor/{id}")]
+    [HttpPost("/Province/ChangeGovernor/{id}")]
+    [ValidateAntiForgeryToken]
     [UserRequired]
     public IActionResult ChangeGovernor(long id, long GovernorId)
     {

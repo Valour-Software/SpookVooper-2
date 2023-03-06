@@ -8,27 +8,27 @@ using SV2.Database.Models.Items;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using SV2.Scripting.Parser;
+using SV2.Scripting;
 
 namespace SV2.Managers;
 
 public class BaseRecipe
 {
-    public Dictionary<string, int> Inputs { get; set; }
-    public KeyValuePair<string, decimal> Output { get; set; }
-    public string Name { get; set; }
-    public List<ModifierLevelDefinition>? Modifiers { get; set; }
+    public Dictionary<string, double> Inputs { get; set; }
+    public Dictionary<string, double> Outputs { get; set; }
+    public string Id { get; set; }
     public double PerHour { get; set; }
-    public bool InputCostScalePerLevel { get; set; }
-}
+    public bool Editable { get; set; }
+    public bool Inputcost_Scaleperlevel { get; set; }
 
-public class ModifierLevelDefinition
-{
-    public BuildInModifierTypes ModifierType { get; set; }
-    public decimal ModifierValue { get; set; }
-    public int Level { get; set; }
-    public Dictionary<string, int> Inputs { get; set; }
-    public double HourlyProduction { get; set; }
-    public string RecipeName { get; set; }
+    public BaseRecipe() {
+        Inputs = new Dictionary<string, double>();
+        Outputs = new Dictionary<string, double>();
+    }
+    public string Name { get; set; }
+
+    public List<SyntaxModifierNode> ModifierNodes { get; set; }
 }
 
 public class ConsumerGood
@@ -45,29 +45,16 @@ public class ConsumerGood
     public double PopConsumptionRate { get; set; }
 }
 
-public class Material_Group
+public class SVResource 
 {
     public string Name { get; set; }
-    public List<string> Materials { get; set; }
-}
+    public ConsumerGood? consumerGood { get; set; }
 
-public class TopLevelResources
-{
-    public List<Material_Group> Material_Groups { get; set; }
-    public List<BaseRecipe> Recipes { get; set; }
-    
-    [JsonPropertyName("Consumer Goods")]
-    public List<ConsumerGood> ConsumerGoods { get; set; }
+    public ItemDefinition ItemDefinition { get; set; }
 }
 
 public static class ResourceManager 
 {
-    static public List<string> Resources = new();
-    static public List<Material_Group> Material_Groups = new();
-    static public List<ConsumerGood> ConsumerGoods = new();
-    static public List<ModifierLevelDefinition> ModifierLevelDefinitions = new();
-    static public Dictionary<string, BaseRecipe> Recipes = new();
-
     public static List<string> GetFilePaths(string path)
     {
         if (path.Contains("/"))
@@ -82,33 +69,5 @@ public static class ResourceManager
         {
             return Directory.GetFiles($"Managers/Data/{path}").ToList();
         }
-    }
-
-    public static async Task Load()
-    {
-        TopLevelResources toplevelresource = await JsonSerializer.DeserializeAsync<TopLevelResources>(File.OpenRead("./Managers/resources.json"));
-
-        Material_Groups = toplevelresource.Material_Groups;
-
-        Resources = toplevelresource.Material_Groups.SelectMany(x => x.Materials).ToList();
-
-        //Recipes = toplevelresource.Recipes;
-
-        // need to create item definitions
-
-        foreach(string Resource in Resources)
-        {
-            TradeItemDefinition? def = DBCache.GetAll<TradeItemDefinition>().FirstOrDefault(x => x.OwnerId == 100 && x.Name == Resource);
-
-            if (def is null) {
-                // now we need to create a definition for this resource
-                def = new TradeItemDefinition(100, Resource);
-                def.BuiltinModifiers = new();
-
-                DBCache.Put(def.Id, def);
-                await VooperDB.Instance.TradeItemDefinitions.AddAsync(def);
-            }
-        }
-        await VooperDB.Instance.SaveChangesAsync();
     }
 }

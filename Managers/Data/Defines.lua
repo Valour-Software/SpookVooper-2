@@ -39,7 +39,7 @@ NProduction = {
 }
 
 NProvince = {
-    BUILDING_SLOTS_FACTOR = 0.0075
+    BUILDING_SLOTS_FACTOR = 0.005
     BASE_BUILDING_SLOTS = 10
     BUILDING_SLOTS_POPULATION_EXPONENT = 0.65
     BASE_BIRTH_RATE = 0.7
@@ -61,13 +61,13 @@ NProvince = {
     BASE_MIGRATION_RATE = 0.275 -- monthly
     BASE_MIGRATION_ATTRACTION = 2
 
-    -- the final formula for this is ((province.development^2)/250) - 10
+    -- the final formula for this is ((province.development^2)/250) - 5
     MIGRATION_DEVELOPMENT_EXPONENT = 2
     MIGRATION_DEVELOPMENT_DIVISOR = 250
     MIGRATION_DEVELOPMENT_BASE = -5
 
-    -- the final formula for this is ((province.buildingslots^2)/3750) + 1.5
+    -- the final formula for this is ((province.buildingslots^2)/2000) + 1.5
     MIGRATION_BUILDINGSLOTS_EXPONENT = 2
-    MIGRATION_BUILDINGSLOTS_DIVISOR = 3750
+    MIGRATION_BUILDINGSLOTS_DIVISOR = 2000
     MIGRATION_BUILDINGSLOTS_BASE = 1.5
 }

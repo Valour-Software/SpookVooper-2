@@ -152,7 +152,7 @@ app.MapControllerRoute(
 
 // ensure districts & Vooperia are created
 await VooperDB.Startup();
-await ResourceManager.Load();
+//await ResourceManager.Load();
 
 await GameDataManager.Load();
 

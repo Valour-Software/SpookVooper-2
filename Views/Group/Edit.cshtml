@@ -199,6 +199,9 @@
     <br />
     <br />
 
+    @await Html.PartialAsync("/Views/Shared/Components/ResourceOwnershipTable.cshtml", Model)
+
+    <br />
     @if (Model.OwnerId == user.Id)
     {
         <div class="row">

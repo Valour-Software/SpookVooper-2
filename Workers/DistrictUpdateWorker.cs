@@ -40,6 +40,7 @@ public class DistrictUpdateWorker : BackgroundService
                         {
                             foreach (var province in DBCache.GetAll<Province>())
                             {
+                                
                                 province.HourlyTick();
                             }
                         }

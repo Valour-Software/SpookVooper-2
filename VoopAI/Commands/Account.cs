@@ -62,8 +62,10 @@ public class AccountCommands : CommandModuleBase
         var embed = new EmbedBuilder()
             .AddPage()
                 .AddRow()
-                    .AddText(null, $"{Math.Round(user.Xp,1)} XP {user.Rank.ToString()}")
+                    .AddText("XP", $"{Math.Round(user.Xp,1)} {user.Rank}")
+                 .AddRow()
                     .AddText("Messages", $"{user.Messages}")
+                 .AddRow()
                     .AddText("Message To XP Ratio", $"1 : {Math.Round((double)user.MessageXp/(double)user.Messages, 2)}");
 
         // get daily UBI
