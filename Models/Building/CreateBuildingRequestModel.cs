@@ -9,6 +9,7 @@ public class CreateBuildingRequestModel
     public LuaBuilding LuaBuildingObj { get; set; }
     public long RequesterId { get; set; }
     public string BuildingId { get; set; }
+    public long? AlreadyExistingBuildingId { get; set; }
     public long ProvinceId { get; set; }
     public int levelsToBuild { get; set; }
     public List<SelectListItem> CanBuildAs { get; set; }

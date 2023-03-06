@@ -11,6 +11,7 @@ using SV2.Database.Managers;
 using SV2.Models.Provinces;
 using SV2.Models.Building;
 using SV2.Scripting.LuaObjects;
+using Valour.Shared;
 
 namespace SV2.Controllers;
 
@@ -24,6 +25,42 @@ public class BuildingController : SVController
     {
         _logger = logger;
         _dbctx = dbctx;
+    }
+
+    [HttpGet]
+    [UserRequired]
+    public IActionResult View(long id) 
+    {
+        var user = HttpContext.GetUser();
+        
+        return View(DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == id));
+    }
+
+    [HttpPost]
+    [UserRequired]
+    public async Task<string> Construct(long buildingrequestid, int levelstobuild) 
+    {
+        var buildingrequest = await _dbctx.BuildingRequests.FindAsync(buildingrequestid);
+        if (!buildingrequest.Reviewed)
+            return "This request has not been reviewed yet!";
+        if (!buildingrequest.Granted)
+            return "This request was not granted! However, the province's governor can change this decision, so try contacting them.";
+        
+        var user = HttpContext.GetUser();
+
+        if (buildingrequest.RequesterId != user.Id) {
+            Group group = DBCache.Get<Group>(buildingrequest.RequesterId);
+            if (!group.HasPermission(user, GroupPermissions.Build)) {
+                return "You lack permission to build as this group!";
+            }
+        }
+        var buildas = BaseEntity.Find(buildingrequest.RequesterId);
+
+        LuaBuilding luabuildingobj = GameDataManager.BaseBuildingObjs[buildingrequest.BuildingObjId];
+
+        ProducingBuilding? building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.OwnerId == buildas.Id && x.ProvinceId == buildingrequest.ProvinceId && x.LuaBuildingObjId == luabuildingobj.Name);
+        TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, buildingrequest.Province.District, buildingrequest.Province, levelstobuild, building);
+        return result.Message;
     }
 
     [HttpGet]
@@ -58,7 +95,7 @@ public class BuildingController : SVController
     [UserRequired]
     [ValidateAntiForgeryToken]
     [HttpPost]
-    public IActionResult Build(CreateBuildingRequestModel model) {
+    public async ValueTask<IActionResult> Build(CreateBuildingRequestModel model) {
         Province? province = DBCache.Get<Province>(model.ProvinceId);
         if (province is null)
             return Redirect("/");
@@ -79,10 +116,12 @@ public class BuildingController : SVController
 
         if (luabuildingobj.OnlyGovernorCanBuild) {
             var buildas = BaseEntity.Find(model.BuildAsId);
-            var result = 
-            if (luabuildingobj)
-            StatusMessage = $"Successfully built {model.levelsToBuild} levels of {luabuildingobj.PrintableName}.";
-            return Redirect($"/Province/Build/{model.ProvinceId}");
+            ProducingBuilding? building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.OwnerId == buildas.Id && x.ProvinceId == province.Id && x.LuaBuildingObjId == luabuildingobj.Name);
+            TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, province.District, province, model.levelsToBuild, building);
+            StatusMessage = result.Message;
+            if (!result.Success)
+                return RedirectBack();
+            return Redirect($"/Building/View/{result.Data.Id}");
         }
 
         else {
@@ -90,7 +129,7 @@ public class BuildingController : SVController
                 Id = IdManagers.GeneralIdGenerator.Generate(),
                 RequesterId = model.BuildAsId,
                 ProvinceId = model.ProvinceId,
-                BuildingId = null,
+                BuildingId = model.AlreadyExistingBuildingId,
                 BuildingObjId = model.BuildingId,
                 LevelsRequested = model.levelsToBuild,
                 Applied = DateTime.UtcNow,

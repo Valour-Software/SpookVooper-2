@@ -14,4 +14,11 @@ public abstract class SVController : Controller
         if (url == "") url = "/";
         return Redirect(url);
     }
+
+    public IActionResult RedirectBack()
+    {
+        var url = Request.Headers["Referer"].ToString();
+        if (url == "") url = "/";
+        return Redirect(url);
+    }
 }

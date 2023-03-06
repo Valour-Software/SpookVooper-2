@@ -61,19 +61,19 @@ public abstract class BaseEntity
     public static BaseEntity? Find(long? Id) => DBCache.FindEntity(Id);
 
     // these methods will simply call Valour.API methods once Valour adds the Community Item System
-    public async ValueTask<decimal> GetOwnershipOfResource(string resource) 
+    public async ValueTask<double> GetOwnershipOfResource(string resource) 
     {
         var itemdefid = GameDataManager.ResourcesToItemDefinitions[resource].Id;
-        if (!SVItemsOwnerships.ContainsKey(itemdefid)) return 0.0m;
+        if (!SVItemsOwnerships.ContainsKey(itemdefid)) return 0.0;
         return SVItemsOwnerships[itemdefid].Amount;
     }
 
-    public async ValueTask<bool> HasEnoughResource(string resource, decimal amount) 
+    public async ValueTask<bool> HasEnoughResource(string resource, double amount) 
     {
         return await GetOwnershipOfResource(resource) > amount;
     }
 
-    public async ValueTask<bool> ChangeResourceAmount(string resource, int by) {
+    public async ValueTask<bool> ChangeResourceAmount(string resource, double by) {
         var itemdefid = GameDataManager.ResourcesToItemDefinitions[resource].Id;
         SVItemOwnership ownership = null;
         if (!SVItemsOwnerships.ContainsKey(itemdefid))

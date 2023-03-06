@@ -55,19 +55,19 @@ public class Regiment
     [ForeignKey("DivisionId")]
     public Division Division { get; set; }
 
-    public List<KeyValuePair<string, int>> GetEquipmentNeeds()
+    public List<KeyValuePair<string, double>> GetEquipmentNeeds()
     {
         // NOTE: 1 of Infantry equipment is enough for 1k troops that uses that equipment, anything else is 1 for 100 troops
         // for example 100k Infantry needs 100 Guns & 100 Ammo.
         switch (Type)
         {
             case RegimentType.Infantry:
-                return new List<KeyValuePair<string, int>> {
-                    KeyValuePair.Create("Ammo", Count/1000),
-                    KeyValuePair.Create("Rifle", Count/1000)
+                return new List<KeyValuePair<string, double>> {
+                    KeyValuePair.Create("Ammo", Count/1000.0),
+                    KeyValuePair.Create("Rifle", Count/1000.0)
                 };
         }
-        return new List<KeyValuePair<string, int>> {};
+        return new List<KeyValuePair<string, double>> {};
     }
 
     public string GetWeapon()
@@ -148,23 +148,23 @@ public class Division : IHasOwner
         return attack;
     }
 
-    public decimal GetCombatEffectiveness()
+    public double GetCombatEffectiveness()
     {
         // CombatEffectiveness is computed as which of the following has the lowest ratio:
         // 1. ManPower / ManPowerNeeded
         // 2. Equipment in storage / EquipmentNeeded
         
         int totalManPowerNeeded = Regiments.Sum(x => x.Count);
-        decimal manPowerEffectiveness = ManPower/totalManPowerNeeded;
-        decimal totalEquipmentNeed = 0;
-        decimal currentequipment = 0;
+        double manPowerEffectiveness = ManPower/totalManPowerNeeded;
+        double totalEquipmentNeed = 0;
+        double currentequipment = 0;
         foreach (Regiment regiment in Regiments) {
-            foreach(KeyValuePair<string, int> equipmentNeed in regiment.GetEquipmentNeeds()) {
-                totalEquipmentNeed += (decimal)equipmentNeed.Value;
+            foreach(KeyValuePair<string, double> equipmentNeed in regiment.GetEquipmentNeeds()) {
+                totalEquipmentNeed += equipmentNeed.Value;
                 currentequipment += Math.Min(equipmentNeed.Value, Equipment.First(x => x.ItemName == equipmentNeed.Key).tradeItem.Amount);
             }
         }
-        decimal equipmentEffectiveness = currentequipment/totalEquipmentNeed;
+        double equipmentEffectiveness = currentequipment/totalEquipmentNeed;
         return Math.Min(manPowerEffectiveness, equipmentEffectiveness);
     }
 }

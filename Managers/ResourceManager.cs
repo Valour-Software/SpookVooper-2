@@ -28,7 +28,7 @@ public class BaseRecipe
     }
     public string Name { get; set; }
 
-    public List<SyntaxModifierNode> ModifierNodes { get; set; }
+    public List<SyntaxModifierNode>? ModifierNodes { get; set; }
 }
 
 public class ConsumerGood

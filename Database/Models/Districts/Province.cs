@@ -249,7 +249,7 @@ public class Province
         return (int)attraction;
     }
 
-    public void HourlyTick()
+    public async ValueTask HourlyTick()
     {
         if (Population < 2500) Population = 2500;
         // update modifiers now
@@ -303,6 +303,12 @@ public class Province
 
         CurrentDevelopmentStage = higheststage;
 
+        foreach (var building in DBCache.ProvincesBuildings[Id]) {
+            await building.Tick();
+        }
+        
+        UpdateModifiersAfterBuildingTick();
+
         // get hourly rate
         var PopulationGrowth = GetMonthlyPopulationGrowth() / 30 / 24;
         Population += (long)Math.Ceiling(PopulationGrowth);
@@ -338,10 +344,10 @@ public class Province
     public void UpdateModifiers()
     {
         Modifiers = new();
+        var value_executionstate = new ExecutionState(District, this);
+        var scaleby_executionstate = new ExecutionState(District, this);
         foreach (var staticmodifier in StaticProvinceModifiers)
         {
-            var value_executionstate = new ExecutionState(District, this);
-            var scaleby_executionstate = new ExecutionState(District, this);
             foreach (var modifiernode in staticmodifier.luaStaticModifierObject.ModifierNodes)
             {
                 var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleByNode.GetValue(scaleby_executionstate));
@@ -351,10 +357,23 @@ public class Province
 
         if (CurrentDevelopmentStage is not null)
         {
+            value_executionstate = new ExecutionState(District, this);
             foreach (var modifiernode in CurrentDevelopmentStage.ModifierNodes)
             {
-                var value_executionstate = new ExecutionState(District, this);
                 var value = (double)modifiernode.GetValue(value_executionstate, 1);
+                UpdateOrAddModifier((ProvinceModifierType)modifiernode.ProvinceModifierType!, value);
+            }
+        }
+    }
+
+    public void UpdateModifiersAfterBuildingTick() {
+        var buildingtick_executionstate = new ExecutionState(District, this);
+        foreach (var building in DBCache.ProvincesBuildings[Id]) {
+            if (!building.SuccessfullyTicked) continue;
+            if (building.Recipe.ModifierNodes is null) continue;
+            foreach (var modifiernode in building.Recipe.ModifierNodes) {
+                var value = (double)modifiernode.GetValue(buildingtick_executionstate, 1);
+                value *= building.GetRateForProduction();
                 UpdateOrAddModifier((ProvinceModifierType)modifiernode.ProvinceModifierType!, value);
             }
         }

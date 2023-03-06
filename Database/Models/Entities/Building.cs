@@ -3,6 +3,7 @@ using SV2.Scripting.LuaObjects;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Scripting;
+using Valour.Shared;
 
 namespace SV2.Database.Models.Buildings;
 
@@ -58,6 +59,8 @@ public abstract class BuildingBase : IHasOwner, ITickable
 
         return null;
     }
+
+    public bool SuccessfullyTicked { get; set; }
 
     public async Task Tick() { }
 }
@@ -148,8 +151,58 @@ public abstract class ProducingBuilding : BuildingBase
         return rate;
     }
 
+    public double GetRateForProduction() {
+        double rate = 1;
+
+        rate *= Size;
+
+        rate *= Recipe.PerHour;
+
+        rate *= Defines.NProduction[$"BASE_{BuildingType}_THROUGHPUT"];
+
+        rate *= Quantity;
+
+        rate *= ThroughputFactor;
+
+        return rate;
+    }
+
     public double GetHourlyProduction(bool useQuantity = true) {
         return GetProductionSpeed(useQuantity) * Size;
+    }
+
+    public double MiningOutputFactor() {
+        if (!Province.Metadata.Resources.ContainsKey(BuildingObj.MustHaveResource)) return 0.0;
+        return Province.Metadata.Resources[BuildingObj.MustHaveResource]/2550.0 / 3;
+    }
+
+    public async ValueTask<TaskResult> TickRecipe(BaseEntity owner) {
+        double rate = GetRateForProduction();
+        if (!Recipe.Inputcost_Scaleperlevel)
+            rate /= Size;
+        double rate_for_input = rate * (1/Efficiency);
+        SuccessfullyTicked = false;
+        foreach (var resourcename in Recipe.Inputs.Keys) {
+            double amount = rate_for_input * Recipe.Inputs[resourcename];
+            if (!await owner.HasEnoughResource(resourcename, amount))
+                return new(false, "Owner lacks enough resources to tick this building");
+        }
+        foreach (var resourcename in Recipe.Inputs.Keys) {
+            double amount = rate_for_input * Recipe.Inputs[resourcename];
+            await owner.ChangeResourceAmount(resourcename, -amount);
+        }
+
+        // do output handling now
+        foreach (var resourcename in Recipe.Outputs.Keys) {
+            double amount = rate * Recipe.Outputs[resourcename];
+            if (BuildingObj.MustHaveResource is not null)
+                amount *= MiningOutputFactor();
+            await owner.ChangeResourceAmount(resourcename, amount);
+        }
+
+        SuccessfullyTicked = true;
+
+        return new(true, "");
     }
 
     public double OutputPerHourPerSize(string resource)

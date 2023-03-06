@@ -1,7 +1,6 @@
 ﻿using IdGen;
 using SV2.Database.Managers;
 using SV2.Managers;
-using SV2.NonDBO;
 using SV2.Scripting;
 using SV2.Scripting.Parser;
 using Valour.Shared;
@@ -21,20 +20,20 @@ public class LuaBuilding
     public bool UseBuildingSlots { get; set; }
     public string MustHaveResource { get; set; }
 
-    public Dictionary<string, decimal> GetConstructionCost(BaseEntity entity, District district, Province province, int levels) {
-        Dictionary<string, decimal> totalresources = new();
+    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, District district, Province province, int levels) {
+        Dictionary<string, double> totalresources = new();
         for (int i = 0; i < levels; i++) {
             var costs = BuildingCosts.Evaluate(new ExecutionState(district, province));
             foreach ((var resource, var amount) in costs) {
                 if (!totalresources.ContainsKey(resource))
                     totalresources[resource] = 0;
-                totalresources[resource] += amount;
+                totalresources[resource] += (double)amount;
             }
         }
         return totalresources;
     }
 
-    public async ValueTask<TaskResult<bool>> CanBuild(BaseEntity entity, District district, Province province, int levels) {
+    public async ValueTask<TaskResult> CanBuild(BaseEntity entity, District district, Province province, int levels) {
         if (levels <= 0)
             return new(false, "The amount of levels you wish to build must be greater than 0!");
         
@@ -58,17 +57,16 @@ public class LuaBuilding
         return new(true, null);
     }
 
-    public async ValueTask<TaskResult<bool>> Build(BaseEntity entity, District district, Province province, int levels) {
+    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity entity, District district, Province province, int levels, ProducingBuilding? building = null) {
         var canbuild = await CanBuild(entity, district, province, levels);
         if (!canbuild.Success)
             return new(false, canbuild.Message);
 
         var costs = GetConstructionCost(entity, district, province, levels);
         foreach ((var resource, var amount) in costs) {
-            await entity.ChangeResourceAmount(resource, (int)(Math.Ceiling(amount)));
+            await entity.ChangeResourceAmount(resource, amount);
         }
 
-        ProducingBuilding? building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.OwnerId == entity.Id && x.ProvinceId == province.Id && x.LuaBuildingObjId == Name);
         if (building is null) {
             building.Id = IdManagers.GeneralIdGenerator.Generate();
             building.OwnerId = building.OwnerId;
@@ -80,13 +78,33 @@ public class LuaBuilding
             switch (type) {
                 case BuildingType.Mine:
                     building.Quantity = Defines.NProduction["BASE_MINE_QUANTITY"];
-                    var _building = (Mine)building;
-                    DBCache.Put(_building.Id, _building);
-                    DBCache.dbctx.Mines.Add(_building);
+                    var mine = (Mine)building;
+                    DBCache.Put(mine.Id, mine);
+                    DBCache.dbctx.Mines.Add(mine);
+                    break;
+                case BuildingType.Factory:
+                    building.Quantity = Defines.NProduction["BASE_FACTORY_QUANTITY"];
+                    var factory = (Factory)building;
+                    DBCache.Put(factory.Id, factory);
+                    DBCache.dbctx.Factories.Add(factory);
+                    break;
+                case BuildingType.Farm:
+                    building.Quantity = Defines.NProduction["BASE_FARM_QUANTITY"];
+                    var farm = (Farm)building;
+                    DBCache.Put(farm.Id, farm);
+                    DBCache.dbctx.Farms.Add(farm);
+                    break;
+                case BuildingType.Infrastructure:
+                    building.Quantity = 1;
+                    var infrastructure = (Mine)building;
+                    DBCache.Put(infrastructure.Id, infrastructure);
+                    DBCache.dbctx.Mines.Add(infrastructure);
                     break;
             }
-
-            
         }
+
+        building.Size += levels;
+
+        return new(true, $"Successfully built {levels} levels of {PrintableName}.", building);
     }
 }

@@ -139,6 +139,8 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<District> Districts { get; set; }
     public DbSet<Province> Provinces { get; set; }
+    public DbSet<Infrastructure> Infrastructures { get; set; }
+    public DbSet<Farm> Farms { get; set; }
     public DbSet<GroupRole> GroupRoles { get; set; }
     public DbSet<Election> Elections { get; set; }
     public DbSet<Vote> Votes { get; set; }

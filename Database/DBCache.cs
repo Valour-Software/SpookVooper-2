@@ -14,6 +14,8 @@ public static class DBCache
 
     public static VooperDB dbctx { get; set; }
 
+    public static Dictionary<long, List<ProducingBuilding>> ProvincesBuildings { get; set; }
+
     public static List<ProducingBuilding> GetAllProducingBuildings() 
     {
         List<ProducingBuilding> buildings = GetAll<Factory>().Select(x => (ProducingBuilding)x).ToList();
@@ -155,14 +157,31 @@ public static class DBCache
         foreach(TaxPolicy policy in dbctx.TaxPolicies) {
             Put(policy.Id, policy);
         }
-        foreach(Factory factory in dbctx.Factories) {
-            Put(factory.Id, factory);
+        foreach(District district in dbctx.Districts) {
+            Put(district.Id, district);
+        }
+        foreach(Province province in dbctx.Provinces) {
+            province.District = Get<District>(province.DistrictId);
+            ProvincesBuildings[province.Id] = new();
+            Put(province.Id, province);
+        }
+        foreach(Factory _obj in dbctx.Factories) {
+            ProvincesBuildings[_obj.ProvinceId].Add(_obj);
+            Put(_obj.Id, _obj);
+        }
+        foreach(Farm _obj in dbctx.Farms) {
+            ProvincesBuildings[_obj.ProvinceId].Add(_obj);
+            Put(_obj.Id, _obj);
+        }
+        foreach(Mine _obj in dbctx.Mines) {
+            ProvincesBuildings[_obj.ProvinceId].Add(_obj);
+            Put(_obj.Id, _obj);
+        }
+        foreach(Infrastructure _obj in dbctx.Infrastructures) {
+            Put(_obj.Id, _obj);
         }
         foreach(UBIPolicy policy in dbctx.UBIPolicies) {
             Put(policy.Id, policy);
-        }
-        foreach(District district in dbctx.Districts) {
-            Put(district.Id, district);
         }
         foreach(GroupRole role in dbctx.GroupRoles) {
             Put(role.Id, role);
@@ -172,10 +191,6 @@ public static class DBCache
         }
         foreach(Vote vote in dbctx.Votes) {
             Put(vote.Id, vote);
-        }
-        foreach(Province province in dbctx.Provinces) {
-            province.District = Get<District>(province.DistrictId);
-            Put(province.Id, province);
         }
         foreach (var _obj in dbctx.Cities)
             Put(_obj.Id, _obj);
