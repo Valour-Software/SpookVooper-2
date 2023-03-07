@@ -32,6 +32,11 @@ metals = {
 	}
 }
 
+products = {
+	tools = {
+	}
+}
+
 military = {
 	ammo = {
 	}

@@ -402,7 +402,7 @@ public static class LuaHandler
                     DBCache.dbctx.Add(itemdef);
                 }
                 resource.ItemDefinition = itemdef;
-                GameDataManager.ResourcesToItemDefinitions[resource.Name] = DBCache.GetAll<ItemDefinition>().First(x => x.Name == resource.Name);
+                GameDataManager.ResourcesToItemDefinitions[key] = DBCache.GetAll<ItemDefinition>().First(x => x.Name == resource.Name);
             }
         }
     }
@@ -425,7 +425,7 @@ public static class LuaHandler
             {
                 foreach (string input in inputs.Keys)
                 {
-                    recipe.Inputs[input.ToTitleCase()] = Convert.ToDouble(inputs[input]);
+                    recipe.Inputs[input] = Convert.ToDouble(inputs[input]);
                 }
             }
             var outputs = (LuaTable)table["outputs"];
@@ -435,7 +435,7 @@ public static class LuaHandler
                     recipe.ModifierNodes = HandleModifierNodes((LuaTable)outputs["modifiers"]);
                 }
                 else
-                    recipe.Outputs[output.ToTitleCase()] = Convert.ToDouble(outputs[output]);
+                    recipe.Outputs[output] = Convert.ToDouble(outputs[output]);
             }
             GameDataManager.BaseRecipeObjs[recipe.Id] = recipe;
         }
@@ -454,9 +454,9 @@ public static class LuaHandler
                 MustHaveResource = table.GetValue("musthaveresource")
             };
 
-            //var recipes = (LuaTable)table["recipes"];
-            //foreach (string recipe in recipes.Values.Select(x => x.Value))
-            //    building.Recipes.Add(ResourceManager.Recipes[recipe]);
+            var recipes = (LuaTable)table["recipes"];
+            foreach (string recipe in recipes.Values.Select(x => x.Value))
+                building.Recipes.Add(GameDataManager.BaseRecipeObjs[recipe]);
             if (table["base_efficiency"] is not null)
                 building.BaseEfficiency = HandleSyntaxExpression((LuaTable)table["base_efficiency"]);
 

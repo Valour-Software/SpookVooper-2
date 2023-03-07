@@ -26,12 +26,12 @@ public static class GameDataManager
 
         LuaHandler.HandleResourcesFile(File.ReadAllText("Managers/Data/Resources.lua"));
 
-        foreach (var path in ResourceManager.GetFilePaths("Buildings")) {
-            LuaHandler.HandleBuildingFile(File.ReadAllText(path));
-        }
-
         foreach (var path in ResourceManager.GetFilePaths("Recipes")) {
             LuaHandler.HandleRecipeFile(File.ReadAllText(path));
+        }
+
+        foreach (var path in ResourceManager.GetFilePaths("Buildings")) {
+            LuaHandler.HandleBuildingFile(File.ReadAllText(path));
         }
     }
 }

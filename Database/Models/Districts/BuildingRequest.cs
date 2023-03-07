@@ -32,6 +32,7 @@ public class BuildingRequest
     public LuaBuilding BuildingLuaObj => GameDataManager.BaseBuildingObjs[BuildingObjId];
 
     public int LevelsRequested { get; set; }
+    public int LevelsBuilt { get; set; }
     public DateTime Applied { get; set; }
 
     /// <summary>

@@ -25,10 +25,11 @@ public abstract class BuildingBase : IHasOwner, ITickable
 {
     [Key]
     public long Id { get; set; }
+    public string? Name { get; set; }
     public long DistrictId { get; set; }
     public int Size { get; set; }
     public string RecipeId { get; set; }
-    public abstract BuildingType BuildingType { get; set; }
+    public abstract BuildingType BuildingType { get; }
     public string LuaBuildingObjId { get; set; }
     public string? Description { get; set; }
     public long ProvinceId { get; set; }
@@ -108,14 +109,14 @@ public abstract class ProducingBuilding : BuildingBase
                 BuildingType.Farm => 1 + District.GetModifierValue(DistrictModifierType.FarmThroughputFactor),
                 BuildingType.Mine => 1 + District.GetModifierValue(DistrictModifierType.MineThroughputFactor),
                 BuildingType.Factory => 1 + District.GetModifierValue(DistrictModifierType.FactoryThroughputFactor),
-                _ => 0.00
+                _ => 1
             };
             basevalue *= BuildingType switch
             {
                 BuildingType.Farm => 1 + Province.GetModifierValue(ProvinceModifierType.FarmThroughputFactor),
                 BuildingType.Mine => 1 + Province.GetModifierValue(ProvinceModifierType.MineThroughputFactor),
                 BuildingType.Factory => 1 + Province.GetModifierValue(ProvinceModifierType.FactoryThroughputFactor),
-                _ => 0.00
+                _ => 1
             };
             basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;
             basevalue *= District.GetModifierValue(DistrictModifierType.AllProducingBuildingThroughputFactor) + 1.00;
@@ -134,7 +135,7 @@ public abstract class ProducingBuilding : BuildingBase
                 BuildingType.Farm => District.GetModifierValue(DistrictModifierType.FarmQuantityCap),
                 BuildingType.Mine => District.GetModifierValue(DistrictModifierType.MineQuantityCap),
                 BuildingType.Factory => District.GetModifierValue(DistrictModifierType.FactoryQuantityCap),
-                _ => 0.00
+                _ => 1
             };
         }
     }
@@ -158,7 +159,7 @@ public abstract class ProducingBuilding : BuildingBase
 
         rate *= Recipe.PerHour;
 
-        rate *= Defines.NProduction[$"BASE_{BuildingType}_THROUGHPUT"];
+        rate *= Defines.NProduction[$"BASE_{BuildingType.ToString().ToUpper()}_THROUGHPUT"];
 
         rate *= Quantity;
 
@@ -173,10 +174,10 @@ public abstract class ProducingBuilding : BuildingBase
 
     public double MiningOutputFactor() {
         if (!Province.Metadata.Resources.ContainsKey(BuildingObj.MustHaveResource)) return 0.0;
-        return Province.Metadata.Resources[BuildingObj.MustHaveResource]/2550.0 / 3;
+        return Province.Metadata.Resources[BuildingObj.MustHaveResource]/2550.0;
     }
 
-    public async ValueTask<TaskResult> TickRecipe(BaseEntity owner) {
+    public async ValueTask<TaskResult> TickRecipe() {
         double rate = GetRateForProduction();
         if (!Recipe.Inputcost_Scaleperlevel)
             rate /= Size;
@@ -184,12 +185,12 @@ public abstract class ProducingBuilding : BuildingBase
         SuccessfullyTicked = false;
         foreach (var resourcename in Recipe.Inputs.Keys) {
             double amount = rate_for_input * Recipe.Inputs[resourcename];
-            if (!await owner.HasEnoughResource(resourcename, amount))
+            if (!await Owner.HasEnoughResource(resourcename, amount))
                 return new(false, "Owner lacks enough resources to tick this building");
         }
         foreach (var resourcename in Recipe.Inputs.Keys) {
             double amount = rate_for_input * Recipe.Inputs[resourcename];
-            await owner.ChangeResourceAmount(resourcename, -amount);
+            await Owner.ChangeResourceAmount(resourcename, -amount, $"Input for building {Name} ({BuildingObj.PrintableName})");
         }
 
         // do output handling now
@@ -197,7 +198,7 @@ public abstract class ProducingBuilding : BuildingBase
             double amount = rate * Recipe.Outputs[resourcename];
             if (BuildingObj.MustHaveResource is not null)
                 amount *= MiningOutputFactor();
-            await owner.ChangeResourceAmount(resourcename, amount);
+            await Owner.ChangeResourceAmount(resourcename, amount, $"Output for building {Name} ({BuildingObj.PrintableName})");
         }
 
         SuccessfullyTicked = true;

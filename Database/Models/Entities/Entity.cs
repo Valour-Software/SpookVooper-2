@@ -73,27 +73,21 @@ public abstract class BaseEntity
         return await GetOwnershipOfResource(resource) > amount;
     }
 
-    public async ValueTask<bool> ChangeResourceAmount(string resource, double by) {
+    public async ValueTask<bool> ChangeResourceAmount(string resource, double by, string details) {
         var itemdefid = GameDataManager.ResourcesToItemDefinitions[resource].Id;
         SVItemOwnership ownership = null;
         if (!SVItemsOwnerships.ContainsKey(itemdefid))
             ownership = await CreateResourceOwnership(resource);
         else
             ownership = SVItemsOwnerships[itemdefid];
-        ownership.Amount += by;
+
+        ItemTrade itemtrade = new(ItemTradeType.Server, null, Id, by, itemdefid, details);
+        itemtrade.NonAsyncExecute(true);
         return true;
     }
 
     public async ValueTask<SVItemOwnership> CreateResourceOwnership(string resource) {
-        var ownership = new SVItemOwnership() {
-            Id = IdManagers.GeneralIdGenerator.Generate(),
-            OwnerId = Id,
-            DefinitionId = GameDataManager.ResourcesToItemDefinitions[resource].Id,
-            Amount = 0
-        };
-        DBCache.Put(ownership.Id, ownership);
-        DBCache.dbctx.SVItemOwnerships.Add(ownership);
-        return ownership;
+        return new();
     }
 
     public double GetHourlyProductionOfResource(string resource) 

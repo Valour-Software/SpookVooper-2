@@ -10,7 +10,7 @@ namespace SV2.Database.Models.Factories;
 
 public class Farm : ProducingBuilding
 {
-    public override BuildingType BuildingType { get => BuildingType.Farm; set => BuildingType = value; }
+    public override BuildingType BuildingType { get => BuildingType.Farm; }
 
     /// <summary>
     /// This function is called every IRL hour

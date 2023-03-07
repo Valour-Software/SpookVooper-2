@@ -29,7 +29,7 @@ public static class ItemTradeManager
 
         if (!dequeued) return false;
 
-        TaskResult result = await trade.ExecuteFromManager(dbctx);
+        TaskResult result = await trade.ExecuteFromManager(dbctx, trade.Force);
 
         trade.Result = result;
 

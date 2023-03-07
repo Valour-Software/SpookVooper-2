@@ -14,13 +14,11 @@ public static class DBCache
 
     public static VooperDB dbctx { get; set; }
 
-    public static Dictionary<long, List<ProducingBuilding>> ProvincesBuildings { get; set; }
+    public static Dictionary<long, List<ProducingBuilding>> ProvincesBuildings = new();
 
     public static List<ProducingBuilding> GetAllProducingBuildings() 
     {
-        List<ProducingBuilding> buildings = GetAll<Factory>().Select(x => (ProducingBuilding)x).ToList();
-        buildings.AddRange(GetAll<Mine>().Select(x => (ProducingBuilding)x).ToList());
-        return buildings;
+        return ProvincesBuildings.SelectMany(x => x.Value).ToList();
     }
 
     public static IEnumerable<T> GetAll<T>() where T : class
@@ -178,6 +176,7 @@ public static class DBCache
             Put(_obj.Id, _obj);
         }
         foreach(Infrastructure _obj in dbctx.Infrastructures) {
+            ProvincesBuildings[_obj.ProvinceId].Add(_obj);
             Put(_obj.Id, _obj);
         }
         foreach(UBIPolicy policy in dbctx.UBIPolicies) {

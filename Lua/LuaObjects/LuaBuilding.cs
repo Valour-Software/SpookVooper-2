@@ -33,16 +33,19 @@ public class LuaBuilding
         return totalresources;
     }
 
-    public async ValueTask<TaskResult> CanBuild(BaseEntity entity, District district, Province province, int levels) {
+    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, District district, Province province, int levels) {
         if (levels <= 0)
             return new(false, "The amount of levels you wish to build must be greater than 0!");
-        
-        var costs = GetConstructionCost(entity, district, province, levels);
+
+        if (OnlyGovernorCanBuild && !province.CanEdit(caller))
+            return new(false, $"Only the Governor of {province.Name} can build this building!");
+
+        var costs = GetConstructionCost(buildas, district, province, levels);
 
         // check for resources
         foreach ((var resource, var amount) in costs) {
-            if (!await entity.HasEnoughResource(resource, amount)) {
-                return new(false, $"{entity.Name}'s lack enough {resource}! About {(amount - (await entity.GetOwnershipOfResource(resource))):0n}");
+            if (!await buildas.HasEnoughResource(resource, amount)) {
+                return new(false, $"{buildas.Name}'s lack enough {resource}! About {(amount - (await buildas.GetOwnershipOfResource(resource))):n0} more is required");
             }
         }
 
@@ -51,25 +54,28 @@ public class LuaBuilding
         if (slotsleftover < 0)
             return new(false, $"{province.Name} lacks enough building slots! {slotsleftover} more building slots are required!");
 
-        if (OnlyGovernorCanBuild && !province.CanManageBuildingRequests(entity))
-            return new(false, $"Only the Governor of {province.Name} can build this building!");
-
         return new(true, null);
     }
 
-    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity entity, District district, Province province, int levels, ProducingBuilding? building = null) {
-        var canbuild = await CanBuild(entity, district, province, levels);
+    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, District district, Province province, int levels, ProducingBuilding? building = null) {
+        var canbuild = await CanBuild(buildas, caller, district, province, levels);
         if (!canbuild.Success)
             return new(false, canbuild.Message);
 
-        var costs = GetConstructionCost(entity, district, province, levels);
+        var costs = GetConstructionCost(buildas, district, province, levels);
         foreach ((var resource, var amount) in costs) {
-            await entity.ChangeResourceAmount(resource, amount);
+            await buildas.ChangeResourceAmount(resource, -amount, "Construction");
         }
 
         if (building is null) {
+            building = type switch {
+                BuildingType.Mine => new Mine(),
+                BuildingType.Factory => new Factory(),
+                BuildingType.Farm => new Farm(),
+                BuildingType.Infrastructure => new Infrastructure()
+            };
             building.Id = IdManagers.GeneralIdGenerator.Generate();
-            building.OwnerId = building.OwnerId;
+            building.OwnerId = buildas.Id;
             building.DistrictId = district.Id;
             building.ProvinceId = province.Id;
             building.RecipeId = Recipes.First().Id;
@@ -96,9 +102,9 @@ public class LuaBuilding
                     break;
                 case BuildingType.Infrastructure:
                     building.Quantity = 1;
-                    var infrastructure = (Mine)building;
+                    var infrastructure = (Infrastructure)building;
                     DBCache.Put(infrastructure.Id, infrastructure);
-                    DBCache.dbctx.Mines.Add(infrastructure);
+                    DBCache.dbctx.Infrastructures.Add(infrastructure);
                     break;
             }
         }

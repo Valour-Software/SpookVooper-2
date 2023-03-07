@@ -1,7 +1,7 @@
 building_simple_factory = {
 	recipes = {
-		recipe_iron_smeltery_base,
-		recipe_steel_factory_base,
+		recipe_iron_smeltery_base
+		recipe_steel_factory_base
 		recipe_simple_components_factory_base
 	}
 	buildingcosts = {

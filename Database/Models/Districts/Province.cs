@@ -196,7 +196,7 @@ public class Province
         var exponent = Defines.NProvince[NProvince.OVERPOPULATION_MODIFIER_EXPONENT];
         exponent += GetModifierValue(ProvinceModifierType.OverPopulationModifierExponent);
         exponent += District.GetModifierValue(DistrictModifierType.OverPopulationModifierExponent);
-        var population = Population - GetModifierValue(ProvinceModifierType.OverPopulationModifierPopulationBase);
+        var population = Population + GetModifierValue(ProvinceModifierType.OverPopulationModifierPopulationBase);
         var rate = Math.Pow(population, exponent) / 100.0;
         rate += Defines.NProvince[NProvince.OVERPOPULATION_MODIFIER_BASE];
         if (rate > 0)
@@ -305,6 +305,7 @@ public class Province
 
         foreach (var building in DBCache.ProvincesBuildings[Id]) {
             await building.Tick();
+            await building.TickRecipe();
         }
         
         UpdateModifiersAfterBuildingTick();

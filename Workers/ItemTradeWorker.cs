@@ -6,14 +6,14 @@ using SV2.Web;
 
 namespace SV2.Workers
 {
-    public class TransactionWorker : BackgroundService
+    public class ItemTradeWorker : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        public readonly ILogger<EconomyWorker> _logger;
+        public readonly ILogger<ItemTradeWorker> _logger;
         private static VooperDB dbctx;
         private static DateTime LastTime = DateTime.UtcNow;
 
-        public TransactionWorker(ILogger<EconomyWorker> logger,
+        public ItemTradeWorker(ILogger<ItemTradeWorker> logger,
                             IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
@@ -31,7 +31,7 @@ namespace SV2.Workers
                     {
                         try
                         {
-                            if (!(await TransactionManager.Run(dbctx)))
+                            if (!(await ItemTradeManager.Run(dbctx)))
                             {
                                 await Task.Delay(10);
                             }
@@ -41,7 +41,7 @@ namespace SV2.Workers
                             Console.WriteLine("FATAL TRANSACTION WORKER ERROR:");
                             Console.WriteLine(e.Message);
                         }
-                        if (TransactionManager.transactionQueue.IsEmpty || (DateTime.UtcNow - LastTime).TotalMinutes >= 1)
+                        if (ItemTradeManager.itemTradeQueue.IsEmpty || (DateTime.UtcNow - LastTime).TotalMinutes >= 1)
                         {
                             await dbctx.SaveChangesAsync();
                             LastTime = DateTime.UtcNow;
@@ -51,11 +51,11 @@ namespace SV2.Workers
 
                 while (!task.IsCompleted)
                 {
-                    _logger.LogInformation("TRANSACTION Worker running at: {time}", DateTimeOffset.Now);
+                    _logger.LogInformation("ITEM TRADE Worker running at: {time}", DateTimeOffset.Now);
                     await Task.Delay(60000);
                 }
 
-                _logger.LogInformation("TRANSACTION Worker task stopped at: {time}", DateTimeOffset.Now);
+                _logger.LogInformation("ITEM TRADE Worker task stopped at: {time}", DateTimeOffset.Now);
                 _logger.LogInformation("Restarting.", DateTimeOffset.Now);
             }
         }

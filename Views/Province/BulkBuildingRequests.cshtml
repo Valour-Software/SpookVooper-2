@@ -91,6 +91,7 @@
             <span id="result" style="font-size: 16px;"></span>
         </center>
         <iframe style="display: none;" name="frame" onLoad="Submitted(this)"></iframe>
+        <iframe style="display: none;" name="constructframe" onLoad="ConstructSubmitted(this)"></iframe>
         <table class="table">
             <thead>
                 <tr class="header">
@@ -101,6 +102,11 @@
                     @if (!Context.Request.QueryString.Value.Contains("filter=MyOwn")) {
                         <th>Approve?</th>
                         <th>Deny?</th>
+                    }
+                    else {
+                        <th>Levels Constructed</th>
+                        <th>Construct</th>
+                        <th>Result</th>
                     }
                 </tr>
             </thead>
@@ -158,6 +164,23 @@
                                     </!form>
                                 </td>
                             }
+                            else {
+                                if (request.Granted ) {
+                                    <td>@request.LevelsBuilt</td>
+                                }
+                                if (request.LevelsBuilt < request.LevelsRequested && request.Granted)
+                                {
+                                    <td>
+                                        <!form method="post" action="/Building/Construct" target="constructframe" id="constructform-@request.Id">
+                                            @Html.AntiForgeryToken()
+                                            @Html.Hidden("buildingrequestid", request.Id)
+                                            <!input name="levelstobuild" class="form-control" type="number" min="0" max="@(request.LevelsRequested-request.LevelsBuilt)" />
+                                            <button class="btn btn-outline-warning">Construct</button>
+                                        </!form>
+                                    </td>
+                                    <td id="result-@request.Id"></td>
+                                }
+                            }
                         </tr>
                     }
                 }
@@ -173,5 +196,14 @@
         e.innerHTML = text[0]
         e = document.getElementById(text[1])
         e.style = "display: none;"
+    }
+    function ConstructSubmitted(element) {
+        var text = element.contentDocument.body.textContent.split(",")
+        var e = document.getElementById("result-"+text[0])
+        e.innerHTML = text[1]
+        if (text[1].includes("Successfully")) {
+            var e = document.getElementById("constructform-" + text[0])
+            e.style = "display: none;"
+        }
     }
 </script>

@@ -9,7 +9,7 @@ namespace SV2.Database.Models.Factories;
 
 public class Mine : ProducingBuilding
 {
-    public override BuildingType BuildingType { get => BuildingType.Factory; set => BuildingType = value; }
+    public override BuildingType BuildingType { get => BuildingType.Factory; }
 
     public async ValueTask Tick()
     {

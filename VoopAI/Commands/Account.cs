@@ -62,7 +62,8 @@ public class AccountCommands : CommandModuleBase
         var embed = new EmbedBuilder()
             .AddPage()
                 .AddRow()
-                    .AddText("XP", $"{Math.Round(user.Xp,1)} {user.Rank}")
+                    .AddText("XP", $"{Math.Round(user.Xp,1)}")
+                    .AddText("Rank", user.Rank.ToString())
                  .AddRow()
                     .AddText("Messages", $"{user.Messages}")
                  .AddRow()
@@ -77,7 +78,7 @@ public class AccountCommands : CommandModuleBase
         // get the user's district's UBI
         ubi += DBCache.GetAll<UBIPolicy>().Where(x => x.DistrictId == user.DistrictId && (x.ApplicableRank == user.Rank || x.ApplicableRank == null)).Sum(x => x.Rate);
 
-        embed.AddText("Daily UBI", $"¢{Math.Round(ubi)}");
+        embed.AddRow().AddText("Daily UBI", $"¢{Math.Round(ubi)}");
         await ctx.ReplyAsync(embed);
     }
     

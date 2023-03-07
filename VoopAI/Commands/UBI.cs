@@ -73,8 +73,9 @@ class UBICommands : CommandModuleBase
                 rankname = policy.ApplicableRank.ToString()!;
                 rankcolor = VoopAI.GetRankColor(policy.ApplicableRank);
             }
-            embed.AddText(rankname).WithStyles(new TextColor(rankcolor));
-            embed.AddText(text:$"¢{Math.Round(policy.Rate)} daily");
+            embed.AddText($"¢{Math.Round(policy.Rate)} daily");
+            embed.WithName(rankname).WithStyles(new TextColor(rankcolor));
+            embed.AddRow();
         }
         await ctx.ReplyAsync(embed);
     }
