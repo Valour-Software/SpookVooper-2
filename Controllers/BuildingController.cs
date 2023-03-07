@@ -29,11 +29,18 @@ public class BuildingController : SVController
 
     [HttpGet]
     [UserRequired]
-    public IActionResult View(long id) 
+    public IActionResult Manage(long id) 
     {
         var user = HttpContext.GetUser();
+        var building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == id);
+    
+        if (!(building.OwnerId == user.Id || (building.Owner.EntityType != EntityType.User && building.Owner.HasPermission(user, GroupPermissions.ManageBuildings))))
+        {    
+            StatusMessage = "You lack permission to manage this building!";
+            return Redirect("/");
+        }
         
-        return View(DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == id));
+        return View(building);
     }
 
     [HttpPost]
@@ -128,7 +135,7 @@ public class BuildingController : SVController
             StatusMessage = result.Message;
             if (!result.Success)
                 return RedirectBack();
-            return Redirect($"/Building/View/{result.Data.Id}");
+            return Redirect($"/Building/Manage/{result.Data.Id}");
         }
 
         else {

@@ -121,6 +121,12 @@
                         <span asp-description-for="Build" class="form-text" style="color:#888888" />
                         <span asp-validation-for="Build" class="text-danger"></span>
                     </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="ManageBuildings" class="form-check-inline" />
+                        <label asp-for="ManageBuildings"></label>
+                        <span asp-description-for="ManageBuildings" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="ManageBuildings" class="text-danger"></span>
+                    </div>
                     @if (group.Flags.Contains(GroupFlag.News))
                     {
                         <div class="form-group">

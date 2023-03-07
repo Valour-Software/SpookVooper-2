@@ -25,7 +25,11 @@ public static class GroupPermissions
                 Post,
                 Eco,
                 Edit,
-                News
+                News,
+                ManageBuildingRequests,
+                ManageProvinces,
+                Build,
+                ManageBuildings
         };
     }
 
@@ -48,6 +52,7 @@ public static class GroupPermissions
     public static readonly GroupPermission ManageBuildingRequests = new GroupPermission(0x400, "Manage Building Requests", "Allows members to accept or deny building requests on provinces that this group has governorship over.");
     public static readonly GroupPermission ManageProvinces = new GroupPermission(0x800, "Manage Provinces", "Allows members to edit provinces that this group has governorship over.");
     public static readonly GroupPermission Build = new GroupPermission(0x1000, "Build", "Allows members to submit building requests as this group.");
+    public static readonly GroupPermission ManageBuildings = new GroupPermission(0x2000, "Manage Buildings", "Allows members to manage building owned by this group.");
 }
 
 public class GroupPermission : Permission

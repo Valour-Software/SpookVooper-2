@@ -1,0 +1,72 @@
+@model ProducingBuilding
+
+@{
+    ViewData["Title"] = "Building Admin";
+
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h3 style="text-align:center">@ViewData["Title"]</h3>
+        <h2 style="text-align:center">@Model.Name</h2>
+
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+
+            </div>
+            <div class="col-4"></div>
+        </div>
+
+        <br />
+        <hr />
+        <br />
+        <form method="post">
+            <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
+                @Html.HiddenFor(x => x.Id)
+                <div class="row">
+                    <h4>Province Info</h4>
+
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <br />
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Recipe</label>
+                    <span>View list of all recipes <a href="https://dev.spookvooper.com/wiki/List_of_Recipes">here</a></span>
+                    <select asp-for="RecipeId" asp-items="Model.BuildingObj.Recipes.Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.Id, Text = x.Name })" class="form-select form-control"></select>
+                    <span asp-validation-for="RecipeId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+        <br />
+
+        <br />
+        <hr />
+        <br />
+    </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>
