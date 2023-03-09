@@ -16,9 +16,8 @@ fertile_land_river_delta_area = {
 		-- put together, these add up to almost ~2x increase in the max farming output
 		-- combined with the increased base fertile land, means these provinces will hold a max output
 		-- of more than 4x other provinces
-		province.fertilelandfactor = 1
-		province.farms.farmingthroughputfactor = 0.75
-		province.overpopulationmodifierexponent = -0.01
+		province.farms.farmingthroughputfactor = 1.5
+		province.overpopulationmodifierexponent = -0.0125
 	}
 	stackable = false
 }

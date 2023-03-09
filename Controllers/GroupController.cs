@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using SV2.Models.Groups;
 using Valour.Api.Models;
 using Microsoft.AspNetCore.Authorization;
+using SV2.Models.Manage;
 
 namespace SV2.Controllers;
 
@@ -84,6 +85,53 @@ public class GroupController : SVController
     {
         Group? group = Group.Find(id);
         return View(group);
+    }
+
+    [UserRequired]
+    public IActionResult ViewInvited() 
+    {
+        var user = HttpContext.GetUser();
+
+        List<long> canacceptinvitesids = new() { user.Id };
+        canacceptinvitesids.AddRange(
+            DBCache.GetAll<Group>().Where(x => x.IsOwner(user))
+            .Select(x => x.Id).ToList());
+
+        List<InvitedModel> invitedmodels = new();
+        foreach (var group in DBCache.GetAll<Group>().Where(x => x.Invited.Any(id => canacceptinvitesids.Contains(id))))
+        {
+            foreach (var entityid in canacceptinvitesids) 
+            {
+                if (group.Invited.Contains(entityid)) {
+                    invitedmodels.Add(new() {
+                        InvitedEntity = BaseEntity.Find(entityid),
+                        InvitedTo = group
+                    });
+                }
+            }
+        }    
+        return View(invitedmodels);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [UserRequired]
+    public IActionResult Invite(long groupid, long entityid)
+    {
+        Group group = Group.Find(groupid);
+        if (group is null) return RedirectBack("group is null!");
+
+        var user = HttpContext.GetUser();
+        if (group.HasPermission(user, GroupPermissions.ManageInvites))
+            return RedirectBack("You lack permission to invite entities!");
+
+        var entitytobeinvited = BaseEntity.Find(entityid);
+        if (entitytobeinvited is null) return RedirectBack("Entity to invite could not be found!");
+        if (group.MembersIds.Contains(entitytobeinvited.Id)) return RedirectBack("Entity is already a member of this group!");
+        if (group.Invited.Contains(entitytobeinvited.Id)) return RedirectBack("Entity has already been invited!");
+        group.Invited.Add(entitytobeinvited.Id);
+
+        return RedirectBack($"Successfully invited {entitytobeinvited.Name}");
     }
 
     public async Task<IActionResult> MyGroups()

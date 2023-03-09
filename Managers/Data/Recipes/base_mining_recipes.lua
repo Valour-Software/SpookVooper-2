@@ -18,7 +18,7 @@ recipe_copper_mining_base = {
 	outputs = {
 		iron_ore = 1
 	}
-	perhour = 5
+	perhour = 7.5
     editable = false
 }
 
@@ -30,7 +30,7 @@ recipe_bauxite_mining_base = {
 	outputs = {
 		bauxite = 1
 	}
-	perhour = 1.5
+	perhour = 2.5
     editable = false
 }
 
@@ -42,6 +42,30 @@ recipe_coal_mining_base = {
 	outputs = {
 		coal = 1
 	}
-	perhour = 3.5
+	perhour = 10
+    editable = false
+}
+
+recipe_gold_mining_base = {
+	name = "Gold Mining"
+    inputs = {
+        tools = 0.2
+    }
+	outputs = {
+		gold = 1
+	}
+	perhour = 1
+    editable = false
+}
+
+recipe_crystallite_mining_base = {
+	name = "Crystallite Mining"
+    inputs = {
+        tools = 0.2
+    }
+	outputs = {
+		crystallite = 1
+	}
+	perhour = 1
     editable = false
 }

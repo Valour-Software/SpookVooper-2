@@ -14,11 +14,12 @@ building_simple_factory = {
 
 building_advanced_factory = {
 	recipes = {
-		recipe_advanced_components_factory_base
+		recipe_advanced_components_factory_base,
+		recipe_computer_chips_factory_base
 	}
 	buildingcosts = {
-		steel = 27500,
-		simple_components = 17500,
+		steel = 35000,
+		simple_components = 20000,
 		advanced_components = 5000
 	}
 	type = "Factory"

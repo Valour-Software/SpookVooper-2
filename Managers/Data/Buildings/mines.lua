@@ -3,7 +3,9 @@ building_iron_mine = {
 		recipe_iron_mining_base
 	}
 	buildingcosts = {
-		steel = 2500
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
 	}
 
     -- a province must contain this resource in order for this building
@@ -17,11 +19,10 @@ building_copper_mine = {
 		recipe_copper_mining_base
 	}
 	buildingcosts = {
-		steel = 2500
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
 	}
-
-    -- a province must contain this resource in order for this building
-    -- to be able to be constructed
     musthaveresource = "Copper"
 	type = "Mine"
 }
@@ -31,11 +32,10 @@ building_bauxite_mine = {
 		recipe_bauxite_mining_base
 	}
 	buildingcosts = {
-		steel = 2500
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
 	}
-
-    -- a province must contain this resource in order for this building
-    -- to be able to be constructed
     musthaveresource = "Bauxite"
 	type = "Mine"
 }
@@ -45,12 +45,36 @@ building_coal_mine = {
 		recipe_coal_mining_base
 	}
 	buildingcosts = {
-		brick = 1000
-		steel = 2500
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
 	}
-
-    -- a province must contain this resource in order for this building
-    -- to be able to be constructed
     musthaveresource = "Coal"
+	type = "Mine"
+}
+
+building_gold_mine = {
+	recipes = {
+		recipe_gold_mining_base
+	}
+	buildingcosts = {
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
+	}
+    musthaveresource = "Gold"
+	type = "Mine"
+}
+
+building_crystallite_mine = {
+	recipes = {
+		recipe_crystallite_mining_base
+	}
+	buildingcosts = {
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
+	}
+    musthaveresource = "Crystallite"
 	type = "Mine"
 }

@@ -38,6 +38,8 @@ public class Group : BaseEntity, IHasOwner
     // if the group is open to the public
     public bool Open { get; set; }
 
+    public List<long> Invited { get; set; }
+
     public List<long> MembersIds { get; set; }
 
     public override EntityType EntityType
@@ -114,6 +116,19 @@ public class Group : BaseEntity, IHasOwner
         // add oauth key handling
         return false;
 
+    }
+
+    public bool IsOwner(BaseEntity entity)
+    {
+        if (entity.Id == OwnerId)
+            return true;
+
+        if (Owner.EntityType == EntityType.Group || Owner.EntityType == EntityType.Corporation) {
+            Group group = (Group)Owner;
+            if (group.IsOwner(entity))
+                return true;
+        }
+        return false;
     }
 
     public bool HasPermission(BaseEntity entity, GroupPermission permission)

@@ -24,6 +24,19 @@ recipe_copper_smeltery_base = {
     editable = false
 }
 
+recipe_bauxite_smeltery_base = {
+	name = "Bauxite Smelting"
+	inputs = {
+		bauxite = 1
+		tools = 0.0075
+	}
+	outputs = {
+		aluminium = 0.75
+	}
+	perhour = 50
+    editable = false
+}
+
 recipe_steel_factory_base = {
 	name = "Steel Production"
 	inputs = {
@@ -38,8 +51,22 @@ recipe_steel_factory_base = {
     editable = false
 }
 
+recipe_tool_factory_base = {
+	name = "Tool Production"
+	inputs = {
+		computer_chips = 0.2
+		advanced_components = 0.05
+		steel = 2
+	}
+	outputs = {
+		tools = 1
+	}
+	perhour = 2
+    editable = false
+}
+
 recipe_simple_components_factory_base = {
-	name = "Simple Components Production"
+	name = "Simple Component Production"
 	inputs = {
 		iron = 1
 		silicon = 1
@@ -53,7 +80,7 @@ recipe_simple_components_factory_base = {
 }
 
 recipe_advanced_components_factory_base = {
-	name = "Advanced Components Production"
+	name = "Advanced Component Production"
 	inputs = {
 		simple_components = 4
 		steel = 4
@@ -61,6 +88,20 @@ recipe_advanced_components_factory_base = {
 	}
 	outputs = {
 		advanced_components = 1
+	}
+	perhour = 1.5
+    editable = false
+}
+
+recipe_computer_chips_factory_base = {
+	name = "Computer Chip Production"
+	inputs = {
+		silicon = 2
+		copper = 3
+		gold = 0.15
+	}
+	outputs = {
+		computer_chips = 1
 	}
 	perhour = 1.5
     editable = false
