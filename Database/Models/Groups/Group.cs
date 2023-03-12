@@ -7,6 +7,7 @@ using SV2.Database.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using SV2.Web;
 using Valour.Api.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace SV2.Database.Models.Groups;
 
@@ -88,6 +89,9 @@ public class Group : BaseEntity, IHasOwner
         Flags = new();
         GroupType = GroupTypes.Company;
         MembersIds = new() { OwnerId };
+        SVItemsOwnerships = new();
+        Invited = new();
+        Create();
     }
 
     public GroupRole? GetHighestRole(BaseEntity entity)

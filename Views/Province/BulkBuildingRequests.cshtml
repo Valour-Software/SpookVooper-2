@@ -198,7 +198,7 @@
         e.style = "display: none;"
     }
     function ConstructSubmitted(element) {
-        var text = element.contentDocument.body.textContent.split(",")
+        var text = element.contentDocument.body.textContent.split("-&-")
         var e = document.getElementById("result-"+text[0])
         e.innerHTML = text[1]
         if (text[1].includes("Successfully")) {

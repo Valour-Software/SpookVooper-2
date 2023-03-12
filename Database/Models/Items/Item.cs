@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Economy;
 using SV2.Web;
+using System.Text.Json.Serialization;
 
 namespace SV2.Database.Models.Items;
 
@@ -16,12 +17,14 @@ public class SVItemOwnership : IHasOwner
     public long OwnerId { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public BaseEntity Owner => BaseEntity.Find(OwnerId)!;
     
     [Column("definitionid")]
     public long DefinitionId { get; set; }
     
     [NotMapped]
+    [JsonIgnore]
     public ItemDefinition Definition => DBCache.Get<ItemDefinition>(DefinitionId)!;
 
     [Column("amount", TypeName = "numeric(16, 2)")]

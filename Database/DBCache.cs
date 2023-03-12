@@ -14,6 +14,9 @@ public static class DBCache
 
     public static VooperDB dbctx { get; set; }
 
+    /// <summary>
+    /// ProvinceId : List<ProducingBuilding>
+    /// </summary>
     public static Dictionary<long, List<ProducingBuilding>> ProvincesBuildings = new();
 
     public static List<ProducingBuilding> GetAllProducingBuildings() 

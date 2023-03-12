@@ -29,6 +29,19 @@ public class BuildingController : SVController
 
     [HttpGet]
     [UserRequired]
+    public IActionResult MyBuildings() {
+        var user = HttpContext.GetUser();
+
+        List<long> canbuildasids = new() { user.Id };
+        canbuildasids.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.ManageBuildings)).Select(x => x.Id).ToList());
+
+        var buildings = DBCache.GetAllProducingBuildings().Where(x => canbuildasids.Contains(x.OwnerId));
+
+        return View(buildings.ToList());
+    }
+
+    [HttpGet("/Building/Manage/{id}")]
+    [UserRequired]
     public IActionResult Manage(long id) 
     {
         var user = HttpContext.GetUser();
@@ -40,7 +53,32 @@ public class BuildingController : SVController
             return Redirect("/");
         }
         
-        return View(building);
+        return View(new BuildingManageModel() {
+            Building = building,
+            Name = building.Name,
+            Description = building.Description,
+            RecipeId = building.RecipeId,
+            BuildingId = building.Id
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [UserRequired]
+    public IActionResult Manage(BuildingManageModel model) {
+        var user = HttpContext.GetUser();
+        var building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == model.BuildingId);
+
+        if (!(building.OwnerId == user.Id || (building.Owner.EntityType != EntityType.User && building.Owner.HasPermission(user, GroupPermissions.ManageBuildings)))) {
+            StatusMessage = "You lack permission to manage this building!";
+            return Redirect("/");
+        }
+
+        building.Name = model.Name;
+        building.Description = model.Description;
+        building.RecipeId = model.RecipeId;
+
+        return RedirectBack($"Successfully updated {model.Name}'s info");
     }
 
     [HttpPost]
@@ -49,19 +87,19 @@ public class BuildingController : SVController
     {
         var buildingrequest = await _dbctx.BuildingRequests.FindAsync(buildingrequestid);
         if (!buildingrequest.Reviewed)
-            return $"{buildingrequestid},This request has not been reviewed yet!";
+            return $"{buildingrequestid}-&-This request has not been reviewed yet!";
         if (!buildingrequest.Granted)
-            return $"{buildingrequestid},This request was not granted! However, the province's governor can change this decision, so try contacting them.";
+            return $"{buildingrequestid}-&-This request was not granted! However, the province's governor can change this decision, so try contacting them.";
 
         if (buildingrequest.LevelsBuilt + levelstobuild > buildingrequest.LevelsRequested)
-            return $"{buildingrequestid},You can not construct more levels than you were approved for!";
+            return $"{buildingrequestid}-&-You can not construct more levels than you were approved for!";
 ;
         var user = HttpContext.GetUser();
 
         if (buildingrequest.RequesterId != user.Id) {
             Group group = DBCache.Get<Group>(buildingrequest.RequesterId);
             if (!group.HasPermission(user, GroupPermissions.Build)) {
-                return $"{buildingrequestid},You lack permission to build as this group!";
+                return $"{buildingrequestid}-&-You lack permission to build as this group!";
             }
         }
         var buildas = BaseEntity.Find(buildingrequest.RequesterId);
@@ -74,7 +112,7 @@ public class BuildingController : SVController
             buildingrequest.LevelsBuilt += levelstobuild;
             await _dbctx.SaveChangesAsync();
         }
-        return $"{buildingrequestid},{result.Message}";
+        return $"{buildingrequestid}-&-{result.Message}";
     }
 
     [HttpGet]
@@ -121,11 +159,23 @@ public class BuildingController : SVController
 
         var user = HttpContext.GetUser();
 
-        if (model.BuildAsId != user.Id) {
+        if (model.BuildAsId is not null && model.BuildAsId != user.Id) {
             Group group = DBCache.Get<Group>(model.BuildAsId);
             if (!group.HasPermission(user, GroupPermissions.Build)) {
                 return RedirectBack("You lack permission to build as this group!");
             }
+        }
+
+        if (model.AlreadyExistingBuildingId is not null) {
+            var building = DBCache.ProvincesBuildings[model.ProvinceId].FirstOrDefault(x => x.Id == (long)model.AlreadyExistingBuildingId);
+
+            if (building.OwnerId != user.Id) {
+                Group group = DBCache.Get<Group>(building.OwnerId);
+                if (!group.HasPermission(user, GroupPermissions.Build)) {
+                    return RedirectBack("You lack permission to build as this group!");
+                }
+            }
+            model.BuildAsId = building.OwnerId;
         }
 
         if (luabuildingobj.OnlyGovernorCanBuild) {
@@ -141,7 +191,7 @@ public class BuildingController : SVController
         else {
             var request = new BuildingRequest() {
                 Id = IdManagers.GeneralIdGenerator.Generate(),
-                RequesterId = model.BuildAsId,
+                RequesterId = (long)model.BuildAsId,
                 ProvinceId = model.ProvinceId,
                 BuildingId = model.AlreadyExistingBuildingId,
                 BuildingObjId = model.BuildingId,

@@ -154,6 +154,8 @@ public class SVUser : BaseEntity
         Created = DateTime.UtcNow;
         Joined = DateTime.UtcNow;
         LastMoved = DateTime.UtcNow.AddDays(-100);
+        SVItemsOwnerships = new();
+        Create();
     }
 
     public async Task<IEnumerable<Group>> GetJoinedGroupsAsync()

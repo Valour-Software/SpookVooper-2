@@ -119,7 +119,14 @@
                     }
                     else
                     {
-                        <td class="infobox-row-value">@Model.Governor.Name</td>
+                        <td class="infobox-row-value">
+                            @if (Model.Governor.EntityType == EntityType.User) {
+                                <a asp-controller="User" asp-action="Info" asp-route-id="@Model.GovernorId">@Model.Governor.Name</a>
+                            }
+                            else {
+                                <a asp-controller="Group" asp-action="View" asp-route-id="@Model.GovernorId">@Model.Governor.Name</a>
+                            }
+                        </td>
                     }
                 </tr>
                 <tr class="mergedrow">
@@ -140,7 +147,7 @@
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Building Slots Used</th>
-                    <td class="infobox-row-value">@($"{Model.GetBuildings().Sum(x => x.Size):n0}")</td>
+                    <td class="infobox-row-value">@($"{Model.BuildingSlotsUsed:n0}")</td>
                 </tr>
                 @if (Model.GetOverpopulationModifier() > 0.001)
                 {

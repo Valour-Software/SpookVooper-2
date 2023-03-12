@@ -13,7 +13,7 @@ public class CreateBuildingRequestModel
     public long ProvinceId { get; set; }
     public int levelsToBuild { get; set; }
     public List<SelectListItem> CanBuildAs { get; set; }
-    public long BuildAsId { get; set; }
+    public long? BuildAsId { get; set; }
 
     public List<BuildingRequest> CurrentRequestsFromThisUser { get; set; }
 }

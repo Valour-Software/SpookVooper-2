@@ -22,9 +22,7 @@ public class Factory : ProducingBuilding
 
         if (Quantity < QuantityCap)
         {
-            double quantitychange = Defines.NProduction["BASE_QUANTITY_GROWTH_RATE"] / 24;
-            quantitychange *= (QuantityCap * QuantityCap) / Quantity;
-            Quantity += quantitychange * QuantityGrowthRateFactor;
+            Quantity += QuantityHourlyGrowth;
         }
     }
 }

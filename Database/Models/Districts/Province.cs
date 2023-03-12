@@ -146,14 +146,16 @@ public class Province
     }
 
     [NotMapped]
-    public int BuildingSlotsUsed => GetBuildings().Where(x => x.BuildingObj.UseBuildingSlots).Count();
+    public int BuildingSlotsUsed => GetBuildings().Where(x => x.BuildingObj.UseBuildingSlots).Sum(x => x.Size);
+
+    public long GetLevelsOfBuildingsOfType(string type) {
+        BuildingType buildingtype = Enum.Parse<BuildingType>(type, true);
+        return GetBuildings().Where(x => x.BuildingType == buildingtype).Sum(x => x.Size);
+    }
 
     public IEnumerable<BuildingBase> GetBuildings()
     {
-        List<BuildingBase> buildings = new();
-        buildings.AddRange(DBCache.GetAll<Factory>().Where(x => x.ProvinceId == Id));
-        buildings.AddRange(DBCache.GetAll<Mine>().Where(x => x.ProvinceId == Id));
-        return buildings;
+        return DBCache.ProvincesBuildings[Id];
     }
 
     public bool CanManageBuildingRequests(BaseEntity entity) {

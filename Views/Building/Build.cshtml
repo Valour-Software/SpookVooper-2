@@ -28,15 +28,18 @@
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @Html.HiddenFor(x => x.ProvinceId)
                 @Html.HiddenFor(x => x.BuildingId)
-                @Html.HiddenFor(x => x.AlreadyExistingBuildingId)
+                <input data-val="true" data-val-required="The AlreadyExistingBuildingId field is required." id="AlreadyExistingBuildingId" name="AlreadyExistingBuildingId" type="hidden" value='@($"{Model.AlreadyExistingBuildingId ?? ViewContext.RouteData.Values.GetValueOrDefault("AlreadyExistingBuildingId")}")'>
                 <div class="row">
                     <h4>Form for submitting a building request for @Model.LuaBuildingObj.PrintableName</h4>
 
                     <div asp-validation-summary="All" class="text-danger"></div>
                 </div>
 
-                <label>Build As (what entity should this request be made from)</label>
-                <select asp-for="BuildAsId" asp-items="Model.CanBuildAs" class="form-select form-control"></select>
+                @if (!ViewContext.RouteData.Values.ContainsKey("AlreadyExistingBuildingId"))
+                {
+                    <label> Build As(what entity should this request be made from)</label>
+                    <select asp-for="BuildAsId" asp-items="Model.CanBuildAs" class="form-select form-control"></select>
+                }
 
                 <div class="form-group">
                     <label>Number of Levels to build</label>

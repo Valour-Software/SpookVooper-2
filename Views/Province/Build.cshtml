@@ -80,7 +80,7 @@
                             </div>
                             @if (buildingobj.type == SV2.Database.Models.Buildings.BuildingType.Mine) {
                                 <span>Production: @(
-                            $"{(Model.Metadata.Resources[buildingobj.MustHaveResource] / 2550.0):n2} hourly"
+                            $"{(Model.Metadata.Resources[buildingobj.MustHaveResource] / 2550.0 * buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value):n2} hourly"
                             )</span>
                         }
                         </div>

@@ -81,29 +81,34 @@ public class LuaBuilding
             building.RecipeId = Recipes.First().Id;
             building.LuaBuildingObjId = Name;
             building.Size = levels;
+            building.Name = IdManagers.GeneralIdGenerator.Generate().ToString();
             switch (type) {
                 case BuildingType.Mine:
                     building.Quantity = Defines.NProduction["BASE_MINE_QUANTITY"];
                     var mine = (Mine)building;
                     DBCache.Put(mine.Id, mine);
+                    DBCache.ProvincesBuildings[province.Id].Add(mine);
                     DBCache.dbctx.Mines.Add(mine);
                     break;
                 case BuildingType.Factory:
                     building.Quantity = Defines.NProduction["BASE_FACTORY_QUANTITY"];
                     var factory = (Factory)building;
                     DBCache.Put(factory.Id, factory);
+                    DBCache.ProvincesBuildings[province.Id].Add(factory);
                     DBCache.dbctx.Factories.Add(factory);
                     break;
                 case BuildingType.Farm:
                     building.Quantity = Defines.NProduction["BASE_FARM_QUANTITY"];
                     var farm = (Farm)building;
                     DBCache.Put(farm.Id, farm);
+                    DBCache.ProvincesBuildings[province.Id].Add(farm);
                     DBCache.dbctx.Farms.Add(farm);
                     break;
                 case BuildingType.Infrastructure:
                     building.Quantity = 1;
                     var infrastructure = (Infrastructure)building;
                     DBCache.Put(infrastructure.Id, infrastructure);
+                    DBCache.ProvincesBuildings[province.Id].Add(infrastructure);
                     DBCache.dbctx.Infrastructures.Add(infrastructure);
                     break;
             }

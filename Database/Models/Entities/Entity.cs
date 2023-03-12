@@ -90,6 +90,19 @@ public abstract class BaseEntity
         return new();
     }
 
+    public async Task Create() {
+        Dictionary<string, double> keyValuePairs = new() {
+            { "steel", 1_000_000 },
+            { "tools", 1_000_000 },
+            { "aluminium", 1_000_000 },
+            { "simple_components", 1_000_000 },
+            { "advanced_components", 1_000_000 }
+        };
+        foreach ((var resource, var amount) in keyValuePairs) {
+            await ChangeResourceAmount(resource, amount, "");
+        }
+    }
+
     public double GetHourlyProductionOfResource(string resource) 
     {
         double total = 0;

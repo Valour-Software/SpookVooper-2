@@ -1,4 +1,4 @@
-@model Group
+@model CreateGroupModel
 @{
     ViewData["Title"] = "Create Group";
 }
@@ -41,7 +41,6 @@
                 </div>
             </div>
 
-            @Html.HiddenFor(x => x.Id)
             @Html.HiddenFor(x => x.OwnerId)
 
             <div class="form-group">

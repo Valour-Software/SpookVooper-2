@@ -20,7 +20,8 @@ public enum NodeType
     MODIFIER,
     DICTNODE,
     ADDLOCALSNODE,
-    GETLOCAL
+    GETLOCAL,
+    DIVIDE
 }
 
 public class ExecutionState
@@ -102,6 +103,16 @@ public class Factor : SyntaxNode
     }
     public override decimal GetValue(ExecutionState state)
     {
+        return Value.GetValue(state);
+    }
+}
+
+public class Divide : SyntaxNode {
+    public SyntaxNode Value;
+    public Divide() {
+        NodeType = NodeType.DIVIDE;
+    }
+    public override decimal GetValue(ExecutionState state) {
         return Value.GetValue(state);
     }
 }
@@ -251,7 +262,9 @@ public class SystemVar : SyntaxNode
             {
                 "population" => state.Province.Population,
                 "owner" => state.Province.District.Id,
-                "totaloftype" => state.Province.GetBuildings().Count(x => x.BuildingObj.Name.ToLower() == levels[2])
+                "buildings" => levels[2].ToLower() switch {
+                    "totaloftype" => (decimal)state.Province.GetLevelsOfBuildingsOfType(levels[3])
+                }
             },
             _ => 0.00m
         };
@@ -284,6 +297,9 @@ public class ExpressionNode : SyntaxNode
                     break;
                 case NodeType.FACTOR:
                     result *= node.GetValue(state);
+                    break;
+                case NodeType.DIVIDE:
+                    result /= node.GetValue(state);
                     break;
                 case NodeType.GETLOCAL:
                     result = node.GetValue(state);

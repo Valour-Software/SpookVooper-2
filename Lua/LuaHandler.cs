@@ -315,6 +315,8 @@ public static class LuaHandler
                 expr.Body.Add(new Add() { Value = valuenode });
             else if (obj.Name == "factor")
                 expr.Body.Add(new Factor() { Value = valuenode });
+            else if (obj.Name == "divide")
+                expr.Body.Add(new Divide() { Value = valuenode });
             else if (obj.Name == "get_local")
                 expr.Body.Add(new GetLocal() { Name = ((SystemVar)valuenode).Value });
             else if (obj.Name == "effects")

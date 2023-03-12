@@ -1,0 +1,81 @@
+﻿@model List<InvitedModel>
+
+@{
+    ViewData["Title"] = "Bulk Manage Building Requests";
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .limit-width {
+        max-width:200px;
+    }
+    input {
+        width: 100%;
+    }
+
+    thead, tbody, tfoot, tr, td, th {
+        border-style: none;
+    }
+
+    tr:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    tr:nth-child(even), .header {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    th {
+        background-color: unset !important;
+    }
+</style>
+
+<div class="container vw-100">
+    @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+    <div class="col-12">
+        <div class="d-flex">
+            <div class="p-1 align-self-start flex-grow-1">
+                <h2>Groups that you or groups you own have been invited to</h2>
+            </div>
+        </div>
+
+        <br />
+        <table class="table">
+            <thead>
+                <tr class="header">
+                    <th>Group</th>
+                    <th>Entity invited</th>
+                    <th>Join</th>
+                    <th>Reject</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var invite in Model)
+                    {
+                        <tr>
+                            <td>@invite.InvitedTo.Name</td>
+                            <td>
+                                @if (invite.InvitedEntity.EntityType == EntityType.User) {
+                                    <a asp-controller="User" asp-action="Info" asp-route-id="@invite.InvitedEntity.Id">@invite.InvitedEntity.Name</a>
+                                }
+                                else {
+                                    <a asp-controller="Group" asp-action="View" asp-route-id="@invite.InvitedEntity.Id">@invite.InvitedEntity.Name</a>
+                                }
+                            </td>
+                            <td>
+                                <a asp-controller="Group" asp-action="AcceptInvite" asp-route-groupid="@invite.InvitedTo.Id" asp-route-inviteeid="@invite.InvitedEntity.Id">
+                                    <button class="btn btn-outline-success">Accept</button>
+                                </a>
+                            </td>
+                            <td>
+                                <a asp-controller="Group" asp-action="ReviewInvite" asp-route-groupid="@invite.InvitedTo.Id" asp-route-inviteeid="@invite.InvitedEntity.Id">
+                                    <button class="btn btn-outline-warning">Reject</button>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+        </table>
+    </div>
+</div>

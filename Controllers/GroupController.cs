@@ -51,7 +51,7 @@ public class GroupController : SVController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Group model)
+    public async Task<IActionResult> Create(CreateGroupModel model)
     {
         SVUser? user = UserManager.GetUser(HttpContext);
         if (user is null) 
@@ -67,12 +67,13 @@ public class GroupController : SVController
         if (DBCache.GetAll<Group>().Count(x => x.OwnerId == user.Id) > 15)
             return RedirectBack($"You can not own more than 15 groups!");
 
-        Group group = new Group(model.Name, user.Id);
-        group.Description = model.Description;
-        group.GroupType = model.GroupType;
-        group.DistrictId = model.DistrictId;
-        group.ImageUrl = model.ImageUrl;
-        group.OwnerId = user.Id;
+        Group group = new Group(model.Name, user.Id) {
+            Description = model.Description,
+            GroupType = model.GroupType,
+            DistrictId = model.DistrictId,
+            ImageUrl = model.ImageUrl,
+            OwnerId = user.Id
+        };
 
         DBCache.Put(group.Id, group);
         DBCache.dbctx.Groups.Add(group);
@@ -85,6 +86,38 @@ public class GroupController : SVController
     {
         Group? group = Group.Find(id);
         return View(group);
+    }
+
+    [UserRequired]
+    public IActionResult AcceptInvite(long groupid, long inviteeid) 
+    {
+        var user = HttpContext.GetUser();
+        var group = DBCache.Get<Group>(groupid);
+        var invitee = BaseEntity.Find(inviteeid);
+        if (invitee.EntityType == EntityType.User && invitee.Id != user.Id)
+            return RedirectBack("You can not accept an invite for someone else!");
+        if ((invitee.EntityType == EntityType.Group || invitee.EntityType == EntityType.Corporation) && !((Group)invitee).IsOwner(user))
+            return RedirectBack("You can not accept an invite for a group you don't own!");
+        if (!group.Invited.Contains(inviteeid))
+            return RedirectBack($"{invitee.Name} has not been invited to this group!");
+        group.Invited.Remove(inviteeid);
+        group.MembersIds.Add(invitee.Id);
+        return RedirectBack($"{invitee.Name} successfully joined {group.Name}");
+    }
+
+    [UserRequired]
+    public IActionResult RejectInvite(long groupid, long inviteeid) {
+        var user = HttpContext.GetUser();
+        var group = DBCache.Get<Group>(groupid);
+        var invitee = BaseEntity.Find(inviteeid);
+        if (invitee.EntityType == EntityType.User && invitee.Id != user.Id)
+            return RedirectBack("You can not reject an invite for someone else!");
+        if ((invitee.EntityType == EntityType.Group || invitee.EntityType == EntityType.Corporation) && !((Group)invitee).IsOwner(user))
+            return RedirectBack("You can not reject an invite for a group you don't own!");
+        if (!group.Invited.Contains(inviteeid))
+            return RedirectBack($"{invitee.Name} has not been invited to this group!");
+        group.Invited.Remove(inviteeid);
+        return RedirectBack($"{invitee.Name} successfully rejected invite to {group.Name}");
     }
 
     [UserRequired]
@@ -113,19 +146,32 @@ public class GroupController : SVController
         return View(invitedmodels);
     }
 
-    [HttpPost]
+    [HttpGet]
+    [UserRequired]
+    public IActionResult Invite(long id) {
+        Group group = Group.Find(id);
+        if (group is null) return RedirectBack("group is null!");
+
+        var user = HttpContext.GetUser();
+        if (!group.HasPermission(user, GroupPermissions.ManageInvites))
+            return RedirectBack("You lack permission to invite entities!");
+
+        return View(group);
+    }
+
+    [HttpPost("/Group/{groupid}/Invite")]
     [ValidateAntiForgeryToken]
     [UserRequired]
-    public IActionResult Invite(long groupid, long entityid)
+    public IActionResult Invite(long groupid, long EntityId)
     {
         Group group = Group.Find(groupid);
         if (group is null) return RedirectBack("group is null!");
 
         var user = HttpContext.GetUser();
-        if (group.HasPermission(user, GroupPermissions.ManageInvites))
+        if (!group.HasPermission(user, GroupPermissions.ManageInvites))
             return RedirectBack("You lack permission to invite entities!");
 
-        var entitytobeinvited = BaseEntity.Find(entityid);
+        var entitytobeinvited = BaseEntity.Find(EntityId);
         if (entitytobeinvited is null) return RedirectBack("Entity to invite could not be found!");
         if (group.MembersIds.Contains(entitytobeinvited.Id)) return RedirectBack("Entity is already a member of this group!");
         if (group.Invited.Contains(entitytobeinvited.Id)) return RedirectBack("Entity has already been invited!");

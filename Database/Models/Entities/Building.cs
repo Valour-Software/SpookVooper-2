@@ -68,8 +68,20 @@ public abstract class BuildingBase : IHasOwner, ITickable
 
 public abstract class ProducingBuilding : BuildingBase
 {
+    public ProducingBuilding() {
+
+    }
     public long? EmployeeId { get; set; }
     public double Quantity { get; set; }
+
+    [NotMapped]
+    public double QuantityHourlyGrowth {
+        get {
+            double quantitychange = Defines.NProduction["BASE_QUANTITY_GROWTH_RATE"] / 24;
+            quantitychange *= (QuantityCap * QuantityCap) / Quantity;
+            return quantitychange * QuantityGrowthRateFactor;
+        }
+    }
 
     [NotMapped]
     public double Efficiency
@@ -81,7 +93,7 @@ public abstract class ProducingBuilding : BuildingBase
                 eff = (double)BuildingObj.BaseEfficiency.GetValue(new ExecutionState(District, Province));
 
             if (BuildingType == BuildingType.Factory) {
-                eff -= ((Size * Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]) - Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]);
+                eff -= (((Size - 1) * Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]) - Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]);
                 eff += District.GetModifierValue(DistrictModifierType.FactoryEfficiency);
                 eff *= 1 + District.GetModifierValue(DistrictModifierType.FactoryEfficiencyFactor);
             }

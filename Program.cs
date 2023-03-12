@@ -27,12 +27,29 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Builder;
 using SV2.Database.Managers;
+using System.Net;
 
 Defines.Load();
 
 await VoopAI.Main();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel((context, options) =>
+{
+    options.Configure(builder.Configuration.GetSection("Kestrel"));
+#if DEBUG
+    options.Listen(IPAddress.Any, 7186, listenOptions => {
+        listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
+    });
+#else
+    options.Listen(IPAddress.Any, 5000, listenOptions =>
+    {
+        listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
+    });
+#endif
+});
+
 string CONF_LOC = "SV2Config/";
 string DBCONF_FILE = "DBConfig.json";
 

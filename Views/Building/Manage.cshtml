@@ -1,4 +1,4 @@
-@model ProducingBuilding
+@model BuildingManageModel
 
 @{
     ViewData["Title"] = "Building Admin";
@@ -6,13 +6,52 @@
     SVUser user = UserManager.GetUser(Context)!;
 }
 
-<div class="container vw-100">
-    <div class="col-12">
+<style>
+    .tooltip-dontshow {
+        opacity: 0 !important;
+    }
+
+    .mergedrow {
+        width: 25em;
+        line-height: 1.2em;
+    }
+
+    .dividertop {
+        border-top: 1px solid darkgray;
+    }
+
+    .infobox {
+        border: 1px solid darkgray;
+        background-color: rgba(255, 255, 255, 0.1);
+        max-width: 300px;
+    }
+
+    .infobox-header div {
+        text-align: center;
+    }
+
+    .infobox-subheader div {
+        text-align: center;
+    }
+
+    .infobox-row-name {
+        padding: 0 0.6em 0.2em 0.6em;
+    }
+
+    .mergedrow th {
+    }
+</style>
+
+<div class="d-flex flex-row align-content-center" style="width:100%">
+    <!-- Leftmost column -->
+    <div class="p-2 flex-shrink-1 ms-auto"></div>
+
+    <div class="p-4" style="width:80em">
 
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
         <h3 style="text-align:center">@ViewData["Title"]</h3>
-        <h2 style="text-align:center">@Model.Name</h2>
+        <h2 style="text-align:center">@Model.Building.Name</h2>
 
         <div class="row">
             <div class="col-4"></div>
@@ -24,12 +63,21 @@
 
         <br />
         <hr />
+        @if (user.Id == Model.Building.OwnerId || Model.Building.Owner.HasPermission(user, GroupPermissions.ManageMembership)) {
+            <center>
+                <a asp-route-buildingid="@Model.Building.BuildingObj.Name" asp-route-provinceid="@Model.Building.ProvinceId" asp-route-AlreadyExistingBuildingId="@Model.Building.Id" asp-action="Build" asp-controller="Building">
+                    <button class="btn btn-outline-primary">
+                        <span>Build more levels</span>
+                    </button>
+                </a>
+            </center>
+        }
         <br />
         <form method="post">
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
-                @Html.HiddenFor(x => x.Id)
+                @Html.HiddenFor(x => x.BuildingId)
                 <div class="row">
-                    <h4>Province Info</h4>
+                    <h4>Building Info</h4>
 
                     <div asp-validation-summary="All" class="text-danger"></div>
                 </div>
@@ -46,14 +94,15 @@
                     <input asp-for="Description" class="form-control" />
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
+                <br />
 
                 <div class="form-group">
                     <label>Recipe</label>
                     <span>View list of all recipes <a href="https://dev.spookvooper.com/wiki/List_of_Recipes">here</a></span>
-                    <select asp-for="RecipeId" asp-items="Model.BuildingObj.Recipes.Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.Id, Text = x.Name })" class="form-select form-control"></select>
+                    <select asp-for="RecipeId" asp-items="Model.Building.BuildingObj.Recipes.Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.Id, Text = x.Name })" class="form-select form-control"></select>
                     <span asp-validation-for="RecipeId" class="text-danger"></span>
                 </div>
-
+                <br />
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
@@ -62,8 +111,131 @@
         <br />
 
         <br />
-        <hr />
         <br />
+    </div>
+
+    <!-- Rightmost column -->
+    <div class="p-4 flex-shrink-1 me-auto" style="margin-top: 2em;">
+        <table class="infobox">
+            <tbody>
+                <tr>
+                    <th colspan="2" class="infobox-header">
+                        <div>@Model.Building.Name</div>
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan="2" class="infobox-subheader">
+                        <div>@Model.Building.BuildingType.ToString()</div>
+                    </td>
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">Province</th>
+                    <td class="infobox-row-value">
+                        <a href="/Province/View/@Model.Building.ProvinceId">
+                            <span>@Model.Building.Province.Name</span>
+                        </a>
+                   </td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">District</th>
+                    <td class="infobox-row-value">
+                        <a href="/District/View/@Model.Building.District.Name">@Model.Building.District.Name</a>
+                    </td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Owner</th>
+                    <td class="infobox-row-value">
+                        @if (Model.Building.Owner.EntityType == EntityType.User) {
+                            <a asp-controller="User" asp-action="Info" asp-route-id="@Model.Building.OwnerId">@Model.Building.Owner.Name</a>
+                        }
+                        else {
+                            <a asp-controller="Group" asp-action="View" asp-route-id="@Model.Building.OwnerId">@Model.Building.Owner.Name</a>
+                        }
+                    </td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Efficiency</th>
+                    <td class="infobox-row-value">@($"{1/Model.Building.Efficiency:n2}")x input</td>
+                </tr>
+                @if (Model.Building.BuildingType != BuildingType.Infrastructure)
+                {
+                    <tr class="mergedrow">
+                        <th class="infobox-row-name">QuantityCap</th>
+                        <td class="infobox-row-value">@(
+                        $"{Model.Building.QuantityCap * 100:n2}%"
+                        )</td>
+                    </tr>
+                    <tr class="mergedrow">
+                        <th class="infobox-row-name">Daily Quantity Growth</th>
+                        <td class="infobox-row-value">@(
+                        $"{Model.Building.QuantityHourlyGrowth * 100 * 24:n2}%"
+                        )</td>
+                    </tr>
+                    <tr class="mergedrow">
+                        <th class="infobox-row-name">Quantity</th>
+                        <td class="infobox-row-value">
+                            @($"{Model.Building.Quantity * 100:n2}%")
+                        </td>
+                    </tr>
+                }
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Throughput</th>
+                    <td class="infobox-row-value">@($"{Model.Building.ThroughputFactor:n2}")x</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Levels</th>
+                    <td class="infobox-row-value">@Model.Building.Size</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Times Recipe Executed per hour</th>
+                    <td class="infobox-row-value">@($"{Model.Building.GetRateForProduction():n1}")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Recipe</th>
+                    <td class="infobox-row-value">@Model.Building.Recipe.Name</td>
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <td colspan="2" class="infobox-subheader">
+                        <div>Resources consumed daily</div>
+                    </td>
+                </tr>
+                @{
+                    double rate = Model.Building.GetRateForProduction();
+                    rate *= 24;
+                    if (!Model.Building.Recipe.Inputcost_Scaleperlevel)
+                        rate /= Model.Building.Size;
+                    double rate_for_input = rate * (1 / Model.Building.Efficiency);
+                    string trclass = "mergedrow dividertop";
+                }
+                @foreach ((var resource, var amount) in Model.Building.Recipe.Inputs) {
+                    <tr class="@trclass">
+
+                        <th class="infobox-row-name">@resource</th>
+                        <td class="infobox-row-value">@($"{rate_for_input*amount:n1}")</td>
+                    </tr>
+                    trclass = "mergedrow";
+                }
+                @if (Model.Building.Recipe.Outputs is not null && Model.Building.Recipe.Outputs.Count > 0)
+                {
+                    <tr class="mergedrow dividertop">
+                        <td colspan="2" class="infobox-subheader">
+                            <div>Resources produced daily</div>
+                        </td>
+                    </tr>
+                    @foreach ((var resource, var amount) in Model.Building.Recipe.Outputs)
+                    {
+                        <tr class="@trclass">
+
+                            <th class="infobox-row-name">@resource</th>
+                            <td class="infobox-row-value">@(
+                        $"{rate * amount:n1}"
+                        )</td>
+                        </tr>
+                        trclass = "mergedrow";
+                    }
+                }
+            </tbody>
+        </table>
     </div>
 
     @section Scripts {
