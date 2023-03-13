@@ -6,11 +6,11 @@ using SV2.Database.Models.Permissions;
 using System.Diagnostics;
 using SV2.Models.Government;
 using Microsoft.EntityFrameworkCore;
+using SV2.Helpers;
 
 namespace SV2.Controllers;
 
-public class GovernmentController : Controller
-{
+public class GovernmentController : SVController {
     private readonly ILogger<GovernmentController> _logger;
     
     [TempData]

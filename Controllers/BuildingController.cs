@@ -106,7 +106,9 @@ public class BuildingController : SVController
 
         LuaBuilding luabuildingobj = GameDataManager.BaseBuildingObjs[buildingrequest.BuildingObjId];
 
-        ProducingBuilding? building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.OwnerId == buildas.Id && x.ProvinceId == buildingrequest.ProvinceId && x.LuaBuildingObjId == luabuildingobj.Name);
+        ProducingBuilding? building = null;
+        if (buildingrequest.BuildingId is not null)
+            building = DBCache.ProvincesBuildings[buildingrequest.ProvinceId].FirstOrDefault(x => x.Id == (long)buildingrequest.BuildingId);
         TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, user, buildingrequest.Province.District, buildingrequest.Province, levelstobuild, building);
         if (result.Success) {
             buildingrequest.LevelsBuilt += levelstobuild;

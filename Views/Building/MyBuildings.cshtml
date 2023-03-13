@@ -58,7 +58,12 @@
                             <td>
                                 <a asp-controller="Building" asp-action="Manage" asp-route-id="@building.Id">@building.Name</a>
                             </td>
-                            <td>@building.BuildingType.ToString()</td>
+                            @if (building.LuaBuildingObjId != "building_advanced_factory") {
+                                <td>@building.BuildingType.ToString()</td>
+                            }
+                            else {
+                                <td>Advanced Factory</td>
+                            }
                             <td>@building.Province.Name</td>
                             <td>@building.Recipe.Name</td>
                             <td>

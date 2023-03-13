@@ -7,9 +7,9 @@ using System.Text.Json;
 using SV2.NonDBO;
 using IdGen;
 using SV2.Database.Managers;
+using SV2.Helpers;
 
-public class MapController : Controller
-{
+public class MapController : SVController {
     private readonly ILogger<MapController> _logger;
 
     public static List<MapState> MapStates = new List<MapState>();

@@ -13,7 +13,12 @@ namespace SV2.API
     {
         public static void AddRoutes(WebApplication app)
         {
-            app.MapGet   ("api/dev/database/sql", GetSQL);
+            //app.MapGet   ("api/dev/database/sql", GetSQL);
+            app.MapGet("api/dev/lackaccess", LackAccess);
+        }
+
+        private static async Task LackAccess(HttpContext ctx) {
+            await ctx.Response.WriteAsync("You lack access to SV 2.0. SV 2.0 is currently in private early alpha, public early alpha is expected in a few weeks to months.");
         }
 
         private static async Task GetSQL(HttpContext ctx, VooperDB db, bool drop = false)

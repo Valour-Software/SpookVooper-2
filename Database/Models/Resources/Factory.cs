@@ -15,7 +15,7 @@ public class Factory : ProducingBuilding
     /// <summary>
     /// This function is called every IRL hour
     /// </summary>
-    public async ValueTask Tick()
+    public override async ValueTask Tick()
     {
         if (Quantity <= 0.01)
             Quantity = 0.01;

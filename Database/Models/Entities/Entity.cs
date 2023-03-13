@@ -115,6 +115,17 @@ public abstract class BaseEntity
         return total;
     }
 
+    public double GetHourlyUsageOfResource(string resource) {
+        double total = 0;
+        List<ProducingBuilding> buildings = DBCache.GetAll<Factory>().Select(x => (ProducingBuilding)x).ToList();
+        buildings.AddRange(DBCache.GetAll<Mine>().Select(x => (ProducingBuilding)x).ToList());
+        foreach (var building in buildings) {
+            if (building.Recipe.Inputs.ContainsKey(resource))
+                total += building.GetHourlyProduction() * building.Recipe.Inputs[resource];
+        }
+        return total;
+    }
+
     public async Task<decimal> GetAvgTaxableBalance(VooperDB dbctx, int hours = 720)
     {
         DateTime timetocheck = DateTime.UtcNow.AddHours(-hours);

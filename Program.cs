@@ -28,6 +28,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Builder;
 using SV2.Database.Managers;
 using System.Net;
+using SV2.Helpers;
 
 Defines.Load();
 
@@ -41,6 +42,7 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 #if DEBUG
     options.Listen(IPAddress.Any, 7186, listenOptions => {
         listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
+        listenOptions.UseHttps();
     });
 #else
     options.Listen(IPAddress.Any, 5000, listenOptions =>
@@ -54,8 +56,10 @@ string CONF_LOC = "SV2Config/";
 string DBCONF_FILE = "DBConfig.json";
 
 // Add services to the container.
-builder.Services.AddMvc()
-    .AddRazorRuntimeCompilation();
+builder.Services.AddMvc(options => {
+    options.Filters.Add<UserRequiredAttribute>();
+}
+).AddRazorRuntimeCompilation();
 
 // Create directory if it doesn't exist
 if (!Directory.Exists(CONF_LOC))

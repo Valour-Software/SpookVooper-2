@@ -8,11 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Valour.Api.Models;
 using SV2.Models.Leaderboard;
 using Microsoft.EntityFrameworkCore;
+using SV2.Helpers;
 
 namespace SV2.Controllers;
 
-public class LeaderboardController : Controller
-{
+public class LeaderboardController : SVController {
     private readonly ILogger<LeaderboardController> _logger;
 
     public LeaderboardController(ILogger<LeaderboardController> logger)

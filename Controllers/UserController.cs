@@ -6,11 +6,11 @@ using SV2.Database.Models.Permissions;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Valour.Api.Models;
+using SV2.Helpers;
 
 namespace SV2.Controllers;
 
-public class UserController : Controller
-{
+public class UserController : SVController {
     private readonly ILogger<UserController> _logger;
     
     [TempData]

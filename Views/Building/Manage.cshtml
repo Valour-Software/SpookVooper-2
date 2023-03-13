@@ -210,7 +210,7 @@
                 @foreach ((var resource, var amount) in Model.Building.Recipe.Inputs) {
                     <tr class="@trclass">
 
-                        <th class="infobox-row-name">@resource</th>
+                        <th class="infobox-row-name">@($"{resource.Replace('_',' ')}")</th>
                         <td class="infobox-row-value">@($"{rate_for_input*amount:n1}")</td>
                     </tr>
                     trclass = "mergedrow";
@@ -226,7 +226,7 @@
                     {
                         <tr class="@trclass">
 
-                            <th class="infobox-row-name">@resource</th>
+                            <th class="infobox-row-name">@($"{resource.Replace('_', ' ')}")</th>
                             <td class="infobox-row-value">@(
                         $"{rate * amount:n1}"
                         )</td>

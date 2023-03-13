@@ -18,7 +18,7 @@ public enum BuildingType
 
 public interface ITickable
 {
-    public Task Tick();
+    public ValueTask Tick();
 }
 
 public abstract class BuildingBase : IHasOwner, ITickable
@@ -63,7 +63,7 @@ public abstract class BuildingBase : IHasOwner, ITickable
 
     public bool SuccessfullyTicked { get; set; }
 
-    public async Task Tick() { }
+    public virtual async ValueTask Tick() { }
 }
 
 public abstract class ProducingBuilding : BuildingBase

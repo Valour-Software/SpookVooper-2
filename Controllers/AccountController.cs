@@ -10,11 +10,11 @@ using Valour.Shared.Authorization;
 using Valour.Api.Client;
 using System.Web;
 using System.Text.Json;
+using SV2.Helpers;
 
 namespace SV2.Controllers
 {
-    public class AccountController : Controller
-    {
+    public class AccountController : SVController {
         private static List<string> OAuthStates = new();
 
 #if DEBUG
@@ -23,6 +23,15 @@ namespace SV2.Controllers
         private static string Redirecturl = "https://dev.spookvooper.com/callback";
 #endif
         private readonly ILogger<AccountController> _logger;
+
+        private readonly List<long> AllowedUsers = new List<long>() {
+            12641943911399424,
+            12201879245422592,
+            12607949301874688,
+            12448715201314816,
+            12935924224884736,
+            12643519258427392
+        };
         
         [TempData]
         public string StatusMessage { get; set; }
@@ -92,6 +101,10 @@ namespace SV2.Controllers
                 Console.WriteLine(result.Message);
             var token = result.Data;
             var valouruser = await Valour.Api.Models.User.FindAsync(token.UserId);
+
+            if (!AllowedUsers.Contains(valouruser.Id)) {
+                return Redirect("/dev/lackaccess");
+            }
 
             var user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == token.UserId);
             if (user is null)

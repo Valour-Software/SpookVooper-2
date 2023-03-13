@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SV2.Helpers;
 using SV2.Models;
 using System.Diagnostics;
 
 namespace SV2.Controllers
 {
-    public class HomeController : Controller
-    {
+    public class HomeController : SVController {
         private readonly ILogger<HomeController> _logger;
         
         [TempData]

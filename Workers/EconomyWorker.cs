@@ -130,6 +130,7 @@ namespace SV2.Workers
 
                             foreach (var building in buildings)
                             {
+                                if (building.BuildingType == BuildingType.Infrastructure) continue;
                                 if (!propertytaxes.ContainsKey(building.OwnerId))
                                     propertytaxes[building.OwnerId] = new();
                                 var entitytaxes = propertytaxes[building.OwnerId];

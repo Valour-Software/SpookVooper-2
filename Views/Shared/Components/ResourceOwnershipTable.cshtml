@@ -35,8 +35,10 @@
         <tr class="header">
             <th>Resource</th>
             <th>Ownership</th>
-            <th>Resource Production (hourly)</th>
+            <th>Resource Production (daily)</th>
             <th>Resource Production (monthly)</th>
+            <th>Resource Usage (daily)</th>
+            <th>Resource Usage (monthly)</th>
         </tr>
     </thead>
     <tbody>
@@ -44,12 +46,15 @@
             foreach (var resource in Model.SVItemsOwnerships.Values) {
                 <tr>
                     <td>@resource.Definition.Name</td>
-                    <td>@resource.Amount</td>
+                    <td>@($"{@resource.Amount:n1}")</td>
                     @{
-                        var hourlyproduction = Model.GetHourlyProductionOfResource(resource.Definition.Name);
+                        var hourlyproduction = Model.GetHourlyProductionOfResource(resource.Definition.Name.Replace(" ", "_").ToLower());
+                        var hourlyusage = Model.GetHourlyUsageOfResource(resource.Definition.Name.Replace(" ", "_").ToLower());
                     }
-                    <td>@($"{hourlyproduction:n1}")</td>
+                    <td>@($"{hourlyproduction*24:n0}")</td>
                     <td>@($"{(hourlyproduction*24*30):n0}")</td>
+                    <td>@($"{hourlyusage * 24:n0}")</td>
+                    <td>@($"{(hourlyusage * 24 * 30):n0}")</td>
                 </tr>
             }
         }

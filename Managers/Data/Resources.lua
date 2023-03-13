@@ -12,6 +12,10 @@ raw = {
 	}
 	copper_ore = {
 	}
+	crystallite = {
+	}
+	silicon = {
+	}
 }
 
 building_materials = {

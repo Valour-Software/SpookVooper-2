@@ -15,16 +15,14 @@ public class Farm : ProducingBuilding
     /// <summary>
     /// This function is called every IRL hour
     /// </summary>
-    public async ValueTask Tick()
+    public override async ValueTask Tick()
     {
         if (Quantity <= 0.01)
             Quantity = 0.01;
 
         if (Quantity < QuantityCap)
         {
-            double quantitychange = Defines.NProduction["BASE_QUANTITY_GROWTH_RATE"] / 24;
-            quantitychange *= (QuantityCap * QuantityCap) / Quantity;
-            Quantity += quantitychange * QuantityGrowthRateFactor;
+            Quantity += QuantityHourlyGrowth;
         }
     }
 }

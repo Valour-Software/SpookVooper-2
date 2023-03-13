@@ -15,10 +15,18 @@ public class UserRequiredAttribute : ActionFilterAttribute
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        SVUser? user = UserManager.GetUser(context.HttpContext);
-        SVController controller = (SVController)context.Controller;
-        if (user is null)
-            context.Result = controller.Redirect("/Account/Login");
-        context.HttpContext.Items["user"] = user;
+        // yes i know this is bad
+        // but this is meant to be temp
+        var path = context.HttpContext.Request.Path.Value;
+        if (!(path == "/Account/Login"
+            || path == "/dev/lackaccess"
+            || path == "/callback")) 
+        {
+            SVUser? user = UserManager.GetUser(context.HttpContext);
+            SVController controller = (SVController)context.Controller;
+            if (user is null)
+                context.Result = controller.Redirect("/Account/Login");
+            context.HttpContext.Items["user"] = user;
+        }
     }
 }
