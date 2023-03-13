@@ -34,6 +34,8 @@ metals = {
 	}
 	lead = {
 	}
+	aluminium = {
+	}
 }
 
 products = {
