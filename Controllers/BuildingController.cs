@@ -182,7 +182,11 @@ public class BuildingController : SVController
 
         if (luabuildingobj.OnlyGovernorCanBuild) {
             var buildas = BaseEntity.Find(model.BuildAsId);
-            ProducingBuilding? building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.OwnerId == buildas.Id && x.ProvinceId == province.Id && x.LuaBuildingObjId == luabuildingobj.Name);
+            ProducingBuilding? building = null;
+            if (model.AlreadyExistingBuildingId is not null) {
+                DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.OwnerId == buildas.Id && x.ProvinceId == province.Id && x.LuaBuildingObjId == luabuildingobj.Name);
+            }
+            
             TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, user, province.District, province, model.levelsToBuild, building);
             StatusMessage = result.Message;
             if (!result.Success)

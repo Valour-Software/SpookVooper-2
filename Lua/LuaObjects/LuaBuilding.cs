@@ -114,7 +114,9 @@ public class LuaBuilding
             }
         }
 
-        building.Size += levels;
+        else {
+            building.Size += levels;
+        }
 
         return new(true, $"Successfully built {levels} levels of {PrintableName}.", building);
     }

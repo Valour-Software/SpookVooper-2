@@ -51,9 +51,9 @@
                         var hourlyproduction = Model.GetHourlyProductionOfResource(resource.Definition.Name.Replace(" ", "_").ToLower());
                         var hourlyusage = Model.GetHourlyUsageOfResource(resource.Definition.Name.Replace(" ", "_").ToLower());
                     }
-                    <td>@($"{hourlyproduction*24:n0}")</td>
+                    <td>@($"{hourlyproduction*24:n1}")</td>
                     <td>@($"{(hourlyproduction*24*30):n0}")</td>
-                    <td>@($"{hourlyusage * 24:n0}")</td>
+                    <td>@($"{hourlyusage * 24:n1}")</td>
                     <td>@($"{(hourlyusage * 24 * 30):n0}")</td>
                 </tr>
             }
