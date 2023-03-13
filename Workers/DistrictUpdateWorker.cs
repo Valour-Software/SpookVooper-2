@@ -63,8 +63,10 @@ public class DistrictUpdateWorker : BackgroundService
                         Console.WriteLine("FATAL DISTRICT UPDATING WORKER ERROR:");
                         Console.WriteLine(e.Message);
                         Console.WriteLine(e.StackTrace);
-                        if (e.InnerException is not null)
+                        if (e.InnerException is not null) {
                             Console.WriteLine(e.InnerException);
+                            Console.WriteLine(e.InnerException.StackTrace);
+                        }
                     }
                 }
             });
