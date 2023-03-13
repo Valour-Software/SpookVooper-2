@@ -184,7 +184,7 @@ namespace SV2.Workers
 #if DEBUG
                     await Task.Delay(10_000, stoppingToken);
 #else
-                    await Task.Delay(120_000, stoppingToken);
+                    await Task.Delay(30_000, stoppingToken);
 #endif
                 }
 

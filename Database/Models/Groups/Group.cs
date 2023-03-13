@@ -13,12 +13,18 @@ namespace SV2.Database.Models.Groups;
 
 public enum GroupTypes
 {
-    Company,
+    Company = 0,
     // a corporation is a company that is listed on SVSE or a company on a private stock exchange that the CFV has determined is a corporation
-    Corporation,
-    NonProfit,
-    PoliticalParty,
-    District
+    Corporation = 1,
+    NonProfit = 2,
+    PoliticalParty = 3,
+    District = 4
+}
+
+public enum ReadableGroupTypes {
+    Company = 0,
+    NonProfit = 2,
+    PoliticalParty = 3
 }
 
 public enum GroupFlag
