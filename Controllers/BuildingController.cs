@@ -115,6 +115,8 @@ public class BuildingController : SVController
         if (result.Success) {
             buildingrequest.LevelsBuilt += levelstobuild;
             buildingrequest.BuildingId = result.Data.Id;
+            if (buildingrequest.BuildingName is not null)
+                result.Data.Name = buildingrequest.BuildingName;
             await _dbctx.SaveChangesAsync();
             message += $"Click <a target='_blank' href='/Building/Manage/{result.Data.Id}'>here</a> to view the building.";
         }
@@ -200,6 +202,8 @@ public class BuildingController : SVController
             StatusMessage = result.Message;
             if (!result.Success)
                 return RedirectBack();
+            if (model.AlreadyExistingBuildingId is not null)
+                result.Data.Name = model.Name;
             return Redirect($"/Building/Manage/{result.Data.Id}");
         }
 
@@ -216,6 +220,9 @@ public class BuildingController : SVController
                 Granted = false,
                 LevelsBuilt = 0
             };
+
+            if (model.AlreadyExistingBuildingId is not null)
+                request.BuildingName = model.Name;
 
             _dbctx.BuildingRequests.Add(request);
             await _dbctx.SaveChangesAsync();

@@ -14,6 +14,7 @@ public class CreateBuildingRequestModel
     public int levelsToBuild { get; set; }
     public List<SelectListItem> CanBuildAs { get; set; }
     public long? BuildAsId { get; set; }
+    public string Name { get; set; }
 
     public List<BuildingRequest> CurrentRequestsFromThisUser { get; set; }
 }

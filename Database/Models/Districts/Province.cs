@@ -93,6 +93,9 @@ public class Province
     [NotMapped]
     public int RankByDevelopment { get; set; }
 
+    [NotMapped]
+    public int RankByMigrationAttraction { get; set; }
+
     public Province() { }
 
     public Province(Random rnd)
@@ -284,6 +287,7 @@ public class Province
         LastTickDevelopmentValue = DevelopmentValue;
 
         RankByDevelopment = District.ProvincesByDevelopmnet.IndexOf(this);
+        RankByMigrationAttraction = District.ProvincesByMigrationAttraction.IndexOf(this)+1;
 
         int currenthighestvalue = 0;
         int index = 0;
@@ -328,12 +332,10 @@ public class Province
         
         // province level
         BuildingSlots += (int)GetModifierValue(ProvinceModifierType.BuildingSlots);
-        var buildingSlots_factor = 1 + GetModifierValue(ProvinceModifierType.BuildingSlotsFactor);
+        BuildingSlots = (int)(BuildingSlots * (1 + GetModifierValue(ProvinceModifierType.BuildingSlotsFactor)));
 
         // district level
-        buildingSlots_factor += District.GetModifierValue(DistrictModifierType.BuildingSlotsFactor);
-
-        BuildingSlots = (int)(BuildingSlots * buildingSlots_factor);
+        BuildingSlots = (int)(BuildingSlots * (1 + District.GetModifierValue(DistrictModifierType.BuildingSlotsFactor)));
 
         MigrationAttraction = GetMigrationAttraction();
     }

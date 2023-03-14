@@ -104,6 +104,9 @@ public class District
     [NotMapped]
     public List<Province> ProvincesByDevelopmnet { get; set; }
 
+    [NotMapped]
+    public List<Province> ProvincesByMigrationAttraction { get; set; }
+
     public void HourlyTick()
     {
         double totalattractionpoints = Provinces.Sum(x => Math.Pow(x.MigrationAttraction, 1.025));

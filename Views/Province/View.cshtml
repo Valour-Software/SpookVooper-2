@@ -1,5 +1,7 @@
 @using SV2.Database;
+@using SV2.Database.Managers;
 @using SV2.Database.Models.Districts;
+@using SV2.Scripting;
 @model SV2.Database.Models.Districts.Province
 
 @{ 
@@ -42,6 +44,15 @@
 
         .mergedrow th {
             
+        }
+        .has-expanded-info {
+            text-decoration: underline dotted;
+            cursor: pointer;
+        }
+
+        .modal-body .has-expanded-info {
+            text-decoration: underline;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -143,7 +154,7 @@
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Building Slots</th>
-                    <td class="infobox-row-value">@($"{Model.BuildingSlots:n0}")</td>
+                    <td class="infobox-row-value has-expanded-info" data-bs-toggle="modal" data-bs-target="#BuildingSlotsModal">@($"{Model.BuildingSlots:n0}")</td>
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Building Slots Used</th>
@@ -172,7 +183,7 @@
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Migration Attraction</th>
-                    <td class="infobox-row-value">@($"{Model.MigrationAttraction:n0}")</td>
+                    <td class="infobox-row-value">@($"{Model.MigrationAttraction:n0}") (@Model.RankByMigrationAttraction.ToStringWithOrdinal() in District)</td>
                 </tr>
                 <tr class="mergedrow dividertop">
                     <th class="infobox-row-name">Base Property Tax</th>
@@ -187,12 +198,127 @@
     </div>
 </div>
 
+@{
+    double buildingslots_exponent = Defines.NProvince["BUILDING_SLOTS_POPULATION_EXPONENT"];
+    buildingslots_exponent += Model.GetModifierValue(ProvinceModifierType.BuildingSlotsExponent);
+    buildingslots_exponent += Model.District.GetModifierValue(DistrictModifierType.BuildingSlotsExponent);
+    double runningtotal = 0;
+    double slotsfrominfrastructures = 0;
+}
+<bootstrap-modal asp-modal-id="Test" asp-modal-title="Building Slots from Population" asp-modal-to-open-on-close-id="BuildingSlotsModal">
+    <span>Formula: (Province.Population ^ @($"{buildingslots_exponent:n4}")) * @(Defines.NProvince[NProvince.BUILDING_SLOTS_FACTOR])</span>
+    <br />
+    <span>The exponent's value is from:</span>
+    <table class="table table-dark table-striped">
+        <tbody>
+            @{
+                runningtotal = Defines.NProvince[NProvince.BUILDING_SLOTS_POPULATION_EXPONENT];
+            }
+            <tr>
+                <td>Base</td>
+                <td></td>
+                <td>@(runningtotal)</td>
+            </tr>
+            <tr>
+                @{
+                    var Infrastructures = Model.GetBuildings().Where(x => x.BuildingType == BuildingType.Infrastructure && x.RecipeId == "recipe_infrastructure_roads").ToList();
+                    double frominfrastructures = 0;
+                    slotsfrominfrastructures = 0;
+                    var buildingtick_executionstate = new ExecutionState(Model.District, Model);
+                    foreach (Infrastructure building in Infrastructures) {
+                        foreach (var modifiernode in building.Recipe.ModifierNodes) {
+                            if (modifiernode.ProvinceModifierType == ProvinceModifierType.BuildingSlotsExponent) {
+                                var value = (double)modifiernode.GetValue(buildingtick_executionstate, 1);
+                                value *= building.GetRateForProduction();
+                                frominfrastructures += value;
+                            }
+                            else if (modifiernode.ProvinceModifierType == ProvinceModifierType.BuildingSlots) {
+                                var value = (double)modifiernode.GetValue(buildingtick_executionstate, 1);
+                                value *= building.GetRateForProduction();
+                                slotsfrominfrastructures += value;
+                            }
+                        }
+                    }
+                    runningtotal += frominfrastructures;
+                }
+                <td>From Infrastructure (@Model.GetLevelsOfBuildingsOfType("infrastructure") levels)</td>
+                <td>+@($"{frominfrastructures:n4}")</td>
+                <td>@($"{runningtotal:n4}")</td>
+            </tr>
+        </tbody>
+    </table>
+</bootstrap-modal>
+
+<bootstrap-modal asp-modal-id="BuildingSlotsModal" asp-modal-title="Building Slots">
+    <table class="table table-dark table-striped">
+        <tbody>
+            @{
+                runningtotal = 0;
+            }
+            <tr>
+                <td>Base</td>
+                <td></td>
+                <td>10</td>
+            </tr>
+            <tr>
+                @{
+                    double BuildingSlotsFromPopulation = Math.Ceiling((Math.Pow(Model.Population, buildingslots_exponent) * Defines.NProvince["BUILDING_SLOTS_FACTOR"]));
+                    runningtotal += BuildingSlotsFromPopulation + 10;
+                }
+                <td>From <span class="has-expanded-info" data-bs-toggle="modal" data-bs-target="#Test">Population</span></td>
+                <td>+@($"{BuildingSlotsFromPopulation:n0}")</td>
+                <td>@($"{runningtotal:n0}")</td>
+            </tr>
+            @{
+                runningtotal += slotsfrominfrastructures;
+            }
+            @if (slotsfrominfrastructures > 0) {
+                <tr>
+                    <td>From Infrastructure (@Model.GetLevelsOfBuildingsOfType("infrastructure") levels)</td>
+                    <td>+@($"{slotsfrominfrastructures:n0}")</td>
+                    <td>@($"{runningtotal:n0}")</td>
+                </tr>
+            }
+            @{
+                int slotsfromprovincemodifier = (int)(Model.GetModifierValue(ProvinceModifierType.BuildingSlots) - slotsfrominfrastructures);
+                runningtotal += slotsfromprovincemodifier;
+            }
+            @if (slotsfromprovincemodifier > 0)
+            {
+                <tr>
+                    <td>Province Modifiers</td>
+                    <td>+@($"{slotsfromprovincemodifier:n0}")</td>
+                    <td>@($"{runningtotal:n0}")</td>
+                </tr>
+            }
+            @{
+                double slotsfactorprovince = Model.GetModifierValue(ProvinceModifierType.BuildingSlotsFactor) + 1;
+                runningtotal *= slotsfactorprovince;
+            }
+            @if (slotsfactorprovince < 0.999 || slotsfactorprovince > 1.001)
+            {
+                <tr> 
+                    <td>Province Factor Modifiers</td>
+                    <td>x@($"{slotsfactorprovince:n3}")</td>
+                    <td>@($"{runningtotal:n0}")</td>
+                </tr>
+            }
+            @{
+                double slotsfactordistrict = Model.District.GetModifierValue(DistrictModifierType.BuildingSlotsFactor) + 1;
+                runningtotal *= slotsfactordistrict;
+            }
+            @if (slotsfactordistrict < 0.999 || slotsfactordistrict > 1.001) {
+                <tr>
+                    <td>District Factor Modifiers</td>
+                    <td>x@($"{slotsfactordistrict:n3}")</td>
+                    <td>@($"{runningtotal:n0}")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</bootstrap-modal>
+
 <script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = []
-    for (i = 0; i < tooltipTriggerList.length;i++) {
-        el = tooltipTriggerList[i]
-        e = new bootstrap.Tooltip(el)
-        tooltipList.push(e)
-    }
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 </script>

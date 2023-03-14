@@ -50,4 +50,6 @@ public class BuildingRequest
     /// The id of the entity who reviewed this request
     /// </summary>
     public long? ReviewerId { get; set; }
+
+    public string? BuildingName { get; set; }
 }

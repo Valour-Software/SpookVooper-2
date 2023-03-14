@@ -33,8 +33,10 @@ public class DistrictUpdateWorker : BackgroundService
                     int times = 0;
                     try
                     {
-                        foreach(var district in DBCache.GetAll<District>())
+                        foreach (var district in DBCache.GetAll<District>()) {
                             district.ProvincesByDevelopmnet = district.Provinces.OrderByDescending(x => x.DevelopmentValue).ToList();
+                            district.ProvincesByMigrationAttraction = district.Provinces.OrderByDescending(x => x.MigrationAttraction).ToList();
+                        }
                         Stopwatch sw = Stopwatch.StartNew();
                         for (int i = 0; i < 1; i++)
                         {
