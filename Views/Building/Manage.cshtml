@@ -63,7 +63,7 @@
 
         <br />
         <hr />
-        @if (user.Id == Model.Building.OwnerId || Model.Building.Owner.HasPermission(user, GroupPermissions.ManageMembership)) {
+        @if (user.Id == Model.Building.OwnerId || Model.Building.Owner.HasPermission(user, GroupPermissions.ManageBuildings)) {
             <center>
                 <a asp-route-buildingid="@Model.Building.BuildingObj.Name" asp-route-provinceid="@Model.Building.ProvinceId" asp-route-AlreadyExistingBuildingId="@Model.Building.Id" asp-action="Build" asp-controller="Building">
                     <button class="btn btn-outline-primary">

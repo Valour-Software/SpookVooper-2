@@ -3,7 +3,7 @@ vooperian_capital {
 	modifiers = {
 		province.buildingslotsfactor = 0.2
 		province.buildingslotsexponent = 0.03
-		province.overpopulationmodifierexponent = -0.01
+		province.overpopulationmodifierexponent = -0.035
 	}
 	stackable = false
 }

@@ -51,7 +51,7 @@ public class LuaBuilding
 
         // check for building slots
         int slotsleftover = province.BuildingSlots - (province.BuildingSlotsUsed + levels);
-        if (slotsleftover < 0)
+        if (slotsleftover < 0 && UseBuildingSlots)
             return new(false, $"{province.Name} lacks enough building slots! {slotsleftover} more building slots are required!");
 
         return new(true, null);

@@ -28,15 +28,14 @@
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @Html.HiddenFor(x => x.ProvinceId)
                 @Html.HiddenFor(x => x.BuildingId)
-                <input data-val="true" data-val-required="The AlreadyExistingBuildingId field is required." id="AlreadyExistingBuildingId" name="AlreadyExistingBuildingId" type="hidden" value='@($"{Model.AlreadyExistingBuildingId ?? ViewContext.RouteData.Values.GetValueOrDefault("AlreadyExistingBuildingId")}")'>
+                <input data-val="true" data-val-required="The AlreadyExistingBuildingId field is required." id="AlreadyExistingBuildingId" name="AlreadyExistingBuildingId" type="hidden" value='@($"{Model.AlreadyExistingBuildingId ?? long.Parse(Context.Request.Query.FirstOrDefault(x => x.Key == "AlreadyExistingBuildingId").Value)}")'>
                 <div class="row">
                     <h4>Form for submitting a building request for @Model.LuaBuildingObj.PrintableName</h4>
 
                     <div asp-validation-summary="All" class="text-danger"></div>
                 </div>
 
-                @if (!ViewContext.RouteData.Values.ContainsKey("AlreadyExistingBuildingId"))
-                {
+                @if (Context.Request.Query.FirstOrDefault(x => x.Key == "AlreadyExistingBuildingId").Value == "") {
                     <label> Build As(what entity should this request be made from)</label>
                     <select asp-for="BuildAsId" asp-items="Model.CanBuildAs" class="form-select form-control"></select>
                 }

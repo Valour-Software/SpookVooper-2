@@ -34,7 +34,8 @@ building_infrastructure = {
 		base = 1
 		divide = {
 			base = province.buildings.totaloftype["infrastructure"]
-			factor = 0.4
+			factor = 0.08
+			factor = province.buildings.totaloftype["infrastructure"]
 			add = 1
 		}
 	}
