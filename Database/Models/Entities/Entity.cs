@@ -116,8 +116,7 @@ public abstract class BaseEntity
 
     public double GetHourlyUsageOfResource(string resource) {
         double total = 0;
-        List<ProducingBuilding> buildings = DBCache.GetAll<Factory>().Select(x => (ProducingBuilding)x).ToList();
-        buildings.AddRange(DBCache.GetAll<Mine>().Select(x => (ProducingBuilding)x).ToList());
+        List<ProducingBuilding> buildings = DBCache.GetAllProducingBuildings().Where(x => x.OwnerId == Id).ToList();
         foreach (var building in buildings) {
             if (building.Recipe.Inputs.ContainsKey(resource))
                 total += building.GetHourlyProduction() * building.Recipe.Inputs[resource];

@@ -199,6 +199,7 @@ public class Province
         exponent += GetModifierValue(ProvinceModifierType.OverPopulationModifierExponent);
         exponent += District.GetModifierValue(DistrictModifierType.OverPopulationModifierExponent);
         var population = Population + GetModifierValue(ProvinceModifierType.OverPopulationModifierPopulationBase);
+        if (population < 2500) population = 2500;
         var rate = Math.Pow(population, exponent) / 100.0;
         rate += Defines.NProvince[NProvince.OVERPOPULATION_MODIFIER_BASE];
         if (rate > 0)
@@ -230,6 +231,7 @@ public class Province
         double attraction = Defines.NProvince[NProvince.BASE_MIGRATION_ATTRACTION];
         attraction += Math.Max(Math.Pow(DevelopmentValue, Defines.NProvince[NProvince.MIGRATION_DEVELOPMENT_EXPONENT]) / Defines.NProvince[NProvince.MIGRATION_DEVELOPMENT_DIVISOR] + Defines.NProvince[NProvince.MIGRATION_DEVELOPMENT_BASE], 0);
         attraction += Math.Max(Math.Pow(BuildingSlots, Defines.NProvince[NProvince.MIGRATION_BUILDINGSLOTS_EXPONENT]) / Defines.NProvince[NProvince.MIGRATION_BUILDINGSLOTS_DIVISOR] + Defines.NProvince[NProvince.MIGRATION_BUILDINGSLOTS_BASE], 0);
+        attraction += GetModifierValue(ProvinceModifierType.MigrationAttraction);
 
         // apply bonuses based on ranking by dev value
         if (District.ProvincesByDevelopmnet[14].DevelopmentValue <= DevelopmentValue)
@@ -427,5 +429,6 @@ public enum ProvinceModifierType
     AllProducingBuildingThroughputFactor,
     MigrationAttractionFactor,
     OverPopulationModifierExponent,
-    OverPopulationModifierPopulationBase
+    OverPopulationModifierPopulationBase,
+    MigrationAttraction
 }

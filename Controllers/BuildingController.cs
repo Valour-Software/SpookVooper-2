@@ -85,21 +85,22 @@ public class BuildingController : SVController
     [UserRequired]
     public async Task<string> Construct(long buildingrequestid, int levelstobuild) 
     {
+        // TODO: after we migrate to dotnet 8 with mixing of blazor and razor, update this method to use json for returning rather than "-&-"
         var buildingrequest = await _dbctx.BuildingRequests.FindAsync(buildingrequestid);
         if (!buildingrequest.Reviewed)
-            return $"{buildingrequestid}-&-This request has not been reviewed yet!";
+            return $"{buildingrequestid}-&-This request has not been reviewed yet!-&-false";
         if (!buildingrequest.Granted)
-            return $"{buildingrequestid}-&-This request was not granted! However, the province's governor can change this decision, so try contacting them.";
+            return $"{buildingrequestid}-&-This request was not granted! However, the province's governor can change this decision, so try contacting them.-&-false";
 
         if (buildingrequest.LevelsBuilt + levelstobuild > buildingrequest.LevelsRequested)
-            return $"{buildingrequestid}-&-You can not construct more levels than you were approved for!";
+            return $"{buildingrequestid}-&-You can not construct more levels than you were approved for!-&-false";
 ;
         var user = HttpContext.GetUser();
 
         if (buildingrequest.RequesterId != user.Id) {
             Group group = DBCache.Get<Group>(buildingrequest.RequesterId);
             if (!group.HasPermission(user, GroupPermissions.Build)) {
-                return $"{buildingrequestid}-&-You lack permission to build as this group!";
+                return $"{buildingrequestid}-&-You lack permission to build as this group!-&-false";
             }
         }
         var buildas = BaseEntity.Find(buildingrequest.RequesterId);
@@ -110,16 +111,19 @@ public class BuildingController : SVController
         if (buildingrequest.BuildingId is not null)
             building = DBCache.ProvincesBuildings[buildingrequest.ProvinceId].FirstOrDefault(x => x.Id == (long)buildingrequest.BuildingId);
         TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, user, buildingrequest.Province.District, buildingrequest.Province, levelstobuild, building);
+        string message = result.Message;
         if (result.Success) {
             buildingrequest.LevelsBuilt += levelstobuild;
+            buildingrequest.BuildingId = result.Data.Id;
             await _dbctx.SaveChangesAsync();
+            message += $"Click <a target='_blank' href='/Building/Manage/{result.Data.Id}'>here</a> to view the building.";
         }
-        return $"{buildingrequestid}-&-{result.Message}";
+        return $"{buildingrequestid}-&-{message}-&-{buildingrequest.LevelsBuilt == buildingrequest.LevelsRequested}";
     }
 
     [HttpGet]
     [UserRequired]
-    public IActionResult Build(string buildingid, long provinceid)
+    public IActionResult Build(string buildingid, long provinceid, long? AlreadyExistingBuildingId = null)
     {
         Province? province = DBCache.Get<Province>(provinceid);
         if (province is null)
@@ -137,13 +141,18 @@ public class BuildingController : SVController
         List<BaseEntity> canbuildas = new() { user };
         canbuildas.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.Build)).Select(x => (BaseEntity)x).ToList());
 
-        return View(new CreateBuildingRequestModel() { 
-            Province = province, 
+        var model = new CreateBuildingRequestModel() {
+            Province = province,
             LuaBuildingObj = luabuildingobj,
             ProvinceId = province.Id,
             BuildingId = buildingid,
             CanBuildAs = canbuildas.Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList()
-        });
+        };
+
+        if (AlreadyExistingBuildingId is not null)
+            model.BuildAsId = DBCache.ProvincesBuildings[provinceid].FirstOrDefault(x => x.Id == AlreadyExistingBuildingId).OwnerId;
+
+        return View(model);
     }
 
     [UserRequired]

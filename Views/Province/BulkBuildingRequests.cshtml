@@ -49,8 +49,9 @@
                 Showonlygrantedurltext = "toggleonlyreviewed=true";
 
             string filterurltext = "filter=Provinces";
-            if (Context.Request.QueryString.Value.Contains("filter=MyOwn"))
+            if (Context.Request.QueryString.Value.Contains("filter=MyOwn")) {
                 filterurltext = "filter=MyOwn";
+            }
         }
 
         <center>
@@ -58,7 +59,7 @@
                 <a href="/Province/BulkBuildingRequests?filter=Provinces&@Showonlygrantedurltext" style="text-decoration:unset;">
                     <button class="btn btn-primary">Provinces you have Governorship over</button>
                 </a>
-                <a href="/Province/BulkBuildingRequests?filter=MyOwn&@Showonlygrantedurltext" style="text-decoration:unset;">
+                <a href="/Province/BulkBuildingRequests?filter=MyOwn&toggleonlyreviewed=true" style="text-decoration:unset;">
                     <button class="btn btn-outline-primary">Requests from groups you manage + yourself</button>
                 </a>
             }
@@ -74,7 +75,7 @@
 
         <br />
         <center>
-            @if (Context.Request.QueryString.Value.Contains("toggleonlyreviewed=false")) {
+            @if (Showonlygrantedurltext.Contains("toggleonlyreviewed=false")) {
                 <a href="/Province/BulkBuildingRequests?@filterurltext&toggleonlyreviewed=true">
                     <button class="btn btn-outline-primary">Show only requests reviewed</button>
                 </a>
@@ -113,7 +114,7 @@
             <tbody>
                 @{
                     Province prevprovince = null;
-                    foreach (var request in Model)
+                    foreach (var request in Model.Where(x => x.LevelsBuilt != x.LevelsRequested))
                     {
                         if (prevprovince is null || prevprovince.DistrictId != request.Province.DistrictId)
                         {
@@ -201,7 +202,7 @@
         var text = element.contentDocument.body.textContent.split("-&-")
         var e = document.getElementById("result-"+text[0])
         e.innerHTML = text[1]
-        if (text[1].includes("Successfully")) {
+        if (text[2].includes("True")) {
             var e = document.getElementById("constructform-" + text[0])
             e.style = "display: none;"
         }

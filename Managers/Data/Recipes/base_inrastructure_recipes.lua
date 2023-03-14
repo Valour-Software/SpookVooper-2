@@ -11,6 +11,7 @@ recipe_infrastructure_roads = {
 			province.buildingslots = 1
 			province.overpopulationmodifierpopulationbase = -30000
 			province.buildingslotsexponent = 0.0001
+			province.migrationattraction = 0.5
 		}
 	}
 	inputcost_scaleperlevel = false

@@ -8,7 +8,8 @@ public enum ObjType
     String,
     LuaTable,
     LuaMainTable,
-    StringForNumber
+    StringForNumber,
+    LuaArray
 }
 
 public abstract class ILuaObject : IConvertible

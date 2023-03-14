@@ -24,7 +24,7 @@ public static class StringExtensions
 
 public class LuaTable : LuaObject
 {
-    public Dictionary<string, LuaObject> Items { get; set; }
+    public List<LuaObject> Items { get; set; }
     public LuaTable()
     {
         Items = new();
@@ -34,23 +34,21 @@ public class LuaTable : LuaObject
     {
         get
         {
-            return Items.Keys;
+            return Items.Select(x => x.Name);
         }
     }
     public IEnumerable<LuaObject> Values
     {
         get
         {
-            return Items.Values;
+            return Items;
         }
     }
     public LuaObject this[string key]
     {
         get
         {
-            if (!Items.ContainsKey(key))
-                return null;
-            return Items[key];
+            return Items.FirstOrDefault(x => x.Name == key);
         }
     }
 
@@ -58,6 +56,10 @@ public class LuaTable : LuaObject
         var obj = this[key];
         if (obj is null) return null;
         return obj.Value;
+    }
+
+    public bool ContainsKey(string key) {
+        return Items.FirstOrDefault(x => x.Name == key) != null;
     }
 }
 
@@ -86,6 +88,8 @@ public class Lua : IDisposable
             var line = l.Replace("\t", "").TrimStart();
             line = line.Replace("\r", "");
             //Console.WriteLine(line);
+            if (line.Contains("province.buildings.totaloftype[\"infrastructure\"]"))
+                Console.WriteLine(line);
             if (line.Contains("=") && !line.StartsWith("--"))
             {
                 var d = line.Split(" = ");
@@ -99,31 +103,30 @@ public class Lua : IDisposable
                 if (rest.Contains("\""))
                 {
                     rest = rest.Replace("\"", "");
-                    currentparent.Items[name] = new LuaObject()
-                    {
+                    currentparent.Items.Add(new LuaObject() {
                         type = ObjType.String,
                         Value = rest,
                         Parent = currentparent,
                         Name = name
-                    };
+                    });
                 }
                 else if (rest.StartsWith("{"))
                 {
                     var obj = new LuaTable();
                     obj.Name = name;
                     obj.Parent = currentparent;
-                    currentparent.Items[name] = obj;
+                    currentparent.Items.Add(obj);
                     currentparent = obj;
                 }
                 else
                 {
-                    currentparent.Items[name] = new LuaObject()
+                    currentparent.Items.Add(new LuaObject()
                     {
                         type = ObjType.StringForNumber,
                         Value = rest,
                         Parent = currentparent,
                         Name = name
-                    };
+                    });
                 }
             }
             else if (line.Contains("}"))
@@ -135,14 +138,12 @@ public class Lua : IDisposable
             {
                 if (line.StartsWith("--") || line.Length == 0)
                     continue;
-                var key = $"{currentparent.Items.Keys.Count}";
-                currentparent.Items[key] = new LuaObject()
-                {
+                currentparent.Items.Add(new LuaObject() {
                     type = ObjType.String,
                     Value = line,
                     Parent = currentparent,
-                    Name = key
-                };
+                    Name = $"{currentparent.Items.Count}"
+                });
             }
         }
     }
@@ -204,8 +205,9 @@ public static class LuaHandler
     public static List<SyntaxModifierNode> HandleModifierNodes(LuaTable table)
     {
         var nodes = new List<SyntaxModifierNode>();
-        foreach (string key in table.Keys)
+        foreach (var item in table.Items)
         {
+            string key = item.Name;
             var levels = key.Split(".").ToList();
             var node = new SyntaxModifierNode();
             if (node.DistrictModifierType is not null)
@@ -238,15 +240,16 @@ public static class LuaHandler
                         "buildingslotsfactor" => ProvinceModifierType.BuildingSlotsFactor,
                         "buildingslotsexponent" => ProvinceModifierType.BuildingSlotsExponent,
                         "migrationattractionfactor" => ProvinceModifierType.MigrationAttractionFactor,
+                        "migrationattraction" => ProvinceModifierType.MigrationAttraction,
                         "overpopulationmodifierexponent" => ProvinceModifierType.OverPopulationModifierExponent,
                         "overpopulationmodifierpopulationbase" => ProvinceModifierType.OverPopulationModifierPopulationBase
                     }
                 };
             }
 
-            table[key].Name = "base";
+            item.Name = "base";
             var temptable = new LuaTable();
-            temptable.Items["base"] = table[key];
+            temptable.Items.Add(item);
 
             node.Value = HandleSyntaxExpression(temptable).Body.First();
 
@@ -273,7 +276,7 @@ public static class LuaHandler
             if (obj.type == ObjType.LuaTable) {
                 LuaTable _table = new();
                 if (obj.Name == "add_locals")
-                    _table.Items[obj.Name] = obj;
+                    _table.Items.Add(obj);
                 else
                     _table = (LuaTable)obj;
                 dict.Body[obj.Name] = HandleSyntaxExpression(_table);
@@ -287,9 +290,8 @@ public static class LuaHandler
     public static ExpressionNode HandleSyntaxExpression(LuaTable table, string parentname = null, SyntaxNode parent = null)
     {
         var expr = new ExpressionNode();
-        foreach (var key in table.Keys)
+        foreach (var obj in table.Items)
         {
-            var obj = table[key];
             Console.WriteLine($"{obj.Name}: {obj.type}");
             SyntaxNode valuenode = null;
             ExpressionNode exprnode = null;
