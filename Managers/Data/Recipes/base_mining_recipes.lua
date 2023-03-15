@@ -16,7 +16,7 @@ recipe_copper_mining_base = {
         tools = 0.15
     }
 	outputs = {
-		iron_ore = 1
+		copper_ore = 1
 	}
 	perhour = 7.5
     editable = false

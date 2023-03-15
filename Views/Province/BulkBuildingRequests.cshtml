@@ -166,7 +166,7 @@
                                 </td>
                             }
                             else {
-                                if (request.Granted ) {
+                                if (request.Granted) {
                                     <td>@request.LevelsBuilt</td>
                                 }
                                 if (request.LevelsBuilt < request.LevelsRequested && request.Granted)
@@ -180,6 +180,18 @@
                                         </!form>
                                     </td>
                                     <td id="result-@request.Id"></td>
+                                }
+                                @if (request.Granted || request.Reviewed == false) {
+                                    <button class="btn btn-success">Approve</button>
+                                }
+                                else {
+                                    <button class="btn btn-outline-success">Approve</button>
+                                }
+                                @if (!request.Granted || request.Reviewed == false) {
+                                    <button class="btn btn-warning">Deny</button>
+                                }
+                                else {
+                                    <button class="btn btn-outline-warning">Deny</button>
                                 }
                             }
                         </tr>

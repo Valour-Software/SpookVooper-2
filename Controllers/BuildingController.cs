@@ -13,6 +13,7 @@ using SV2.Models.Building;
 using SV2.Scripting.LuaObjects;
 using Valour.Shared;
 using SV2.Database.Models.Districts;
+using SV2.Database.Models.Buildings;
 
 namespace SV2.Controllers;
 
@@ -48,7 +49,7 @@ public class BuildingController : SVController
         var user = HttpContext.GetUser();
         var building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == id);
     
-        if (!(building.OwnerId == user.Id || (building.Owner.EntityType != EntityType.User && building.Owner.HasPermission(user, GroupPermissions.ManageBuildings))))
+        if (!(building.OwnerId == user.Id || (building.Owner.EntityType != EntityType.User && ((Group)building.Owner).HasPermission(user, GroupPermissions.ManageBuildings))))
         {    
             StatusMessage = "You lack permission to manage this building!";
             return Redirect("/");
@@ -203,7 +204,8 @@ public class BuildingController : SVController
                 Applied = DateTime.UtcNow,
                 Reviewed = false,
                 Granted = false,
-                LevelsBuilt = 0
+                LevelsBuilt = 0,
+                BuildingName = model.Name
             };
 
             if (model.AlreadyExistingBuildingId is not null)
