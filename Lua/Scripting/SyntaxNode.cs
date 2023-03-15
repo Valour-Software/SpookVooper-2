@@ -29,11 +29,13 @@ public class ExecutionState
     public Dictionary<string, decimal> Locals { get; set; }
     public District District { get; set; }
     public Province? Province { get; set; }
-    public ExecutionState(District district, Province? province)
+    public Dictionary<string, decimal> ChangeSystemVarsBy { get; set; }
+    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null)
     {
         Locals = new();
         District = district;
         Province = province;
+        ChangeSystemVarsBy = changesystemvarsby ?? new();
     }
 }
 
@@ -252,22 +254,40 @@ public class SystemVar : SyntaxNode
     public override decimal GetValue(ExecutionState state)
     {
         var levels = CleanUp(Value).Split(".").ToList();
-        return levels[0].ToLower() switch
-        {
-            "district" => levels[1].ToLower() switch
-            {
-                "population" => state.District.TotalPopulation
-            },
-            "province" => levels[1].ToLower() switch
-            {
-                "population" => state.Province.Population,
-                "owner" => state.Province.District.Id,
-                "buildings" => levels[2].ToLower() switch {
-                    "totaloftype" => (decimal)state.Province.GetLevelsOfBuildingsOfType(levels[3])
-                }
-            },
-            _ => 0.00m
-        };
+        if (state.ChangeSystemVarsBy.Count > 0) {
+            decimal value = levels[0].ToLower() switch {
+                "district" => levels[1].ToLower() switch {
+                    "population" => state.District.TotalPopulation
+                },
+                "province" => levels[1].ToLower() switch {
+                    "population" => state.Province.Population,
+                    "owner" => state.Province.District.Id,
+                    "buildings" => levels[2].ToLower() switch {
+                        "totaloftype" => (decimal)state.Province.GetLevelsOfBuildingsOfType(levels[3])
+                    }
+                },
+                _ => 0.00m
+            };
+            if (state.ChangeSystemVarsBy.ContainsKey(Value)) {
+                value += state.ChangeSystemVarsBy[Value];
+            }
+            return value;
+        }
+        else {
+            return levels[0].ToLower() switch {
+                "district" => levels[1].ToLower() switch {
+                    "population" => state.District.TotalPopulation
+                },
+                "province" => levels[1].ToLower() switch {
+                    "population" => state.Province.Population,
+                    "owner" => state.Province.District.Id,
+                    "buildings" => levels[2].ToLower() switch {
+                        "totaloftype" => (decimal)state.Province.GetLevelsOfBuildingsOfType(levels[3])
+                    }
+                },
+                _ => 0.00m
+            };
+        }
     }
 }
 

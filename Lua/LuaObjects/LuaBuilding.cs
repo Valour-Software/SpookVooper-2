@@ -22,13 +22,17 @@ public class LuaBuilding
 
     public Dictionary<string, double> GetConstructionCost(BaseEntity entity, District district, Province province, int levels) {
         Dictionary<string, double> totalresources = new();
+        Dictionary<string, decimal> changesystemvarsby = new Dictionary<string, decimal>() {
+            { @"province.buildings.totaloftype[""infrastructure""]", 0.0m }
+        };
         for (int i = 0; i < levels; i++) {
-            var costs = BuildingCosts.Evaluate(new ExecutionState(district, province));
+            var costs = BuildingCosts.Evaluate(new ExecutionState(district, province, changesystemvarsby));
             foreach ((var resource, var amount) in costs) {
                 if (!totalresources.ContainsKey(resource))
                     totalresources[resource] = 0;
                 totalresources[resource] += (double)amount;
             }
+            changesystemvarsby["province.buildings.totaloftype[\"infrastructure\"]"] += 1.0m;
         }
         return totalresources;
     }
@@ -110,12 +114,18 @@ public class LuaBuilding
                     DBCache.Put(infrastructure.Id, infrastructure);
                     DBCache.ProvincesBuildings[province.Id].Add(infrastructure);
                     DBCache.dbctx.Infrastructures.Add(infrastructure);
+                    province.UpdateModifiers();
+                    province.UpdateModifiersAfterBuildingTick();
                     break;
             }
         }
 
         else {
             building.Size += levels;
+            if (building.BuildingType == BuildingType.Infrastructure) {
+                province.UpdateModifiers();
+                province.UpdateModifiersAfterBuildingTick();
+            }
         }
 
         return new(true, $"Successfully built {levels} levels of {PrintableName}.", building);

@@ -41,6 +41,7 @@ class VoopAI
         //if (prod) LoadSVIDNameCache();
 
         ValourNetClient.AddPrefix("/");
+        ValourNetClient.ExecuteMessagesInParallel = false;
 
         await ValourNetClient.Start(valourConfig.Email,valourConfig.BotPassword);
 

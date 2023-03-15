@@ -12,6 +12,7 @@ using SV2.Models.Provinces;
 using SV2.Models.Building;
 using SV2.Scripting.LuaObjects;
 using Valour.Shared;
+using SV2.Database.Models.Districts;
 
 namespace SV2.Controllers;
 
@@ -52,13 +53,28 @@ public class BuildingController : SVController
             StatusMessage = "You lack permission to manage this building!";
             return Redirect("/");
         }
-        
+
+        List<BaseEntity> canbuildas = new() { user };
+        canbuildas.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.Build)).Select(x => (BaseEntity)x).ToList());
+
+        var model = new CreateBuildingRequestModel() {
+            Province = building.Province,
+            LuaBuildingObj = building.BuildingObj,
+            ProvinceId = building.ProvinceId,
+            BuildingId = building.LuaBuildingObjId,
+            AlreadyExistingBuildingId = building.Id,
+            CanBuildAs = canbuildas.Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList(),
+            IncludeScript = true,
+            PrefixForIds = ""
+        };
+
         return View(new BuildingManageModel() {
             Building = building,
             Name = building.Name,
             Description = building.Description,
             RecipeId = building.RecipeId,
-            BuildingId = building.Id
+            BuildingId = building.Id,
+            createBuildingRequestModel = model,
         });
     }
 
@@ -94,7 +110,7 @@ public class BuildingController : SVController
 
         if (buildingrequest.LevelsBuilt + levelstobuild > buildingrequest.LevelsRequested)
             return $"{buildingrequestid}-&-You can not construct more levels than you were approved for!-&-false";
-;
+
         var user = HttpContext.GetUser();
 
         if (buildingrequest.RequesterId != user.Id) {
@@ -123,50 +139,16 @@ public class BuildingController : SVController
         return $"{buildingrequestid}-&-{message}-&-{buildingrequest.LevelsBuilt == buildingrequest.LevelsRequested}";
     }
 
-    [HttpGet]
-    [UserRequired]
-    public IActionResult Build(string buildingid, long provinceid, long? AlreadyExistingBuildingId = null)
-    {
-        Province? province = DBCache.Get<Province>(provinceid);
-        if (province is null)
-            return RedirectBack("Province not found! Please try again.");
-
-        if (!GameDataManager.BaseBuildingObjs.ContainsKey(buildingid))
-            return RedirectBack("Building type not found! Please try again.");
-
-        LuaBuilding luabuildingobj = GameDataManager.BaseBuildingObjs[buildingid];
-
-        //Console.WriteLine(GameDataManager.BaseRecipeObjs.FirstOrDefault());
-
-        var user = HttpContext.GetUser();
-
-        List<BaseEntity> canbuildas = new() { user };
-        canbuildas.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.Build)).Select(x => (BaseEntity)x).ToList());
-
-        var model = new CreateBuildingRequestModel() {
-            Province = province,
-            LuaBuildingObj = luabuildingobj,
-            ProvinceId = province.Id,
-            BuildingId = buildingid,
-            CanBuildAs = canbuildas.Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList()
-        };
-
-        if (AlreadyExistingBuildingId is not null)
-            model.BuildAsId = DBCache.ProvincesBuildings[provinceid].FirstOrDefault(x => x.Id == AlreadyExistingBuildingId).OwnerId;
-
-        return View(model);
-    }
-
     [UserRequired]
     [ValidateAntiForgeryToken]
     [HttpPost]
-    public async ValueTask<IActionResult> Build(CreateBuildingRequestModel model) {
+    public async ValueTask<JsonResult> Build(CreateBuildingRequestModel model) {
         Province? province = DBCache.Get<Province>(model.ProvinceId);
         if (province is null)
-            return Redirect("/");
+            return Json(new TaskResult(false, "Province is null"));
 
         if (!GameDataManager.BaseBuildingObjs.ContainsKey(model.BuildingId))
-            return RedirectBack("Building type not found! Please try again.");
+            return Json(new TaskResult(false, "Building type not found! Please try again."));
 
         LuaBuilding luabuildingobj = GameDataManager.BaseBuildingObjs[model.BuildingId];
 
@@ -175,7 +157,7 @@ public class BuildingController : SVController
         if (model.BuildAsId is not null && model.BuildAsId != user.Id) {
             Group group = DBCache.Get<Group>(model.BuildAsId);
             if (!group.HasPermission(user, GroupPermissions.Build)) {
-                return RedirectBack("You lack permission to build as this group!");
+                return Json(new TaskResult(false, "You lack permission to build as this group!"));
             }
         }
 
@@ -185,7 +167,7 @@ public class BuildingController : SVController
             if (building.OwnerId != user.Id) {
                 Group group = DBCache.Get<Group>(building.OwnerId);
                 if (!group.HasPermission(user, GroupPermissions.Build)) {
-                    return RedirectBack("You lack permission to build as this group!");
+                    return Json(new TaskResult(false, "You lack permission to build as this group!"));
                 }
             }
             model.BuildAsId = building.OwnerId;
@@ -201,10 +183,10 @@ public class BuildingController : SVController
             TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, user, province.District, province, model.levelsToBuild, building);
             StatusMessage = result.Message;
             if (!result.Success)
-                return RedirectBack();
+                return Json(new TaskResult(result.Success, result.Message));
             if (model.AlreadyExistingBuildingId is not null)
                 result.Data.Name = model.Name;
-            return Redirect($"/Building/Manage/{result.Data.Id}");
+            return Json(new TaskResult(true, $@"Successfully built {model.levelsToBuild} of {result.Data.BuildingObj.PrintableName}.Click<a href""/Building/Manage/{result.Data.Id}""> Here</a> to view"));
         }
 
         else {
@@ -227,8 +209,7 @@ public class BuildingController : SVController
             _dbctx.BuildingRequests.Add(request);
             await _dbctx.SaveChangesAsync();
 
-            StatusMessage = "Successfully created and sent your building request.";
-            return Redirect($"/Province/Build/{model.ProvinceId}");
+            return Json(new TaskResult(true, "Successfully created and sent your building request."));
         }
     }
 

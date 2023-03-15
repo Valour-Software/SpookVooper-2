@@ -1,7 +1,6 @@
 @using SV2.Database;
 @using SV2.Database.Managers;
 @using SV2.Database.Models.Districts;
-@using SV2.Scripting;
 @model SV2.Database.Models.Districts.Province
 
 @{ 
@@ -44,16 +43,7 @@
 
         .mergedrow th {
             
-        }
-        .has-expanded-info {
-            text-decoration: underline dotted;
-            cursor: pointer;
-        }
-
-        .modal-body .has-expanded-info {
-            text-decoration: underline;
-            cursor: pointer;
-        }
+        }        
     </style>
 </head>
 
@@ -195,6 +185,7 @@
                 </tr>
             </tbody>
         </table>
+        <a target="_blank" href="https://dev.spookvooper.com/wiki/Province">Wiki page for Provinces</a>
     </div>
 </div>
 

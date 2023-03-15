@@ -15,6 +15,8 @@ public class CreateBuildingRequestModel
     public List<SelectListItem> CanBuildAs { get; set; }
     public long? BuildAsId { get; set; }
     public string Name { get; set; }
+    public bool IncludeScript { get; set; }
+    public string PrefixForIds { get; set; }
 
     public List<BuildingRequest> CurrentRequestsFromThisUser { get; set; }
 }

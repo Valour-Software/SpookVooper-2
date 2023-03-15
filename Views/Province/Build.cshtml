@@ -1,4 +1,4 @@
-@model Province
+@model SV2.Views.ProvinceViews.Models.SelectBuildingModel
 @using SV2.Scripting
 
 @{
@@ -40,7 +40,11 @@
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
         <h3 style="text-align:center">@ViewData["Title"]</h3>
-        <h2 style="text-align:center">The Province of @Model.Name</h2>
+        <h2 style="text-align:center">The Province of @Model.Province.Name</h2>
+
+        <a asp-controller="Province" asp-action="View" asp-route-id="@Model.Province.Id">
+            <button class="btn btn-primary">Go Back</button>
+        </a>
 
         <div class="row">
             <div class="col-4"></div>
@@ -57,18 +61,17 @@
         <div class="buildings">
             @foreach (var buildingobj in GameDataManager.BaseBuildingObjs.Values) 
             {
-                if (!buildingobj.OnlyGovernorCanBuild || (buildingobj.OnlyGovernorCanBuild && Model.CanEdit(user)))
+                bool first = true;
+                if (!buildingobj.OnlyGovernorCanBuild || (buildingobj.OnlyGovernorCanBuild && Model.Province.CanEdit(user)))
                 {
-                    if (buildingobj.MustHaveResource is null || (Model.Metadata.Resources.ContainsKey(buildingobj.MustHaveResource))) {
+                    if (buildingobj.MustHaveResource is null || (Model.Province.Metadata.Resources.ContainsKey(buildingobj.MustHaveResource))) {
                         <div class="building">
-                            <a asp-route-buildingid="@buildingobj.Name" asp-route-provinceid="@Model.Id" asp-action="Build" asp-controller="Building">
-                                <span>@buildingobj.PrintableName</span>
-                            </a>
+                            <span data-bs-toggle="modal" data-bs-target="#createbuildingrequest-@buildingobj.Name" class="has-expanded-info" style="cursor: pointer;">@buildingobj.PrintableName</span>
                             <br>
                             <span>Costs to build</span>
                             <br>
                             <div class="buildingcosts">
-                                @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(Model.District, Model)))
+                                @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(Model.Province.District, Model.Province)))
                                 {
                                     <div class="resource-row">
                                         <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
@@ -80,10 +83,23 @@
                             </div>
                             @if (buildingobj.type == SV2.Database.Models.Buildings.BuildingType.Mine) {
                                 <span>Production: @(
-                            $"{(Model.Metadata.Resources[buildingobj.MustHaveResource] / 2550.0 * buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value):n2} hourly"
+                            $"{(Model.Province.Metadata.Resources[buildingobj.MustHaveResource] / 2550.0 * buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value):n2} hourly"
                             )</span>
-                        }
+                            }
                         </div>
+                        CreateBuildingRequestModel model = new() {
+                            Province = Model.Province,
+                            LuaBuildingObj = buildingobj,
+                            ProvinceId = Model.Province.Id,
+                            BuildingId = buildingobj.Name,
+                            CanBuildAs = Model.CanBuildAs,
+                            IncludeScript = first,
+                            PrefixForIds = buildingobj.Name
+                        };
+                        first = false;
+                        <bootstrap-modal asp-modal-id="createbuildingrequest-@buildingobj.Name" asp-modal-title="Submit Request">
+                            @await Html.PartialAsync("/Views/Shared/Components/SubmitBuildingRequest.cshtml", model)
+                        </bootstrap-modal>
                     }
                 }
             }

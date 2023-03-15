@@ -9,4 +9,5 @@ public class BuildingManageModel {
     public string? Description { get; set; }
     public long BuildingId { get; set; }
     public string RecipeId { get; set; }
+    public CreateBuildingRequestModel createBuildingRequestModel { get; set; }
 }

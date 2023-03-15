@@ -11,6 +11,7 @@ using SV2.Database.Managers;
 using SV2.Models.Provinces;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using SV2.Views.ProvinceViews.Models;
 
 namespace SV2.Controllers;
 
@@ -196,7 +197,12 @@ public class ProvinceController : SVController
         if (user is null)
             return Redirect("/account/login");
 
-        return View(province);
+        List<BaseEntity> canbuildas = new() { user };
+        canbuildas.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.Build)).Select(x => (BaseEntity)x).ToList());
+        return View(new SelectBuildingModel() {
+            Province = province,
+            CanBuildAs = canbuildas.Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList()
+        });
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

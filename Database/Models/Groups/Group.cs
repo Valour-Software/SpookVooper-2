@@ -18,13 +18,15 @@ public enum GroupTypes
     Corporation = 1,
     NonProfit = 2,
     PoliticalParty = 3,
-    District = 4
+    District = 4,
+    State = 5
 }
 
 public enum ReadableGroupTypes {
     Company = 0,
     NonProfit = 2,
-    PoliticalParty = 3
+    PoliticalParty = 3,
+    State = 4
 }
 
 public enum GroupFlag

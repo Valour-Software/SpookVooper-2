@@ -65,11 +65,9 @@
         <hr />
         @if (user.Id == Model.Building.OwnerId || Model.Building.Owner.HasPermission(user, GroupPermissions.ManageBuildings)) {
             <center>
-                <a asp-route-buildingid="@Model.Building.BuildingObj.Name" asp-route-provinceid="@Model.Building.ProvinceId" asp-route-AlreadyExistingBuildingId="@Model.Building.Id" asp-action="Build" asp-controller="Building">
-                    <button class="btn btn-outline-primary">
-                        <span>Build more levels</span>
-                    </button>
-                </a>
+                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createbuildingrequest">
+                    <span>Build more levels</span>
+                </button>
             </center>
         }
         <br />
@@ -237,6 +235,10 @@
             </tbody>
         </table>
     </div>
+
+    <bootstrap-modal asp-modal-id="createbuildingrequest" asp-modal-title="Request more Levels">
+        @await Html.PartialAsync("/Views/Shared/Components/SubmitBuildingRequest.cshtml", Model.createBuildingRequestModel)
+    </bootstrap-modal>
 
     @section Scripts {
         @await Html.PartialAsync("_ValidationScriptsPartial")

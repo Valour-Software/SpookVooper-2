@@ -63,6 +63,16 @@ a {
   color: var(--font-color);
 }
 
+.has-expanded-info {
+    text-decoration: underline dotted;
+    cursor: pointer;
+}
+
+.modal-body .has-expanded-info {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .btn-primary {
   color: #fff;
   background-color: #1b6ec2;
@@ -81,6 +91,13 @@ select option {
   background-color: var(--input-color);
   border-color: var(--alt-border-color);
   color: var(--font-color);
+}
+
+[data-bs-theme=dark] .form-select {
+    background-color: var(--input-color);
+    border-color: var(--alt-border-color);
+    color: var(--font-color);
+    box-shadow: none;
 }
 
 .form-control {

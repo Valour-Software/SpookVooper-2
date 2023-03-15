@@ -64,7 +64,6 @@ public class AccountCommands : CommandModuleBase
                 .AddRow()
                     .AddText("XP", $"{Math.Round(user.Xp,1)}")
                     .AddText("Rank", user.Rank.ToString())
-                 .AddRow()
                     .AddText("Messages", $"{user.Messages}")
                  .AddRow()
                     .AddText("Message To XP Ratio", $"1 : {Math.Round((double)user.MessageXp/(double)user.Messages, 2)}");
