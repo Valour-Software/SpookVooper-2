@@ -248,8 +248,8 @@ public class Province
 
         if (GetOverpopulationModifier() > 0.25)
         {
-            var muit = (GetOverpopulationModifier() - 0.25) * 3;
-            muit = Math.Min(muit, 0.6);
+            var muit = 1 - ((GetOverpopulationModifier() - 0.25) * 3);
+            muit = Math.Max(muit, 0.6);
             attraction *= muit;
         }
 

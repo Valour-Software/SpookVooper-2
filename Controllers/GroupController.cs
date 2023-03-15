@@ -82,10 +82,23 @@ public class GroupController : SVController
         return Redirect($"/group/view/{group.Id}");
     }
 
+    [UserRequired]
     public IActionResult Edit(long id)
     {
         Group? group = Group.Find(id);
-        return View(group);
+        var user = HttpContext.GetUser();
+        if (!group.HasPermission(user, GroupPermissions.Edit))
+            return RedirectBack("You lack permission to edit this group!");
+        return View(new EditGroupModel() {
+            Group = group,
+            Name = group.Name,
+            Description = group.Description,
+            Open = group.Open,
+            Id = group.Id,
+            DistrictId = group.DistrictId,
+            ImageUrl = group.ImageUrl,
+            GroupType = group.GroupType
+        });
     }
 
     [UserRequired]
@@ -188,7 +201,7 @@ public class GroupController : SVController
     [HttpPost]
     [ValidateAntiForgeryToken]
     [UserRequired]
-    public IActionResult Edit(Group model)
+    public IActionResult Edit(EditGroupModel model)
     {
         //if (!ModelState.IsValid)
         //{

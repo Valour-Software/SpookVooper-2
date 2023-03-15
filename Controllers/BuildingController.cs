@@ -65,7 +65,8 @@ public class BuildingController : SVController
             AlreadyExistingBuildingId = building.Id,
             CanBuildAs = canbuildas.Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList(),
             IncludeScript = true,
-            PrefixForIds = ""
+            PrefixForIds = "",
+            User = user
         };
 
         return View(new BuildingManageModel() {
@@ -173,7 +174,7 @@ public class BuildingController : SVController
             model.BuildAsId = building.OwnerId;
         }
 
-        if (luabuildingobj.OnlyGovernorCanBuild) {
+        if (luabuildingobj.OnlyGovernorCanBuild || province.CanManageBuildingRequests(user)) {
             var buildas = BaseEntity.Find(model.BuildAsId);
             ProducingBuilding? building = null;
             if (model.AlreadyExistingBuildingId is not null) {
@@ -181,12 +182,14 @@ public class BuildingController : SVController
             }
             
             TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, user, province.District, province, model.levelsToBuild, building);
-            StatusMessage = result.Message;
             if (!result.Success)
                 return Json(new TaskResult(result.Success, result.Message));
             if (model.AlreadyExistingBuildingId is not null)
                 result.Data.Name = model.Name;
-            return Json(new TaskResult(true, $@"Successfully built {model.levelsToBuild} of {result.Data.BuildingObj.PrintableName}.Click<a href""/Building/Manage/{result.Data.Id}""> Here</a> to view"));
+            if (model.AlreadyExistingBuildingId is null)
+                return Json(new TaskResult(true, $@"Successfully built {model.levelsToBuild} of {result.Data.BuildingObj.PrintableName}.Click <a href=""/Building/Manage/{result.Data.Id}"">Here</a> to view"));
+            else
+                return Json(new TaskResult(true, $@"Successfully built {model.levelsToBuild} of {result.Data.BuildingObj.PrintableName}."));
         }
 
         else {

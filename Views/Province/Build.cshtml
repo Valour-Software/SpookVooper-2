@@ -94,7 +94,8 @@
                             BuildingId = buildingobj.Name,
                             CanBuildAs = Model.CanBuildAs,
                             IncludeScript = first,
-                            PrefixForIds = buildingobj.Name
+                            PrefixForIds = buildingobj.Name,
+                            User = user
                         };
                         first = false;
                         <bootstrap-modal asp-modal-id="createbuildingrequest-@buildingobj.Name" asp-modal-title="Submit Request">

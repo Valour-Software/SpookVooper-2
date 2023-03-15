@@ -117,6 +117,10 @@ public class ProvinceController : SVController
     public IActionResult BulkManage(BulkManageModel model) {
         var user = HttpContext.GetUser();
 
+        if (model.Provinces is null || model.Provinces.Count == 0) {
+            return RedirectBack("You have no provinces you can manage!");
+        }
+
         foreach (var newprovince in model.Provinces) {
             var oldprovince = DBCache.Get<Province>(newprovince.Id);
             if (oldprovince.CanEdit(user)) 

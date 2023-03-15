@@ -6,21 +6,23 @@
     <span id="alert-text-@Model.PrefixForIds">something</span>
 </div>
 
-@if (false)
+@if (Model.Province.CanManageBuildingRequests(Model.User))
 {
-    <style>
+    if (Model.IncludeScript)
+    {
+        <style>
+            .buildingcosts {
+                flex-direction: column;
+                padding-left: 2px;
+            }
 
-        .buildingcosts {
-            flex-direction: column;
-            padding-left: 2px;
-        }
-
-        .buildingcosts-holder {
-            margin-left: auto;
-            margin-right: auto;
-            width: 250px;
-        }
-    </style>
+            .buildingcosts-holder {
+                margin-left: auto;
+                margin-right: auto;
+                width: 250px;
+            }
+        </style>
+    }
     <div class="buildingcosts-holder">
         <span>Costs to build:</span>
         <br />

@@ -41,7 +41,7 @@ public class LuaBuilding
         if (levels <= 0)
             return new(false, "The amount of levels you wish to build must be greater than 0!");
 
-        if (OnlyGovernorCanBuild && !province.CanEdit(caller))
+        if (OnlyGovernorCanBuild && !province.CanManageBuildingRequests(caller))
             return new(false, $"Only the Governor of {province.Name} can build this building!");
 
         var costs = GetConstructionCost(buildas, district, province, levels);

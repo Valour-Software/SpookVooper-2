@@ -17,6 +17,7 @@ public class CreateBuildingRequestModel
     public string Name { get; set; }
     public bool IncludeScript { get; set; }
     public string PrefixForIds { get; set; }
+    public SVUser User { get; set; }
 
     public List<BuildingRequest> CurrentRequestsFromThisUser { get; set; }
 }

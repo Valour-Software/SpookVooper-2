@@ -1,4 +1,4 @@
-@model Group
+@model EditGroupModel
 
 @{
     ViewData["Title"] = "Group Admin";
@@ -17,7 +17,7 @@
         <div class="row">
             <div class="col-4"></div>
             <div class="col-4">
-                @await Component.InvokeAsync("GroupImage", Model)
+                @await Component.InvokeAsync("GroupImage", Model.Group)
             </div>
             <div class="col-4"></div>
         </div>
@@ -52,7 +52,7 @@
                         <br />
                         <select class="form-control" asp-for="DistrictId" asp-items="DBCache.GetAll<District>().Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString()})"></select>
                     </div>
-                    @if (Model.HasPermission(user, GroupPermissions.Edit))
+                    @if (Model.Group.HasPermission(user, GroupPermissions.Edit))
                     {
                         <div class="form-group">
                             <label asp-for="Description"></label>
@@ -71,7 +71,7 @@
                         @Html.HiddenFor(x => x.Description)
                     }
 
-                    @if (Model.OwnerId == user.Id)
+                    @if (Model.Group.OwnerId == user.Id)
                     {
                         <div class="form-group">
                             <label asp-for="ImageUrl"></label>
@@ -103,7 +103,7 @@
                     <br />
                     <div class="container">
                         <div class="row">
-                            @foreach (BaseEntity member in Model.Members)
+                            @foreach (BaseEntity member in Model.Group.Members)
                             {
                                 <div class="col-6 srow">
                                     <div class="p-1">
@@ -123,7 +123,7 @@
                                 </div>
                                 <div class="col-6 srow">
                                     <a asp-action="ViewMemberRoles" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-targetid="@member.Id" class="btn btn-outline-primary">Roles</a>
-                                    @if (Model.HasPermission(user, GroupPermissions.ManageMembership))
+                                    @if (Model.Group.HasPermission(user, GroupPermissions.ManageMembership))
                                     {
                                         <a asp-action="ManageUser" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-userid="@member.Id" asp-route-operation="kick" class="btn btn-outline-warning">Kick</a>
                                         <a asp-action="ManageUser" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-userid="@member.Id" asp-route-operation="ban" class="btn btn-outline-danger">Ban</a>
@@ -134,8 +134,6 @@
                     </div>
                 </div>
             </div>
-
-            @Html.HiddenFor(x => x.OwnerId)
 
             <div class="form-group">
                 <div class="container" style="align-content:flex-start">
@@ -180,7 +178,7 @@
                 <p>Perms: @role.GetPermissions()</p>
             </div>
             <div class="col-3">
-                @if (Model.HasPermission(user, GroupPermissions.CreateRole))
+                @if (Model.Group.HasPermission(user, GroupPermissions.CreateRole))
                 {
                     <a asp-action="CreateRole" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-roleid="@role.Id" class="btn btn-outline-warning">Edit</a>
                     <a asp-action="DeleteRole" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-roleid="@role.Id" class="btn btn-outline-danger">Delete</a>
@@ -196,7 +194,7 @@
     <div class="row">
         <div class="col-12 align-content-center text-center">
             <h4 style="text-align:center">Credit Management</h4>
-            <h5 style="text-align:center">Credits: ¢@Math.Round(Model.Credits, 2)</h5>
+            <h5 style="text-align:center">Credits: ¢@Math.Round(Model.Group.Credits, 2)</h5>
             <br />
 
             <p>This does not work right now</p>
@@ -208,10 +206,10 @@
     <br />
     <br />
 
-    @await Html.PartialAsync("/Views/Shared/Components/ResourceOwnershipTable.cshtml", Model)
+    @await Html.PartialAsync("/Views/Shared/Components/ResourceOwnershipTable.cshtml", Model.Group)
 
     <br />
-    @if (Model.OwnerId == user.Id)
+    @if (Model.Group.OwnerId == user.Id)
     {
         <p>These do not work right now</p>
         <div class="row">
