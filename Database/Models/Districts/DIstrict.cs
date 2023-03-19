@@ -5,6 +5,7 @@ using SV2.Database.Models.Entities;
 using SV2.Database.Models.Economy;
 using Microsoft.EntityFrameworkCore;
 using SV2.Database.Managers;
+using SV2.Scripting;
 
 namespace SV2.Database.Models.Districts;
 
@@ -24,7 +25,7 @@ public class District
     public string? Name { get; set; }
 
     [NotMapped]
-    public string ScriptName => Name.Replace(" ", "_");
+    public string ScriptName => Name.ToLower().Replace(" ", "_");
 
     [Column("description", TypeName = "VARCHAR(512)")]
     public string? Description { get; set; }
@@ -69,6 +70,9 @@ public class District
 
     [Column("propertytaxpersize")]
     public double? PropertyTaxPerSize { get; set; }
+
+    [Column("staticmodifiers", TypeName = "jsonb[]")]
+    public List<StaticModifier> StaticModifiers { get; set; }
 
     [NotMapped]
     public Dictionary<DistrictModifierType, DistrictModifier> Modifiers = new();
@@ -146,6 +150,25 @@ public class District
 
             province.MonthlyEstimatedMigrants = (int)(netchange * 30 * 24);
             totalchange += province.MonthlyEstimatedMigrants;
+        }
+    }
+
+    public void UpdateOrAddModifier(DistrictModifierType type, double value) {
+        if (!Modifiers.ContainsKey(type))
+            Modifiers[type] = new() { Amount = value, ModifierType = type };
+        else
+            Modifiers[type].Amount += value;
+    }
+
+    public void UpdateModifiers() {
+        Modifiers = new();
+        var value_executionstate = new ExecutionState(this, null, parentscopetype:ScriptScopeType.District);
+        //var scaleby_executionstate = new ExecutionState(District, this);
+        foreach (var staticmodifier in StaticModifiers) {
+            foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes) {
+                var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleBy);
+                UpdateOrAddModifier((DistrictModifierType)modifiernode.DistrictModifierType!, value);
+            }
         }
     }
 }

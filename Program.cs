@@ -180,4 +180,9 @@ await GameDataManager.Load();
 
 ProvinceManager.LoadMap();
 
+foreach (var onaction in GameDataManager.LuaOnActions[SV2.Scripting.LuaObjects.OnActionType.OnServerStart]) {
+    // OnServerStart actions MUST change scope
+    onaction.EffectBody.Execute(new(null, null));
+}
+
 app.Run();

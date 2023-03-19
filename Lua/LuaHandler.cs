@@ -80,16 +80,18 @@ public class Lua : IDisposable
         }
     }
 
-    public void DoString(string Content)
+    public void DoString(string Content, string filename = null)
     {
         LuaTable currentparent = Objects;
+        int linenum = 0;
         foreach (var l in Content.Split("\n"))
         {
+            linenum += 1;
             var line = l.Replace("\t", "").TrimStart();
             line = line.Replace("\r", "");
             //Console.WriteLine(line);
-            if (line.Contains("province.buildings.totaloftype[\"infrastructure\"]"))
-                Console.WriteLine(line);
+            //if (line.Contains("province.buildings.totaloftype[\"infrastructure\"]"))
+            //    Console.WriteLine(line);
             if (line.Contains("=") && !line.StartsWith("--"))
             {
                 var d = line.Split(" = ");
@@ -107,7 +109,9 @@ public class Lua : IDisposable
                         type = ObjType.String,
                         Value = rest,
                         Parent = currentparent,
-                        Name = name
+                        Name = name,
+                        FileName = filename,
+                        LineNumber = linenum
                     });
                 }
                 else if (rest.StartsWith("{"))
@@ -115,6 +119,8 @@ public class Lua : IDisposable
                     var obj = new LuaTable();
                     obj.Name = name;
                     obj.Parent = currentparent;
+                    obj.FileName = filename;
+                    obj.LineNumber = linenum;
                     currentparent.Items.Add(obj);
                     currentparent = obj;
                 }
@@ -125,7 +131,9 @@ public class Lua : IDisposable
                         type = ObjType.StringForNumber,
                         Value = rest,
                         Parent = currentparent,
-                        Name = name
+                        Name = name,
+                        FileName = filename,
+                        LineNumber = linenum
                     });
                 }
             }
@@ -142,7 +150,9 @@ public class Lua : IDisposable
                     type = ObjType.String,
                     Value = line,
                     Parent = currentparent,
-                    Name = $"{currentparent.Items.Count}"
+                    Name = $"{currentparent.Items.Count}",
+                    FileName = filename,
+                    LineNumber = linenum
                 });
             }
         }
@@ -151,6 +161,12 @@ public class Lua : IDisposable
 
 public static class LuaHandler
 {
+    public static StreamWriter errorfile = new StreamWriter("Managers/ScriptErrors.txt");
+    public static void HandleError(string filename, int linenumber, string error, string message)
+    {
+        errorfile.WriteLine($"{filename.Split("/").Last()}:{linenumber} {error}: {message}");
+        errorfile.Flush();
+    }
     public static (string content, List<string> tables) PreProcessLua(string Lua)
     {
         List<string> TopLevelTables = new List<string>();
@@ -186,18 +202,18 @@ public static class LuaHandler
         return (Lua, TopLevelTables);
     }
 
-    public static IEnumerable<(LuaTable, string)> HandleFile(string content)
+    public static IEnumerable<(LuaTable, string)> HandleFile(string content, string filename)
     {
         //var data = PreProcessLua(content);
         //File.WriteAllText("../../../../Database/LuaDump.lua", data.content);
         using (Lua lua = new Lua())
         {
             //lua.State.Encoding = Encoding.UTF8;
-            lua.DoString(content);
-            foreach (var name in lua.Objects.Keys)
+            lua.DoString(content, filename);
+            foreach (var value in lua.Objects.Values)
             {
-                var t = (LuaTable)lua[name];
-                yield return (t, name);
+                var t = (LuaTable)value;
+                yield return (t, value.Name);
             }
         }
     }
@@ -210,7 +226,7 @@ public static class LuaHandler
             string key = item.Name;
             var levels = key.Split(".").ToList();
             var node = new SyntaxModifierNode();
-            if (node.DistrictModifierType is not null)
+            if (levels[0] == "district")
             {
                 node.DistrictModifierType = levels[0] switch
                 {
@@ -290,6 +306,8 @@ public static class LuaHandler
     public static ExpressionNode HandleSyntaxExpression(LuaTable table, string parentname = null, SyntaxNode parent = null)
     {
         var expr = new ExpressionNode();
+        expr.FileName = table.FileName;
+        expr.LineNumber = table.LineNumber;
         foreach (var obj in table.Items)
         {
             Console.WriteLine($"{obj.Name}: {obj.type}");
@@ -311,30 +329,55 @@ public static class LuaHandler
             else
                 valuenode = new Decimal() { Value = Convert.ToDecimal(obj.Value) };
 
+            if (valuenode is not null) {
+                valuenode.LineNumber = obj.LineNumber;
+                valuenode.FileName = obj.FileName;
+            }
+
             if (obj.Name == "base")
-                expr.Body.Add(new Base() { Value = valuenode });
+                expr.Body.Add(new Base() { Value = valuenode, LineNumber = obj.LineNumber });
             else if (obj.Name == "add")
-                expr.Body.Add(new Add() { Value = valuenode });
+                expr.Body.Add(new Add() { Value = valuenode, LineNumber = obj.LineNumber });
             else if (obj.Name == "factor")
-                expr.Body.Add(new Factor() { Value = valuenode });
+                expr.Body.Add(new Factor() { Value = valuenode, LineNumber = obj.LineNumber });
             else if (obj.Name == "divide")
-                expr.Body.Add(new Divide() { Value = valuenode });
+                expr.Body.Add(new Divide() { Value = valuenode, LineNumber = obj.LineNumber });
             else if (obj.Name == "get_local")
-                expr.Body.Add(new GetLocal() { Name = ((SystemVar)valuenode).Value });
+                expr.Body.Add(new GetLocal() { Name = ((SystemVar)valuenode).Value, LineNumber = obj.LineNumber });
             else if (obj.Name == "effects")
-                expr.Body.Add(new EffectBody() { Body = exprnode.Body.Select(x => (IEffectNode)x).ToList() });
+                expr.Body.Add(new EffectBody() { Body = exprnode.Body.Select(x => (IEffectNode)x).ToList(), LineNumber = obj.LineNumber });
+            else if (obj.Name.Contains(":")) {
+                var spliced = obj.Name.Split(":");
+                var node = new ChangeScopeNode() {
+                    scopeType = Enum.Parse<ScriptScopeType>(spliced[0], true),
+                    ChangeTo = spliced[1],
+                    LineNumber = obj.LineNumber
+                };
+                if (parentname == "effects") {
+                    exprnode = new();
+                    exprnode.Body = HandleSyntaxExpression((LuaTable)obj, "effects").Body;
+                    node.EffectBodyNode = new EffectBody() { Body = exprnode.Body.Select(x => (IEffectNode)x).ToList(), LineNumber = obj.LineNumber, FileName = obj.FileName };
+                }
+                else {
+                    node.Value = valuenode;
+                }
+                expr.Body.Add(node);
+            }
             else if (obj.Name == "add_locals") 
             {
                 var node = new AddLocalsNode();
                 foreach (var item in exprnode.Body.Select(x => (LocalNode)x))
                     node.Body[item.Name] = item.Value;
+                node.LineNumber = obj.LineNumber;
                 expr.Body.Add(node);
             }
             else if (obj.Name == "if") {
                 var iftable = (LuaTable)obj;
                 var ifstatement = new IfStatement() {
                     Limit = (ConditionalStatement)exprnode.Body.FirstOrDefault(x => x.NodeType == NodeType.CONDITIONALSTATEMENT),
-                    ValueNode = new()
+                    ValueNode = new(),
+                    LineNumber = obj.LineNumber,
+                    FileName = obj.FileName
                 };
 
                 if (iftable.Keys.Contains("effects"))
@@ -351,30 +394,46 @@ public static class LuaHandler
             else if (parentname == "add_locals") {
                 expr.Body.Add(new LocalNode() {
                     Name = obj.Name,
-                    Value = HandleSyntaxExpression((LuaTable)obj)
+                    Value = HandleSyntaxExpression((LuaTable)obj),
+                    LineNumber = obj.LineNumber,
+                    FileName = obj.FileName
                 });
             }
             else if (parentname == "effects") {
                 var effectbody_table = (LuaTable)obj;
 
-                if (obj.Name == "add_modifier") {
-                    var addmodifiernode = new AddModifierNode() {
+                if (obj.Name == "add_static_modifier_if_not_already_added" || obj.Name == "add_static_modifier") {
+                    var addmodifiernode = new AddStaticModifierNode() {
                         ModifierName = effectbody_table["name"].Value,
-                        Decay = Convert.ToBoolean(effectbody_table["decay"].Value ?? "false"),
-                        Duration = Convert.ToInt32(effectbody_table["duration"].Value ?? "0")
+                        Decay = Convert.ToBoolean(effectbody_table.GetValue("decay") ?? "false"),
+                        Duration = Convert.ToInt32(effectbody_table.GetValue("duration") ?? "0"),
+                        LineNumber = obj.LineNumber,
+                        FileName = obj.FileName
                     };
                     if (effectbody_table.Keys.Contains("scale_by"))
                         addmodifiernode.ScaleBy = HandleSyntaxExpression((LuaTable)effectbody_table["scale_by"]);
-                    expr.Body.Add(addmodifiernode);
+                    if (obj.Name == "add_static_modifier_if_not_already_added") {
+                        var _node = new AddStaticModifierIfNotAlreadyExistsNode() {
+                            AddStaticModifierNode = addmodifiernode,
+                            LineNumber = obj.LineNumber,
+                            FileName = obj.FileName
+                        };
+                        expr.Body.Add(_node);
+                    }
+                    else
+                        expr.Body.Add(addmodifiernode);
                 }
             }
+        }
+        foreach (var node in expr.Body) {
+            node.FileName = table.FileName;
         }
         return expr;
     }
 
-    public static void HandleProvinceDevelopmentStagesFile(string content)
+    public static void HandleProvinceDevelopmentStagesFile(string content, string filename)
     {
-        foreach (var (table, key) in HandleFile(content))
+        foreach (var (table, key) in HandleFile(content, filename))
         {
             var stage = new ProvinceDevelopmentStage()
             {
@@ -387,8 +446,8 @@ public static class LuaHandler
         }
     }
 
-    public static void HandleResourcesFile(string content) {
-        foreach (var (__table, materialgroup) in HandleFile(content)) 
+    public static void HandleResourcesFile(string content, string filename) {
+        foreach (var (__table, materialgroup) in HandleFile(content, filename)) 
         {
             GameDataManager.ResourcesByMaterialGroup[materialgroup] = new();
             var _table = (LuaTable)__table;
@@ -411,9 +470,9 @@ public static class LuaHandler
         }
     }
 
-    public static void HandleRecipeFile(string content)
+    public static void HandleRecipeFile(string content, string filename)
     {
-        foreach (var (table, key) in HandleFile(content))
+        foreach (var (table, key) in HandleFile(content, filename))
         {
             var recipe = new BaseRecipe()
             {
@@ -445,9 +504,9 @@ public static class LuaHandler
         }
     }
 
-    public static void HandleBuildingFile(string content)
+    public static void HandleBuildingFile(string content, string filename)
     {
-        foreach (var (table, name) in HandleFile(content))
+        foreach (var (table, name) in HandleFile(content, filename))
         {
             var building = new LuaBuilding() {
                 Name = name,
@@ -466,6 +525,34 @@ public static class LuaHandler
 
             building.type = Enum.Parse<BuildingType>(table["type"].Value);
             GameDataManager.BaseBuildingObjs[building.Name] = building;
+        }
+    }
+
+    public static void HandleOnActionFile(string content, string filename)
+    {
+        foreach (var (table, name) in HandleFile(content, filename)) {
+            var onaction = new LuaOnAction() {
+                OnActionType = name switch {
+                    "on_server_start" => OnActionType.OnServerStart
+                },
+                EffectBody = (EffectBody)(HandleSyntaxExpression(table).Body.First())
+            };
+            if (!GameDataManager.LuaOnActions.ContainsKey(onaction.OnActionType))
+                GameDataManager.LuaOnActions[onaction.OnActionType] = new();
+            GameDataManager.LuaOnActions[onaction.OnActionType].Add(onaction);
+        }
+    }
+
+    public static void HandleStaticModifierFile(string content, string filename) {
+        foreach (var (table, name) in HandleFile(content, filename)) {
+            var modifier = new LuaStaticModifier() {
+                Name = name,
+                Description = table.GetValue("Description"),
+                Stackable = Convert.ToBoolean(table["stackable"].Value),
+                Icon = table.GetValue("icon") ?? "⚙",
+                ModifierNodes = HandleModifierNodes((LuaTable)table["modifiers"])
+            };
+            GameDataManager.BaseStaticModifiersObjs[modifier.Name] = modifier;
         }
     }
 }

@@ -114,6 +114,8 @@ public class LuaBuilding
                     DBCache.Put(infrastructure.Id, infrastructure);
                     DBCache.ProvincesBuildings[province.Id].Add(infrastructure);
                     DBCache.dbctx.Infrastructures.Add(infrastructure);
+                    await building.Tick();
+                    await building.TickRecipe();
                     province.UpdateModifiers();
                     province.UpdateModifiersAfterBuildingTick();
                     break;
@@ -123,6 +125,8 @@ public class LuaBuilding
         else {
             building.Size += levels;
             if (building.BuildingType == BuildingType.Infrastructure) {
+                await building.Tick();
+                await building.TickRecipe();
                 province.UpdateModifiers();
                 province.UpdateModifiersAfterBuildingTick();
             }

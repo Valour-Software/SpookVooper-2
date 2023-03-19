@@ -112,6 +112,12 @@
                     <h3>User Population: @population</h3>
                 </div>
 
+                @foreach (var staticmodififer in Model.StaticModifiers) {
+                    <div class="p-2 align-self-center" style="text-align:center">
+                        <span>@staticmodififer.BaseStaticModifiersObj.Icon</span>
+                    </div>
+                }
+
                 if (user != null)
                 {
                     if (user.DistrictId != null && user.DistrictId == Model.Id)
@@ -134,17 +140,12 @@
                     </div>
                 }
 
-                <br />
-
                 if (user!.Id == Model.GovernorId) {
                     <div class="p-2 align-self-center" style="text-align:center">
                             <a asp-controller="District" asp-action="EditPolicies" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit Policies</a>
                     </div>
                 }
-
-                <br />
  
-
                 if (Model.Description != null)
                 {
                     <h1 style="text-align:left">Description</h1>
@@ -213,7 +214,7 @@
                                         <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;" class="province"></path>
                                         if (ShowCityCircle)
                                         {
-                                            <circle cx="@(province.XPos)" cy="@(province.YPos+8)" r="3" style="fill: black;" />
+                                            <circle cx="@(province.XPos+4)" cy="@(province.YPos+8)" r="3" style="fill: white;" />
                                         }
                                     }
                                     else

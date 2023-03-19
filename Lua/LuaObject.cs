@@ -18,6 +18,8 @@ public abstract class ILuaObject : IConvertible
     public ObjType type { get; set; }
     public string Value { get; set; }
     public LuaTable Parent { get; set; }
+    public int LineNumber { get; set; }
+    public string FileName { get; set; }
 
     public TypeCode GetTypeCode()
     {

@@ -68,6 +68,12 @@
                     </div>
                 </div>
 
+                @foreach (var staticmodififer in Model.StaticModifiers) {
+                    <div class="p-2 align-self-center" style="text-align:center">
+                        <span>@staticmodififer.BaseStaticModifiersObj.Icon</span>
+                    </div>
+                }
+
                 if (Model.Description is not null)
                 {
                     <h1 style="text-align:center">Description</h1>
@@ -75,6 +81,7 @@
                         @Html.Raw(MarkdownManager.GetHtml(Model.Description))
                     </div>
                 }
+                <br />
                 <center>
                     @if (user is not null && Model.District.GovernorId == user.Id)
                     {

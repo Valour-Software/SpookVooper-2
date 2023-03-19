@@ -181,18 +181,22 @@
                                     </td>
                                     <td id="result-@request.Id"></td>
                                 }
-                                @if (request.Granted || request.Reviewed == false) {
-                                    <button class="btn btn-success">Approve</button>
-                                }
-                                else {
-                                    <button class="btn btn-outline-success">Approve</button>
-                                }
-                                @if (!request.Granted || request.Reviewed == false) {
-                                    <button class="btn btn-warning">Deny</button>
-                                }
-                                else {
-                                    <button class="btn btn-outline-warning">Deny</button>
-                                }
+                                <td>
+                                    @if (request.Granted && request.Reviewed) {
+                                        <button class="btn btn-success">Approved</button>
+                                    }
+                                    else {
+                                        <button class="btn btn-outline-success">Approve</button>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!request.Granted && request.Reviewed) {
+                                        <button class="btn btn-warning">Denied</button>
+                                    }
+                                    else {
+                                        <button class="btn btn-outline-warning">Deny</button>
+                                    }
+                                </td>
                             }
                         </tr>
                     }

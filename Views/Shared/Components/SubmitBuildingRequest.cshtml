@@ -24,6 +24,9 @@
         </style>
     }
     <div class="buildingcosts-holder">
+        @if (Model.LuaBuildingObj.type == BuildingType.Infrastructure) {
+            <span class="text-warning">Note: This building's construction cost increases per level!!</span>
+        }
         <span>Costs to build:</span>
         <br />
         <div class="buildingcosts">
@@ -37,10 +40,6 @@
                 </div>
             }
         </div>
-        @if (Model.LuaBuildingObj.type == BuildingType.Infrastructure)
-        {
-            <span class="text-warning">Note: This building's construction cost increases per level!!</span>
-        }
     </div>
     <hr />
 }

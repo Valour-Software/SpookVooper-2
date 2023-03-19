@@ -81,8 +81,8 @@ public class Province
     [NotMapped]
     public Dictionary<ProvinceModifierType, ProvinceModifier> Modifiers { get; set; }
 
-    [Column(TypeName = "jsonb")]
-    public List<StaticProvinceModifier> StaticProvinceModifiers { get; set; }
+    [Column("staticmodifiers", TypeName = "jsonb[]")]
+    public List<StaticModifier> StaticModifiers { get; set; }
 
     [NotMapped]
     public ProvinceMetadata Metadata => ProvinceManager.ProvincesMetadata[Id];
@@ -100,7 +100,7 @@ public class Province
 
     public Province(Random rnd)
     {
-        StaticProvinceModifiers = new();
+        StaticModifiers = new();
         Modifiers = new();
         long min = (long)Defines.NProvince[NProvince.BASE_POPULATION_MIN];
         long max = (long)Defines.NProvince[NProvince.BASE_POPULATION_MAX];
@@ -352,12 +352,12 @@ public class Province
     {
         Modifiers = new();
         var value_executionstate = new ExecutionState(District, this);
-        var scaleby_executionstate = new ExecutionState(District, this);
-        foreach (var staticmodifier in StaticProvinceModifiers)
+        //var scaleby_executionstate = new ExecutionState(District, this);
+        foreach (var staticmodifier in StaticModifiers)
         {
-            foreach (var modifiernode in staticmodifier.luaStaticModifierObject.ModifierNodes)
+            foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes)
             {
-                var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleByNode.GetValue(scaleby_executionstate));
+                var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleBy);
                 UpdateOrAddModifier((ProvinceModifierType)modifiernode.ProvinceModifierType!, value);
             }
         }
@@ -391,20 +391,6 @@ public class ProvinceModifier
 {
     public ProvinceModifierType ModifierType { get; set; }
     public double Amount { get; set; }
-}
-
-public class StaticProvinceModifier
-{
-    public string Id { get; set; }
-    public long? Duration { get; set; }
-    public bool Decay { get; set; }
-    public ExpressionNode? ScaleByNode { get; set; }
-    public DateTime TimeStarted { get; set; }
-    public string StaticModifierId { get; set; }
-
-    [NotMapped]
-    [JsonIgnore]
-    public LuaProvinceStaticModifier luaStaticModifierObject => GameDataManager.BaseProvinceStaticModifers[StaticModifierId];
 }
 
 /// <summary>

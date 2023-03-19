@@ -10,8 +10,9 @@ namespace SV2.Scripting;
 public enum EffectType
 {
 	None,
-	AddModifier,
-	AddMoney
+	AddStaticModifier,
+	AddMoney,
+	AddStaticModifierIfNotAlreadyAdded
 }
 
 public abstract class EffectSyntaxNode : SyntaxNode
@@ -49,35 +50,50 @@ public class AddMoneyNode : EffectNode
 	}
 }
 
-public class AddModifierNode : EffectNode
+public class AddStaticModifierNode : EffectNode
 {
-	public EffectType effectType => EffectType.AddModifier;
+	public EffectType effectType => EffectType.AddStaticModifier;
 	public string ModifierName { get; set; }
-	public bool Decay { get; set; } = false;
-	public int Duration { get; set; }
-	public SyntaxNode ScaleBy { get; set; }
+	public bool Decay { get; set; }
+	public int? Duration { get; set; }
+	public ExpressionNode? ScaleBy { get; set; }
 
 	public override void Execute(ExecutionState state)
 	{
-		//var dbmodifier = new DistrictStaticModifier()
-		//{
-		//	Id = StaticModifierManager.idManager.Generate(),
-			//DistrictId = district.Id,
-		//	Decay = Decay,
-		//	Duration = Duration,
-		//	StartDate = DateTime.UtcNow,
-			//ScaleBy = ScaleBy.GetValue(district),
-		//	StaticModifierId = ModifierName
-		//};
-		//using var dbctx = VooperDB.DbFactory.CreateDbContext();
-		//dbctx.DistrictStaticModifiers.Add(dbmodifier);
-	//	dbctx.SaveChanges();
-		//DBCache.Put(dbmodifier.Id, dbmodifier);
-		//dbmodifier.District = district;
-	}
+		var dbmodifier = new StaticModifier()
+		{
+			Decay = Decay,
+			Duration = Duration,
+			StartDate = DateTime.UtcNow,
+			LuaStaticModifierObjId = ModifierName
+		};
+		if (ScaleBy is not null)
+			dbmodifier.ScaleBy = ScaleBy.GetValue(state);
+		else
+			dbmodifier.ScaleBy = 1.0m;
+		if (state.ParentScopeType == ScriptScopeType.District)
+			state.District.StaticModifiers.Add(dbmodifier);
+        else if (state.ParentScopeType == ScriptScopeType.Province)
+            state.Province.StaticModifiers.Add(dbmodifier);
+    }
 }
 
-public class EffectBody : SyntaxNode
+public class AddStaticModifierIfNotAlreadyExistsNode : EffectNode {
+	public AddStaticModifierNode AddStaticModifierNode { get; set; }
+    public override void Execute(ExecutionState state) {
+		if (state.ParentScopeType == ScriptScopeType.District) {
+			if (state.District.StaticModifiers.Any(x => x.LuaStaticModifierObjId == AddStaticModifierNode.ModifierName))
+				return;
+		}
+		else if (state.ParentScopeType == ScriptScopeType.Province) {
+            if (state.Province.StaticModifiers.Any(x => x.LuaStaticModifierObjId == AddStaticModifierNode.ModifierName))
+                return;
+        }
+		AddStaticModifierNode.Execute(state);
+    }
+}
+
+public class EffectBody : SyntaxNode, IEffectNode
 {
 	public List<IEffectNode> Body;
 	public EffectBody()
@@ -86,7 +102,9 @@ public class EffectBody : SyntaxNode
 		Body = new();
 	}
 
-	public void Execute(ExecutionState state)
+	public EffectType effectType => EffectType.None;
+
+    public void Execute(ExecutionState state)
 	{
 		foreach(var effectnode in Body)
 			effectnode.Execute(state);

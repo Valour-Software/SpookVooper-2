@@ -163,6 +163,11 @@ public class ProvinceController : SVController
         if (!oldprovince.CanEdit(user))
             return RedirectBack("You lack permission to manage this province!");
 
+        if (newprovince.BasePropertyTax > 10000)
+            return RedirectBack("Base Property Tax must be 10,000 or less!");
+        if (newprovince.PropertyTaxPerSize > 10000)
+            return RedirectBack("Property Tax per size must be 10,000 or less!");
+
         oldprovince.Name = newprovince.Name;
         oldprovince.Description = newprovince.Description;
         oldprovince.BasePropertyTax = newprovince.BasePropertyTax;

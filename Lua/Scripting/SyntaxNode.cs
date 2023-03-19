@@ -1,5 +1,6 @@
 ﻿using System;
 using SV2.Scripting;
+using SV2.Scripting.Parser;
 
 namespace SV2.Scripting;
 
@@ -30,12 +31,14 @@ public class ExecutionState
     public District District { get; set; }
     public Province? Province { get; set; }
     public Dictionary<string, decimal> ChangeSystemVarsBy { get; set; }
-    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null)
+    public ScriptScopeType? ParentScopeType { get; set; }
+    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null)
     {
         Locals = new();
         District = district;
         Province = province;
         ChangeSystemVarsBy = changesystemvarsby ?? new();
+        ParentScopeType = parentscopetype;
     }
 }
 
@@ -43,7 +46,12 @@ public abstract class SyntaxNode
 {
     public NodeType NodeType;
     public SyntaxNode Parent;
+    public int LineNumber { get; set; }
+    public string FileName { get; set; }
     public abstract decimal GetValue(ExecutionState state);
+    public void HandleError(string error, string message) {
+        LuaHandler.HandleError(FileName, LineNumber, error, message);
+    }
 }
 
 public abstract class ConditionalSyntaxNode : SyntaxNode
@@ -254,39 +262,27 @@ public class SystemVar : SyntaxNode
     public override decimal GetValue(ExecutionState state)
     {
         var levels = CleanUp(Value).Split(".").ToList();
+        decimal value = levels[0].ToLower() switch {
+            "district" => levels[1].ToLower() switch {
+                "population" => state.District.TotalPopulation
+            },
+            "province" => levels[1].ToLower() switch {
+                "population" => state.Province.Population,
+                "owner" => state.Province.District.Id,
+                "buildings" => levels[2].ToLower() switch {
+                    "totaloftype" => (decimal)state.Province.GetLevelsOfBuildingsOfType(levels[3])
+                }
+            },
+            _ => 0.00m
+        };
         if (state.ChangeSystemVarsBy.Count > 0) {
-            decimal value = levels[0].ToLower() switch {
-                "district" => levels[1].ToLower() switch {
-                    "population" => state.District.TotalPopulation
-                },
-                "province" => levels[1].ToLower() switch {
-                    "population" => state.Province.Population,
-                    "owner" => state.Province.District.Id,
-                    "buildings" => levels[2].ToLower() switch {
-                        "totaloftype" => (decimal)state.Province.GetLevelsOfBuildingsOfType(levels[3])
-                    }
-                },
-                _ => 0.00m
-            };
             if (state.ChangeSystemVarsBy.ContainsKey(Value)) {
                 value += state.ChangeSystemVarsBy[Value];
             }
             return value;
         }
         else {
-            return levels[0].ToLower() switch {
-                "district" => levels[1].ToLower() switch {
-                    "population" => state.District.TotalPopulation
-                },
-                "province" => levels[1].ToLower() switch {
-                    "population" => state.Province.Population,
-                    "owner" => state.Province.District.Id,
-                    "buildings" => levels[2].ToLower() switch {
-                        "totaloftype" => (decimal)state.Province.GetLevelsOfBuildingsOfType(levels[3])
-                    }
-                },
-                _ => 0.00m
-            };
+            return value;
         }
     }
 }
@@ -409,4 +405,48 @@ public class LocalNode : SyntaxNode
     public string Name { get; set; }
     public SyntaxNode Value { get; set; }
     public override decimal GetValue(ExecutionState state) { return 0.00m; }
+}
+
+public enum ScriptScopeType {
+    District,
+    Province
+}
+
+public class ChangeScopeNode : EffectNode 
+{
+    public ScriptScopeType scopeType { get; set; }
+    public string ChangeTo { get; set; }
+    public SyntaxNode Value { get; set; }
+    public EffectBody EffectBodyNode { get; set; }
+
+    public ExecutionState GetExecutionState(ExecutionState state) {
+        var newstate = new ExecutionState(state.District, state.Province, state.ChangeSystemVarsBy);
+        newstate.Locals = state.Locals;
+
+        if (scopeType == ScriptScopeType.District) {
+            var district = DBCache.GetAll<District>().FirstOrDefault(x => x.ScriptName == ChangeTo);
+            if (district is null)
+                HandleError("Could not find district", $"key: {ChangeTo}");
+            newstate.District = district;
+            newstate.ParentScopeType = scopeType;
+        }
+
+        else if (scopeType == ScriptScopeType.Province) {
+            var province = DBCache.GetAll<Province>().FirstOrDefault(x => x.Id == long.Parse(ChangeTo));
+            if (province is null)
+                HandleError("Could not find province", $"key: {ChangeTo}");
+            newstate.Province = province;
+            newstate.ParentScopeType = scopeType;
+        }
+        return newstate;
+    }
+
+    public override decimal GetValue(ExecutionState state)
+    {
+        return Value.GetValue(GetExecutionState(state));
+    }
+
+    public override void Execute(ExecutionState state) {
+        EffectBodyNode.Execute(GetExecutionState(state));
+    }
 }

@@ -1,9 +1,10 @@
-vooperian_capital {
+vooperian_capital = {
 	name = "Capital of the Vooperian Empire"
 	modifiers = {
 		province.buildingslotsfactor = 0.2
 		province.buildingslotsexponent = 0.03
-		province.overpopulationmodifierexponent = -0.035
+		province.overpopulationmodifierexponent = -0.015
+		province.migrationattractionfactor = 0.2
 	}
 	stackable = false
 }
