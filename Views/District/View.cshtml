@@ -114,7 +114,12 @@
 
                 @foreach (var staticmodififer in Model.StaticModifiers) {
                     <div class="p-2 align-self-center" style="text-align:center">
-                        <span>@staticmodififer.BaseStaticModifiersObj.Icon</span>
+                        @{
+                            var spanclass = "modifier-icon-good";
+                            if (!staticmodififer.BaseStaticModifiersObj.IsGood)
+                                spanclass = "modifier-icon-bad";
+                        }
+                        <span class="@spanclass" data-bs-toggle="tooltip" data-bs-html="true" data-bs-custom-class="modifier-tooltip-div" data-bs-sanitize="false" data-bs-title="@Html.Raw(staticmodififer.GenerateHtmlForTooltip(Model))">@staticmodififer.BaseStaticModifiersObj.Icon</span>
                     </div>
                 }
 

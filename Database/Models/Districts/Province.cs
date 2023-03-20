@@ -358,7 +358,7 @@ public class Province
             foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes)
             {
                 var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleBy);
-                UpdateOrAddModifier((ProvinceModifierType)modifiernode.ProvinceModifierType!, value);
+                UpdateOrAddModifier((ProvinceModifierType)modifiernode.provinceModifierType!, value);
             }
         }
 
@@ -368,7 +368,7 @@ public class Province
             foreach (var modifiernode in CurrentDevelopmentStage.ModifierNodes)
             {
                 var value = (double)modifiernode.GetValue(value_executionstate, 1);
-                UpdateOrAddModifier((ProvinceModifierType)modifiernode.ProvinceModifierType!, value);
+                UpdateOrAddModifier((ProvinceModifierType)modifiernode.provinceModifierType!, value);
             }
         }
     }
@@ -381,7 +381,7 @@ public class Province
             foreach (var modifiernode in building.Recipe.ModifierNodes) {
                 var value = (double)modifiernode.GetValue(buildingtick_executionstate, 1);
                 value *= building.GetRateForProduction();
-                UpdateOrAddModifier((ProvinceModifierType)modifiernode.ProvinceModifierType!, value);
+                UpdateOrAddModifier((ProvinceModifierType)modifiernode.provinceModifierType!, value);
             }
         }
     }

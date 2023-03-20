@@ -186,7 +186,7 @@ public abstract class ProducingBuilding : BuildingBase
 
     public double MiningOutputFactor() {
         if (!Province.Metadata.Resources.ContainsKey(BuildingObj.MustHaveResource)) return 0.0;
-        return Province.Metadata.Resources[BuildingObj.MustHaveResource]/2550.0;
+        return Province.Metadata.Resources[BuildingObj.MustHaveResource]/7550.0;
     }
 
     public async ValueTask<TaskResult> TickRecipe() {

@@ -19,6 +19,38 @@ for details on configuring this project to bundle and minify static web assets. 
     --main-4: #192630;
 }
 
+.modifier-tooltip-modifier-listitem-good, .modifier-icon-good {
+    color: #63AA54;
+}
+
+.modifier-tooltip-modifier-listitem-bad, .modifier-icon-bad {
+    color: #DB5454;
+}
+
+.modifier-tooltip-modifier-listitem-neutral {
+    color: #FFFFFF;
+}
+
+.modifier-tooltip-div {
+    opacity: 1 !important;
+}
+
+.modifier-tooltip-div, .modifier-tooltip-div .tooltip-inner {
+    background-color: var(--main-4);
+}
+
+.modifier-tooltip-div .tooltip-inner {
+    max-width: 400px;
+}
+
+.modifier-tooltip-listitem-name, modifier-tooltip-description {
+    color: #D8D18E;
+}
+
+.modifier-tooltip-name, .modifier-tooltip-description {
+    color: #FFFFFF;
+}
+
 .new-input-style {
     background-color: unset !important;
     border: unset !important;

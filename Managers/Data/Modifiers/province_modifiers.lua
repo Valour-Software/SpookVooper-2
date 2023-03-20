@@ -6,6 +6,7 @@ vooperian_capital = {
 		province.overpopulationmodifierexponent = -0.015
 		province.migrationattractionfactor = 0.2
 	}
+	isgood = true
 	stackable = false
 }
 
@@ -20,5 +21,6 @@ fertile_land_river_delta_area = {
 		province.farms.farmingthroughputfactor = 1.5
 		province.overpopulationmodifierexponent = -0.0125
 	}
+	isgood = true
 	stackable = false
 }

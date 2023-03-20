@@ -70,7 +70,12 @@
 
                 @foreach (var staticmodififer in Model.StaticModifiers) {
                     <div class="p-2 align-self-center" style="text-align:center">
-                        <span>@staticmodififer.BaseStaticModifiersObj.Icon</span>
+                        @{
+                            var spanclass = "modifier-icon-good";
+                            if (!staticmodififer.BaseStaticModifiersObj.IsGood)
+                                spanclass = "modifier-icon-bad";
+                        }
+                        <span class="@spanclass" data-bs-toggle="tooltip" data-bs-html="true" data-bs-custom-class="modifier-tooltip-div" data-bs-sanitize="false" data-bs-title="@Html.Raw(staticmodififer.GenerateHtmlForTooltip(Model.District, Model))">@staticmodififer.BaseStaticModifiersObj.Icon</span>
                     </div>
                 }
 
@@ -83,7 +88,7 @@
                 }
                 <br />
                 <center>
-                    @if (user is not null && Model.District.GovernorId == user.Id)
+                    @if (user is not null && Model.CanEdit(user))
                     {
                         <a asp-route-id="@Model.Id" asp-action="Edit" asp-controller="Province" class="btn btn-primary">Modify</a>
                     }
@@ -225,12 +230,12 @@
                     var buildingtick_executionstate = new ExecutionState(Model.District, Model);
                     foreach (Infrastructure building in Infrastructures) {
                         foreach (var modifiernode in building.Recipe.ModifierNodes) {
-                            if (modifiernode.ProvinceModifierType == ProvinceModifierType.BuildingSlotsExponent) {
+                            if (modifiernode.provinceModifierType == ProvinceModifierType.BuildingSlotsExponent) {
                                 var value = (double)modifiernode.GetValue(buildingtick_executionstate, 1);
                                 value *= building.GetRateForProduction();
                                 frominfrastructures += value;
                             }
-                            else if (modifiernode.ProvinceModifierType == ProvinceModifierType.BuildingSlots) {
+                            else if (modifiernode.provinceModifierType == ProvinceModifierType.BuildingSlots) {
                                 var value = (double)modifiernode.GetValue(buildingtick_executionstate, 1);
                                 value *= building.GetRateForProduction();
                                 slotsfrominfrastructures += value;

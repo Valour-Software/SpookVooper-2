@@ -5,5 +5,6 @@ novastella_free_market = {
 		district.provinces.buildingslotsexponent = 0.04
 		district.provinces.overpopulationmodifierexponent = -0.01
 	}
+	isgood = true
 	stackable = false
 }

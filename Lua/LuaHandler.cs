@@ -228,7 +228,7 @@ public static class LuaHandler
             var node = new SyntaxModifierNode();
             if (levels[0] == "district")
             {
-                node.DistrictModifierType = levels[0] switch
+                node.districtModifierType = levels[0] switch
                 {
                     "district" => levels[1] switch
                     {
@@ -243,7 +243,7 @@ public static class LuaHandler
             }
             else
             {
-                node.ProvinceModifierType = levels[0] switch
+                node.provinceModifierType = levels[0] switch
                 {
                     "province" => levels[1] switch
                     {
@@ -546,13 +546,14 @@ public static class LuaHandler
     public static void HandleStaticModifierFile(string content, string filename) {
         foreach (var (table, name) in HandleFile(content, filename)) {
             var modifier = new LuaStaticModifier() {
-                Name = name,
-                Description = table.GetValue("Description"),
+                Name = table["name"].Value,
+                Description = table.GetValue("description"),
                 Stackable = Convert.ToBoolean(table["stackable"].Value),
-                Icon = table.GetValue("icon") ?? "⚙",
-                ModifierNodes = HandleModifierNodes((LuaTable)table["modifiers"])
+                Icon = table.GetValue("icon") ?? "~",
+                ModifierNodes = HandleModifierNodes((LuaTable)table["modifiers"]),
+                IsGood = Convert.ToBoolean(table.GetValue("isgood"))
             };
-            GameDataManager.BaseStaticModifiersObjs[modifier.Name] = modifier;
+            GameDataManager.BaseStaticModifiersObjs[name] = modifier;
         }
     }
 }

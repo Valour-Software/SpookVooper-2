@@ -167,7 +167,7 @@ public class District
         foreach (var staticmodifier in StaticModifiers) {
             foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes) {
                 var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleBy);
-                UpdateOrAddModifier((DistrictModifierType)modifiernode.DistrictModifierType!, value);
+                UpdateOrAddModifier((DistrictModifierType)modifiernode.districtModifierType!, value);
             }
         }
     }
