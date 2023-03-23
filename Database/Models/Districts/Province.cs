@@ -48,14 +48,10 @@ public class Province
     [NotMapped]
     public BaseEntity? Governor => BaseEntity.Find(GovernorId);
 
-    public City? City
-    {
-        get
-        {
-            if (CityId is null) return null;
-            return DBCache.Get<City>(CityId);
-        }
-    }
+    public long? StateId { get; set; }
+
+    [NotMapped]
+    public State? State => DBCache.Get<State>(StateId);
 
     /// <summary>
     /// How "developed" this province is

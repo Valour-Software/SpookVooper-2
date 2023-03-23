@@ -154,6 +154,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<City> Cities { get; set; }
     public DbSet<BuildingRequest> BuildingRequests { get; set; }
     public DbSet<EntityBalanceRecord> EntityBalanceRecords { get; set; }
+    public DbSet<State> States { get; set; }
 
     public VooperDB(DbContextOptions options)
     {

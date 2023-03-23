@@ -194,7 +194,7 @@ public static class DBCache
         foreach(Vote vote in dbctx.Votes) {
             Put(vote.Id, vote);
         }
-        foreach (var _obj in dbctx.Cities)
+        foreach (var _obj in dbctx.States)
             Put(_obj.Id, _obj);
         foreach (Recipe recipe in dbctx.Recipes)
             Put(recipe.Id, recipe);
