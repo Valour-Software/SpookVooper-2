@@ -199,6 +199,18 @@ public class Province
 
     public bool CanManageBuildingRequests(BaseEntity entity) {
         if (entity.Id == District.GovernorId) return true;
+        if (State is not null && State.Governor is not null) {
+            if (State.Governor.EntityType == EntityType.User) {
+                if (State.GovernorId == entity.Id) {
+                    return true;
+                }
+            }
+            else {
+                Group governorasgroup = (Group)State.Governor;
+                if (governorasgroup.HasPermission(entity, GroupPermissions.ManageBuildingRequests))
+                    return true;
+            }
+        }
         if (Governor is not null) {
             if (Governor.EntityType == EntityType.User)
                 return GovernorId == entity.Id;
@@ -213,6 +225,18 @@ public class Province
     public bool CanEdit(BaseEntity entity)
     {
         if (entity.Id == District.GovernorId) return true;
+        if (State is not null && State.Governor is not null) {
+            if (State.Governor.EntityType == EntityType.User) {
+                if (State.GovernorId == entity.Id) {
+                    return true;
+                }
+            }
+            else {
+                Group governorasgroup = (Group)State.Governor;
+                if (governorasgroup.HasPermission(entity, GroupPermissions.ManageBuildingRequests))
+                    return true;
+            }
+        }
         if (Governor is not null)
         {
             if (Governor.EntityType == EntityType.User)

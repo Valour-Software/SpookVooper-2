@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SV2.Models;
 using SV2.Managers;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Valour.Api.Models;
 using SV2.Helpers;
 using SV2.Extensions;
+using SV2.Database.Models.Districts;
+using System.Xml.Linq;
 
 namespace SV2.Controllers
 {
@@ -30,15 +31,79 @@ namespace SV2.Controllers
             return View(district);
         }
 
+        [UserRequired]
+        public IActionResult ManageStates(long Id) {
+            District district = DBCache.Get<District>(Id);
+            SVUser user = HttpContext.GetUser();
+
+            if (district is null)
+                return Redirect("/");
+
+            if (user.Id != district.GovernorId)
+                return Redirect("/");
+
+            return View(new ManageStatesModel() {
+                States = district.States,
+                District = district,
+                CreateStateModel = new() {
+                    DistrictId = district.Id
+                }
+            });
+        }
+
+        [UserRequired]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateState(CreateStateModel model) {
+            SVUser user = HttpContext.GetUser();
+
+            District district = DBCache.Get<District>(model.DistrictId);
+            if (district is null)
+                return Redirect("/");
+            if (user.Id != district.GovernorId)
+                return Redirect("/");
+
+            var state = new State() {
+                Name = model.Name,
+                Description = model.Description,
+                MapColor = model.MapColor,
+                DistrictId = district.Id
+            };
+            Group stategroup = new(model.Name, district.GroupId) {
+                Id = IdManagers.GroupIdGenerator.Generate(),
+                Credits = 0.0m
+            };
+
+            DBCache.Put(stategroup.Id, stategroup);
+            DBCache.dbctx.Add(stategroup);
+            state.GroupId = stategroup.Id;
+            state.Id = stategroup.Id;
+
+            var role = new GroupRole() {
+                Name = "Governor",
+                Color = "ffffff",
+                GroupId = stategroup.Id,
+                PermissionValue = GroupPermissions.FullControl.Value,
+                Id = IdManagers.GeneralIdGenerator.Generate(),
+                Authority = 99999999,
+                Salary = 0.0m,
+                MembersIds = new()
+            };
+            DBCache.Put(role.Id, role);
+            DBCache.dbctx.GroupRoles.Add(role);
+
+            DBCache.Put(state.Id, state);
+            DBCache.dbctx.Add(state);
+
+            return RedirectBack("Successfully create state.");
+        }
+
+        [UserRequired]
         public IActionResult EditPolicies(long Id)
         {
             District district = DBCache.Get<District>(Id);
-            SVUser? user = UserManager.GetUser(HttpContext);
+            SVUser user = HttpContext.GetUser();
 
-            if (user is null) 
-            {
-                return Redirect("/account/login");
-            }
             if (district is null) {
                 return Redirect("/");
             }
@@ -53,16 +118,12 @@ namespace SV2.Controllers
         }
 
         [HttpPost]
+        [UserRequired]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPolicies(DistrictPolicyModel model)
         {
-            SVUser? user = UserManager.GetUser(HttpContext);
+            SVUser user = HttpContext.GetUser();
 
-            if (user is null) 
-            {
-                return Redirect("/account/login");
-            }
-            
             District district = DBCache.Get<District>(model.DistrictId);
             if (district is null) {
                 return Redirect("/");
@@ -138,12 +199,6 @@ namespace SV2.Controllers
                 user.LastMoved = DateTime.UtcNow;
 
             return RedirectBack($"You have moved to {district.Name}!");
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

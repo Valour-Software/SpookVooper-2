@@ -12,6 +12,7 @@ using SV2.Models.Provinces;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using SV2.Views.ProvinceViews.Models;
+using SV2.Database.Models.Districts;
 
 namespace SV2.Controllers;
 
@@ -161,7 +162,7 @@ public class ProvinceController : SVController
 
         var user = HttpContext.GetUser();
         if (!oldprovince.CanEdit(user))
-            return RedirectBack("You lack permission to manage this province!");
+            return RedirectBack("You lack permission to edit this province!");
 
         if (newprovince.BasePropertyTax > 10000)
             return RedirectBack("Base Property Tax must be 10,000 or less!");
@@ -174,7 +175,7 @@ public class ProvinceController : SVController
         oldprovince.PropertyTaxPerSize = newprovince.PropertyTaxPerSize;
 
         StatusMessage = "Successfully saved your changes.";
-        return Redirect($"/Province/View/{oldprovince.Id}");
+        return Redirect($"/State/View/{oldprovince.Id}");
     }
 
     [HttpPost("/Province/ChangeGovernor/{id}")]
@@ -193,6 +194,34 @@ public class ProvinceController : SVController
         province.GovernorId = GovernorId;
 
         return RedirectBack($"Successfully changed the governorship of this province to {BaseEntity.Find(GovernorId).Name}");
+    }
+
+    [HttpPost("/Province/ChangeState")]
+    [ValidateAntiForgeryToken]
+    [UserRequired]
+    public IActionResult ChangeState(ChangeStateModel model) {
+        Province? province = DBCache.Get<Province>(model.Id);
+        if (province is null) return Redirect("/");
+
+        var user = HttpContext.GetUser();
+        if (province.District.GovernorId != user.Id)
+            return RedirectBack("You must be governor of the district to change the state of a province!");
+        if (model.StateId is null) {
+            province.StateId = null;
+            StatusMessage = $"Successfully changed the state of this province to none";
+            return Redirect($"/District/View/{province.District.Name}");
+        }
+        else {
+            State? state = DBCache.Get<State>(model.StateId);
+            if (state is null) return Redirect("/");
+
+            if (state.DistrictId != province.DistrictId)
+                return RedirectBack("You can not assign a state to a province that is not in the same district!");
+
+            province.StateId = model.StateId;
+            StatusMessage = $"Successfully changed the state of this province to {state.Name}";
+            return Redirect($"/District/View/{province.District.Name}");
+        }
     }
 
     [HttpGet("/Province/Build/{id}")]

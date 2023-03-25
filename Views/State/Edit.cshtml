@@ -1,7 +1,7 @@
-@model Province
+@model State
 
 @{
-    ViewData["Title"] = "Province Admin";
+    ViewData["Title"] = "State Admin";
 
     SVUser user = UserManager.GetUser(Context)!;
 }
@@ -12,7 +12,7 @@
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
         <h3 style="text-align:center">@ViewData["Title"]</h3>
-        <h2 style="text-align:center">The Province of @Model.Name</h2>
+        <h2 style="text-align:center">The State of @Model.Name</h2>
 
         <div class="row">
             <div class="col-4"></div>
@@ -29,7 +29,7 @@
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @Html.HiddenFor(x => x.Id)
                 <div class="row">
-                    <h4>Province Info</h4>
+                    <h4>State Info</h4>
 
                     <div asp-validation-summary="All" class="text-danger"></div>
                 </div>
@@ -43,22 +43,15 @@
 
                 <div class="form-group">
                     <label>Description</label>
-                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <input asp-for="Description" class="form-control" />
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
 
                 <br />
-                <p>Property Taxes are paid to the Governor of a province, or to the District if the governor is not set</p>
                 <div class="form-group">
-                    <label>Base monthly property tax per building (not size!)</label>
-                    <input asp-for="BasePropertyTax" class="form-control"/>
-                    <span asp-validation-for="BasePropertyTax" class="text-danger"></span>
-                </div>
-                <br />
-                <div class="form-group">
-                    <label>Monthly Property Tax per size (level) of a building (ex: a level 15 factory will pay 15x this tax monthly)</label>
-                    <input asp-for="PropertyTaxPerSize" class="form-control" />
-                    <span asp-validation-for="PropertyTaxPerSize" class="text-danger"></span>
+                    <label>Map Color</label>
+                    <input asp-for="MapColor" class="form-control" />
+                    <span asp-validation-for="MapColor" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
@@ -67,39 +60,7 @@
             </div>
         </form>
         <br />
-        <br />
-        <!form method="post" action="/Province/ChangeState">
-            @Html.AntiForgeryToken()
-            @Html.Hidden("Id", Model.Id)
-            <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
-                <p>The state this province belongs to</p>
-                <div class="input-group" style="max-width:700px;margin-left:auto;margin-right:auto;">
-                    <select id="StateId" name="StateId" class="form-select" style="display:inline-block; max-width:500px;">
-                        @if (Model.StateId == null)
-                        {
-                            <option selected="selected" id="0">None</option>
-                        }
-                        else {
-                            <option id="0">None</option>
-                        }
-                        @foreach (var state in Model.District.States) {
-                            if (state.Id == Model.StateId) {
-                                <option selected="selected" value="@state.Id">@state.Name</option>
-                            }
-                            else {
-                                <option value="@state.Id">@state.Name</option>
-                            }
-                        }
-                    </select>
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-outline-warning">Confirm</button>
-                    </div>
-                </div>
-            </div>
-        </!form>
-        <br />
-        <br />
-        <!form method="post" action="/Province/ChangeGovernor/@Model.Id">
+        <!form method="post" action="/State/ChangeGovernor/@Model.Id">
             @Html.AntiForgeryToken()
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @if (Model.District.GovernorId == user.Id)
@@ -120,7 +81,7 @@
                     </div>
                 }
             </div>
-        </!form> 
+        </!form>
 
         <br />
         <hr />

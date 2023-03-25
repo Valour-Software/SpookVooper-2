@@ -21,6 +21,42 @@
         .tooltip {
             cursor:pointer;
         }
+        .tooltip-dontshow {
+            opacity: 0 !important;
+        }
+
+        .mergedrow {
+            width: 25em;
+            line-height: 1.2em;
+        }
+
+        .dividertop {
+            border-top: 1px solid darkgray;
+        }
+
+        .infobox {
+            border: 1px solid darkgray;
+            background-color: rgba(255, 255, 255, 0.1);
+            max-width: 300px;
+        }
+
+        .infobox-header div {
+            text-align: center;
+        }
+
+        .infobox-subheader div {
+            text-align: center;
+        }
+
+        .infobox-row-name {
+            padding: 0 0.6em 0.2em 0.6em;
+        }
+
+        .mergedrow th {
+        }
+        .fit-to-content .infobox-row-value {
+            display: inline-block;
+        }
     </style>
 </head>
 
@@ -144,10 +180,10 @@
                         <h3>Log in to move!</h3>
                     </div>
                 }
-
                 if (user!.Id == Model.GovernorId) {
                     <div class="p-2 align-self-center" style="text-align:center">
-                            <a asp-controller="District" asp-action="EditPolicies" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit Policies</a>
+                        <a asp-controller="District" asp-action="EditPolicies" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit Policies</a>
+                        <a asp-controller="District" asp-action="ManageStates" asp-route-id="@Model.Id" class="btn btn-outline-primary">Manage States</a>
                     </div>
                 }
  
@@ -258,7 +294,61 @@
     </div>
 
     <!-- Rightmost column -->
-    <div class="p-4 flex-shrink-1 me-auto"></div>
+    <div class="p-4 flex-shrink-1 me-auto" style="margin-top: 2em;">
+        <table class="infobox">
+            <tbody>
+                <tr>
+                    <th colspan="2" class="infobox-header">
+                        <div>@Model.Name</div>
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan="2" class="infobox-subheader">
+                        <div>District</div>
+                    </td>
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">Governor</th>
+                    @if (Model.Governor is null) {
+                        <td class="infobox-row-value">None</td>
+                    }
+                    else {
+                        <td class="infobox-row-value">
+                            <a asp-controller="User" asp-action="Info" asp-route-id="@Model.GovernorId">@Model.Governor.Name</a>
+                        </td>
+                    }
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Population</th>
+                    <td class="infobox-row-value">@($"{Model.TotalPopulation:n0}")</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="infobox-subheader">
+                        <div>States</div>
+                    </td>
+                </tr>
+                @{
+                    var _class = "mergedrow fit-to-content dividertop";
+                }
+                @foreach (var state in Model.States) {
+                    <tr class="@_class">
+                        <th class="infobox-row-name">
+                            <a href="/State/View/@state.Id">@state.Name</a>
+                        </th>
+                        <td class="infobox-row-value">
+                            <div style="width:16px;height:16px;background-color:#@state.MapColor;"></div>
+                        </td>
+                        <td class="infobox-row-value" style="margin-left:12px;">
+                            @($"{(state.Population):n0}")
+                        </td>
+                    </tr>
+                    _class = "mergedrow fit-to-content";
+                }
+                
+            </tbody>
+        </table>
+        <a target="_blank" href="https://dev.spookvooper.com/wiki/District">Wiki page for Districts</a>
+    </div>
 </div>
 
 <script>
@@ -293,4 +383,11 @@
             tooltipList.push(e)
         }
     }
+
+    //function AuxClickedProvince(event) {
+   //     var target = event.target || event.srcElement;
+    //    if (e.button == 1) {
+   //         var myModal = new bootstrap.Modal(document.getElementById('myModal'), options)
+  //      }
+   // }
 </script>

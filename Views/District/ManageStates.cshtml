@@ -1,0 +1,106 @@
+﻿@model ManageStatesModel
+
+@{
+    ViewData["Title"] = "Manage States";
+
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .limit-width {
+        max-width: 200px;
+    }
+
+    input {
+        width: 100%;
+    }
+
+    thead, tbody, tfoot, tr, td, th {
+        border-style: none;
+    }
+
+        tr:nth-child(odd) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        tr:nth-child(even), .header {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+    th {
+        background-color: unset !important;
+    }
+
+    .form-text {
+        display: block;
+    }
+</style>
+
+<div class="container vw-100">
+    <div class="col-12">
+        <h4>@ViewData["Title"]</h4>
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <!form method="post" action="/District/CreateState">
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-md-6">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    @Html.Hidden("DistrictId", Model.CreateStateModel.DistrictId)
+                    <div class="form-group">
+                        <label asp-for="CreateStateModel.Name"></label>
+                        <span asp-description-for="CreateStateModel.Name" class="form-text" style="color:#888888" />
+                        <!input type="text" data-val="true" id="Name" name="Name" class="form-control" />
+                        <span asp-validation-for="CreateStateModel.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CreateStateModel.Description"></label>
+                        <span asp-description-for="CreateStateModel.Description" class="form-text" style="color:#888888" />
+                        <!input type="text" data-val="true" id="Description" name="Description" class="form-control" />
+                        <span asp-validation-for="CreateStateModel.Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CreateStateModel.MapColor"></label>
+                        <span asp-description-for="CreateStateModel.MapColor" class="form-text" style="color:#888888" />
+                        <!input type="text" data-val="true" id="MapColor" name="MapColor" class="form-control" />
+                        <span asp-validation-for="CreateStateModel.MapColor" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="container" style="align-content:flex-start">
+                    <div class="d-flex">
+                        <div class="flex-column" style="margin-right:5px; margin-left: -15px">
+                            <button type="submit" class="btn btn-primary">Create State</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </!form>
+
+        <br />
+
+        <table class="table">
+            <thead>
+                <tr class="header">
+                    <th>State Name</th>
+                    <th>Num of Provinces</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var state in Model.States) {
+                        <tr>
+                            <td><a href="/State/View/@state.Id">@state.Name</a></td>
+                            <td>@($"{state.Provinces.Count():n0}")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>

@@ -40,6 +40,9 @@ public class District
     public List<SVUser> Citizens => DBCache.GetAll<SVUser>().Where(x => x.DistrictId == Id).ToList();
 
     [NotMapped]
+    public List<State> States => DBCache.GetAll<State>().Where(x => x.DistrictId == Id).ToList();
+
+    [NotMapped]
     public long TotalPopulation
     {
         get
@@ -57,10 +60,13 @@ public class District
     public long GroupId { get; set; }
 
     [NotMapped]
-    public Senator Senator => DBCache.Get<Senator>(Id);
+    public Senator? Senator => DBCache.Get<Senator>(Id);
 
     [Column("governorid")]
     public long? GovernorId { get; set; }
+
+    [NotMapped]
+    public SVUser? Governor => DBCache.Get<SVUser>(GovernorId);
 
     [Column("flagurl", TypeName = "VARCHAR(256)")]
     public string? FlagUrl { get; set; }

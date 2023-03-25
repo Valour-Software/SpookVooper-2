@@ -218,6 +218,9 @@ public static class DBCache
             Put(definition.Id, definition);
         }
 
+        foreach (var _obj in dbctx.States)
+            Put(_obj.Id, _obj);
+
         //#endif
     }
 
