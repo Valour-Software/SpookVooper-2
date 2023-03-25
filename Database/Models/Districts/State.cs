@@ -31,4 +31,7 @@ public class State : BaseEntity {
 
     [NotMapped]
     public IEnumerable<Province> Provinces => DBCache.GetAll<Province>().Where(x => x.StateId == Id);
+
+    [NotMapped]
+    public long Population => Provinces.Sum(x => x.Population);
 }

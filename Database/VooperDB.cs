@@ -163,8 +163,6 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
 
     public static async Task Startup() 
     {
-        using var dbctx = DbFactory.CreateDbContext();
-
         //List<string> cands = new List<string>() {
         //    "u-3bfaf0da-05db-4b4d-b77e-78d2faca261a", 
         //    "u-42a0bc23-6a2b-428b-940c-1595f355c8d0",
@@ -260,7 +258,22 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
             }
             i += 1;
         }
-       
-        await dbctx.SaveChangesAsync();
+
+        foreach (var district in DBCache.GetAll<District>()) {
+            if (!district.Group.Roles.Any(x => x.Name == "Governor")) {
+                var role = new GroupRole() {
+                    Name = "Governor",
+                    Color = "ffffff",
+                    GroupId = district.GroupId,
+                    PermissionValue = GroupPermissions.FullControl.Value,
+                    Id = IdManagers.GeneralIdGenerator.Generate(),
+                    Authority = 99999999,
+                    Salary = 0.0m,
+                    MembersIds = new()
+                };
+                DBCache.Put(role.Id, role);
+                DBCache.dbctx.GroupRoles.Add(role);
+            }
+        }
     }
 }

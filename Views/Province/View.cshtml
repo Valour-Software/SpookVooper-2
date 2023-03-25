@@ -1,11 +1,10 @@
-@using SV2.Database;
-@using SV2.Database.Managers;
-@using SV2.Database.Models.Districts;
-@model SV2.Database.Models.Districts.Province
+@using SV2.Database
+@using SV2.Database.Managers
+@using SV2.Database.Models.Districts
+@model Province
 
-@{ 
-    if (Model != null)
-    {
+@{
+    if (Model != null) {
         ViewData["Title"] = Model.Name;
     }
 }
@@ -19,31 +18,36 @@
         .tooltip-dontshow {
             opacity: 0 !important;
         }
+
         .mergedrow {
             width: 25em;
             line-height: 1.2em;
         }
+
         .dividertop {
             border-top: 1px solid darkgray;
         }
+
         .infobox {
             border: 1px solid darkgray;
             background-color: rgba(255, 255, 255, 0.1);
             max-width: 300px;
         }
+
         .infobox-header div {
             text-align: center;
         }
+
         .infobox-subheader div {
             text-align: center;
         }
+
         .infobox-row-name {
             padding: 0 0.6em 0.2em 0.6em;
         }
 
         .mergedrow th {
-            
-        }        
+        }
     </style>
 </head>
 
@@ -57,8 +61,7 @@
 
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
         @{
-            if (Model is not null)
-            {
+            if (Model is not null) {
                 SVUser? user = UserManager.GetUser(Context);
 
                 <div class="d-flex align-content-center align-items-center">
@@ -79,8 +82,7 @@
                     </div>
                 }
 
-                if (Model.Description is not null)
-                {
+                if (Model.Description is not null) {
                     <h1 style="text-align:center">Description</h1>
                     <div style="margin-left:auto;margin-right:auto;max-width: 70%;width: fit-content;">
                         @Html.Raw(MarkdownManager.GetHtml(Model.Description))
@@ -88,15 +90,13 @@
                 }
                 <br />
                 <center>
-                    @if (user is not null && Model.CanEdit(user))
-                    {
+                    @if (user is not null && Model.CanEdit(user)) {
                         <a asp-route-id="@Model.Id" asp-action="Edit" asp-controller="Province" class="btn btn-primary">Modify</a>
                     }
                     <a asp-route-id="@Model.Id" asp-action="Build" asp-controller="Province" class="btn btn-primary">Build</a>
                 </center>
-            } 
-            else
-            {
+            }
+            else {
                 <h1 style="text-align:center" class="display-4">District not found!</h1>
             }
         }
@@ -109,7 +109,7 @@
                 <tr>
                     <th colspan="2" class="infobox-header">
                         <div>@Model.Name, @Model.District.Name</div>
-                   </th>
+                    </th>
                 </tr>
                 <tr>
                     <td colspan="2" class="infobox-subheader">
@@ -126,12 +126,10 @@
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Governor</th>
-                    @if (Model.Governor is null)
-                    {
+                    @if (Model.Governor is null) {
                         <td class="infobox-row-value">None</td>
                     }
-                    else
-                    {
+                    else {
                         <td class="infobox-row-value">
                             @if (Model.Governor.EntityType == EntityType.User) {
                                 <a asp-controller="User" asp-action="Info" asp-route-id="@Model.GovernorId">@Model.Governor.Name</a>
@@ -162,11 +160,10 @@
                     <th class="infobox-row-name">Building Slots Used</th>
                     <td class="infobox-row-value">@($"{Model.BuildingSlotsUsed:n0}")</td>
                 </tr>
-                @if (Model.GetOverpopulationModifier() > 0.001)
-                {
+                @if (Model.GetOverpopulationModifier() > 0.001) {
                     <tr class="mergedrow dividertop">
                         <th class="infobox-row-name">Overpopulation Modifier</th>
-                        <td class="infobox-row-value">@($"+{Math.Round(Model.GetOverpopulationModifier()*100, 2)}%") to death rate</td>
+                        <td class="infobox-row-value">@($"+{Math.Round(Model.GetOverpopulationModifier() * 100, 2)}%") to death rate</td>
                     </tr>
                 }
                 <tr class="mergedrow dividertop">
@@ -174,9 +171,8 @@
                     @if (Model.GetOverpopulationModifier() > 0.001) {
                         <td class="infobox-row-value">@($"{(Model.GetMonthlyPopulationGrowth() * 1.1):n0}")</td>
                     }
-                    else
-                    {
-                        <td class="infobox-row-value">@($"{(Math.Max(Model.GetMonthlyPopulationGrowth() * 1.1, 24*30)):n0}")</td>
+                    else {
+                        <td class="infobox-row-value">@($"{(Math.Max(Model.GetMonthlyPopulationGrowth() * 1.1, 24 * 30)):n0}")</td>
                     }
                 </tr>
                 <tr class="mergedrow dividertop">
@@ -206,7 +202,7 @@
     buildingslots_exponent += Model.GetModifierValue(ProvinceModifierType.BuildingSlotsExponent);
     buildingslots_exponent += Model.District.GetModifierValue(DistrictModifierType.BuildingSlotsExponent);
     double runningtotal = 0;
-    double slotsfrominfrastructures = 0;
+    double factorfrominfrastructures = 0;
 }
 <bootstrap-modal asp-modal-id="Test" asp-modal-title="Building Slots from Population" asp-modal-to-open-on-close-id="BuildingSlotsModal">
     <span>Formula: (Province.Population ^ @($"{buildingslots_exponent:n4}")) * @(Defines.NProvince[NProvince.BUILDING_SLOTS_FACTOR])</span>
@@ -226,7 +222,7 @@
                 @{
                     var Infrastructures = Model.GetBuildings().Where(x => x.BuildingType == BuildingType.Infrastructure && x.RecipeId == "recipe_infrastructure_roads").ToList();
                     double frominfrastructures = 0;
-                    slotsfrominfrastructures = 0;
+                    factorfrominfrastructures = 1;
                     var buildingtick_executionstate = new ExecutionState(Model.District, Model);
                     foreach (Infrastructure building in Infrastructures) {
                         foreach (var modifiernode in building.Recipe.ModifierNodes) {
@@ -235,10 +231,10 @@
                                 value *= building.GetRateForProduction();
                                 frominfrastructures += value;
                             }
-                            else if (modifiernode.provinceModifierType == ProvinceModifierType.BuildingSlots) {
+                            else if (modifiernode.provinceModifierType == ProvinceModifierType.BuildingSlotsFactor) {
                                 var value = (double)modifiernode.GetValue(buildingtick_executionstate, 1);
                                 value *= building.GetRateForProduction();
-                                slotsfrominfrastructures += value;
+                                factorfrominfrastructures += value;
                             }
                         }
                     }
@@ -248,11 +244,20 @@
                 <td>+@($"{frominfrastructures:n4}")</td>
                 <td>@($"{runningtotal:n4}")</td>
             </tr>
+            @foreach (var item in Model.GetStaticModifiersOfType(ProvinceModifierType.BuildingSlotsExponent, DistrictModifierType.BuildingSlotsExponent, true, IncludeDevStage: true)) {
+                runningtotal += (double)item.value;
+                <tr>
+                    <td>@item.modifiername</td>
+                    <td>+@($"{item.value:n4}")</td>
+                    <td>@($"{runningtotal:n4}")</td>
+                </tr>
+            }
         </tbody>
     </table>
 </bootstrap-modal>
 
 <bootstrap-modal asp-modal-id="BuildingSlotsModal" asp-modal-title="Building Slots">
+    <span>Note, most values with "x" stack additivity! The final value may be slightly different than the actual number of building slots due to rounding.</span>
     <table class="table table-dark table-striped">
         <tbody>
             @{
@@ -273,48 +278,46 @@
                 <td>@($"{runningtotal:n0}")</td>
             </tr>
             @{
-                runningtotal += slotsfrominfrastructures;
+                runningtotal *= factorfrominfrastructures;
+                double runningtotalforstacking = 1;
             }
-            @if (slotsfrominfrastructures > 0) {
+            @if (factorfrominfrastructures > 1) {
                 <tr>
                     <td>From Infrastructure (@Model.GetLevelsOfBuildingsOfType("infrastructure") levels)</td>
-                    <td>+@($"{slotsfrominfrastructures:n0}")</td>
+                    <td>x@($"{factorfrominfrastructures:n3}")</td>
                     <td>@($"{runningtotal:n0}")</td>
                 </tr>
             }
-            @{
-                int slotsfromprovincemodifier = (int)(Model.GetModifierValue(ProvinceModifierType.BuildingSlots) - slotsfrominfrastructures);
-                runningtotal += slotsfromprovincemodifier;
-            }
-            @if (slotsfromprovincemodifier > 0)
-            {
+            @foreach (var item in Model.GetStaticModifiersOfType(ProvinceModifierType.BuildingSlots, null, false)) {
+                runningtotal += item.value;
                 <tr>
-                    <td>Province Modifiers</td>
-                    <td>+@($"{slotsfromprovincemodifier:n0}")</td>
+                    <td>@item.modifiername</td>
+                    <td>+@($"{item.value:n0}")</td>
                     <td>@($"{runningtotal:n0}")</td>
                 </tr>
             }
             @{
-                double slotsfactorprovince = Model.GetModifierValue(ProvinceModifierType.BuildingSlotsFactor) + 1;
-                runningtotal *= slotsfactorprovince;
+                var items = Model.GetStaticModifiersOfType(ProvinceModifierType.BuildingSlotsFactor, null, false, IncludeDevStage:true);
             }
-            @if (slotsfactorprovince < 0.999 || slotsfactorprovince > 1.001)
-            {
-                <tr> 
-                    <td>Province Factor Modifiers</td>
-                    <td>x@($"{slotsfactorprovince:n3}")</td>
-                    <td>@($"{runningtotal:n0}")</td>
-                </tr>
-            }
-            @{
-                double slotsfactordistrict = Model.District.GetModifierValue(DistrictModifierType.BuildingSlotsFactor) + 1;
-                runningtotal *= slotsfactordistrict;
-            }
-            @if (slotsfactordistrict < 0.999 || slotsfactordistrict > 1.001) {
+            @foreach (var item in items) {
+                runningtotalforstacking += item.value-1;
                 <tr>
-                    <td>District Factor Modifiers</td>
-                    <td>x@($"{slotsfactordistrict:n3}")</td>
-                    <td>@($"{runningtotal:n0}")</td>
+                    <td>@item.modifiername</td>
+                    <td>x@($"{item.value:n3}")</td>
+                    <td>@($"{runningtotal * runningtotalforstacking:n0}")</td>
+                </tr>
+            }
+            @{
+                runningtotal *= runningtotalforstacking;
+                items = Model.GetStaticModifiersOfType(null, DistrictModifierType.BuildingSlotsFactor, true, false);
+                runningtotalforstacking = 1;
+            }
+            @foreach (var item in items) {
+                runningtotalforstacking += item.value - 1;
+                <tr>
+                    <td>@item.modifiername</td>
+                    <td>x@($"{item.value:n3}")</td>
+                    <td>@($"{runningtotal * runningtotalforstacking:n0}")</td>
                 </tr>
             }
         </tbody>

@@ -25,8 +25,7 @@ public enum GroupTypes
 public enum ReadableGroupTypes {
     Company = 0,
     NonProfit = 2,
-    PoliticalParty = 3,
-    State = 4
+    PoliticalParty = 3
 }
 
 public enum GroupFlag
@@ -170,6 +169,9 @@ public class Group : BaseEntity, IHasOwner
             }
             else
             {
+                code = new PermissionCode(role.PermissionValue, GroupPermissions.FullControl.Value);
+                state = code.GetState(permission);
+                if (state == PermissionState.True) return true;
                 return false;
             }
         }

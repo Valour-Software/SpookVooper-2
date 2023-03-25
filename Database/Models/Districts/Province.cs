@@ -103,6 +103,46 @@ public class Province
         Population = rnd.NextInt64(min, max);
     }
 
+    public List<(string modifiername, double value)> GetStaticModifiersOfType(ProvinceModifierType? provincetype, DistrictModifierType? districttype, bool AlsoUseDistrictModifiers, bool UseProvinceModifiers = true, bool IncludeDevStage = false) {
+        var result = new List<(string modifiername, double value)>();
+        var modifiers = new List<StaticModifier>();
+        if (UseProvinceModifiers)
+            modifiers.AddRange(StaticModifiers);
+        if (AlsoUseDistrictModifiers)
+            modifiers.AddRange(District.StaticModifiers);
+        foreach (var modifier in modifiers) {
+            foreach (var node in modifier.BaseStaticModifiersObj.ModifierNodes) {
+                if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.districtModifierType == districttype && node.districtModifierType is not null)) {
+                    (string modifiername, double value) item = new() {
+                        modifiername = modifier.BaseStaticModifiersObj.Name,
+                        value = (double)node.GetValue(new(District, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.District)))
+                    }; 
+                    if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor") )
+                        || (node.districtModifierType == districttype && node.districtModifierType is not null && node.districtModifierType.ToString().Contains("Factor"))) {
+                        item.value += 1;
+                    }
+                    result.Add(item);
+                }
+            }
+        }
+        if (IncludeDevStage) {
+            foreach (var node in CurrentDevelopmentStage.ModifierNodes) {
+                if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.districtModifierType == districttype && node.districtModifierType is not null)) {
+                    (string modifiername, double value) item = new() {
+                        modifiername = CurrentDevelopmentStage.PrintableName,
+                        value = (double)node.GetValue(new(District, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.District)))
+                    };
+                    if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor"))
+                        || (node.districtModifierType == districttype && node.districtModifierType is not null && node.districtModifierType.ToString().Contains("Factor"))) {
+                        item.value += 1;
+                    }
+                    result.Add(item);
+                }
+            }
+        }
+        return result;
+    }
+
     public string GetDevelopmentColorForMap()
     {
         DevelopmentMapColor currentmapcolor = null;
@@ -324,14 +364,15 @@ public class Province
         buildingslots_exponent += GetModifierValue(ProvinceModifierType.BuildingSlotsExponent);
         buildingslots_exponent += District.GetModifierValue(DistrictModifierType.BuildingSlotsExponent);
 
-        BuildingSlots = (int)(Defines.NProvince["BASE_BUILDING_SLOTS"] + Math.Ceiling((Math.Pow(Population, buildingslots_exponent) * Defines.NProvince["BUILDING_SLOTS_FACTOR"])));
-        
+        var slots = (Defines.NProvince["BASE_BUILDING_SLOTS"] + Math.Ceiling((Math.Pow(Population, buildingslots_exponent) * Defines.NProvince["BUILDING_SLOTS_FACTOR"])));
+
         // province level
-        BuildingSlots += (int)GetModifierValue(ProvinceModifierType.BuildingSlots);
-        BuildingSlots = (int)(BuildingSlots * (1 + GetModifierValue(ProvinceModifierType.BuildingSlotsFactor)));
+        slots += GetModifierValue(ProvinceModifierType.BuildingSlots);
+        slots *= 1 + GetModifierValue(ProvinceModifierType.BuildingSlotsFactor);
 
         // district level
-        BuildingSlots = (int)(BuildingSlots * (1 + District.GetModifierValue(DistrictModifierType.BuildingSlotsFactor)));
+        slots *= 1 + District.GetModifierValue(DistrictModifierType.BuildingSlotsFactor);
+        BuildingSlots = (int)slots;
 
         MigrationAttraction = GetMigrationAttraction();
     }

@@ -216,7 +216,7 @@
                                 <a href="/Province/View/@province.Id" data-bs-toggle="tooltip" data-placement="top" title="@dbprovince.Name" data-sv-show="@ShowCityCircle">
                                     @if (!Context.Request.QueryString.Value.Contains("devmapmode=true"))
                                     {
-                                        <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;" class="province"></path>
+                                        <path d="@province.D" id="@province.Id" style="fill:#@province.GetMapColor();" class="province"></path>
                                         if (ShowCityCircle)
                                         {
                                             <circle cx="@(province.XPos+4)" cy="@(province.YPos+8)" r="3" style="fill: white;" />
