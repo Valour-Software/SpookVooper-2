@@ -87,7 +87,7 @@ public class BuildingController : SVController
         var user = HttpContext.GetUser();
         var building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == model.BuildingId);
 
-        if (!(building.OwnerId == user.Id || (building.Owner.EntityType != EntityType.User && building.Owner.HasPermission(user, GroupPermissions.ManageBuildings)))) {
+        if (!(building.OwnerId == user.Id || (building.Owner.EntityType != EntityType.User && ((Group)building.Owner).HasPermission(user, GroupPermissions.ManageBuildings)))) {
             StatusMessage = "You lack permission to manage this building!";
             return Redirect("/");
         }
