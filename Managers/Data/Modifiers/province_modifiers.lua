@@ -24,3 +24,13 @@ fertile_land_river_delta_area = {
 	isgood = true
 	stackable = false
 }
+
+mass_migration = {
+	name = "Mass Migration"
+	description = "Large number of people are moving to this province"
+	modifiers = {
+		province.migrationattractionfactor = 1.5
+	}
+	isgood = true
+	stackable = false
+}

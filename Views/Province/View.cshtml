@@ -122,7 +122,14 @@
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">State</th>
-                    <td class="infobox-row-value">None</td>
+                    <td class="infobox-row-value">
+                        @if (Model.StateId is null) {
+                            @("None")
+                        }
+                        else {
+                            @Model.State!.Name
+                        }
+                    </td>
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Governor</th>

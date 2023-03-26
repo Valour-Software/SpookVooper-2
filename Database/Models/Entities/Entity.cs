@@ -108,8 +108,12 @@ public abstract class BaseEntity
         double total = 0;
         List<ProducingBuilding> buildings = DBCache.GetAllProducingBuildings().Where(x => x.OwnerId == Id).ToList();
         foreach (var building in buildings) {
-            if (building.Recipe.Outputs.ContainsKey(resource))
-                total += building.GetHourlyProduction() * building.Recipe.Outputs[resource];
+            if (building.Recipe.Outputs.ContainsKey(resource)) {
+                if (building.BuildingObj.type == BuildingType.Mine)
+                    total += building.GetHourlyProduction() * building.Recipe.Outputs[resource] * building.MiningOutputFactor();
+                else
+                    total += building.GetHourlyProduction() * building.Recipe.Outputs[resource];
+            }
         }
         return total;
     }
