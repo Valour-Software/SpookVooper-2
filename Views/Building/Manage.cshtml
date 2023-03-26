@@ -225,9 +225,12 @@
                         <tr class="@trclass">
 
                             <th class="infobox-row-name">@($"{resource.Replace('_', ' ')}")</th>
-                            <td class="infobox-row-value">@(
-                        $"{rate * amount:n1}"
-                        )</td>
+                            @if (Model.Building.BuildingObj.type == SV2.Database.Models.Buildings.BuildingType.Mine) {
+                            }
+                            <td class="infobox-row-value">@($"{rate * amount * Model.Building.MiningOutputFactor():n1}")</td>
+                            {
+                                <td class="infobox-row-value">@($"{rate * amount:n1}")</td>
+                            }
                         </tr>
                         trclass = "mergedrow";
                     }

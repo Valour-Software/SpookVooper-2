@@ -56,6 +56,7 @@ public class SVUser : BaseEntity
     public async ValueTask<List<PlanetRole>> GetValourRolesAsync()
     {
         var member = await PlanetMember.FindAsyncByUser(ValourId, VoopAI.VoopAI.PlanetId);
+        if (member is null) return new();
         return await member.GetRolesAsync();
     }
 
