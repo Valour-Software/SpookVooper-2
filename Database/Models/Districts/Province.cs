@@ -388,7 +388,10 @@ public class Province
         buildingslots_exponent += GetModifierValue(ProvinceModifierType.BuildingSlotsExponent);
         buildingslots_exponent += District.GetModifierValue(DistrictModifierType.BuildingSlotsExponent);
 
-        var slots = (Defines.NProvince["BASE_BUILDING_SLOTS"] + Math.Ceiling((Math.Pow(Population, buildingslots_exponent) * Defines.NProvince["BUILDING_SLOTS_FACTOR"])));
+        var slots = (Defines.NProvince["BASE_BUILDING_SLOTS"] + Math.Ceiling(Math.Pow(Population, buildingslots_exponent) * Defines.NProvince["BUILDING_SLOTS_FACTOR"]));
+
+        if (Id == 384)
+            Console.WriteLine("gkgkgk");
 
         // province level
         slots += GetModifierValue(ProvinceModifierType.BuildingSlots);

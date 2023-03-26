@@ -214,7 +214,7 @@ public class Group : BaseEntity, IHasOwner
         if (target is null)
             return int.MinValue;
 
-        if (OwnerId == target.Id)
+        else if (IsOwner(target))
             return int.MaxValue;
 
         List<GroupRole> roles = GetMemberRoles(target);
@@ -225,47 +225,55 @@ public class Group : BaseEntity, IHasOwner
         return roles.Max(r => r.Authority);
     }
 
-    public TaskResult AddEntityToRole(BaseEntity caller, BaseEntity target, GroupRole role)
+    public TaskResult AddEntityToRole(BaseEntity caller, BaseEntity target, GroupRole role, bool force = false)
     {
         // Validate arguments
         TaskResult validate = CommonValidation(caller, target, GroupPermissions.AddMembersToRoles);
         if (!validate.Succeeded) { return validate; }
 
-        // Authority check
-        if (role.Authority > GetAuthority(target))
-            return new TaskResult(false, $"{role.Name} has more authority than you!");
+        if (!force) {
 
-        if (role is null)
-            return new TaskResult(false, "Error: The role value was empty.");
+            // Authority check
+            if (role.Authority > GetAuthority(target))
+                return new TaskResult(false, $"{role.Name} has more authority than you!");
 
-        if (Roles.Any(x => x.MembersIds.Contains(target.Id)))
-            return new TaskResult(false, "Error: The entity already has this role.");
+            if (role is null)
+                return new TaskResult(false, "Error: The role value was empty.");
 
-        if (role.GroupId != Id)
-            return new TaskResult(false, "Error: The role does not belong to this group!");
+            if (Roles.Any(x => x.MembersIds.Contains(target.Id)))
+                return new TaskResult(false, "Error: The entity already has this role.");
+
+            if (role.GroupId != Id)
+                return new TaskResult(false, "Error: The role does not belong to this group!");
+        }
 
         role.MembersIds.Add(target.Id);
         return new(true, $"Successfully added {target.Name} to {role.Name}");
     }
 
-    public TaskResult RemoveEntityFromRole(BaseEntity caller, BaseEntity target, GroupRole role)
+    public TaskResult RemoveEntityFromRole(BaseEntity caller, BaseEntity target, GroupRole role, bool force = false)
     {
         // Validate arguments
         TaskResult validate = CommonValidation(caller, target, GroupPermissions.RemoveMembersFromRoles);
         if (!validate.Succeeded) { return validate; }
 
-        // Authority check
-        if (role.Authority > GetAuthority(target))
-            return new TaskResult(false, $"{role.Name} has more authority than you!");
+        if (!force) {
+            if (OwnerId == 100 && role.Name == "Governor") {
+                return new(false, "You can not remove the governor role from yourself!!");
+            }
+            // Authority check
+            if (role.Authority > GetAuthority(target))
+                return new TaskResult(false, $"{role.Name} has more authority than you!");
 
-        if (role is null)
-            return new TaskResult(false, "Error: The role value was empty.");
+            if (role is null)
+                return new TaskResult(false, "Error: The role value was empty.");
 
-        if (!Roles.Any(x => x.MembersIds.Contains(target.Id)))
-            return new TaskResult(false, "Error: The entity does has this role.");
+            if (!Roles.Any(x => x.MembersIds.Contains(target.Id)))
+                return new TaskResult(false, "Error: The entity does has this role.");
 
-        if (role.GroupId != Id)
-            return new TaskResult(false, "Error: The role does not belong to this group!");
+            if (role.GroupId != Id)
+                return new TaskResult(false, "Error: The role does not belong to this group!");
+        }
 
         role.MembersIds.Remove(target.Id);
         return new(true, $"Successfully removed {target.Name} from {role.Name}");

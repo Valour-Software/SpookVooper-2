@@ -23,8 +23,7 @@
         {
             <h3 style="text-align:center">@ViewData["Title"]</h3>
             <div class="row srow">
-                @foreach (GroupRole role in Model.Group.Roles.Where(x => x.MembersIds.Contains(user.Id)))
-                {
+                @foreach (GroupRole role in Model.Group.Roles.Where(x => x.MembersIds.Contains(Model.Target.Id))) {
                     <div class="col-6">
                         <h4>@role.Name</h4>
                     </div>
@@ -43,8 +42,7 @@
 
             <h2 style="text-align:center">Other roles</h2>
             <div class="row srow">
-                @foreach (GroupRole role in Model.Group.Roles.Where(x => !x.MembersIds.Contains(user.Id)))
-                {
+                @foreach (GroupRole role in Model.Group.Roles.Where(x => !x.MembersIds.Contains(Model.Target.Id))) {
                     <div class="col-6">
                         <h4>@role.Name</h4>
                     </div>

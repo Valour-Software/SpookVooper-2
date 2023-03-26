@@ -67,6 +67,9 @@
                     @if (user is not null && Model.CanEdit(user)) {
                         <a asp-route-id="@Model.Id" asp-action="Edit" asp-controller="State" class="btn btn-primary">Modify</a>
                     }
+                    @if (user is not null && Model.CanManageBuildingRequests(user)) {
+                        <a asp-route-id="@Model.Id" asp-action="ManageBuildingRequests" asp-controller="State" class="btn btn-primary">Manage Building Requests</a>
+                    }
                 </center>
             }
             else {

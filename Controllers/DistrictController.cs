@@ -31,6 +31,36 @@ namespace SV2.Controllers
             return View(district);
         }
 
+        [HttpPost("/District/ChangeGovernor/{id}")]
+        [ValidateAntiForgeryToken]
+        [UserRequired]
+        public async Task<IActionResult> ChangeGovernor(long id, long GovernorId) {
+            District? district = DBCache.Get<District>(id);
+            if (district is null)
+                return Redirect("/");
+
+            var user = HttpContext.GetUser();
+            if (!(await user.IsGovernmentAdmin()))
+                return RedirectBack("You must be governor of the district to change the governor of a province!");
+
+            var oldgovernor = DBCache.Get<SVUser>(district.GovernorId);
+            var newgovernor = DBCache.Get<SVUser>(GovernorId);
+
+            if (oldgovernor is not null) {
+                var roles = district.Group.GetMemberRoles(oldgovernor);
+                if (roles.Any(x => x.Name == "Governor")) {
+                    district.Group.RemoveEntityFromRole(DBCache.Get<Group>(100), oldgovernor, district.Group.Roles.First(x => x.Name == "Governor"), true);
+                }
+            }
+            district.GovernorId = GovernorId;
+            if (!district.Group.MembersIds.Contains(newgovernor.Id)) {
+                district.Group.MembersIds.Add(newgovernor.Id);
+            }
+            district.Group.AddEntityToRole(DBCache.Get<Group>(100), newgovernor, district.Group.Roles.First(x => x.Name == "Governor"), true);
+
+            return RedirectBack($"Successfully changed the governorship of this district to {BaseEntity.Find(GovernorId).Name}");
+        }
+
         [UserRequired]
         public IActionResult ManageStates(long Id) {
             District district = DBCache.Get<District>(Id);

@@ -203,6 +203,7 @@
     buildingslots_exponent += Model.District.GetModifierValue(DistrictModifierType.BuildingSlotsExponent);
     double runningtotal = 0;
     double factorfrominfrastructures = 0;
+    double slotsfrominfrastructures = 0;
 }
 <bootstrap-modal asp-modal-id="Test" asp-modal-title="Building Slots from Population" asp-modal-to-open-on-close-id="BuildingSlotsModal">
     <span>Formula: (Province.Population ^ @($"{buildingslots_exponent:n4}")) * @(Defines.NProvince[NProvince.BUILDING_SLOTS_FACTOR])</span>
@@ -236,6 +237,11 @@
                                 value *= building.GetRateForProduction();
                                 factorfrominfrastructures += value;
                             }
+                            else if (modifiernode.provinceModifierType == ProvinceModifierType.BuildingSlots) {
+                                var value = (double)modifiernode.GetValue(buildingtick_executionstate, 1);
+                                value *= building.GetRateForProduction();
+                                slotsfrominfrastructures += value;
+                            }
                         }
                     }
                     runningtotal += frominfrastructures;
@@ -260,66 +266,71 @@
     <span>Note, most values with "x" stack additivity! The final value may be slightly different than the actual number of building slots due to rounding.</span>
     <table class="table table-dark table-striped">
         <tbody>
-            @{
-                runningtotal = 0;
-            }
+        @{
+            runningtotal = 0;
             <tr>
                 <td>Base</td>
                 <td></td>
                 <td>10</td>
             </tr>
+
+            double BuildingSlotsFromPopulation = Math.Ceiling((Math.Pow(Model.Population, buildingslots_exponent) * Defines.NProvince["BUILDING_SLOTS_FACTOR"]));
+            runningtotal += BuildingSlotsFromPopulation + 10;
             <tr>
-                @{
-                    double BuildingSlotsFromPopulation = Math.Ceiling((Math.Pow(Model.Population, buildingslots_exponent) * Defines.NProvince["BUILDING_SLOTS_FACTOR"]));
-                    runningtotal += BuildingSlotsFromPopulation + 10;
-                }
                 <td>From <span class="has-expanded-info" data-bs-toggle="modal" data-bs-target="#Test">Population</span></td>
-                <td>+@($"{BuildingSlotsFromPopulation:n0}")</td>
+                <td>+@($"{BuildingSlotsFromPopulation:n1}")</td>
                 <td>@($"{runningtotal:n0}")</td>
             </tr>
-            @{
-                runningtotal *= factorfrominfrastructures;
-                double runningtotalforstacking = 1;
-            }
-            @if (factorfrominfrastructures > 1) {
+            
+            runningtotal += slotsfrominfrastructures;
+            @if (slotsfrominfrastructures > 1) {
                 <tr>
                     <td>From Infrastructure (@Model.GetLevelsOfBuildingsOfType("infrastructure") levels)</td>
-                    <td>x@($"{factorfrominfrastructures:n3}")</td>
-                    <td>@($"{runningtotal:n0}")</td>
+                    <td>+@($"{slotsfrominfrastructures:n2}")</td>
+                    <td>@($"{runningtotal:n1}")</td>
                 </tr>
             }
+
             @foreach (var item in Model.GetStaticModifiersOfType(ProvinceModifierType.BuildingSlots, null, false)) {
                 runningtotal += item.value;
                 <tr>
                     <td>@item.modifiername</td>
                     <td>+@($"{item.value:n0}")</td>
-                    <td>@($"{runningtotal:n0}")</td>
+                    <td>@($"{runningtotal:n1}")</td>
                 </tr>
             }
-            @{
-                var items = Model.GetStaticModifiersOfType(ProvinceModifierType.BuildingSlotsFactor, null, false, IncludeDevStage:true);
+
+            double runningtotalforstacking = factorfrominfrastructures;
+            @if (factorfrominfrastructures > 1) {
+                <tr>
+                    <td>From Infrastructure (@Model.GetLevelsOfBuildingsOfType("infrastructure") levels)</td>
+                    <td>x@($"{factorfrominfrastructures:n3}")</td>
+                    <td>@($"{runningtotal:n1}")</td>
+                </tr>
             }
+
+            var items = Model.GetStaticModifiersOfType(ProvinceModifierType.BuildingSlotsFactor, null, false, IncludeDevStage:true);
             @foreach (var item in items) {
                 runningtotalforstacking += item.value-1;
                 <tr>
                     <td>@item.modifiername</td>
                     <td>x@($"{item.value:n3}")</td>
-                    <td>@($"{runningtotal * runningtotalforstacking:n0}")</td>
+                    <td>@($"{runningtotal * runningtotalforstacking:n1}")</td>
                 </tr>
             }
-            @{
-                runningtotal *= runningtotalforstacking;
-                items = Model.GetStaticModifiersOfType(null, DistrictModifierType.BuildingSlotsFactor, true, false);
-                runningtotalforstacking = 1;
-            }
+
+            runningtotal *= runningtotalforstacking;
+            items = Model.GetStaticModifiersOfType(null, DistrictModifierType.BuildingSlotsFactor, true, false);
+            runningtotalforstacking = 1;
             @foreach (var item in items) {
                 runningtotalforstacking += item.value - 1;
                 <tr>
                     <td>@item.modifiername</td>
                     <td>x@($"{item.value:n3}")</td>
-                    <td>@($"{runningtotal * runningtotalforstacking:n0}")</td>
+                    <td>@($"{runningtotal * runningtotalforstacking:n1}")</td>
                 </tr>
             }
+        }
         </tbody>
     </table>
 </bootstrap-modal>

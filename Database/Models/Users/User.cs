@@ -59,6 +59,10 @@ public class SVUser : BaseEntity
         return await member.GetRolesAsync();
     }
 
+    public async ValueTask<bool> IsGovernmentAdmin() {
+        return (await GetValourRolesAsync()).Any(x => x.Name == "Government Admin");
+    }
+
     public static string RemoveWhitespace(string input)
     {
         return new string(input.ToCharArray()

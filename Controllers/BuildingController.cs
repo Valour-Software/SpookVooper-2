@@ -185,7 +185,7 @@ public class BuildingController : SVController
             TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, user, province.District, province, model.levelsToBuild, building);
             if (!result.Success)
                 return Json(new TaskResult(result.Success, result.Message));
-            if (model.AlreadyExistingBuildingId is not null)
+            if (model.AlreadyExistingBuildingId is null)
                 result.Data.Name = model.Name;
             if (model.AlreadyExistingBuildingId is null)
                 return Json(new TaskResult(true, $@"Successfully built {model.levelsToBuild} of {result.Data.BuildingObj.PrintableName}.Click <a href=""/Building/Manage/{result.Data.Id}"">Here</a> to view"));

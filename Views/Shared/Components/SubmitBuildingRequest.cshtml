@@ -9,6 +9,7 @@
 @if (Model.Province.CanManageBuildingRequests(Model.User))
 {
     if (Model.IncludeScript)
+
     {
         <style>
             .buildingcosts {
@@ -26,6 +27,7 @@
     <div class="buildingcosts-holder">
         @if (Model.LuaBuildingObj.type == BuildingType.Infrastructure) {
             <span class="text-warning">Note: This building's construction cost increases per level!!</span>
+            <br />  
         }
         <span>Costs to build:</span>
         <br />

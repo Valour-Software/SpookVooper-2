@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SV2.Models;
+using SV2.Models.States;
 using SV2.Managers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,16 +10,20 @@ using SV2.Extensions;
 using SV2.Database.Models.Districts;
 using System.Xml.Linq;
 using SV2.Database.Managers;
+using Microsoft.EntityFrameworkCore;
 
 namespace SV2.Controllers
 {
     public class StateController : SVController
     {
         private readonly ILogger<StateController> _logger;
+        private readonly VooperDB _dbctx;
 
-        public StateController(ILogger<StateController> logger)
+        public StateController(ILogger<StateController> logger,
+            VooperDB dbctx)
         {
             _logger = logger;
+            _dbctx = dbctx;
         }
 
         public IActionResult View(long id) {
@@ -77,6 +82,28 @@ namespace SV2.Controllers
             state.GovernorId = GovernorId;
 
             return RedirectBack($"Successfully changed the governorship of this province to {BaseEntity.Find(GovernorId).Name}");
+        }
+
+        [HttpGet]
+        [UserRequired]
+        public async Task<IActionResult> ManageBuildingRequests(long id, bool? toggleonlyreviewed = false) {
+            State? state = DBCache.Get<State>(id);
+            if (state is null)
+                return Redirect("/");
+
+            var user = HttpContext.GetUser();
+
+            if (!state.CanManageBuildingRequests(user))
+                return RedirectBack("You lack permission to manage building requests for this state!");
+
+            List<BuildingRequest> requests = new();
+            var idscanmanage = DBCache.GetAll<Province>().Where(x => x.CanManageBuildingRequests(user)).Select(x => x.Id).ToList();
+            requests = await _dbctx.BuildingRequests.Where(x => x.Reviewed == toggleonlyreviewed && idscanmanage.Contains(x.ProvinceId)).ToListAsync();
+
+            return View(new ManageBuildingRequestsModel() {
+                BuildingRequests = requests,
+                State = state
+            });
         }
     }
 }
