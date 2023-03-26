@@ -34,55 +34,30 @@
     <div class="col-12">
         <div class="d-flex">
             <div class="p-1 align-self-start flex-grow-1">
-                @if (Context.Request.QueryString.Value.Contains("filter=Provinces")) {
-                    <h2>Bulk Manage Building Requests Provinces You Have Governorship Over</h2>
-                }
-                else {
-                    <h2>Bulk Manage Building Requests Provinces You Have Submitted</h2>
-                }
+                <h2>Bulk Manage Building Requests in Provinces You Have Governorship Over</h2>
             </div>
         </div>
 
         @{
-            string Showonlygrantedurltext = "toggleonlyreviewed=false";
-            if (Context.Request.QueryString.Value.Contains("toggleonlyreviewed=true")) 
-                Showonlygrantedurltext = "toggleonlyreviewed=true";
-
-            string filterurltext = "filter=Provinces";
-            if (Context.Request.QueryString.Value.Contains("filter=MyOwn")) {
-                filterurltext = "filter=MyOwn";
-            }
+            bool onlyviewreviewed = Context.Request.QueryString.Value.Contains("toggleonlyreviewed=true");
         }
-
-        <center>
-            @if (Context.Request.QueryString.Value.Contains("filter=Provinces")) {
-                <a href="/Province/BulkBuildingRequests?filter=Provinces&@Showonlygrantedurltext" style="text-decoration:unset;">
-                    <button class="btn btn-primary">Provinces you have Governorship over</button>
-                </a>
-                <a href="/Province/BulkBuildingRequests?filter=MyOwn&toggleonlyreviewed=true" style="text-decoration:unset;">
-                    <button class="btn btn-outline-primary">Requests from groups you manage + yourself</button>
-                </a>
-            }
-            else {
-                <a href="/Province/BulkBuildingRequests?filter=Provinces&@Showonlygrantedurltext" style="text-decoration:unset;">
-                    <button class="btn btn-outline-primary">Provinces you have Governorship over</button>
-                </a>
-                <a href="/Province/BulkBuildingRequests?filter=MyOwn&@Showonlygrantedurltext" style="text-decoration:unset;">
-                    <button class="btn btn-primary">Requests from groups you manage + yourself</button>
-                </a>
-            }
-        </center>
 
         <br />
         <center>
-            @if (Showonlygrantedurltext.Contains("toggleonlyreviewed=false")) {
-                <a href="/Province/BulkBuildingRequests?@filterurltext&toggleonlyreviewed=true">
-                    <button class="btn btn-outline-primary">Show only requests reviewed</button>
+            @if (onlyviewreviewed) {
+                <a href="/Province/BulkBuildingRequests?toggleonlyreviewed=false" style="text-decoration:none;">
+                    <button class="btn btn-outline-primary">Show only requests not reviewed</button>
+                </a>
+                <a href="/Province/BulkBuildingRequests?toggleonlyreviewed=true" style="text-decoration:none;">
+                    <button class="btn btn-primary">Show only requests reviewed</button>
                 </a>
             }
             else {
-                <a href="/Province/BulkBuildingRequests?@filterurltext&toggleonlyreviewed=false">
-                    <button class="btn btn-outline-primary">Show only requests not reviewed</button>
+                <a href="/Province/BulkBuildingRequests?toggleonlyreviewed=false" style="text-decoration:none;">
+                    <button class="btn btn-primary">Show only requests not reviewed</button>
+                </a>
+                <a href="/Province/BulkBuildingRequests?toggleonlyreviewed=true" style="text-decoration:none;">
+                    <button class="btn btn-outline-primary">Show only requests reviewed</button>
                 </a>
             }
         </center>
@@ -100,15 +75,9 @@
                     <th>Requester Name</th>
                     <th>Building Requested</th>
                     <th>Levels Requested</th>
-                    @if (!Context.Request.QueryString.Value.Contains("filter=MyOwn")) {
-                        <th>Approve?</th>
-                        <th>Deny?</th>
-                    }
-                    else {
-                        <th>Levels Constructed</th>
-                        <th>Construct</th>
-                        <th>Result</th>
-                    }
+                    <th>Levels Constructed</th>
+                    <th>Approve?</th>
+                    <th>Deny?</th>
                 </tr>
             </thead>
             <tbody>
@@ -137,67 +106,39 @@
                             </td>
                             <td>@request.BuildingLuaObj.PrintableName</td>
                             <td>@request.LevelsRequested</td>
-                            @if (!Context.Request.QueryString.Value.Contains("filter=MyOwn")) {
-                                <td>
-                                    <!form method="post" action="/Province/BuildingRequest/Approve?id=@request.Id" target="frame">
-                                        @Html.AntiForgeryToken()
-                                        @if (request.Granted || request.Reviewed == false)
-                                        {
-                                            <button class="btn btn-success">Approve</button>
-                                        }
-                                        else
-                                        {
-                                            <button class="btn btn-outline-success">Approve</button>
-                                        }
-                                    </!form>
-                                </td>
-                                <td>
-                                    <!form method="post" action="/Province/BuildingRequest/Deny?id=@request.Id" target="frame">
-                                        @Html.AntiForgeryToken()
-                                        @if (!request.Granted || request.Reviewed == false)
-                                        {
-                                            <button class="btn btn-warning">Deny</button>
-                                        }
-                                        else
-                                        {
-                                            <button class="btn btn-outline-warning">Deny</button>
-                                        }
-                                    </!form>
-                                </td>
-                            }
-                            else {
-                                if (request.Granted) {
-                                    <td>@request.LevelsBuilt</td>
-                                }
-                                if (request.LevelsBuilt < request.LevelsRequested && request.Granted)
-                                {
-                                    <td>
-                                        <!form method="post" action="/Building/Construct" target="constructframe" id="constructform-@request.Id">
-                                            @Html.AntiForgeryToken()
-                                            @Html.Hidden("buildingrequestid", request.Id)
-                                            <!input name="levelstobuild" class="form-control" type="number" min="0" max="@(request.LevelsRequested-request.LevelsBuilt)" />
-                                            <button class="btn btn-outline-warning">Construct</button>
-                                        </!form>
-                                    </td>
-                                    <td id="result-@request.Id"></td>
-                                }
-                                <td>
-                                    @if (request.Granted && request.Reviewed) {
-                                        <button class="btn btn-success">Approved</button>
+                            <td>@request.LevelsBuilt</td>
+                            <td>
+                                <!form method="post" action="/Province/BuildingRequest/Approve?id=@request.Id" target="frame">
+                                    @Html.AntiForgeryToken()
+                                    @if (request.Granted)
+                                    {
+                                        <button class="btn btn-success">Approve</button>
                                     }
-                                    else {
+                                    else if (!request.Reviewed) {
                                         <button class="btn btn-outline-success">Approve</button>
                                     }
-                                </td>
-                                <td>
-                                    @if (!request.Granted && request.Reviewed) {
-                                        <button class="btn btn-warning">Denied</button>
+                                    else
+                                    {
+                                        <button class="btn btn-outline-success">Approve</button>
                                     }
-                                    else {
+                                </!form>
+                            </td>
+                            <td>
+                                <!form method="post" action="/Province/BuildingRequest/Deny?id=@request.Id" target="frame">
+                                    @Html.AntiForgeryToken()
+                                    @if (!request.Granted && request.Reviewed)
+                                    {
+                                        <button class="btn btn-warning">Deny</button>
+                                    }
+                                    else if (!request.Reviewed) {
                                         <button class="btn btn-outline-warning">Deny</button>
                                     }
-                                </td>
-                            }
+                                    else
+                                    {
+                                        <button class="btn btn-outline-warning">Deny</button>
+                                    }
+                                </!form>
+                            </td>
                         </tr>
                     }
                 }
@@ -213,14 +154,5 @@
         e.innerHTML = text[0]
         e = document.getElementById(text[1])
         e.style = "display: none;"
-    }
-    function ConstructSubmitted(element) {
-        var text = element.contentDocument.body.textContent.split("-&-")
-        var e = document.getElementById("result-"+text[0])
-        e.innerHTML = text[1]
-        if (text[2].includes("True")) {
-            var e = document.getElementById("constructform-" + text[0])
-            e.style = "display: none;"
-        }
     }
 </script>

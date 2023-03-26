@@ -1,0 +1,229 @@
+﻿@model List<BuildingRequest>
+@using SV2.Scripting
+
+@{
+    ViewData["Title"] = "My Requests";
+
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .buildings {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .building {
+        width: 300px;
+        /* height: 275px; */
+        border-radius: 18px;
+        margin: 8px;
+        text-align: center;
+        background-color: rgba(0,0,0,0.3);
+        padding: 16px;
+    }
+
+    .resource-row {
+        width: 100%;
+    }
+
+    .buildingcosts {
+        flex-direction: column;
+        padding-left: 2px;
+        padding-right: 2px;
+        text-align: start;
+        margin-left: 20px;
+    }
+</style>
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h2 style="text-align:center">@ViewData["Title"]</h2>
+        <br />
+        @{
+            var onlyviewgranted = Context.Request.QueryString.Value.Contains("toggleonlygranted=true"); ;
+        }
+
+        <center>
+            @if (onlyviewgranted) {
+                <a href="/Province/MyRequests?toggleonlygranted=true" style="text-decoration:none;">
+                    <button class="btn btn-primary">Click to go construct</button>
+                </a>
+                <a href="/Province/MyRequests?toggleonlygranted=false" style="text-decoration:none;">
+                    <button class="btn btn-outline-primary">Show requests not granted</button>
+                </a>
+            }
+            else {
+                <a href="/Province/MyRequests?toggleonlygranted=true" style="text-decoration:none;">
+                    <button class="btn btn-outline-primary">Click to go construct</button>
+                </a>
+                <a href="/Province/MyRequests?toggleonlygranted=false" style="text-decoration:none;">
+                    <button class="btn btn-primary">Show requests not granted</button>
+                </a>
+            }
+        </center>
+
+        <iframe style="display: none;" name="constructframe" onLoad="Submitted(this)"></iframe>
+
+        <br />
+
+        @if (onlyviewgranted) {
+            <h3 style="text-align:center">Construct Buildings</h3>
+            <h4 style="text-align:center">Only buildings that have had their building requests approved will show up here</h4>
+            <hr />
+            <br />
+
+            <div class="buildings">
+                @foreach (var request in Model)
+                {
+                    bool first = true;
+                    @if (request.Granted && (request.LevelsRequested-request.LevelsBuilt) > 0)
+                    {
+                        var buildingobj = request.BuildingLuaObj;
+                        <div class="building">
+                            <span>@buildingobj.PrintableName</span>
+                            <br>
+                            <span>Name: @(request.BuildingName ?? "none")</span>
+                            <br>
+                            <span>Built/Requested: @request.LevelsBuilt/@request.LevelsRequested</span>
+                            <br>
+                            <span>@request.Province.Name</span>
+                            <br>
+                            <br>
+                            <span>Costs to build per level</span>
+                            <br>
+                            <div class="buildingcosts">
+                                @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(request.Province.District, request.Province)))
+                                {
+                                    <div class="resource-row">
+                                        <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                                        <span style="align-self: flex-end">
+                                            @(
+                                    $"{amount:n0}"
+                                    )
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                            <br>
+                            <!form method="post" action="/Building/Construct" target="constructframe" id="constructform-@request.Id">
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("buildingrequestid", request.Id)
+                                <div class="input-group" style="max-width:700px;margin-left:auto;margin-right:auto;">
+                                    <!input name="levelstobuild"  style="margin-right: 8px;border-radius: 6px;" id="input-@request.Id" class="form-control" type="number" min="0" max="@(request.LevelsRequested-request.LevelsBuilt)" />
+                                    <div class="input-group-append">
+                                        <button id="submit-@request.Id" class="btn btn-outline-warning">Construct</button>
+                                    </div>
+                                </div>
+                            </!form>
+                            <center>
+                                <span id="result-@request.Id" style="font-size: 16px;"></span>
+                            </center>
+                        </div>
+                    }
+                }
+            </div>
+        }
+        else {
+            <h3 style="text-align:center">My Requests</h3>
+            <hr />
+            <br />
+
+            <table class="table">
+                <thead>
+                    <tr class="header">
+                        <th>Province Name</th>
+                        <th>Requester Name</th>
+                        <th>Building Requested</th>
+                        <th>Levels Requested</th>
+                        <th>Levels Constructed</th>
+                        <th>Approve?</th>
+                        <th>Deny?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        Province prevprovince = null;
+                        foreach (var request in Model.Where(x => x.LevelsBuilt != x.LevelsRequested)) {
+                            if (prevprovince is null || prevprovince.DistrictId != request.Province.DistrictId) {
+                                <row class="text-center">
+                                    <h4>@request.Province.District.Name</h4>
+                                </row>
+                            }
+                            prevprovince = request.Province;
+                            <tr id="@request.Id">
+                                <td>
+                                    <a href="/Province/View/@request.ProvinceId">@request.Province.Name</a>
+                                </td>
+                                <td>
+                                    @if (request.Requester.EntityType == EntityType.User) {
+                                        <a asp-controller="User" asp-action="Info" asp-route-id="@request.RequesterId">@request.Requester.Name</a>
+                                    }
+                                    else {
+                                        <a asp-controller="Group" asp-action="View" asp-route-id="@request.RequesterId">@request.Requester.Name</a>
+                                    }
+                                </td>
+                                <td>@request.BuildingLuaObj.PrintableName</td>
+                                <td>@request.LevelsRequested</td>
+                                <td>@request.LevelsBuilt</td>
+                                <td>
+                                    @Html.AntiForgeryToken()
+                                    @if (request.Granted) {
+                                        <button class="btn btn-success" disabled>Approve</button>
+                                    }
+                                    else if (!request.Reviewed) {
+                                        <button class="btn btn-outline-success" disabled>Approve</button>
+                                    }
+                                    else {
+                                        <button class="btn btn-outline-success" disabled>Approve</button>
+                                    }
+                                </td>
+                                <td>
+                                    @Html.AntiForgeryToken()
+                                    @if (!request.Granted && request.Reviewed) {
+                                        <button class="btn btn-warning" disabled>Deny</button>
+                                    }
+                                    else if (!request.Reviewed) {
+                                        <button class="btn btn-outline-warning" disabled>Deny</button>
+                                    }
+                                    else {
+                                        <button class="btn btn-outline-warning" disabled>Deny</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>
+<script>
+    function Submitted(element) {
+        var data = JSON.parse(element.contentDocument.body.textContent)
+        var e = document.getElementById("result-" + data["Data"])
+
+        e.innerHTML = data["Message"].replace("|REACHEDLIMIT","")
+        if (data["Success"]) {
+            if (data["Message"].includes("|REACHEDLIMIT")) {
+                var input = document.getElementById("input-" + data["Data"])
+                var button = document.getElementById("button-" + data["Data"])
+                input.disabled = true
+                input.value = ""
+                button.disabled = true
+            }
+            e.classList.add("text-success")
+        }
+        else {
+            e.classList.add("text-danger")
+        }
+    }
+</script>

@@ -49,7 +49,7 @@ public class LuaBuilding
         // check for resources
         foreach ((var resource, var amount) in costs) {
             if (!await buildas.HasEnoughResource(resource, amount)) {
-                return new(false, $"{buildas.Name}'s lack enough {resource}! About {(amount - (await buildas.GetOwnershipOfResource(resource))):n0} more is required");
+                return new(false, $"{buildas.Name} lack enough {resource}! About {(amount - (await buildas.GetOwnershipOfResource(resource))):n0} more is required");
             }
         }
 

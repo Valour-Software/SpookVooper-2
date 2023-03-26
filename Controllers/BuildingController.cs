@@ -101,24 +101,24 @@ public class BuildingController : SVController
 
     [HttpPost]
     [UserRequired]
-    public async Task<string> Construct(long buildingrequestid, int levelstobuild) 
+    public async Task<JsonResult> Construct(long buildingrequestid, int levelstobuild) 
     {
         // TODO: after we migrate to dotnet 8 with mixing of blazor and razor, update this method to use json for returning rather than "-&-"
         var buildingrequest = await _dbctx.BuildingRequests.FindAsync(buildingrequestid);
         if (!buildingrequest.Reviewed)
-            return $"{buildingrequestid}-&-This request has not been reviewed yet!-&-false";
+            return Json(new TaskResult<long>(false, "This request has not been reviewed yet!", buildingrequestid));
         if (!buildingrequest.Granted)
-            return $"{buildingrequestid}-&-This request was not granted! However, the province's governor can change this decision, so try contacting them.-&-false";
+            return Json(new TaskResult<long>(false, "This request was not granted! However, the province's governor can change this decision, so try contacting them.", buildingrequestid));
 
         if (buildingrequest.LevelsBuilt + levelstobuild > buildingrequest.LevelsRequested)
-            return $"{buildingrequestid}-&-You can not construct more levels than you were approved for!-&-false";
+            return Json(new TaskResult<long>(false, "You can not construct more levels than you were approved for!", buildingrequestid));
 
         var user = HttpContext.GetUser();
 
         if (buildingrequest.RequesterId != user.Id) {
             Group group = DBCache.Get<Group>(buildingrequest.RequesterId);
             if (!group.HasPermission(user, GroupPermissions.Build)) {
-                return $"{buildingrequestid}-&-You lack permission to build as this group!-&-false";
+                return Json(new TaskResult<long>(false, "You lack permission to build as this group!", buildingrequestid));
             }
         }
         var buildas = BaseEntity.Find(buildingrequest.RequesterId);
@@ -138,7 +138,7 @@ public class BuildingController : SVController
             await _dbctx.SaveChangesAsync();
             message += $"Click <a target='_blank' href='/Building/Manage/{result.Data.Id}'>here</a> to view the building.";
         }
-        return $"{buildingrequestid}-&-{message}-&-{buildingrequest.LevelsBuilt == buildingrequest.LevelsRequested}";
+        return Json(new TaskResult<long>(result.Success, message + (buildingrequest.LevelsBuilt == buildingrequest.LevelsRequested ? "|REACHEDLIMIT" : ""), buildingrequestid));
     }
 
     [UserRequired]

@@ -39,23 +39,24 @@
         </div>
 
         @{
-            string Showonlygrantedurltext = "toggleonlyreviewed=false";
-            bool ShowOnlyReviewed = false;
-            if (Context.Request.QueryString.Value.Contains("toggleonlyreviewed=true")) {
-                ShowOnlyReviewed = true;
-                Showonlygrantedurltext = "toggleonlyreviewed=true";
-            }
+            bool ShowOnlyReviewed = Context.Request.QueryString.Value.Contains("toggleonlyreviewed=true");
         }
 
         <center>
-            @if (Showonlygrantedurltext.Contains("toggleonlyreviewed=false")) {
-                <a href="/State/ManageBuildingRequests?toggleonlyreviewed=true">
-                    <button class="btn btn-outline-primary">Show only requests reviewed</button>
+            @if (ShowOnlyReviewed) {
+                <a href="/State/ManageBuildingRequests/@Model.State.Id?toggleonlyreviewed=false" style="text-decoration:none;">
+                    <button class="btn btn-outline-primary">Show only requests not reviewed</button>
+                </a>
+                <a href="/State/ManageBuildingRequests/@Model.State.Id?toggleonlyreviewed=true" style="text-decoration:none;">
+                    <button class="btn btn-primary">Show only requests reviewed</button>
                 </a>
             }
             else {
-                <a href="/State/ManageBuildingRequests?toggleonlyreviewed=false">
-                    <button class="btn btn-outline-primary">Show only requests not reviewed</button>
+                <a href="/State/ManageBuildingRequests/@Model.State.Id?toggleonlyreviewed=false" style="text-decoration:none;">
+                    <button class="btn btn-primary">Show only requests not reviewed</button>
+                </a>
+                <a href="/State/ManageBuildingRequests/@Model.State.Id?toggleonlyreviewed=true" style="text-decoration:none;">
+                    <button class="btn btn-outline-primary">Show only requests reviewed</button>
                 </a>
             }
         </center>
@@ -99,12 +100,13 @@
                             <td>
                                 <!form method="post" action="/Province/BuildingRequest/Approve?id=@request.Id" target="frame">
                                     @Html.AntiForgeryToken()
-                                    @if (request.Granted || request.Reviewed == false)
-                                    {
+                                    @if (request.Granted) {
                                         <button class="btn btn-success">Approve</button>
                                     }
-                                    else
-                                    {
+                                    else if (!request.Reviewed) {
+                                        <button class="btn btn-outline-success">Approve</button>
+                                    }
+                                    else {
                                         <button class="btn btn-outline-success">Approve</button>
                                     }
                                 </!form>
@@ -112,12 +114,13 @@
                             <td>
                                 <!form method="post" action="/Province/BuildingRequest/Deny?id=@request.Id" target="frame">
                                     @Html.AntiForgeryToken()
-                                    @if (!request.Granted || request.Reviewed == false)
-                                    {
+                                    @if (!request.Granted && request.Reviewed) {
                                         <button class="btn btn-warning">Deny</button>
                                     }
-                                    else
-                                    {
+                                    else if (!request.Reviewed) {
+                                        <button class="btn btn-outline-warning">Deny</button>
+                                    }
+                                    else {
                                         <button class="btn btn-outline-warning">Deny</button>
                                     }
                                 </!form>

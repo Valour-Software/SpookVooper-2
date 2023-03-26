@@ -49,17 +49,29 @@ public class ProvinceController : SVController
         return View(model);
     }
 
-    [HttpGet("/Province/BulkBuildingRequests")]
+    [HttpGet("/Province/MyRequests")]
     [UserRequired]
-    public async Task<IActionResult> BulkBuildingRequests(string filter, bool toggleonlyreviewed) {
+    public async Task<IActionResult> MyRequests(bool toggleonlygranted) {
         var user = HttpContext.GetUser();
 
         List<BuildingRequest> requests = new();
-        if (filter == "Provinces") {
+        List<long> canbuildasids = new() { user.Id };
+        canbuildasids.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.Build)).Select(x => x.Id).ToList());
+        requests = await _dbctx.BuildingRequests.Where(x => x.Granted == toggleonlygranted && canbuildasids.Contains(x.RequesterId)).ToListAsync();
+        return View(requests);
+    }
+
+    [HttpGet("/Province/BulkBuildingRequests")]
+    [UserRequired]
+    public async Task<IActionResult> BulkBuildingRequests(bool toggleonlyreviewed) {
+        var user = HttpContext.GetUser();
+
+        List<BuildingRequest> requests = new();
+        if (true) {
             var idscanmanage = DBCache.GetAll<Province>().Where(x => x.CanManageBuildingRequests(user)).Select(x => x.Id).ToList();
             requests = await _dbctx.BuildingRequests.Where(x => x.Reviewed == toggleonlyreviewed && idscanmanage.Contains(x.ProvinceId)).ToListAsync();
         }
-        else if (filter == "MyOwn") {
+        else if (false) {
             List<long> canbuildasids = new() { user.Id };
             canbuildasids.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.Build)).Select(x => x.Id).ToList());
             requests = await _dbctx.BuildingRequests.Where(x => x.Reviewed == toggleonlyreviewed && canbuildasids.Contains(x.RequesterId)).ToListAsync();
