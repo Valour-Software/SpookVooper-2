@@ -21,6 +21,13 @@
         text-align: center;
         background-color: rgba(0,0,0,0.3);
     }
+
+    .building:hover {
+        border-color: pink;
+        border-width: 1px;
+        border-style: solid;
+    }
+
     .resource-row {
         width: 100%;
     }
@@ -65,7 +72,7 @@
                 if (!buildingobj.OnlyGovernorCanBuild || (buildingobj.OnlyGovernorCanBuild && Model.Province.CanEdit(user)))
                 {
                     if (buildingobj.MustHaveResource is null || (Model.Province.Metadata.Resources.ContainsKey(buildingobj.MustHaveResource))) {
-                        <div class="building">
+                        <div class="building" data-bs-toggle="modal" data-bs-target="#createbuildingrequest-@buildingobj.Name" style="cursor: pointer;">
                             <span data-bs-toggle="modal" data-bs-target="#createbuildingrequest-@buildingobj.Name" class="has-expanded-info" style="cursor: pointer;">@buildingobj.PrintableName</span>
                             <br>
                             <span>Costs to build</span>

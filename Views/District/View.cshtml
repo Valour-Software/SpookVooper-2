@@ -61,6 +61,15 @@
     </style>
 </head>
 
+@{
+    string resourcetomap = "";
+    if (!Context.Request.Query.TryGetValue("resource", out var _resourcetomap))
+        resourcetomap = null;
+    else
+        resourcetomap = _resourcetomap.ToString();
+    if (resourcetomap == "") resourcetomap = null;
+}
+
 <!-- Main row for page -->
 <div class="d-flex flex-row align-content-center" style="width:100%">
     <!-- Leftmost column -->
@@ -199,21 +208,22 @@
                 }
                 <br />
                 <center>
-                    @if (!Context.Request.QueryString.Value.Contains("devmapmode=true")) {
-                        <a href="/District/View/@Model.Name">
-                            <button class="btn btn-primary">Normal Mode</button>
-                        </a>
-                        <a href="/District/View/@Model.Name?devmapmode=true">
-                            <button class="btn btn-outline-primary">View Development</button>
-                        </a>
+                    @{
+                        var devmapmode = Context.Request.QueryString.Value.Contains("devmapmode=true");
+                        double maxresource = 0;
+                        if (resourcetomap is not null) {
+                            maxresource = DBCache.GetAll<Province>().Max(x => x.GetMiningResourceProduction(resourcetomap));
+                        }
                     }
-                    else {
-                        <a href="/District/View/@Model.Name">
-                        <button class="btn btn-outline-primary">Normal Mode</button>
-                        </a>
-                        <a href="/District/View/@Model.Name?devmapmode=true">
-                            <button class="btn btn-primary">View Development</button>
-                        </a>
+                    <a href="/District/View/@Model.Name">
+                        <button class='btn @(devmapmode || resourcetomap != null ? "btn-outline-primary" : "btn-primary")'>Normal Mode</button>
+                    </a>
+                    <a href="/District/View/@Model.Name?devmapmode=true">
+                        <button class='btn @(devmapmode ? "btn-primary" : "btn-outline-primary")'>View Development</button>
+                    </a>
+                    <button class='btn @(resourcetomap is null ? "btn-outline-primary" : "btn-primary")' data-bs-toggle="modal" data-bs-target="#showresources">View Resource Density</button>
+                    @if (resourcetomap is not null) {
+                        <p>Currently showing resource density for @resourcetomap</p>
                     }
                     <div class="window" id="window" style="margin-top: 15px;">
                         @{
@@ -255,7 +265,14 @@
                                     ShowCityCircle = true;
                                 }
                                 <a href="/Province/View/@province.Id" data-bs-toggle="tooltip" data-placement="top" title="@dbprovince.Name" data-sv-show="@ShowCityCircle">
-                                    @if (!Context.Request.QueryString.Value.Contains("devmapmode=true"))
+                                    @if (resourcetomap is not null) {
+                                        <path d="@province.D" id="@province.Id" style="fill:@dbprovince.GetMapColorForResourceDensity(maxresource, resourcetomap)" class="province"></path>
+                                        if (ShowCityCircle)
+                                        {
+                                            <circle cx="@(province.XPos)" cy="@(province.YPos+8)" r="3" style="fill: white;" />
+                                        }
+                                    }
+                                    else if (!Context.Request.QueryString.Value.Contains("devmapmode=true"))
                                     {
                                         <path d="@province.D" id="@province.Id" style="fill:#@province.GetMapColor();" class="province"></path>
                                         if (ShowCityCircle)
@@ -355,6 +372,28 @@
         <a target="_blank" href="https://dev.spookvooper.com/wiki/District">Wiki page for Districts</a>
     </div>
 </div>
+
+<bootstrap-modal asp-modal-id="showresources" asp-modal-title="View Resource Density">
+    <center>
+        <span>Click below to view the density map for that resource.</span>
+        <br />
+        <br />
+        @{
+            var i = 0;
+        }
+        @foreach (var building in GameDataManager.BaseBuildingObjs.Values.Where(x => x.MustHaveResource is not null)) {
+            @if (i == 3)
+            {
+                <br />
+                i = 0;
+            }
+            <a href="/District/View/@Model.Name?resource=@building.MustHaveResource">
+                <button style="margin-bottom: 10px;" class='btn @(resourcetomap == building.MustHaveResource ? "btn-primary" : "btn-outline-primary")'>@building.MustHaveResource.Replace("_", " ")</button>
+            </a>
+            i += 1;
+        }
+    </center>
+</bootstrap-modal>
 
 @if (user is not null && await user.IsGovernmentAdmin())
 {

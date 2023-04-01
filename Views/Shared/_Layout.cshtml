@@ -73,9 +73,11 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="News" asp-action="Index">News</a>
                         </li>
-                        <li class="nav-item">
+                        <!--
+                            <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Exchange" asp-action="Index">Exchange</a>
                         </li>
+                        -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="CommunityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
                                 Community
@@ -84,7 +86,7 @@
                                 <a class="dropdown-item" asp-controller="Government" asp-action="Index">Government</a>
                                 <a class="dropdown-item" asp-controller="Leaderboard" asp-action="Index">Leaderboard</a>
                                 <a class="dropdown-item" asp-controller="Map" asp-action="World">Districts</a>
-                                <a class="dropdown-item" asp-controller="Government" asp-action="Elections">Elections</a>
+                                <!--<a class="dropdown-item" asp-controller="Government" asp-action="Elections">Elections</a>-->
                             </div>
                         </li>
                         <li class="nav-item dropdown">
@@ -108,7 +110,9 @@
                                     }
                                 }
 
-                                <a class="dropdown-item" asp-controller="User" asp-action="Search">Find</a>
+                                <!--
+                                    <a class="dropdown-item" asp-controller="User" asp-action="Search">Find</a>
+                                    -->
                             </div>
                         </li>
                         <li class="nav-item dropdown">
@@ -118,7 +122,7 @@
                             <div class="dropdown-menu" aria-labelledby="GroupDropdown">
                                 <a class="dropdown-item" asp-controller="Group" asp-action="Create">Create</a>
                                 <a class="dropdown-item" asp-controller="Group" asp-action="MyGroups">My Groups</a>
-                                <a class="dropdown-item" asp-controller="Group" asp-action="Search">Find</a>
+                                <!--<a class="dropdown-item" asp-controller="Group" asp-action="Search">Find</a> -->
                                 <a class="dropdown-item" asp-controller="Group" asp-action="ViewInvited">Groups invited to</a>
                             </div>
                         </li>

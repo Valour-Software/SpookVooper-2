@@ -9,7 +9,7 @@ for details on configuring this project to bundle and minify static web assets. 
     --primary-color: #040d14;
     --secondary-color: #aaaaaa;
     --font-color: #ffffff;
-    --bg-color: #040d14;
+    --bg-color: #202020;/*#040d14; */
     --heading-color: #040d14;
     --link-color: #00aaff;
     --border-color: #303030;

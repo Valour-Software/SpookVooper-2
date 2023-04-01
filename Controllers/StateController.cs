@@ -70,7 +70,7 @@ namespace SV2.Controllers
         [HttpPost("/State/ChangeGovernor/{id}")]
         [ValidateAntiForgeryToken]
         [UserRequired]
-        public IActionResult ChangeGovernor(long id, long GovernorId) {
+        public IActionResult ChangeGovernor(long id, long? GovernorId) {
             State? state = DBCache.Get<State>(id);
             if (state is null)
                 return Redirect("/");
@@ -81,7 +81,10 @@ namespace SV2.Controllers
 
             state.GovernorId = GovernorId;
 
-            return RedirectBack($"Successfully changed the governorship of this province to {BaseEntity.Find(GovernorId).Name}");
+            if (GovernorId is not null)
+                return RedirectBack($"Successfully changed the governorship of this province to {BaseEntity.Find(GovernorId).Name}");
+            else
+                return RedirectBack($"Successfully changed the governorship of this province to none");
         }
 
         [HttpGet]

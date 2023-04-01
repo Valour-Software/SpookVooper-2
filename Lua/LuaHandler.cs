@@ -258,7 +258,8 @@ public static class LuaHandler
                         "migrationattractionfactor" => ProvinceModifierType.MigrationAttractionFactor,
                         "migrationattraction" => ProvinceModifierType.MigrationAttraction,
                         "overpopulationmodifierexponent" => ProvinceModifierType.OverPopulationModifierExponent,
-                        "overpopulationmodifierpopulationbase" => ProvinceModifierType.OverPopulationModifierPopulationBase
+                        "overpopulationmodifierpopulationbase" => ProvinceModifierType.OverPopulationModifierPopulationBase,
+                        "developmentvalue" => ProvinceModifierType.DevelopmentValue
                     }
                 };
             }

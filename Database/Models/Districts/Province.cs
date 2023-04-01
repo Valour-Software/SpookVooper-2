@@ -143,6 +143,29 @@ public class Province
         return result;
     }
 
+    public double GetMiningResourceProduction(string resource)
+    {
+        if (!Metadata.Resources.ContainsKey(resource))
+            return 0;
+        var modifiervalue = GetModifierValue(ProvinceModifierType.MineThroughputFactor) + GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor);
+        modifiervalue += 1;
+        return Metadata.Resources[resource] * modifiervalue;
+    }
+
+    public string GetMapColorForResourceDensity(double max, string resource)
+    {
+        Color color = new(0, 0, 0);
+        if (Metadata.Resources.ContainsKey(resource) && max > 0.01)
+        {
+            var amount = GetMiningResourceProduction(resource);
+            var scale = amount / max;
+            color.R = (int)(255 * scale);
+            color.G = (int)(255 * scale);
+            color.B = (int)(255 * scale);
+        }
+        return $"rgb({color.R}, {color.G}, {color.B})";
+    }
+
     public string GetDevelopmentColorForMap()
     {
         DevelopmentMapColor currentmapcolor = null;
@@ -378,6 +401,8 @@ public class Province
         
         UpdateModifiersAfterBuildingTick();
 
+        DevelopmentValue += (int)Math.Floor(GetModifierValue(ProvinceModifierType.DevelopmentValue));
+
         // get hourly rate
         var PopulationGrowth = GetMonthlyPopulationGrowth() / 30 / 24;
         Population += (long)Math.Ceiling(PopulationGrowth);
@@ -389,9 +414,6 @@ public class Province
         buildingslots_exponent += District.GetModifierValue(DistrictModifierType.BuildingSlotsExponent);
 
         var slots = (Defines.NProvince["BASE_BUILDING_SLOTS"] + Math.Ceiling(Math.Pow(Population, buildingslots_exponent) * Defines.NProvince["BUILDING_SLOTS_FACTOR"]));
-
-        if (Id == 384)
-            Console.WriteLine("gkgkgk");
 
         // province level
         slots += GetModifierValue(ProvinceModifierType.BuildingSlots);
@@ -482,5 +504,6 @@ public enum ProvinceModifierType
     MigrationAttractionFactor,
     OverPopulationModifierExponent,
     OverPopulationModifierPopulationBase,
-    MigrationAttraction
+    MigrationAttraction,
+    DevelopmentValue
 }
