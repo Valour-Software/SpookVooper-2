@@ -33,9 +33,7 @@ public class BaseRecipe
 
 public class ConsumerGood
 {
-    public string Name { get; set; }
-
-    // in x per 1,000 citizens per year
+    // in x per 1,000 citizens per month
     public double PopGrowthRateModifier { get; set; }
 
     // the score per 10k citizens that have this good filled
@@ -48,6 +46,7 @@ public class ConsumerGood
 public class SVResource 
 {
     public string Name { get; set; }
+    public string LowerCaseName { get; set; }
     public ConsumerGood? consumerGood { get; set; }
 
     public ItemDefinition ItemDefinition { get; set; }

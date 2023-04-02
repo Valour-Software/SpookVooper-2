@@ -84,6 +84,9 @@ public class District
     public Dictionary<DistrictModifierType, DistrictModifier> Modifiers = new();
 
     [NotMapped]
+    public double EconomicScore { get; set; }
+
+    [NotMapped]
     public string Color => Name switch
     {
         "Lanatia" => "F4B7FD",

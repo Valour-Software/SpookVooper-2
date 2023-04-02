@@ -15,10 +15,12 @@ public static class GameDataManager
     static public Dictionary<string, BaseRecipe> BaseRecipeObjs = new();
 
     static public Dictionary<string, SVResource> Resources = new();
+    static public List<SVResource> ConsumerGoods = new();
 
     static public Dictionary<string, List<SVResource>> ResourcesByMaterialGroup = new();
 
     static public Dictionary<string, ItemDefinition> ResourcesToItemDefinitions = new();
+    static public Dictionary<string, LuaPolicy> LuaPolicyObjs = new();
     static public Dictionary<OnActionType, List<LuaOnAction>> LuaOnActions = new();
 
     public static async Task Load()
@@ -40,6 +42,10 @@ public static class GameDataManager
         }
         foreach (var path in ResourceManager.GetFilePaths("Modifiers")) {
             LuaHandler.HandleStaticModifierFile(File.ReadAllText(path), path);
+        }
+        foreach (var path in ResourceManager.GetFilePaths("Policies"))
+        {
+            LuaHandler.HandlePolicyFile(File.ReadAllText(path), path);
         }
     }
 }

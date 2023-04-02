@@ -1,0 +1,80 @@
+﻿@model Province
+
+@{
+    ViewData["Title"] = $"{Model.Name}'s Buildings";
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .buildings {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .building {
+        width: 300px;
+        height: 185px;
+        border-radius: 18px;
+        margin: 8px;
+        text-align: center;
+        background-color: rgba(0,0,0,0.3);
+        padding: 16px;
+    }
+
+    .resource-row {
+        width: 100%;
+    }
+
+    .buildingcosts {
+        flex-direction: column;
+        padding-left: 2px;
+        padding-right: 2px;
+        text-align: start;
+        margin-left: 20px;
+    }
+
+    a .building:hover {
+        border-color: pink;
+        border-width: 1px;
+        border-style: solid;
+        cursor: pointer;
+    }
+</style>
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h3 style="text-align:center">@ViewData["Title"]</h3>
+
+        <a asp-controller="Province" asp-action="View" asp-route-id="@Model.Id">
+            <button class="btn btn-primary">Go Back</button>
+        </a>
+
+        <br />
+        <hr />
+        <br />
+        
+        <div class="buildings">
+            @foreach (var building in DBCache.ProvincesBuildings[Model.Id])
+            {
+                if (building.CanManage(user))
+                {
+                    <a asp-controller="Building" asp-action="Manage" asp-route-id="@building.Id" style="text-decoration: none;color:white;" class="building-manage-link">
+                        @await Html.PartialAsync("/Views/Shared/Components/ViewBuildingInGrid.cshtml", building)
+                    </a>
+                }
+                else
+                {
+                    @await Html.PartialAsync("/Views/Shared/Components/ViewBuildingInGrid.cshtml", building)
+                }
+            }
+        </div>
+    </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>

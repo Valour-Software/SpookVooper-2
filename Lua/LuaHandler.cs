@@ -220,6 +220,7 @@ public static class LuaHandler
 
     public static List<SyntaxModifierNode> HandleModifierNodes(LuaTable table)
     {
+        if (table is null) return new();
         var nodes = new List<SyntaxModifierNode>();
         foreach (var item in table.Items)
         {
@@ -251,6 +252,11 @@ public static class LuaHandler
                         "farms" => levels[2] switch
                         {
                             "farmingthroughputfactor" => ProvinceModifierType.FarmThroughputFactor
+                        },
+                        "consumergoods" => levels[2] switch
+                        {
+                            "consumptionfactor" => ProvinceModifierType.ConsumerGoodsConsumptionFactor,
+                            "modifierfactor" => ProvinceModifierType.ConsumerGoodsModifierFactor
                         },
                         "buildingslots" => ProvinceModifierType.BuildingSlots,
                         "buildingslotsfactor" => ProvinceModifierType.BuildingSlotsFactor,
@@ -453,10 +459,21 @@ public static class LuaHandler
             GameDataManager.ResourcesByMaterialGroup[materialgroup] = new();
             var _table = (LuaTable)__table;
             foreach (var key in _table.Keys) {
-                var table = _table[key];
+                var table = (LuaTable)_table[key];
                 var resource = new SVResource() {
-                    Name = key.ToTitleCase()
+                    Name = key.ToTitleCase(),
+                    LowerCaseName = key
                 };
+                if (table.GetValue("popgrowthratemodifier") is not null)
+                {
+                    resource.consumerGood = new()
+                    {
+                        PopGrowthRateModifier = Convert.ToDouble(table["popgrowthratemodifier"]),
+                        EconomicScoreModifier = Convert.ToDouble(table["economicscore"]),
+                        PopConsumptionRate = Convert.ToDouble(table["consumptionrate"])
+                    };
+                    GameDataManager.ConsumerGoods.Add(resource);
+                }
                 GameDataManager.ResourcesByMaterialGroup[materialgroup].Add(resource);
                 GameDataManager.Resources[resource.Name] = resource;
                 var itemdef = DBCache.GetAll<ItemDefinition>().FirstOrDefault(x => x.Name == resource.Name);
@@ -555,6 +572,34 @@ public static class LuaHandler
                 IsGood = Convert.ToBoolean(table.GetValue("isgood"))
             };
             GameDataManager.BaseStaticModifiersObjs[name] = modifier;
+        }
+    }
+
+    public static void HandlePolicyFile(string content, string filename)
+    {
+        foreach (var (table, name) in HandleFile(content, filename))
+        {
+            var policy = new LuaPolicy()
+            {
+                Id = name,
+                Name = table["name"].Value,
+                Type = Enum.Parse<LuaPolicyType>(table["type"].Value, true),
+                DefaultOption = table["default"].Value,
+                Options = new()
+            };
+            
+            foreach (var item in ((LuaTable)table["options"]).Values)
+            {
+                var option_table = (LuaTable)item;
+                var option = new LuaPolicyOption()
+                {
+                    Id = option_table.Name,
+                    ModifierNodes = HandleModifierNodes((LuaTable)table["modifiers"])
+                };
+                policy.Options[option.Id] = option;
+            }
+
+            GameDataManager.LuaPolicyObjs[policy.Id] = policy;
         }
     }
 }

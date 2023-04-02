@@ -90,7 +90,7 @@
                             </div>
                             @if (buildingobj.type == SV2.Database.Models.Buildings.BuildingType.Mine) {
                                 <span>Production: @(
-                            $"{(Model.Province.Metadata.Resources[buildingobj.MustHaveResource] / 10550.0 * buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value):n2} hourly"
+                            $"{(Model.Province.GetMiningResourceProduction(buildingobj.MustHaveResource) / 10550.0 * buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value):n2} hourly"
                             )</span>
                             }
                         </div>

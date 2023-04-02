@@ -81,3 +81,15 @@ recipe_crystallite_mining_base = {
 	perhour = 0.25
     editable = false
 }
+
+recipe_oil_well_mining_base = {
+	name = "Oil Production"
+    inputs = {
+        tools = 0.5
+    }
+	outputs = {
+		oil = 1
+	}
+	perhour = 2.5
+    editable = false
+}

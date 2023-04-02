@@ -91,3 +91,16 @@ building_crystallite_mine = {
     musthaveresource = "Crystallite"
 	type = "Mine"
 }
+
+building_oil_well = {
+	recipes = {
+		recipe_oil_well_mining_base
+	}
+	buildingcosts = {
+		steel = 4000
+		simple_components = 1000
+		advanced_components = 500
+	}
+    musthaveresource = "Oil"
+	type = "Mine"
+}

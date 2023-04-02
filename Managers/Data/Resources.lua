@@ -1,5 +1,21 @@
 food = {
 	food = {
+		-- added to birth rate
+		popgrowthratemodifier = 0
+
+		-- the score per 10k citizens that have this good filled
+		economicscore = 0
+
+		-- 10k citizens will consume this many units per hour
+		consumptionrate = 1
+	}
+}
+
+consumer_goods = {
+	televisions = {
+		popgrowthratemodifier = 5
+		economicscore = 1
+		consumptionrate = 0.1
 	}
 }
 
@@ -15,6 +31,8 @@ raw = {
 	crystallite = {
 	}
 	silicon = {
+	}
+	oil = {
 	}
 }
 
@@ -40,6 +58,10 @@ metals = {
 
 products = {
 	tools = {
+	}
+	computer_chips = {
+	}
+	plastic = {
 	}
 }
 

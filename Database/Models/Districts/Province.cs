@@ -22,6 +22,13 @@ public enum TerrainType
     Marsh = 7
 }
 
+public class ProvinceConsumerGoodsData
+{
+    public string ConsumerGood { get; set; }
+    public double AmountNeeded { get; set; }
+    public double BuffToBirthRate { get; set; }
+}
+
 public class Province
 {
     [Key]
@@ -91,6 +98,9 @@ public class Province
 
     [NotMapped]
     public int RankByMigrationAttraction { get; set; }
+
+    [NotMapped]
+    public int BuildingSlotsUsed => GetBuildings().Where(x => x.BuildingObj.UseBuildingSlots).Sum(x => x.Size);
 
     public Province() { }
 
@@ -207,9 +217,6 @@ public class Province
         return $"rgb({color.R}, {color.G}, {color.B})";
     }
 
-    [NotMapped]
-    public int BuildingSlotsUsed => GetBuildings().Where(x => x.BuildingObj.UseBuildingSlots).Sum(x => x.Size);
-
     public long GetLevelsOfBuildingsOfType(string type) {
         BuildingType buildingtype = Enum.Parse<BuildingType>(type, true);
         return GetBuildings().Where(x => x.BuildingType == buildingtype).Sum(x => x.Size);
@@ -218,6 +225,21 @@ public class Province
     public IEnumerable<BuildingBase> GetBuildings()
     {
         return DBCache.ProvincesBuildings[Id];
+    }
+
+    /// <summary>
+    /// Returns the governor of this province, or if governor is null, then the state
+    /// If the state's is null, then the district
+    /// </summary>
+    /// <returns></returns>
+    public BaseEntity GetGovernor()
+    {
+        if (Governor is not null)
+            return Governor;
+        else if (State is not null)
+            return State.Group;
+        else
+            return District.Group;
     }
 
     public bool CanManageBuildingRequests(BaseEntity entity) {
@@ -293,11 +315,36 @@ public class Province
         return 0.00;
     }
 
-    public double GetMonthlyPopulationGrowth()
+    public async ValueTask<(double growthrate, List<ProvinceConsumerGoodsData> ConsumerGoodsData)> GetMonthlyPopulationGrowth(bool UseResources = false)
     {
         double BirthRate = Defines.NProvince["BASE_BIRTH_RATE"];
         BirthRate += District.GetModifierValue(DistrictModifierType.MonthlyBirthRate);
         BirthRate *= District.GetModifierValue(DistrictModifierType.MonthlyBirthRateFactor) + 1;
+
+        var governor = GetGovernor();
+        List<ProvinceConsumerGoodsData> consumerGoodsData = new();
+        var rate_for_consumergood = Population / 10_000 * (1 + GetModifierValue(ProvinceModifierType.ConsumerGoodsConsumptionFactor));
+        foreach (var consumergood in GameDataManager.ConsumerGoods)
+        {
+            var toconsume = rate_for_consumergood * consumergood.consumerGood.PopConsumptionRate;
+            var data = new ProvinceConsumerGoodsData()
+            {
+                ConsumerGood = consumergood.Name,
+                AmountNeeded = toconsume,
+                BuffToBirthRate = 0
+            };
+            if (await governor.HasEnoughResource(consumergood.LowerCaseName, toconsume))
+            {
+                var buff = consumergood.consumerGood.PopGrowthRateModifier * (1 + GetModifierValue(ProvinceModifierType.ConsumerGoodsModifierFactor));
+                BirthRate += buff;
+                data.BuffToBirthRate = buff;
+                if (UseResources)
+                {
+                    await governor.ChangeResourceAmount(consumergood.LowerCaseName, toconsume, $"Consumer Good Usage for Province with name: {Name}");
+                }
+            }
+            consumerGoodsData.Add(data);
+        }
 
         double DeathRate = Defines.NProvince["BASE_DEATH_RATE"];
         DeathRate += District.GetModifierValue(DistrictModifierType.MonthlyDeathRate);
@@ -309,7 +356,7 @@ public class Province
 
         double PopulationGrowth = BirthRate * Population;
         PopulationGrowth -= DeathRate * Population;
-        return PopulationGrowth;
+        return new(PopulationGrowth, consumerGoodsData);
     }
 
     public int GetMigrationAttraction()
@@ -404,7 +451,7 @@ public class Province
         DevelopmentValue += (int)Math.Floor(GetModifierValue(ProvinceModifierType.DevelopmentValue));
 
         // get hourly rate
-        var PopulationGrowth = GetMonthlyPopulationGrowth() / 30 / 24;
+        var PopulationGrowth = (await GetMonthlyPopulationGrowth(true)).growthrate / 30 / 24;
         Population += (long)Math.Ceiling(PopulationGrowth);
 
         // update building slot count
@@ -505,5 +552,7 @@ public enum ProvinceModifierType
     OverPopulationModifierExponent,
     OverPopulationModifierPopulationBase,
     MigrationAttraction,
-    DevelopmentValue
+    DevelopmentValue,
+    ConsumerGoodsConsumptionFactor,
+    ConsumerGoodsModifierFactor
 }

@@ -38,6 +38,17 @@ public class ProvinceController : SVController
         return View(province);
     }
 
+    [HttpGet("/Province/ViewBuildings")]
+    [UserRequired]
+    public IActionResult ViewBuildings(long id)
+    {
+        Province? province = DBCache.Get<Province>(id);
+        if (province is null)
+            return Redirect("/");
+
+        return View(province);
+    }
+
     [HttpGet("/Province/BulkManage")]
     [UserRequired]
     public IActionResult BulkManage()

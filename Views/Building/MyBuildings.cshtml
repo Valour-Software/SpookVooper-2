@@ -56,7 +56,7 @@
                     foreach (var building in Model) {
                         <tr>
                             <td>
-                                <a asp-controller="Building" asp-action="Manage" asp-route-id="@building.Id">@building.Name</a>
+                                <a asp-controller="Building" asp-action="Manage" asp-route-id="@building.Id">@(building.Name is null || building.Name == "" ? "No Name Set" : building.Name)</a>
                             </td>
                             @if (building.LuaBuildingObjId != "building_advanced_factory") {
                                 <td>@building.BuildingType.ToString()</td>

@@ -239,7 +239,8 @@
                                 }
 
                                 path:hover {
-                                    filter: brightness(0.75);
+                                    /* filter: brightness(0.75); */
+                                    stroke-width: 1.5px;
                                 }
                                 a {
                                     text-decoration: none;
@@ -264,31 +265,38 @@
                                 {
                                     ShowCityCircle = true;
                                 }
-                                <a href="/Province/View/@province.Id" data-bs-toggle="tooltip" data-placement="top" title="@dbprovince.Name" data-sv-show="@ShowCityCircle">
-                                    @if (resourcetomap is not null) {
+                                @if (resourcetomap is not null) {
+                                    var buildingobj = GameDataManager.BaseBuildingObjs.Values.First(x => x.MustHaveResource == resourcetomap);
+                                    var production = $"{dbprovince.GetMiningResourceProduction(resourcetomap) / 10550.0 * buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value:n2}";
+                                    <a href="/Province/View/@province.Id" data-bs-toggle="tooltip" data-placement="top" title="@production @(resourcetomap.ToLower())/h" data-sv-show="@ShowCityCircle">
                                         <path d="@province.D" id="@province.Id" style="fill:@dbprovince.GetMapColorForResourceDensity(maxresource, resourcetomap)" class="province"></path>
-                                        if (ShowCityCircle)
+                                        @if (ShowCityCircle)
                                         {
                                             <circle cx="@(province.XPos)" cy="@(province.YPos+8)" r="3" style="fill: white;" />
                                         }
-                                    }
-                                    else if (!Context.Request.QueryString.Value.Contains("devmapmode=true"))
-                                    {
+                                    </a>
+                                }
+                                else if (!Context.Request.QueryString.Value.Contains("devmapmode=true"))
+                                {
+                                    <a href="/Province/View/@province.Id" data-bs-toggle="tooltip" data-placement="top" title="@dbprovince.Name" data-sv-show="@ShowCityCircle">
                                         <path d="@province.D" id="@province.Id" style="fill:#@province.GetMapColor();" class="province"></path>
-                                        if (ShowCityCircle)
+                                        @if (ShowCityCircle)
                                         {
                                             <circle cx="@(province.XPos+4)" cy="@(province.YPos+8)" r="3" style="fill: white;" />
                                         }
-                                    }
-                                    else
-                                    {
+                                    </a>
+                                }
+                                else
+                                {
+                                        
+                                    <a href="/Province/View/@province.Id" data-bs-toggle="tooltip" data-placement="top" title="@dbprovince.Name" data-sv-show="@ShowCityCircle">
                                         <path d="@province.D" id="@province.Id" style="fill:@dbprovince.GetDevelopmentColorForMap()" class="province"></path>
-                                        if (ShowCityCircle)
+                                        @if (ShowCityCircle)
                                         {
                                             <circle cx="@(province.XPos)" cy="@(province.YPos+8)" r="3" style="fill: white;" />
                                         }
-                                    }
-                                </a>
+                                    </a>
+                                }
                             }
 
                             @if (false)

@@ -65,6 +65,18 @@ recipe_tool_factory_base = {
     editable = false
 }
 
+recipe_plastic_factory_base = {
+	name = "Plastic Production"
+	inputs = {
+		oil = 1
+	}
+	outputs = {
+		plastic = 2.5
+	}
+	perhour = 20
+    editable = false
+}
+
 recipe_simple_components_factory_base = {
 	name = "Simple Component Production"
 	inputs = {
@@ -107,6 +119,20 @@ recipe_computer_chips_factory_base = {
     editable = false
 }
 
+recipe_televisions_factory_base = {
+	name = "Television Production"
+	inputs = {
+		computer_chips = 5
+		steel = 2
+		plastic = 40
+	}
+	outputs = {
+		televisions = 1
+	}
+	perhour = 6
+    editable = false
+}
+
 recipe_small_arms_factory_base = {
 	name = "Small Arms Production"
 	inputs = {
@@ -120,9 +146,18 @@ recipe_small_arms_factory_base = {
 	edits = {
 		attack = {
 			name = "Attack"
+			base = 1
 			modifiers = {
-				item = {
-					item.attack = 1
+				item.attack = 0.25
+			}
+			costs = {
+				steel = {
+					base = 1
+					factor = edits.level
+					factor = {
+						base = edits.level
+						factor = 0.25
+					}
 				}
 			}
 		}

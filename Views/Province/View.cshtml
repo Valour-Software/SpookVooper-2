@@ -94,6 +94,7 @@
                         <a asp-route-id="@Model.Id" asp-action="Edit" asp-controller="Province" class="btn btn-primary">Modify</a>
                     }
                     <a asp-route-id="@Model.Id" asp-action="Build" asp-controller="Province" class="btn btn-primary">Build</a>
+                    <a asp-route-id="@Model.Id" asp-action="ViewBuildings" asp-controller="Province" class="btn btn-primary">View Buildings</a>
                 </center>
             }
             else {
@@ -176,10 +177,10 @@
                 <tr class="mergedrow dividertop">
                     <th class="infobox-row-name">Monthly (Est.) Growth</th>
                     @if (Model.GetOverpopulationModifier() > 0.001) {
-                        <td class="infobox-row-value">@($"{(Model.GetMonthlyPopulationGrowth() * 1.1):n0}")</td>
+                        <td class="infobox-row-value">@($"{((await Model.GetMonthlyPopulationGrowth()).growthrate * 1.1):n0}")</td>
                     }
                     else {
-                        <td class="infobox-row-value">@($"{(Math.Max(Model.GetMonthlyPopulationGrowth() * 1.1, 24 * 30)):n0}")</td>
+                        <td class="infobox-row-value">@($"{(Math.Max((await Model.GetMonthlyPopulationGrowth()).growthrate * 1.1, 24 * 30)):n0}")</td>
                     }
                 </tr>
                 <tr class="mergedrow dividertop">

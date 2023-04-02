@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Scripting;
 using Valour.Shared;
+using Valour.Api.Models;
 
 namespace SV2.Database.Models.Buildings;
 
@@ -222,5 +223,12 @@ public abstract class ProducingBuilding : BuildingBase
     {
         return 0;
         //return Recipe.Outputs.FirstOrDefault(x => x.Key == resource).Value * GetProductionSpeed();
+    }
+
+    public bool CanManage(BaseEntity entity)
+    {
+        if (OwnerId == entity.Id || (Owner.EntityType != EntityType.User && ((Group)Owner).HasPermission(entity, GroupPermissions.ManageBuildings)))
+            return true;
+        return false;
     }
 }

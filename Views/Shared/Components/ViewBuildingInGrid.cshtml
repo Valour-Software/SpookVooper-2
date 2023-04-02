@@ -1,0 +1,14 @@
+﻿@model ProducingBuilding
+
+
+<div class="building">
+    <span>@Model.BuildingObj.PrintableName</span>
+    <br>
+    <span>Name: @(Model.Name ?? "none")</span>
+    <br />
+    <span>Owner: @Model.Owner.Name</span>
+    <br />
+    <span>Built: @Model.Size</span>
+    <br />
+    <span>Recipe: @Model.Recipe.Name</span>
+</div>
