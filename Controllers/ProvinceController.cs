@@ -216,7 +216,10 @@ public class ProvinceController : SVController
 
         province.GovernorId = GovernorId;
 
-        return RedirectBack($"Successfully changed the governorship of this province to {BaseEntity.Find(GovernorId).Name}");
+        var entity = BaseEntity.Find(GovernorId);
+        var name = entity is not null ? entity.Name : "none";
+
+        return RedirectBack($"Successfully changed the governorship of this province to {name}");
     }
 
     [HttpPost("/Province/ChangeState")]

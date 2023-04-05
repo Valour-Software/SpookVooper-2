@@ -1,6 +1,6 @@
 food = {
 	food = {
-		-- added to birth rate
+		-- added to birth rate (0.01 is 1%)
 		popgrowthratemodifier = 0
 
 		-- the score per 10k citizens that have this good filled
@@ -13,7 +13,7 @@ food = {
 
 consumer_goods = {
 	televisions = {
-		popgrowthratemodifier = 5
+		popgrowthratemodifier = 0.05
 		economicscore = 1
 		consumptionrate = 0.1
 	}

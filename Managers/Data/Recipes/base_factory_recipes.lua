@@ -157,6 +157,7 @@ recipe_small_arms_factory_base = {
 					factor = {
 						base = edits.level
 						factor = 0.25
+						add = 1
 					}
 				}
 			}

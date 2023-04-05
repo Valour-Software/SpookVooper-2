@@ -30,15 +30,17 @@ public class ExecutionState
     public Dictionary<string, decimal> Locals { get; set; }
     public District District { get; set; }
     public Province? Province { get; set; }
+    public ProducingBuilding Building { get; set; }
     public Dictionary<string, decimal> ChangeSystemVarsBy { get; set; }
     public ScriptScopeType? ParentScopeType { get; set; }
-    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null)
+    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, ProducingBuilding? building = null)
     {
         Locals = new();
         District = district;
         Province = province;
         ChangeSystemVarsBy = changesystemvarsby ?? new();
         ParentScopeType = parentscopetype;
+        Building = building;
     }
 }
 
@@ -49,7 +51,8 @@ public abstract class SyntaxNode
     public int LineNumber { get; set; }
     public string FileName { get; set; }
     public abstract decimal GetValue(ExecutionState state);
-    public void HandleError(string error, string message) {
+    public void HandleError(string error, string message)
+    {
         LuaHandler.HandleError(FileName, LineNumber, error, message);
     }
 }
@@ -117,12 +120,15 @@ public class Factor : SyntaxNode
     }
 }
 
-public class Divide : SyntaxNode {
+public class Divide : SyntaxNode
+{
     public SyntaxNode Value;
-    public Divide() {
+    public Divide()
+    {
         NodeType = NodeType.DIVIDE;
     }
-    public override decimal GetValue(ExecutionState state) {
+    public override decimal GetValue(ExecutionState state)
+    {
         return Value.GetValue(state);
     }
 }
@@ -262,26 +268,33 @@ public class SystemVar : SyntaxNode
     public override decimal GetValue(ExecutionState state)
     {
         var levels = CleanUp(Value).Split(".").ToList();
-        decimal value = levels[0].ToLower() switch {
-            "district" => levels[1].ToLower() switch {
+        decimal value = levels[0].ToLower() switch
+        {
+            "district" => levels[1].ToLower() switch
+            {
                 "population" => state.District.TotalPopulation
             },
-            "province" => levels[1].ToLower() switch {
+            "province" => levels[1].ToLower() switch
+            {
                 "population" => state.Province.Population,
                 "owner" => state.Province.District.Id,
-                "buildings" => levels[2].ToLower() switch {
+                "buildings" => levels[2].ToLower() switch
+                {
                     "totaloftype" => (decimal)state.Province.GetLevelsOfBuildingsOfType(levels[3])
                 }
             },
             _ => 0.00m
         };
-        if (state.ChangeSystemVarsBy.Count > 0) {
-            if (state.ChangeSystemVarsBy.ContainsKey(Value)) {
+        if (state.ChangeSystemVarsBy.Count > 0)
+        {
+            if (state.ChangeSystemVarsBy.ContainsKey(Value))
+            {
                 value += state.ChangeSystemVarsBy[Value];
             }
             return value;
         }
-        else {
+        else
+        {
             return value;
         }
     }
@@ -352,15 +365,17 @@ public class DictNode : SyntaxNode
         var data = new Dictionary<string, decimal>();
         foreach ((var key, var value) in PermanentValues)
             data[key] = value;
-        foreach ((var key, var valuenode) in Body) 
+        foreach ((var key, var valuenode) in Body)
         {
-            if (key == "add_locals") {
-                foreach (var _node in ((ExpressionNode)valuenode).Body) {
+            if (key == "add_locals")
+            {
+                foreach (var _node in ((ExpressionNode)valuenode).Body)
+                {
                     var node = (AddLocalsNode)_node;
                     node.Execute(state);
                 }
             }
-                
+
             else
                 data[key] = valuenode.GetValue(state);
         }
@@ -371,20 +386,23 @@ public class DictNode : SyntaxNode
 public class GetLocal : SyntaxNode
 {
     public string Name;
-    public GetLocal() {
+    public GetLocal()
+    {
         NodeType = NodeType.GETLOCAL;
     }
 
-    public override decimal GetValue(ExecutionState state) {
+    public override decimal GetValue(ExecutionState state)
+    {
         return state.Locals[Name];
     }
 }
 
-public class AddLocalsNode : SyntaxNode 
+public class AddLocalsNode : SyntaxNode
 {
     public Dictionary<string, SyntaxNode> Body { get; set; }
 
-    public AddLocalsNode() {
+    public AddLocalsNode()
+    {
         Body = new();
         NodeType = NodeType.ADDLOCALSNODE;
     }
@@ -393,37 +411,40 @@ public class AddLocalsNode : SyntaxNode
 
     public void Execute(ExecutionState state)
     {
-        foreach ((var key, var valuenode) in Body) 
+        foreach ((var key, var valuenode) in Body)
         {
             state.Locals[key] = valuenode.GetValue(state);
         }
     }
 }
 
-public class LocalNode : SyntaxNode 
+public class LocalNode : SyntaxNode
 {
     public string Name { get; set; }
     public SyntaxNode Value { get; set; }
     public override decimal GetValue(ExecutionState state) { return 0.00m; }
 }
 
-public enum ScriptScopeType {
+public enum ScriptScopeType
+{
     District,
     Province
 }
 
-public class ChangeScopeNode : EffectNode 
+public class ChangeScopeNode : EffectNode
 {
     public ScriptScopeType scopeType { get; set; }
     public string ChangeTo { get; set; }
     public SyntaxNode Value { get; set; }
     public EffectBody EffectBodyNode { get; set; }
 
-    public ExecutionState GetExecutionState(ExecutionState state) {
+    public ExecutionState GetExecutionState(ExecutionState state)
+    {
         var newstate = new ExecutionState(state.District, state.Province, state.ChangeSystemVarsBy);
         newstate.Locals = state.Locals;
 
-        if (scopeType == ScriptScopeType.District) {
+        if (scopeType == ScriptScopeType.District)
+        {
             var district = DBCache.GetAll<District>().FirstOrDefault(x => x.ScriptName == ChangeTo);
             if (district is null)
                 HandleError("Could not find district", $"key: {ChangeTo}");
@@ -431,7 +452,8 @@ public class ChangeScopeNode : EffectNode
             newstate.ParentScopeType = scopeType;
         }
 
-        else if (scopeType == ScriptScopeType.Province) {
+        else if (scopeType == ScriptScopeType.Province)
+        {
             var province = DBCache.GetAll<Province>().FirstOrDefault(x => x.Id == long.Parse(ChangeTo));
             if (province is null)
                 HandleError("Could not find province", $"key: {ChangeTo}");
@@ -446,7 +468,8 @@ public class ChangeScopeNode : EffectNode
         return Value.GetValue(GetExecutionState(state));
     }
 
-    public override void Execute(ExecutionState state) {
+    public override void Execute(ExecutionState state)
+    {
         EffectBodyNode.Execute(GetExecutionState(state));
     }
 }

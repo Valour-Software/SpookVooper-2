@@ -13,6 +13,10 @@ building_simple_factory = {
 		simple_components = 7500,
 		advanced_components = 1000
 	}
+	upgrades = {
+		simple_factory_throughput_upgrade
+		simple_factory_efficiency_upgrade
+	}
 	type = "Factory"
 }
 

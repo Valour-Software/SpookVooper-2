@@ -36,7 +36,8 @@ public static class ItemTradeManager
         trade.IsCompleted = true;
 
         string success = "SUCC";
-        if (!result.Succeeded) success = "FAIL";
+        if (!result.Succeeded) 
+            success = "FAIL";
 
         Console.WriteLine($"[{success}] Processed {trade.Details}");
 

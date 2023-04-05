@@ -14,6 +14,10 @@
         <h3 style="text-align:center">@ViewData["Title"]</h3>
         <h2 style="text-align:center">The Province of @Model.Name</h2>
 
+        <a asp-controller="Province" asp-action="View" asp-route-id="@Model.Id">
+            <button class="btn btn-primary">Go Back</button>
+        </a>
+
         <div class="row">
             <div class="col-4"></div>
             <div class="col-4">
