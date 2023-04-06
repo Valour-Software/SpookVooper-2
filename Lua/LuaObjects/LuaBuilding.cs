@@ -19,6 +19,7 @@ public class LuaBuilding
     public ExpressionNode? BaseEfficiency { get; set; }
     public bool UseBuildingSlots { get; set; }
     public string MustHaveResource { get; set; }
+    public bool ApplyStackingBonus { get; set; }
 
     public Dictionary<string, double> GetConstructionCost(BaseEntity entity, District district, Province province, int levels) {
         Dictionary<string, double> totalresources = new();

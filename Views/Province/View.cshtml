@@ -313,7 +313,7 @@
                 <tr>
                     <td>From Infrastructure (@Model.GetLevelsOfBuildingsOfType("infrastructure") levels)</td>
                     <td>x@($"{factorfrominfrastructures:n3}")</td>
-                    <td>@($"{runningtotal:n1}")</td>
+                    <td>@($"{runningtotal * runningtotalforstacking:n1}")</td>
                 </tr>
             }
 

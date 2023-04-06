@@ -19,10 +19,10 @@ NProduction = {
     BASE_INFRASTRUCTURE_THROUGHPUT = 1
 
     BASE_FACTORY_INPUT_EFFICIENCY = 0 -- the base % reduction in input usage
-    FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE = 0.015
+    FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE = 0.005
 
-    STACKING_THROUGHPUT_BONUS = 0.025 -- % bonus to throughput per level of building built
-    MAX_STACKING_THROUGHPUT_BONUS = 0.5
+    STACKING_THROUGHPUT_BONUS = 0.01 -- % bonus to throughput per level of building built
+    MAX_STACKING_THROUGHPUT_BONUS = 0.75
 
     BASE_MINE_QUANTITY = 0.1
     BASE_FACTORY_QUANTITY = 0.1

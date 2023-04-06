@@ -44,4 +44,5 @@ building_infrastructure = {
 	onlygovernorcanbuild = true
 	usebuildingslots = false
 	type = "Infrastructure"
+	applystackingbonus = false
 }

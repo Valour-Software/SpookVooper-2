@@ -113,6 +113,61 @@ public class Province
         Population = rnd.NextInt64(min, max);
     }
 
+    public List<(string modifiername, double value)> GetStaticModifiersOfTypes(List<ProvinceModifierType?>? provincetypes, List<DistrictModifierType?> districttypes, bool AlsoUseDistrictModifiers, bool UseProvinceModifiers = true, bool IncludeDevStage = false)
+    {
+        if (provincetypes is null)
+            provincetypes = new();
+        if (districttypes is null)
+            districttypes = new();
+        var result = new List<(string modifiername, double value)>();
+        var modifiers = new List<StaticModifier>();
+        if (UseProvinceModifiers)
+            modifiers.AddRange(StaticModifiers);
+        if (AlsoUseDistrictModifiers)
+            modifiers.AddRange(District.StaticModifiers);
+        foreach (var modifier in modifiers)
+        {
+            foreach (var node in modifier.BaseStaticModifiersObj.ModifierNodes)
+            {
+                if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null) || (districttypes.Contains(node.districtModifierType) && node.districtModifierType is not null))
+                {
+                    (string modifiername, double value) item = new()
+                    {
+                        modifiername = modifier.BaseStaticModifiersObj.Name,
+                        value = (double)node.GetValue(new(District, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.District)))
+                    };
+                    if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor"))
+                        || (districttypes.Contains(node.districtModifierType) && node.districtModifierType is not null && node.districtModifierType.ToString().Contains("Factor")))
+                    {
+                        item.value += 1;
+                    }
+                    result.Add(item);
+                }
+            }
+        }
+        if (IncludeDevStage)
+        {
+            foreach (var node in CurrentDevelopmentStage.ModifierNodes)
+            {
+                if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null) || (districttypes.Contains(node.districtModifierType) && node.districtModifierType is not null))
+                {
+                    (string modifiername, double value) item = new()
+                    {
+                        modifiername = CurrentDevelopmentStage.PrintableName,
+                        value = (double)node.GetValue(new(District, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.District)))
+                    };
+                    if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor"))
+                        || (districttypes.Contains(node.districtModifierType) && node.districtModifierType is not null && node.districtModifierType.ToString().Contains("Factor")))
+                    {
+                        item.value += 1;
+                    }
+                    result.Add(item);
+                }
+            }
+        }
+        return result;
+    }
+
     public List<(string modifiername, double value)> GetStaticModifiersOfType(ProvinceModifierType? provincetype, DistrictModifierType? districttype, bool AlsoUseDistrictModifiers, bool UseProvinceModifiers = true, bool IncludeDevStage = false) {
         var result = new List<(string modifiername, double value)>();
         var modifiers = new List<StaticModifier>();
@@ -554,5 +609,6 @@ public enum ProvinceModifierType
     MigrationAttraction,
     DevelopmentValue,
     ConsumerGoodsConsumptionFactor,
-    ConsumerGoodsModifierFactor
+    ConsumerGoodsModifierFactor,
+    InfrastructureThroughputFactor
 }

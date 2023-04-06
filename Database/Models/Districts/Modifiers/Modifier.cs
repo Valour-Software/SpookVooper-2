@@ -37,5 +37,6 @@ public enum DistrictModifierType
     AllProducingBuildingThroughputFactor,
     BuildingSlotsFactor,
     BuildingSlotsExponent,
-    OverPopulationModifierExponent
+    OverPopulationModifierExponent,
+    InfrastructureThroughputFactor
 }

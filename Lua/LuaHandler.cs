@@ -532,7 +532,8 @@ public static class LuaHandler
                 OnlyGovernorCanBuild = Convert.ToBoolean(table.GetValue("onlygovernorcanbuild") ?? "false"),
                 UseBuildingSlots = Convert.ToBoolean(table.GetValue("usebuildingslots") ?? "true"),
                 BuildingCosts = HandleDictExpression((LuaTable)table["buildingcosts"]),
-                MustHaveResource = table.GetValue("musthaveresource")
+                MustHaveResource = table.GetValue("musthaveresource"),
+                ApplyStackingBonus = Convert.ToBoolean(table.GetValue("applystackingbonus") ?? "true")
             };
 
             var recipes = (LuaTable)table["recipes"];

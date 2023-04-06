@@ -1,3 +1,4 @@
+@using SV2.Database.Managers
 @model BuildingManageModel
 
 @{
@@ -178,7 +179,7 @@
                 }
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Throughput</th>
-                    <td class="infobox-row-value">@($"{Model.Building.ThroughputFactor:n2}")x</td>
+                    <td class="infobox-row-value has-expanded-info" data-bs-toggle="modal" data-bs-target="#ThroughputModal">@($"{Model.Building.ThroughputFactor:n2}")x</td>
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Levels</th>
@@ -245,6 +246,94 @@
 
     <bootstrap-modal asp-modal-id="createbuildingrequest" asp-modal-title="Request more Levels">
         @await Html.PartialAsync("/Views/Shared/Components/SubmitBuildingRequest.cshtml", Model.createBuildingRequestModel)
+    </bootstrap-modal>
+
+    <bootstrap-modal asp-modal-id="ThroughputModal" asp-modal-title="Throughput">
+        <span>Note, most values with "x" stack additivity! The final value may be slightly different than the actual number due to rounding.</span>
+        <table class="table table-dark table-striped">
+            <tbody>
+                @{
+                    double runningtotal = 1;
+                    <tr>
+                        <td>Base</td>
+                        <td></td>
+                        <td>1x</td>
+                    </tr>
+
+                    if (Model.Building.BuildingObj.ApplyStackingBonus)
+                    {
+                        double EconomicsofScale = Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Model.Building.Size;
+                        bool IsMaxed = false;
+                        if (EconomicsofScale >= Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"])
+                        {
+                            EconomicsofScale = Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"];
+                            IsMaxed = true;
+                        }
+                        runningtotal += EconomicsofScale;
+
+                        <tr>
+                            <td>
+                                <span>Stacking Bonus</span>
+                                @if (IsMaxed)
+                                {
+                                    <span> (maxed)</span>
+                                }
+                            </td>
+                            <td>+@(
+                                   $"{EconomicsofScale:n2}"
+                                   )</td>
+                            <td>@(
+                                    $"{runningtotal:n2}"
+                                    )</td>
+                        </tr>
+                    }
+
+                    double runningtotalforstacking = 1;
+                    var provincetypestoget = new List<ProvinceModifierType?>() { ProvinceModifierType.AllProducingBuildingThroughputFactor };
+                    provincetypestoget.Add(Model.Building.BuildingType switch
+                    {
+                        BuildingType.Mine => ProvinceModifierType.MineThroughputFactor,
+                        BuildingType.Factory => ProvinceModifierType.FactoryThroughputFactor,
+                        BuildingType.Farm => ProvinceModifierType.FarmThroughputFactor,
+                        BuildingType.Infrastructure => ProvinceModifierType.InfrastructureThroughputFactor
+                    });
+
+
+                    @foreach (var item in Model.Building.Province.GetStaticModifiersOfTypes(provincetypestoget, null, false))
+                    {
+                        runningtotalforstacking += item.value - 1;
+                        <tr>
+                            <td>@item.modifiername</td>
+                            <td>+@($"{item.value:n2}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n2}")</td>
+                        </tr>
+                    }
+
+                    runningtotal *= runningtotalforstacking;
+
+
+                    runningtotalforstacking = 1;
+                    var districttypestoget = new List<DistrictModifierType?>() { DistrictModifierType.AllProducingBuildingThroughputFactor };
+                    districttypestoget.Add(Model.Building.BuildingType switch
+                    {
+                        BuildingType.Mine => DistrictModifierType.MineThroughputFactor,
+                        BuildingType.Factory => DistrictModifierType.FactoryThroughputFactor,
+                        BuildingType.Farm => DistrictModifierType.FarmThroughputFactor,
+                        BuildingType.Infrastructure => DistrictModifierType.InfrastructureThroughputFactor
+                    });
+
+                    @foreach (var item in Model.Building.Province.GetStaticModifiersOfTypes(null, districttypestoget, true, false))
+                    {
+                        runningtotalforstacking += item.value;
+                        <tr>
+                            <td>@item.modifiername</td>
+                            <td>+@($"{item.value:n2}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n2}")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
     </bootstrap-modal>
 
     @section Scripts {

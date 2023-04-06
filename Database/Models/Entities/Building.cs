@@ -131,8 +131,13 @@ public abstract class ProducingBuilding : BuildingBase
                 BuildingType.Factory => 1 + Province.GetModifierValue(ProvinceModifierType.FactoryThroughputFactor),
                 _ => 1
             };
+
+            if (BuildingObj.ApplyStackingBonus)
+                basevalue += Math.Min(Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Size, Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"]);
+
             basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;
             basevalue *= District.GetModifierValue(DistrictModifierType.AllProducingBuildingThroughputFactor) + 1.00;
+            
             return basevalue;
         }
     }
