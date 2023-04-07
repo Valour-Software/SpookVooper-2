@@ -8,7 +8,9 @@ public enum NodeType
 {
     BASE,
     ADD,
+    SUBTRACT,
     FACTOR,
+    RAISETO,
     DECIMAL,
     SYSTEMVAR,
     EXPRESSION,
@@ -78,6 +80,20 @@ public class Add : SyntaxNode
     }
 }
 
+public class Subtract : SyntaxNode
+{
+    public SyntaxNode Value;
+    public Subtract()
+    {
+        NodeType = NodeType.SUBTRACT;
+    }
+
+    public override decimal GetValue(ExecutionState state)
+    {
+        return Value.GetValue(state);
+    }
+}
+
 public class Decimal : SyntaxNode
 {
     public decimal Value;
@@ -100,6 +116,19 @@ public class Base : SyntaxNode
         NodeType = NodeType.BASE;
     }
 
+    public override decimal GetValue(ExecutionState state)
+    {
+        return Value.GetValue(state);
+    }
+}
+
+public class RaiseTo : SyntaxNode
+{
+    public SyntaxNode Value;
+    public RaiseTo()
+    {
+        NodeType = NodeType.RAISETO;
+    }
     public override decimal GetValue(ExecutionState state)
     {
         return Value.GetValue(state);
@@ -239,6 +268,7 @@ public class IfStatement : ConditionalSyntaxNode, IEffectNode
         {
             NodeType.ADD => 0.00m,
             NodeType.FACTOR => 1.00m,
+            NodeType.RAISETO => 1.00m,
             NodeType.BASE => 0.00m,
             NodeType.IFSTATEMENT => 99999999999999999999999.99999m,
             _ => 99999999999999999999999.99999m
@@ -324,8 +354,14 @@ public class ExpressionNode : SyntaxNode
                 case NodeType.ADD:
                     result += node.GetValue(state);
                     break;
+                case NodeType.SUBTRACT:
+                    result -= node.GetValue(state);
+                    break;
                 case NodeType.FACTOR:
                     result *= node.GetValue(state);
+                    break;
+                case NodeType.RAISETO:
+                    result = (decimal)Math.Pow((double)result, (double)node.GetValue(state));
                     break;
                 case NodeType.DIVIDE:
                     result /= node.GetValue(state);

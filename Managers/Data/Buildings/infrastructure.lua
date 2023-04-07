@@ -1,7 +1,7 @@
 building_infrastructure = {
-	recipes = {
+	recipes = [
 		recipe_infrastructure_roads
-	}
+	]
 	buildingcosts = {
 		add_locals = {
 			cost_increase = {

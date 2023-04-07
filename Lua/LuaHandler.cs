@@ -10,6 +10,7 @@ using SV2.NonDBO;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SV2.Scripting.LuaObjects;
 using SV2.Scripting;
+using System.Text.Json.Serialization;
 
 namespace SV2.Scripting.Parser;
 
@@ -30,6 +31,8 @@ public class LuaTable : LuaObject
         Items = new();
         type = ObjType.LuaTable;
     }
+
+    [JsonIgnore]
     public IEnumerable<string> Keys
     {
         get
@@ -37,6 +40,8 @@ public class LuaTable : LuaObject
             return Items.Select(x => x.Name);
         }
     }
+
+    [JsonIgnore]
     public IEnumerable<LuaObject> Values
     {
         get
@@ -206,15 +211,13 @@ public static class LuaHandler
     {
         //var data = PreProcessLua(content);
         //File.WriteAllText("../../../../Database/LuaDump.lua", data.content);
-        using (Lua lua = new Lua())
+        LuaParser parser = new();
+        parser.LoadTokenizer();
+        parser.Parse(content, filename);
+        foreach (var value in parser.Objects.Values)
         {
-            //lua.State.Encoding = Encoding.UTF8;
-            lua.DoString(content, filename);
-            foreach (var value in lua.Objects.Values)
-            {
-                var t = (LuaTable)value;
-                yield return (t, value.Name);
-            }
+            var t = (LuaTable)value;
+            yield return (t, value.Name);
         }
     }
 

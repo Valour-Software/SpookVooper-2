@@ -1,4 +1,6 @@
-﻿namespace SV2.Scripting.Parser;
+﻿using System.Text.Json.Serialization;
+
+namespace SV2.Scripting.Parser;
 
 public enum ObjType
 {
@@ -17,8 +19,16 @@ public abstract class ILuaObject : IConvertible
     public string Name { get; set; }
     public ObjType type { get; set; }
     public string Value { get; set; }
+
+    public int IPosition { get; set; } = 0;
+
+    [JsonIgnore]
     public LuaTable Parent { get; set; }
+
+    [JsonIgnore]
     public int LineNumber { get; set; }
+
+    [JsonIgnore]
     public string FileName { get; set; }
 
     public TypeCode GetTypeCode()
@@ -107,6 +117,8 @@ public abstract class ILuaObject : IConvertible
     }
 }
 
+[JsonDerivedType(typeof(LuaObject), 0)]
+[JsonDerivedType(typeof(LuaTable), 1)]
 public class LuaObject : ILuaObject
 {
 

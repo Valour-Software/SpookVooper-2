@@ -1,7 +1,7 @@
 building_iron_mine = {
-	recipes = {
+	recipes = [
 		recipe_iron_mining_base
-	}
+	]
 	buildingcosts = {
 		steel = 2000
 		simple_components = 2000
@@ -15,9 +15,9 @@ building_iron_mine = {
 }
 
 building_copper_mine = {
-	recipes = {
+	recipes = [
 		recipe_copper_mining_base
-	}
+	]
 	buildingcosts = {
 		steel = 2000
 		simple_components = 2000
@@ -28,9 +28,9 @@ building_copper_mine = {
 }
 
 building_silicon_mine = {
-	recipes = {
+	recipes = [
 		recipe_silicon_mining_base
-	}
+	]
 	buildingcosts = {
 		steel = 2000
 		simple_components = 2000
@@ -41,9 +41,9 @@ building_silicon_mine = {
 }
 
 building_bauxite_mine = {
-	recipes = {
+	recipes = [
 		recipe_bauxite_mining_base
-	}
+	]
 	buildingcosts = {
 		steel = 2000
 		simple_components = 2000
@@ -54,9 +54,9 @@ building_bauxite_mine = {
 }
 
 building_coal_mine = {
-	recipes = {
+	recipes = [
 		recipe_coal_mining_base
-	}
+	]
 	buildingcosts = {
 		steel = 2000
 		simple_components = 2000
@@ -67,9 +67,9 @@ building_coal_mine = {
 }
 
 building_gold_mine = {
-	recipes = {
+	recipes = [
 		recipe_gold_mining_base
-	}
+	]
 	buildingcosts = {
 		steel = 2000
 		simple_components = 2000
@@ -80,9 +80,9 @@ building_gold_mine = {
 }
 
 building_crystallite_mine = {
-	recipes = {
+	recipes = [
 		recipe_crystallite_mining_base
-	}
+	]
 	buildingcosts = {
 		steel = 2000
 		simple_components = 2000
@@ -93,9 +93,9 @@ building_crystallite_mine = {
 }
 
 building_oil_well = {
-	recipes = {
+	recipes = [
 		recipe_oil_well_mining_base
-	}
+	]
 	buildingcosts = {
 		steel = 4000
 		simple_components = 1000

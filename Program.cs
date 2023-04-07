@@ -29,6 +29,15 @@ using Microsoft.AspNetCore.Builder;
 using SV2.Database.Managers;
 using System.Net;
 using SV2.Helpers;
+using SV2.Scripting.Parser;
+
+//LuaParser parser = new();
+
+//parser.LoadTokenizer();
+//parser.Parse(File.ReadAllText("Managers/Data/BuildingUpgrades/factoryupgrades.lua"), "factoryupgrades.lua");
+
+//string jsonString = JsonSerializer.Serialize((LuaTable)parser.Objects.Items.First(), options: new() { WriteIndented = true});
+//await File.WriteAllTextAsync("Managers/Data/ParserOutput.txt", jsonString);
 
 Defines.Load();
 
