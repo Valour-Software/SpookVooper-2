@@ -66,7 +66,7 @@
 
                 <div class="d-flex align-content-center align-items-center">
                     <div style="display:inline-block; margin:2em;margin-left: auto;margin-right: auto;">
-                        <h2 style="text-align:center" class="display-4">The Province of</h2>
+                        <h2 style="text-align:center" class="display-4">The @Model.District.NameForProvince of</h2>
                         <h1 style="text-align:center" class="display-3">@Model.Name</h1>
                     </div>
                 </div>
@@ -114,7 +114,7 @@
                 </tr>
                 <tr>
                     <td colspan="2" class="infobox-subheader">
-                        <div>Province</div>
+                        <div>@Model.District.NameForProvince</div>
                     </td>
                 </tr>
                 <tr class="mergedrow dividertop">
@@ -122,18 +122,18 @@
                     <td class="infobox-row-value"><a href="/District/View/@Model.District.Name">@Model.District.Name</a></td>
                 </tr>
                 <tr class="mergedrow">
-                    <th class="infobox-row-name">State</th>
+                    <th class="infobox-row-name">@Model.District.NameForState</th>
                     <td class="infobox-row-value">
                         @if (Model.StateId is null) {
                             @("None")
                         }
                         else {
-                            @Model.State!.Name
+                            <a href="/State/View/@Model.State.Id">@Model.State!.Name</a>
                         }
                     </td>
                 </tr>
                 <tr class="mergedrow">
-                    <th class="infobox-row-name">Governor</th>
+                    <th class="infobox-row-name">@Model.District.NameForGovernorOfAProvince</th>
                     @if (Model.Governor is null) {
                         <td class="infobox-row-value">None</td>
                     }

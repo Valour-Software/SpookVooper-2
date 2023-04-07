@@ -80,6 +80,30 @@ public class District
     [Column("staticmodifiers", TypeName = "jsonb[]")]
     public List<StaticModifier> StaticModifiers { get; set; }
 
+    [Column("titleforprovince")]
+    public string? TitleForProvince { get; set; }
+
+    [Column("titleforstate")]
+    public string? TitleForState { get; set; }
+
+    [Column("titleforgovernorofaprovince")]
+    public string? TitleForGovernorOfProvince { get; set; }
+
+    [Column("titleforgovernorofastate")]
+    public string? TitleForGovernorOfState { get; set; }
+
+    [NotMapped]
+    public string NameForState => TitleForState is null ? "State" : TitleForState;
+
+    [NotMapped]
+    public string NameForProvince => TitleForProvince is null ? "Province" : TitleForProvince;
+
+    [NotMapped]
+    public string NameForGovernorOfAProvince => TitleForGovernorOfProvince is null ? "Governor" : TitleForGovernorOfProvince;
+
+    [NotMapped]
+    public string NameForGovernorOfAState => TitleForGovernorOfState is null ? "Governor" : TitleForGovernorOfState;
+
     [NotMapped]
     public Dictionary<DistrictModifierType, DistrictModifier> Modifiers = new();
 

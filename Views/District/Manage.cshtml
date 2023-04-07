@@ -1,0 +1,92 @@
+﻿@model ManageDistrictModel
+
+@{
+    ViewData["Title"] = "District Admin";
+
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h3 style="text-align:center">@ViewData["Title"]</h3>
+        <h2 style="text-align:center">The District of @Model.District.Name</h2>
+
+        <a asp-controller="District" asp-action="View" asp-route-name="@Model.District.Name">
+            <button class="btn btn-primary">Go Back</button>
+        </a>
+
+        <br />
+        <hr />
+        <br />
+        <form method="post">
+            <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
+                @Html.HiddenFor(x => x.Id)
+                <div class="row">
+                    <h4>District Info</h4>
+
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                
+                <br />
+                <div class="form-group">
+                    <label>Name for a state</label>
+                    <input asp-for="NameForState" class="form-control" value="@Model.District.NameForState"></input>
+                    <span asp-validation-for="NameForState" class="text-danger"></span>
+                </div>
+                
+                <br />
+                <div class="form-group">
+                    <label>Name for a province</label>
+                    <input asp-for="NameForProvince" class="form-control" value="@Model.District.NameForProvince"></input>
+                    <span asp-validation-for="NameForProvince" class="text-danger"></span>
+                </div>
+
+                <br />
+                <div class="form-group">
+                    <label>Name for the governor of a @Model.District.NameForState</label>
+                    <input asp-for="NameForGovernorOfAState" class="form-control" value="@Model.District.NameForGovernorOfAState"></input>
+                    <span asp-validation-for="NameForGovernorOfAState" class="text-danger"></span>
+                </div>
+                
+                <br />
+                <div class="form-group">
+                    <label>Name for the governor of a @Model.District.NameForProvince</label>
+                    <input asp-for="NameForGovernorOfAProvince" class="form-control" value="@Model.District.NameForGovernorOfAProvince"></input>
+                    <span asp-validation-for="NameForGovernorOfAProvince" class="text-danger"></span>
+                </div>
+
+                <br />
+                <p>Property Taxes are paid to the group for @Model.District.Name</p>
+                <div class="form-group">
+                    <label>Base monthly property tax per building (not size!)</label>
+                    <input asp-for="BasePropertyTax" class="form-control"/>
+                    <span asp-validation-for="BasePropertyTax" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label>Monthly Property Tax per size (level) of a building (ex: a level 15 factory will pay 15x this tax monthly)</label>
+                    <input asp-for="PropertyTaxPerSize" class="form-control" />
+                    <span asp-validation-for="PropertyTaxPerSize" class="text-danger"></span>
+                </div>
+                
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>

@@ -8,6 +8,8 @@ using SV2.Helpers;
 using SV2.Extensions;
 using SV2.Database.Models.Districts;
 using System.Xml.Linq;
+using SV2.Database.Managers;
+using SV2.Scripting.Parser;
 
 namespace SV2.Controllers
 {
@@ -31,6 +33,63 @@ namespace SV2.Controllers
             return View(district);
         }
 
+        [HttpGet("/District/Manage/{id}")]
+        [UserRequired]
+        public IActionResult Manage(long id)
+        {
+            SVUser user = HttpContext.GetUser();
+
+            District district = DBCache.Get<District>(id);
+            if (district is null)
+                return Redirect("/");
+
+            if (district.GovernorId != user.Id)
+                return RedirectBack("You must be governor of the district to change the details of the district!");
+
+            return View(new ManageDistrictModel()
+            {
+                District = district,
+                Id = id,
+                Description = district.Description,
+                NameForProvince = district.NameForProvince,
+                NameForState = district.NameForState,
+                BasePropertyTax = district.BasePropertyTax,
+                PropertyTaxPerSize = district.PropertyTaxPerSize,
+                NameForGovernorOfAProvince = district.NameForGovernorOfAProvince,
+                NameForGovernorOfAState = district.NameForGovernorOfAState
+            });
+        }
+
+        [HttpPost("/District/Manage/{id}")]
+        [ValidateAntiForgeryToken]
+        [UserRequired]
+        public IActionResult Manage(ManageDistrictModel model)
+        {
+            District district = DBCache.Get<District>(model.Id);
+            if (district is null)
+                return Redirect("/");
+
+            var user = HttpContext.GetUser();
+            if (district.GovernorId != user.Id)
+                return RedirectBack("You must be governor of the district to change the details of the district!");
+
+            if (model.BasePropertyTax > 2000)
+                return RedirectBack("District's Base Property Tax must be 2,000 or less!");
+            if (model.PropertyTaxPerSize > 2000)
+                return RedirectBack("District's Property Tax per size must be 2,000 or less!");
+
+            district.Description = model.Description;
+            district.TitleForProvince = model.NameForProvince is null ? null : model.NameForProvince.ToTitleCase();
+            district.TitleForState = model.NameForState is null ? null : model.NameForState.ToTitleCase();
+            district.TitleForGovernorOfProvince = model.NameForGovernorOfAProvince is null ? null : model.NameForGovernorOfAProvince.ToTitleCase();
+            district.TitleForGovernorOfState = model.NameForGovernorOfAState is null ? null : model.NameForGovernorOfAState.ToTitleCase();
+            district.BasePropertyTax = model.BasePropertyTax;
+            district.PropertyTaxPerSize = model.PropertyTaxPerSize;
+
+            StatusMessage = "Successfully saved your changes.";
+            return Redirect($"/State/View/{district.Id}");
+        }
+
         [HttpPost("/District/ChangeGovernor/{id}")]
         [ValidateAntiForgeryToken]
         [UserRequired]
@@ -41,7 +100,7 @@ namespace SV2.Controllers
 
             var user = HttpContext.GetUser();
             if (!(await user.IsGovernmentAdmin()))
-                return RedirectBack("You must be governor of the district to change the governor of a province!");
+                return RedirectBack("You must be a government admin to change the governor of a district!");
 
             var oldgovernor = DBCache.Get<SVUser>(district.GovernorId);
             var newgovernor = DBCache.Get<SVUser>(GovernorId);

@@ -51,7 +51,7 @@
 
                 <div class="d-flex align-content-center align-items-center">
                     <div style="display:inline-block; margin:2em;margin-left: auto;margin-right: auto;">
-                        <h2 style="text-align:center" class="display-4">The State of</h2>
+                        <h2 style="text-align:center" class="display-4">The @Model.District.NameForState of</h2>
                         <h1 style="text-align:center" class="display-3">@Model.Name</h1>
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                 </tr>
                 <tr>
                     <td colspan="2" class="infobox-subheader">
-                        <div>State</div>
+                        <div>@Model.District.NameForState</div>
                     </td>
                 </tr>
                 <tr class="mergedrow dividertop">
@@ -97,7 +97,7 @@
                     <td class="infobox-row-value"><a href="/District/View/@Model.District.Name">@Model.District.Name</a></td>
                 </tr>
                 <tr class="mergedrow">
-                    <th class="infobox-row-name">Governor</th>
+                    <th class="infobox-row-name">@Model.District.NameForGovernorOfAState</th>
                     @if (Model.Governor is null) {
                         <td class="infobox-row-value">None</td>
                     }
@@ -123,7 +123,7 @@
                     </td>
                 </tr>
                 <tr class="mergedrow">
-                    <th class="infobox-row-name">Provinces</th>
+                    <th class="infobox-row-name">@Model.District.NameForProvince.Pluralize()</th>
                     <td class="infobox-row-value">
                         @foreach (var province in Model.Provinces.OrderByDescending(x => x.Population)) {
                             <span><a href="/Province/View/@province.Id">@province.Name</a></span>

@@ -1,7 +1,7 @@
 @model State
 
 @{
-    ViewData["Title"] = "State Admin";
+    ViewData["Title"] = $"{Model.District.NameForState} Admin";
 
     SVUser user = UserManager.GetUser(Context)!;
 }
@@ -12,7 +12,7 @@
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
         <h3 style="text-align:center">@ViewData["Title"]</h3>
-        <h2 style="text-align:center">The State of @Model.Name</h2>
+        <h2 style="text-align:center">The @Model.District.NameForState of @Model.Name</h2>
 
         <div class="row">
             <div class="col-4"></div>
@@ -29,7 +29,7 @@
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @Html.HiddenFor(x => x.Id)
                 <div class="row">
-                    <h4>State Info</h4>
+                    <h4>@Model.District.NameForState Info</h4>
 
                     <div asp-validation-summary="All" class="text-danger"></div>
                 </div>
@@ -65,7 +65,7 @@
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @if (Model.District.GovernorId == user.Id)
                 {
-                    <p>Governor Entity's name</p>
+                    <p>@Model.District.NameForGovernorOfAState Entity's name</p>
                     <input data-val="true" data-val-required="The Id field is required." id="GovernorId" name="GovernorId" type="hidden" value="@Model.GovernorId">
                     <div class="input-group" style="max-width:700px;margin-left:auto;margin-right:auto;">
                         <input style="margin-bottom:20px; display:inline-block; max-width:500px;" id="user-input" class="form-control" value="@(Model.Governor?.Name ?? "")"/>

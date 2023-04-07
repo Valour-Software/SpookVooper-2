@@ -83,10 +83,6 @@
         @{
             if (Model is not null)
             {
-                if (user != null && Model.Senator != null && (Model.Senator.UserId == user.Id || user.ValourId == 12200448886571008))
-                {
-                    <a asp-route-id="@Model.Name" asp-action="Edit" asp-controller="District" class="btn btn-primary">Modify</a>
-                }
 
                 <div class="d-flex align-content-center align-items-center">
 
@@ -190,6 +186,7 @@
                 }
                 if (user!.Id == Model.GovernorId) {
                     <div class="p-2 align-self-center" style="text-align:center">
+                        <a asp-controller="District" asp-action="Manage" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
                         <a asp-controller="District" asp-action="EditPolicies" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit Policies</a>
                         <a asp-controller="District" asp-action="ManageStates" asp-route-id="@Model.Id" class="btn btn-outline-primary">Manage States</a>
                     </div>
@@ -354,7 +351,7 @@
                 </tr>
                 <tr>
                     <td colspan="2" class="infobox-subheader">
-                        <div>States</div>
+                        <div>@Model.TitleForState.Pluralize()</div>
                     </td>
                 </tr>
                 @{

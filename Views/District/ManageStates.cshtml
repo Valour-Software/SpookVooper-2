@@ -1,7 +1,7 @@
 ﻿@model ManageStatesModel
 
 @{
-    ViewData["Title"] = "Manage States";
+    ViewData["Title"] = $"Manage {Model.District.NameForState.Pluralize()}";
 
     SVUser user = UserManager.GetUser(Context)!;
 }
@@ -38,7 +38,14 @@
 
 <div class="container vw-100">
     <div class="col-12">
+        <a asp-controller="District" asp-action="View" asp-route-name="@Model.District.Name">
+            <button class="btn btn-primary">Go Back</button>
+        </a>
+
+        <br />
+        <br />
         <h4>@ViewData["Title"]</h4>
+
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
         <!form method="post" action="/District/CreateState">
@@ -72,7 +79,7 @@
                 <div class="container" style="align-content:flex-start">
                     <div class="d-flex">
                         <div class="flex-column" style="margin-right:5px; margin-left: -15px">
-                            <button type="submit" class="btn btn-primary">Create State</button>
+                            <button type="submit" class="btn btn-primary">Create @Model.District.NameForState</button>
                         </div>
                     </div>
                 </div>
@@ -84,8 +91,8 @@
         <table class="table">
             <thead>
                 <tr class="header">
-                    <th>State Name</th>
-                    <th>Num of Provinces</th>
+                    <th>@Model.District.NameForState Name</th>
+                    <th>Num of @Model.District.NameForProvince.Pluralize()</th>
                 </tr>
             </thead>
             <tbody>

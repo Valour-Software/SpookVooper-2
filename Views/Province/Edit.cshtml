@@ -12,7 +12,7 @@
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
         <h3 style="text-align:center">@ViewData["Title"]</h3>
-        <h2 style="text-align:center">The Province of @Model.Name</h2>
+        <h2 style="text-align:center">The @Model.District.NameForProvince of @Model.Name</h2>
 
         <a asp-controller="Province" asp-action="View" asp-route-id="@Model.Id">
             <button class="btn btn-primary">Go Back</button>
@@ -33,7 +33,7 @@
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @Html.HiddenFor(x => x.Id)
                 <div class="row">
-                    <h4>Province Info</h4>
+                    <h4>@Model.District.NameForProvince Info</h4>
 
                     <div asp-validation-summary="All" class="text-danger"></div>
                 </div>
@@ -52,7 +52,7 @@
                 </div>
 
                 <br />
-                <p>Property Taxes are paid to the Governor of a province, or to the District if the governor is not set</p>
+                <p>Property Taxes are paid to the @Model.District.NameForGovernorOfAProvince of a @Model.District.NameForProvince.ToLower(), or to the District if the @Model.District.NameForGovernorOfAProvince is not set</p>
                 <div class="form-group">
                     <label>Base monthly property tax per building (not size!)</label>
                     <input asp-for="BasePropertyTax" class="form-control"/>
@@ -76,7 +76,7 @@
             @Html.AntiForgeryToken()
             @Html.Hidden("Id", Model.Id)
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
-                <p>The state this province belongs to</p>
+                <p>The state this @Model.District.NameForProvince.ToLower() belongs to</p>
                 <div class="input-group" style="max-width:700px;margin-left:auto;margin-right:auto;">
                     <select id="StateId" name="StateId" class="form-select" style="display:inline-block; max-width:500px;">
                         @if (Model.StateId == null)
@@ -108,7 +108,7 @@
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @if (Model.District.GovernorId == user.Id)
                 {
-                    <p>Governor Entity's name</p>
+                    <p>@Model.District.NameForGovernorOfAProvince Entity's name</p>
                     <input data-val="true" data-val-required="The Id field is required." id="GovernorId" name="GovernorId" type="hidden" value="@Model.GovernorId">
                     <div class="input-group" style="max-width:700px;margin-left:auto;margin-right:auto;">
                         <input style="margin-bottom:20px; display:inline-block; max-width:500px;" id="user-input" class="form-control" value="@(Model.Governor?.Name ?? "")"/>

@@ -47,7 +47,7 @@
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
         <h3 style="text-align:center">@ViewData["Title"]</h3>
-        <h2 style="text-align:center">The Province of @Model.Province.Name</h2>
+        <h2 style="text-align:center">The @Model.Province.District.NameForProvince of @Model.Province.Name</h2>
 
         <a asp-controller="Province" asp-action="View" asp-route-id="@Model.Province.Id">
             <button class="btn btn-primary">Go Back</button>
