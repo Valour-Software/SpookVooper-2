@@ -24,6 +24,8 @@ building_advanced_factory = {
 	recipes = [
 		recipe_advanced_components_factory_base
 		recipe_computer_chips_factory_base
+		recipe_cars_factory_base
+		recipe_televisions_factory_base
 	]
 	buildingcosts = {
 		steel = 35000

@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal;
 using System.Text;
 using SV2.Database.Models.News;
+using SV2.Database.Models.Corporations;
 
 /*  Valour - A free and secure chat client
  *  Copyright (C) 2021 Vooper Media LLC
@@ -129,6 +130,10 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     /// Table for SV2 groups
     /// </summary>
     public DbSet<Group> Groups { get; set; }
+
+    public DbSet<Corporation> Corporations { get; set; }
+    public DbSet<CorporationShare> CorporationShares { get; set; }
+    public DbSet<CorporationShareClass> CorporationShareClasses { get; set; }
 
     public DbSet<TaxPolicy> TaxPolicies { get; set; }
     public DbSet<ItemDefinition> ItemDefinitions {get; set; }

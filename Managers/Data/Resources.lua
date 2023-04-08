@@ -15,7 +15,12 @@ consumer_goods = {
 	televisions = {
 		popgrowthratemodifier = 0.05
 		economicscore = 1
-		consumptionrate = 0.1
+		consumptionrate = 0.15
+	}
+	cars = {
+		popgrowthratemodifier = 0.1
+		economicscore = 2.5
+		consumptionrate = 2.25
 	}
 }
 
@@ -27,6 +32,8 @@ raw = {
 	iron_ore = {
 	}
 	copper_ore = {
+	}
+	gold_ore = {
 	}
 	crystallite = {
 	}
@@ -53,6 +60,8 @@ metals = {
 	lead = {
 	}
 	aluminium = {
+	}
+	gold = {
 	}
 }
 

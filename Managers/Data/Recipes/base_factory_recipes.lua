@@ -42,7 +42,6 @@ recipe_steel_factory_base = {
 	inputs = {
 		coal = 2
 		iron = 4
-		tools = 0.1
 	}
 	outputs = {
 		steel = 2.5
@@ -123,13 +122,29 @@ recipe_televisions_factory_base = {
 	name = "Television Production"
 	inputs = {
 		computer_chips = 5
-		steel = 2
-		plastic = 40
+		steel = 1
+		plastic = 5
 	}
 	outputs = {
 		televisions = 1
 	}
-	perhour = 6
+	perhour = 15
+    editable = false
+}
+
+recipe_cars_factory_base = {
+	name = "Car Production"
+	inputs = {
+		computer_chips = 4
+		steel = 5
+		plastic = 40
+		aluminium = 80
+		crystallite = 0.5
+	}
+	outputs = {
+		cars = 1
+	}
+	perhour = 35
     editable = false
 }
 

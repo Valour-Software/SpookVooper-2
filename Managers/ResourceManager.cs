@@ -29,6 +29,44 @@ public class BaseRecipe
     public string Name { get; set; }
 
     public List<SyntaxModifierNode>? ModifierNodes { get; set; }
+
+    /// <summary>
+    /// Returns the input costs per 1 output
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<string, double> GetRawResourceConsumption(int depth = 1)
+    {
+        if (GameDataManager.ResourceConsumptionPerRecipe.ContainsKey(Name))
+            return GameDataManager.ResourceConsumptionPerRecipe[Name];
+        var usage = new Dictionary<string, double>();
+        var div = Outputs.First().Value;
+        foreach (var input in Inputs)
+        {
+            Console.WriteLine($"{depth}: {Name}: {input.Key}");
+            // determine if input resource is a raw resource or not
+            if (GameDataManager.ResourcesByMaterialGroup["metals"].Any(x => x.LowerCaseName == input.Key)
+                || GameDataManager.ResourcesByMaterialGroup["raw"].Any(x => x.LowerCaseName == input.Key)
+                || input.Key == "bauxite")
+            {
+                if (!usage.ContainsKey(input.Key))
+                    usage[input.Key] = 0;
+                usage[input.Key] += input.Value/div;
+            }
+            else
+            {
+                foreach (var pair in GameDataManager.BaseBuildingObjs.Values.Where(x => x.type == BuildingType.Factory || x.type == BuildingType.Mine)
+                    .SelectMany(x => x.Recipes)
+                    .First(x => x.Outputs.First().Key == input.Key).GetRawResourceConsumption(depth + 1))
+                {
+                    if (!usage.ContainsKey(pair.Key))
+                        usage[pair.Key] = 0;
+                    usage[pair.Key] += pair.Value / div * input.Value;
+                }
+            }
+        }
+        GameDataManager.ResourceConsumptionPerRecipe[Name] = usage;
+        return usage;
+    }
 }
 
 public class ConsumerGood

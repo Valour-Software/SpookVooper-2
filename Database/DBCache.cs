@@ -191,17 +191,20 @@ public static class DBCache
         foreach(Election election in dbctx.Elections) {
             Put(election.Id, election);
         }
-        foreach(Vote vote in dbctx.Votes) {
-            Put(vote.Id, vote);
-        }
+        foreach(var _obj in dbctx.Votes)
+            Put(_obj.Id, _obj);
         foreach (var _obj in dbctx.States)
             Put(_obj.Id, _obj);
-        foreach (Recipe recipe in dbctx.Recipes)
-            Put(recipe.Id, recipe);
-        foreach(Minister minister in dbctx.Ministers)
-            Put(minister.UserId, minister);
+        foreach (var _obj in dbctx.Recipes)
+            Put(_obj.Id, _obj);
+        foreach(var _obj in dbctx.Ministers)
+            Put(_obj.UserId, _obj);
         foreach (var _obj in dbctx.Senators)
             Put(_obj.DistrictId, _obj);
+        foreach (var _obj in dbctx.Corporations)
+            Put(_obj.Id, _obj);
+        foreach (var _obj in dbctx.CorporationShareClasses)
+            Put(_obj.Id, _obj);
 
         foreach (District district in GetAll<District>())
         {

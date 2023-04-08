@@ -22,6 +22,7 @@ public static class GameDataManager
     static public Dictionary<string, ItemDefinition> ResourcesToItemDefinitions = new();
     static public Dictionary<string, LuaPolicy> LuaPolicyObjs = new();
     static public Dictionary<OnActionType, List<LuaOnAction>> LuaOnActions = new();
+    static public Dictionary<string, Dictionary<string, double>> ResourceConsumptionPerRecipe = new();
 
     public static async Task Load()
     {
