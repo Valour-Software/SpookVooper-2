@@ -9,4 +9,8 @@ public class MiscController : SVController
     {
         return View();
     }
+    public IActionResult TechTree()
+    {
+        return View();
+    }
 }

@@ -247,3 +247,10 @@ public abstract class BaseEntity
         return ImageUrl;
     }
 }
+
+public enum EntityModifierType
+{
+    FactoryThroughputFactor,
+    FactoryEfficiencyFactor,
+    FactoryQuantityCapFactor
+}

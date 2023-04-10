@@ -11,6 +11,8 @@ public class SyntaxModifierNode : SyntaxNode
 {
     public DistrictModifierType? districtModifierType { get; set; }
     public ProvinceModifierType? provinceModifierType { get; set; }
+    public BuildingModifierType? buildingModifierType { get; set; }
+    public EntityModifierType? entityModifierType { get; set; }
     public SyntaxNode Value { get; set; }
 
     public string GetColorClass(bool flip, decimal value) {
@@ -25,16 +27,26 @@ public class SyntaxModifierNode : SyntaxNode
     public string GetHumanReadableName() {
         if (districtModifierType is not null) {
             return districtModifierType switch {
-                DistrictModifierType.AllProducingBuildingThroughputFactor => "Buildings' Throughtput",
+                DistrictModifierType.AllProducingBuildingThroughputFactor => "Buildings' Throughput",
                 DistrictModifierType.BuildingSlotsExponent => "Exponent for Building Slots from Population",
                 DistrictModifierType.BuildingSlotsFactor => "Building Slots",
                 DistrictModifierType.OverPopulationModifierExponent => "Exponent for Overpopulation",
                 _ => "[No Loc]"
             };
         }
+        else if (entityModifierType is not null)
+        {
+            return entityModifierType switch
+            {
+                EntityModifierType.FactoryEfficiencyFactor => "Factories' Efficiency",
+                EntityModifierType.FactoryThroughputFactor => "Factories' Throughput",
+                EntityModifierType.FactoryQuantityCapFactor => "Factories' Quantity Cap",
+                _ => "[No Loc]"
+            };
+        }
         else {
             return provinceModifierType switch {
-                ProvinceModifierType.AllProducingBuildingThroughputFactor => "Buildings' Throughtput",
+                ProvinceModifierType.AllProducingBuildingThroughputFactor => "Buildings' Throughput",
                 ProvinceModifierType.BuildingSlotsExponent => "Exponent for Building Slots from Population",
                 ProvinceModifierType.BuildingSlotsFactor => "Building Slots",
                 ProvinceModifierType.OverPopulationModifierExponent => "Exponent for Overpopulation",
@@ -50,6 +62,16 @@ public class SyntaxModifierNode : SyntaxNode
                 DistrictModifierType.BuildingSlotsExponent => GetColorClass(false, value),
                 DistrictModifierType.BuildingSlotsFactor => GetColorClass(false, value),
                 DistrictModifierType.OverPopulationModifierExponent => GetColorClass(true, value),
+                _ => "modifier-tooltip-modifier-listitem-neutral"
+            };
+        }
+        else if (entityModifierType is not null)
+        {
+            return entityModifierType switch
+            {
+                EntityModifierType.FactoryEfficiencyFactor => GetColorClass(false, value),
+                EntityModifierType.FactoryQuantityCapFactor => GetColorClass(false, value),
+                EntityModifierType.FactoryThroughputFactor => GetColorClass(false, value),
                 _ => "modifier-tooltip-modifier-listitem-neutral"
             };
         }
@@ -70,7 +92,9 @@ public class SyntaxModifierNode : SyntaxNode
         if (value < 0.0m) sign = "";
         string valuestring = "";
         if ((districtModifierType is not null && districtModifierType.ToString().Contains("Factor"))
-            || (provinceModifierType is not null && provinceModifierType.ToString().Contains("Factor")))
+            || (provinceModifierType is not null && provinceModifierType.ToString().Contains("Factor"))
+            || (entityModifierType is not null && entityModifierType.ToString().Contains("Factor"))
+            || (buildingModifierType is not null && buildingModifierType.ToString().Contains("Factor")))
             valuestring = $"{(value * 100):n2}%";
         else
             valuestring = $"{value:n2}";

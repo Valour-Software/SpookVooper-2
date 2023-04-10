@@ -25,4 +25,8 @@
 	<PackageReference Include="Valour.Api" Version="0.1.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Database\Models\Research\" />
+  </ItemGroup>
+
 </Project>

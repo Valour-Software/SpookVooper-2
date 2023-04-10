@@ -45,6 +45,8 @@ public class ItemDefinition : IHasOwner
     [Column("baseitemdefinitionid")]
     public long? BaseItemDefinitionId { get; set; }
 
+    public bool Transferable { get; set; }
+
     [NotMapped]
     public bool IsSVItem => OwnerId == 100 || BaseItemDefinitionId is not null;
 

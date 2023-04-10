@@ -80,3 +80,9 @@ military = {
 	arms = {
 	}
 }
+
+research_points = {
+	production_research_points = {
+		transferable = false
+	}
+}

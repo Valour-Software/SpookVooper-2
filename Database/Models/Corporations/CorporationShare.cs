@@ -22,6 +22,4 @@ public class CorporationShare
 
     [NotMapped]
     public Corporation Corporation => DBCache.Get<Corporation>(CorporationId)!;
-
-
 }

@@ -1,7 +1,5 @@
 ﻿simple_factory_throughput_upgrade = {
     name = "Increase Simple Factory's Throughput"
-
-	-- these costs are scaled to the building's level!
     costs = {
         add_locals = {
 			cost_increase = 1.3^building.level
@@ -12,7 +10,7 @@
     }
     modifiers = {
         building.throughputfactor = 0.15
-		building.efficiencyfactor = -0.02
+		building.efficiencyfactor = -0.03
     }
 }
 
@@ -32,8 +30,6 @@ simple_factory_efficiency_upgrade = {
 
 advanced_factory_throughput_upgrade = {
     name = "Increase Advanced Factory's Throughput"
-
-	-- these costs are scaled to the building's level!
     costs = {
         add_locals = {
 			cost_increase = 1.3^building.level
@@ -44,7 +40,7 @@ advanced_factory_throughput_upgrade = {
     }
     modifiers = {
         building.throughputfactor = 0.2
-		building.efficiencyfactor = -0.02
+		building.efficiencyfactor = -0.03
     }
 }
 

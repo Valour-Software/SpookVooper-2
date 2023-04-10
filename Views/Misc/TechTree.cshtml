@@ -1,0 +1,68 @@
+﻿@using SV2.Helpers
+@using SV2.Helpers.TreeHelper
+
+<style id="stylesheet">
+    text {
+        text-anchor: middle;
+        font-size: small;
+        font-weight: bold;
+    }
+
+    rect {
+        fill: lightblue;
+        stroke: black;
+        opacity: 0.25;
+        stroke-width: 1.5;
+    }
+
+    line {
+        stroke: black;
+        opacity: 1;
+        stroke-width: 1.5;
+    }
+</style>
+
+<svg id="diagramSvg" xmlns="http://www.w3.org/2000/svg" style="width: 900px; height: 3000px;">
+    <defs>
+        <marker id="arrowHead" viewBox="-10 -5 10 10" markerUnits="strokeWidth" markerWidth="6" markerHeight="5" orient="auto-start-reverse">
+            <path d="M -10 -5 L 0 0 L -10 5 z"></path>
+        </marker>
+    </defs>
+    <g id="diagramGroup">
+        @{
+            var tree = new TechTreeVisualizer();
+            tree.Generate(GameDataManager.ResearchCategories["production_category"]);
+            foreach (var node in tree._tree.Children) {
+                @Html.Raw(tree.DrawNode(node));
+            }
+        }
+    </g>
+</svg>
+<svg id="diagramSvg" xmlns="http://www.w3.org/2000/svg" style="width: 900px; height: 3000px;">
+    <defs>
+        <marker id="arrowHead" viewBox="-10 -5 10 10" markerUnits="strokeWidth" markerWidth="6" markerHeight="5" orient="auto-start-reverse">
+            <path d="M -10 -5 L 0 0 L -10 5 z"></path>
+        </marker>
+    </defs>
+    <g id="diagramGroup">
+        @{
+            tree = new TechTreeVisualizer();
+            tree.Generate(GameDataManager.ResearchCategories["civil_category"]);
+            foreach (var node in tree._tree.Children)
+            {
+                @Html.Raw(tree.DrawNode(node));
+            }
+        }
+    </g>
+</svg>
+
+
+<script>
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = []
+for (i = 0; i < tooltipTriggerList.length;i++) {
+    el = tooltipTriggerList[i]
+    e = new bootstrap.Tooltip(el)
+    tooltipList.push(e)
+}
+</script>

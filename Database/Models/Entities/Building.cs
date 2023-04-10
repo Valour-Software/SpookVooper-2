@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Scripting;
 using Valour.Shared;
 using Valour.Api.Models;
+using SV2.Database.Models.Districts;
+using System.Text.Json.Serialization;
 
 namespace SV2.Database.Models.Buildings;
 
@@ -14,7 +16,8 @@ public enum BuildingType
     Farm = 3,
     Factory = 1,
     Recruitment_Center = 2,
-    Infrastructure = 4
+    Infrastructure = 4,
+    ResearchLab = 5
 }
 
 public interface ITickable
@@ -67,6 +70,17 @@ public abstract class BuildingBase : IHasOwner, ITickable
     public virtual async ValueTask Tick() { }
 }
 
+public class BuildingUpgrade
+{
+    public string LuaBuildingUpgradeId { get; set; }
+
+    [NotMapped]
+    [JsonIgnore]
+    public LuaBuildingUpgrade LuaBuildingUpgradeObj => GameDataManager.BaseBuildingUpgradesObjs[LuaBuildingUpgradeId];
+
+    public int Level { get; set; }
+}
+
 public abstract class ProducingBuilding : BuildingBase
 {
     public ProducingBuilding() {
@@ -74,6 +88,12 @@ public abstract class ProducingBuilding : BuildingBase
     }
     public long? EmployeeId { get; set; }
     public double Quantity { get; set; }
+
+    [NotMapped]
+    public Dictionary<BuildingModifierType, double> Modifiers { get; set; }
+
+    [Column("upgrades", TypeName = "jsonb[]")]
+    public List<BuildingUpgrade>? Upgrades { get; set; } = new();
 
     [NotMapped]
     public double QuantityHourlyGrowth {
@@ -98,6 +118,7 @@ public abstract class ProducingBuilding : BuildingBase
                 eff += District.GetModifierValue(DistrictModifierType.FactoryEfficiency);
                 eff *= 1 + District.GetModifierValue(DistrictModifierType.FactoryEfficiencyFactor);
             }
+            eff *= GetModifierValue(BuildingModifierType.EfficiencyFactor) + 1.00;
             return eff;
         }
     }
@@ -135,6 +156,7 @@ public abstract class ProducingBuilding : BuildingBase
             if (BuildingObj.ApplyStackingBonus)
                 basevalue += Math.Min(Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Size, Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"]);
 
+            basevalue *= GetModifierValue(BuildingModifierType.EfficiencyFactor) + 1.00;
             basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;
             basevalue *= District.GetModifierValue(DistrictModifierType.AllProducingBuildingThroughputFactor) + 1.00;
             
@@ -186,6 +208,13 @@ public abstract class ProducingBuilding : BuildingBase
         return rate;
     }
 
+    public double GetModifierValue(BuildingModifierType modifierType)
+    {
+        if (!Modifiers.ContainsKey(modifierType))
+            return 0;
+        return Modifiers[modifierType];
+    }
+
     public double GetHourlyProduction(bool useQuantity = true) {
         return GetProductionSpeed(useQuantity) * Size;
     }
@@ -195,7 +224,34 @@ public abstract class ProducingBuilding : BuildingBase
         return Province.Metadata.Resources[BuildingObj.MustHaveResource]/10550.0;
     }
 
+    public void UpdateOrAddModifier(BuildingModifierType type, double value)
+    {
+        if (!Modifiers.ContainsKey(type))
+            Modifiers[type] = value;
+        else
+            Modifiers[type] += value;
+    }
+
     public async ValueTask<TaskResult> TickRecipe() {
+        Modifiers = new();
+
+        var executionstate = new ExecutionState(District, Province, parentscopetype: ScriptScopeType.Building, building: this);
+
+        if (Upgrades is not null)
+        {
+            foreach (var upgrade in Upgrades)
+            {
+                foreach (var modifiernode in upgrade.LuaBuildingUpgradeObj.ModifierNodes)
+                {
+                    var value = (double)modifiernode.GetValue(executionstate);
+                    UpdateOrAddModifier((BuildingModifierType)modifiernode.provinceModifierType!, value);
+                }
+            }
+        }
+        else
+            Upgrades = new();
+
+
         double rate = GetRateForProduction();
         if (!Recipe.Inputcost_Scaleperlevel)
             rate /= Size;
@@ -236,4 +292,10 @@ public abstract class ProducingBuilding : BuildingBase
             return true;
         return false;
     }
+}
+
+public enum BuildingModifierType
+{
+    ThroughputFactor,
+    EfficiencyFactor
 }

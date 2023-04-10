@@ -9,6 +9,8 @@ public static class IdManagers
     // seperate generators so that we can have a united entity table and that requires having different ids per entity
     public static IdManager UserIdGenerator = new(0);
     public static IdManager GroupIdGenerator = new(1);
+
+    public static IdManager StatIdGenerator = new(2);
 }
 
 public class IdManager

@@ -161,10 +161,19 @@ recipe_small_arms_factory_base = {
 	edits = {
 		attack = {
 			name = "Attack"
-			base = 1
+
+			-- these are NOT scaled to the edit's level
 			modifiers = {
-				item.attack = 0.25
+				item.attack = {
+					base = 1
+					add = {
+						base = 0.25
+						factor = edit.level
+					}
+				}
 			}
+
+			-- per level
 			costs = {
 				steel = {
 					base = 1

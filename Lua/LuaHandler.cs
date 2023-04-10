@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SV2.Scripting.LuaObjects;
 using SV2.Scripting;
 using System.Text.Json.Serialization;
+using SV2.Database.Models.Districts;
 
 namespace SV2.Scripting.Parser;
 
@@ -245,6 +246,32 @@ public static class LuaHandler
                     }
                 };
             }
+            else if (levels[0] == "building")
+            {
+                node.buildingModifierType = levels[0] switch
+                {
+                    "building" => levels[1] switch
+                    {
+                        "throughputfactor" => BuildingModifierType.ThroughputFactor,
+                        "efficiencyfactor" => BuildingModifierType.EfficiencyFactor
+                    }
+                };
+            }
+            else if (levels[0] == "entity")
+            {
+                node.entityModifierType = levels[0] switch
+                {
+                    "entity" => levels[1] switch
+                    {
+                        "factories" => levels[2] switch
+                        {
+                            "throughputfactor" => EntityModifierType.FactoryThroughputFactor,
+                            "efficiencyfactor" => EntityModifierType.FactoryEfficiencyFactor,
+                            "quantitycapfactor" => EntityModifierType.FactoryQuantityCapFactor
+                        }
+                    }
+                };
+            }
             else
             {
                 node.provinceModifierType = levels[0] switch
@@ -293,13 +320,14 @@ public static class LuaHandler
         return nodes;
     }
 
-    public static DictNode HandleDictExpression(LuaTable table) 
+    public static DictNode HandleDictExpression(LuaTable table)
     {
         DictNode dict = new();
-        foreach (var key in table.Keys) 
+        foreach (var key in table.Keys)
         {
             var obj = table[key];
-            if (obj.type == ObjType.LuaTable) {
+            if (obj.type == ObjType.LuaTable)
+            {
                 LuaTable _table = new();
                 if (obj.Name == "add_locals")
                     _table.Items.Add(obj);
@@ -339,7 +367,8 @@ public static class LuaHandler
             else
                 valuenode = new Decimal() { Value = Convert.ToDecimal(obj.Value) };
 
-            if (valuenode is not null) {
+            if (valuenode is not null)
+            {
                 valuenode.LineNumber = obj.LineNumber;
                 valuenode.FileName = obj.FileName;
             }
@@ -356,24 +385,28 @@ public static class LuaHandler
                 expr.Body.Add(new GetLocal() { Name = ((SystemVar)valuenode).Value, LineNumber = obj.LineNumber });
             else if (obj.Name == "effects")
                 expr.Body.Add(new EffectBody() { Body = exprnode.Body.Select(x => (IEffectNode)x).ToList(), LineNumber = obj.LineNumber });
-            else if (obj.Name.Contains(":")) {
+            else if (obj.Name.Contains(":"))
+            {
                 var spliced = obj.Name.Split(":");
-                var node = new ChangeScopeNode() {
+                var node = new ChangeScopeNode()
+                {
                     scopeType = Enum.Parse<ScriptScopeType>(spliced[0], true),
                     ChangeTo = spliced[1],
                     LineNumber = obj.LineNumber
                 };
-                if (parentname == "effects") {
+                if (parentname == "effects")
+                {
                     exprnode = new();
                     exprnode.Body = HandleSyntaxExpression((LuaTable)obj, "effects").Body;
                     node.EffectBodyNode = new EffectBody() { Body = exprnode.Body.Select(x => (IEffectNode)x).ToList(), LineNumber = obj.LineNumber, FileName = obj.FileName };
                 }
-                else {
+                else
+                {
                     node.Value = valuenode;
                 }
                 expr.Body.Add(node);
             }
-            else if (obj.Name == "add_locals") 
+            else if (obj.Name == "add_locals")
             {
                 var node = new AddLocalsNode();
                 foreach (var item in exprnode.Body.Select(x => (LocalNode)x))
@@ -381,9 +414,11 @@ public static class LuaHandler
                 node.LineNumber = obj.LineNumber;
                 expr.Body.Add(node);
             }
-            else if (obj.Name == "if") {
+            else if (obj.Name == "if")
+            {
                 var iftable = (LuaTable)obj;
-                var ifstatement = new IfStatement() {
+                var ifstatement = new IfStatement()
+                {
                     Limit = (ConditionalStatement)exprnode.Body.FirstOrDefault(x => x.NodeType == NodeType.CONDITIONALSTATEMENT),
                     ValueNode = new(),
                     LineNumber = obj.LineNumber,
@@ -393,7 +428,8 @@ public static class LuaHandler
                 if (iftable.Keys.Contains("effects"))
                     ifstatement.EffectNode = (EffectBody)exprnode.Body.FirstOrDefault(x => x.NodeType == NodeType.EFFECTBODY);
 
-                foreach (var node in exprnode.Body) {
+                foreach (var node in exprnode.Body)
+                {
                     if (node.NodeType == NodeType.CONDITIONALSTATEMENT || node.NodeType == NodeType.EFFECTBODY)
                         continue;
                     ifstatement.ValueNode.Body.Add(node);
@@ -401,19 +437,24 @@ public static class LuaHandler
 
                 expr.Body.Add(expr);
             }
-            else if (parentname == "add_locals") {
-                expr.Body.Add(new LocalNode() {
+            else if (parentname == "add_locals")
+            {
+                expr.Body.Add(new LocalNode()
+                {
                     Name = obj.Name,
                     Value = HandleSyntaxExpression((LuaTable)obj),
                     LineNumber = obj.LineNumber,
                     FileName = obj.FileName
                 });
             }
-            else if (parentname == "effects") {
+            else if (parentname == "effects")
+            {
                 var effectbody_table = (LuaTable)obj;
 
-                if (obj.Name == "add_static_modifier_if_not_already_added" || obj.Name == "add_static_modifier") {
-                    var addmodifiernode = new AddStaticModifierNode() {
+                if (obj.Name == "add_static_modifier_if_not_already_added" || obj.Name == "add_static_modifier")
+                {
+                    var addmodifiernode = new AddStaticModifierNode()
+                    {
                         ModifierName = effectbody_table["name"].Value,
                         Decay = Convert.ToBoolean(effectbody_table.GetValue("decay") ?? "false"),
                         Duration = Convert.ToInt32(effectbody_table.GetValue("duration") ?? "0"),
@@ -422,8 +463,10 @@ public static class LuaHandler
                     };
                     if (effectbody_table.Keys.Contains("scale_by"))
                         addmodifiernode.ScaleBy = HandleSyntaxExpression((LuaTable)effectbody_table["scale_by"]);
-                    if (obj.Name == "add_static_modifier_if_not_already_added") {
-                        var _node = new AddStaticModifierIfNotAlreadyExistsNode() {
+                    if (obj.Name == "add_static_modifier_if_not_already_added")
+                    {
+                        var _node = new AddStaticModifierIfNotAlreadyExistsNode()
+                        {
                             AddStaticModifierNode = addmodifiernode,
                             LineNumber = obj.LineNumber,
                             FileName = obj.FileName
@@ -435,7 +478,8 @@ public static class LuaHandler
                 }
             }
         }
-        foreach (var node in expr.Body) {
+        foreach (var node in expr.Body)
+        {
             node.FileName = table.FileName;
         }
         return expr;
@@ -456,16 +500,19 @@ public static class LuaHandler
         }
     }
 
-    public static void HandleResourcesFile(string content, string filename) {
-        foreach (var (__table, materialgroup) in HandleFile(content, filename)) 
+    public static void HandleResourcesFile(string content, string filename)
+    {
+        foreach (var (__table, materialgroup) in HandleFile(content, filename))
         {
             GameDataManager.ResourcesByMaterialGroup[materialgroup] = new();
             var _table = (LuaTable)__table;
-            foreach (var key in _table.Keys) {
+            foreach (var key in _table.Keys)
+            {
                 var table = (LuaTable)_table[key];
-                var resource = new SVResource() {
+                var resource = new SVResource()
+                {
                     Name = key.ToTitleCase(),
-                    LowerCaseName = key
+                    LowerCaseName = key,
                 };
                 if (table.GetValue("popgrowthratemodifier") is not null)
                 {
@@ -480,8 +527,10 @@ public static class LuaHandler
                 GameDataManager.ResourcesByMaterialGroup[materialgroup].Add(resource);
                 GameDataManager.Resources[resource.Name] = resource;
                 var itemdef = DBCache.GetAll<ItemDefinition>().FirstOrDefault(x => x.Name == resource.Name);
-                if (itemdef is null) {
+                if (itemdef is null)
+                {
                     itemdef = new(100, resource.Name);
+                    itemdef.Transferable = Convert.ToBoolean(table.GetValue("transferable") ?? "true");
                     DBCache.Put(itemdef.Id, itemdef);
                     DBCache.dbctx.Add(itemdef);
                 }
@@ -515,7 +564,8 @@ public static class LuaHandler
             var outputs = (LuaTable)table["outputs"];
             foreach (string output in outputs.Keys)
             {
-                if (output == "modifiers") {
+                if (output == "modifiers")
+                {
                     recipe.ModifierNodes = HandleModifierNodes((LuaTable)outputs["modifiers"]);
                 }
                 else
@@ -529,7 +579,8 @@ public static class LuaHandler
     {
         foreach (var (table, name) in HandleFile(content, filename))
         {
-            var building = new LuaBuilding() {
+            var building = new LuaBuilding()
+            {
                 Name = name,
                 Recipes = new(),
                 OnlyGovernorCanBuild = Convert.ToBoolean(table.GetValue("onlygovernorcanbuild") ?? "false"),
@@ -552,9 +603,12 @@ public static class LuaHandler
 
     public static void HandleOnActionFile(string content, string filename)
     {
-        foreach (var (table, name) in HandleFile(content, filename)) {
-            var onaction = new LuaOnAction() {
-                OnActionType = name switch {
+        foreach (var (table, name) in HandleFile(content, filename))
+        {
+            var onaction = new LuaOnAction()
+            {
+                OnActionType = name switch
+                {
                     "on_server_start" => OnActionType.OnServerStart
                 },
                 EffectBody = (EffectBody)(HandleSyntaxExpression(table).Body.First())
@@ -565,9 +619,12 @@ public static class LuaHandler
         }
     }
 
-    public static void HandleStaticModifierFile(string content, string filename) {
-        foreach (var (table, name) in HandleFile(content, filename)) {
-            var modifier = new LuaStaticModifier() {
+    public static void HandleStaticModifierFile(string content, string filename)
+    {
+        foreach (var (table, name) in HandleFile(content, filename))
+        {
+            var modifier = new LuaStaticModifier()
+            {
                 Name = table["name"].Value,
                 Description = table.GetValue("description"),
                 Stackable = Convert.ToBoolean(table["stackable"].Value),
@@ -591,7 +648,7 @@ public static class LuaHandler
                 DefaultOption = table["default"].Value,
                 Options = new()
             };
-            
+
             foreach (var item in ((LuaTable)table["options"]).Values)
             {
                 var option_table = (LuaTable)item;
@@ -604,6 +661,56 @@ public static class LuaHandler
             }
 
             GameDataManager.LuaPolicyObjs[policy.Id] = policy;
+        }
+    }
+
+    public static List<LuaResearchPrototype> GetLuaResearchPrototypes(LuaTable table)
+    {
+        var prototypes = new List<LuaResearchPrototype>();
+        foreach(var item in table.Items)
+        {
+            var item_table = (LuaTable)item;
+            var prototype = new LuaResearchPrototype()
+            {
+                Id = item.Name,
+                Name = item_table["name"].Value,
+                Color = item_table["color"].Value,
+                WhoCanResearch = Enum.Parse<WhoCanResearch>(item_table["who_can_research"].Value, ignoreCase: true),
+                ModifierNodes = HandleModifierNodes((LuaTable)item_table["modifiers"]),
+                Costs = HandleDictExpression((LuaTable)item_table["costs"]),
+                IsInfinite = Convert.ToBoolean(item_table.GetValue("isinfinite") ?? "true")
+            };
+
+            prototypes.Add(prototype);
+            GameDataManager.BaseResearchPrototypes[prototype.Id] = prototype;
+
+            if (item_table.Items.Any(x => x.Name == "children"))
+                prototype.Children = GetLuaResearchPrototypes((LuaTable)item_table["children"]);
+            else
+                prototype.Children = new();
+        }
+
+        return prototypes;
+    }
+
+    public static void HandleResearchFile(string content, string filename)
+    {
+        foreach (var (table, name) in HandleFile(content, filename))
+        {
+            // first handle the category
+            var category = new LuaResearchCategory()
+            {
+                Name = table["name"].Value,
+                Id = table.Name,
+                Children = new()
+            };
+
+            GameDataManager.ResearchCategories[category.Id] = category;
+
+            // now handle the children
+            category.Children = GetLuaResearchPrototypes((LuaTable)table["researches"]);
+            foreach (var child in category.Children)
+                child.CategoryId = category.Id;
         }
     }
 }

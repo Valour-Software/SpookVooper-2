@@ -464,7 +464,8 @@ public class LocalNode : SyntaxNode
 public enum ScriptScopeType
 {
     District,
-    Province
+    Province,
+    Building
 }
 
 public class ChangeScopeNode : EffectNode
