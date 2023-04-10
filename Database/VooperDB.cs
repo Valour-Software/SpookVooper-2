@@ -152,7 +152,6 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<ItemTrade> ItemTrades { get; set; }
-    public DbSet<Minister> Ministers { get; set; }
     //public DbSet<DistrictStaticModifier> DistrictStaticModifiers { get; set; }
     public DbSet<Senator> Senators { get; set; }
     public DbSet<NewsPost> NewsPosts { get; set; }

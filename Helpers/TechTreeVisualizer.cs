@@ -53,7 +53,10 @@ public class TechTreeVisualizer
 
     public string GenerateRect(int x, int y, int width, int height, string color, LuaResearch research)
     {
-        return $@"<rect x='{x}px' y='{y}px' width='{width}px' height='{height}px' style='fill: #{color};' data-bs-toggle=""tooltip"" data-bs-html=""true"" data-bs-custom-class=""modifier-tooltip-div"" data-bs-sanitize=""false"" data-bs-title=""{GenerateTooltip(research)}""></rect>";
+        string opacity = "0.25";
+        if (research.ParentId == String.Empty) opacity = "1";
+        if (research.Id == "more_building_slots_i" || research.Id == "less_overpopulation_i") opacity = "1";
+        return $@"<rect x='{x}px' y='{y}px' width='{width}px' height='{height}px' style='fill: #{color};opacity:{opacity};' data-bs-toggle=""tooltip"" data-bs-html=""true"" data-bs-custom-class=""modifier-tooltip-div"" data-bs-sanitize=""false"" data-bs-title=""{GenerateTooltip(research)}""></rect>";
     }
 
     public string GenerateText(string text, int x, int y)

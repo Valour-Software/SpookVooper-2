@@ -39,8 +39,14 @@ public class CorporationShareClass
     [Column("classtype")]
     public ShareClassType ClassType { get; set; }
 
-    [Column("votingpower", TypeName = "numeric(8, 3)")]
+    [Column("votingpower", TypeName = "numeric(9, 3)")]
     public decimal VotingPower { get; set; }
+
+    /// <summary>
+    /// Dividend payment per share per month
+    /// </summary>
+    [Column("dividendrate", TypeName = "numeric(9, 3)")]
+    public decimal DividendRate { get; set; }
 
     [NotMapped]
     public Corporation Corporation => DBCache.Get<Corporation>(CorporationId)!;

@@ -9,8 +9,8 @@ namespace SV2.Helpers;
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
 public class IsMinisterAttribute : ActionFilterAttribute
 {
-    public MinisterType Type { get; }
-    public IsMinisterAttribute(MinisterType type)
+    public string Type { get; }
+    public IsMinisterAttribute(string type)
     {
         Type = type;
     }
@@ -22,6 +22,6 @@ public class IsMinisterAttribute : ActionFilterAttribute
         if (user is null)
             context.Result = controller.Redirect("/Account/Login");
         if (!user.IsMinister(Type))
-            context.Result = controller.RedirectBack($"You must be {MinisterHelper.ToReadableName(Type)}");
+            context.Result = controller.RedirectBack($"You must be {Type}");
     }
 }

@@ -53,7 +53,7 @@
                     foreach (var invite in Model)
                     {
                         <tr>
-                            <td>@invite.InvitedTo.Name</td>
+                            <td><a asp-controller="Group" asp-action="View" asp-route-id="@invite.InvitedTo.Id">@invite.InvitedTo.Name</a></td>
                             <td>
                                 @if (invite.InvitedEntity.EntityType == EntityType.User) {
                                     <a asp-controller="User" asp-action="Info" asp-route-id="@invite.InvitedEntity.Id">@invite.InvitedEntity.Name</a>

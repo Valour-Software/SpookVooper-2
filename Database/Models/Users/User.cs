@@ -6,6 +6,7 @@ using SV2.Database.Models.Permissions;
 using Valour.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using SV2.VoopAI;
 
 namespace SV2.Database.Models.Users;
 
@@ -108,12 +109,11 @@ public class SVUser : BaseEntity
         Messages += 1;
     }
 
-    public bool IsMinister(MinisterType ministertype)
+    public bool IsMinister(string ministertype)
     {
-        Minister? minister = DBCache.GetAll<Minister>().FirstOrDefault(x => x.UserId == Id && x.Type == ministertype);
-        if (minister is null)
-            return false;
-        return true;
+        if (DBCache.Vooperia.GetMemberRoles(this).Any(x => x.Name == ministertype))
+            return true;
+        return false;
     }
 
     public static SVUser? FindByName(string name)

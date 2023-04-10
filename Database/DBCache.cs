@@ -1,9 +1,26 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using SV2.Database.Models.Corporations;
 using SV2.Database.Models.Factories;
 
 namespace SV2.Database;
+
+public class DBCacheItemAddition
+{
+    public Type Type { get; set; }
+    public object Item { get; set; }
+
+    public void AddToDB()
+    {
+        if (Type == typeof(Corporation))
+            DBCache.dbctx.Add((Corporation)Item);
+        else if (Type == typeof(CorporationShare))
+            DBCache.dbctx.Add((CorporationShare)Item);
+        else if (Type == typeof(CorporationShareClass))
+            DBCache.dbctx.Add((CorporationShareClass)Item);
+    }
+}
 
 public static class DBCache
 {
@@ -12,7 +29,11 @@ public static class DBCache
     /// </summary>
     public static Dictionary<Type, ConcurrentDictionary<long, object>> HCache = new();
 
+    public static ConcurrentQueue<DBCacheItemAddition> ItemQueue = new();
+
     public static VooperDB dbctx { get; set; }
+
+    public static Group Vooperia => Get<Group>(100)!;
 
     /// <summary>
     /// ProvinceId : List<ProducingBuilding>
@@ -86,6 +107,12 @@ public static class DBCache
         if (!HCache[type].ContainsKey(Id)) {
             HCache[type][Id] = obj;
         }
+    }
+
+    public static void AddNew<T>(long Id, T? obj) where T : class
+    {
+        Put(Id, obj);
+        ItemQueue.Enqueue(new() { Type = typeof(T), Item = obj });
     }
 
     /// <summary>
@@ -197,8 +224,6 @@ public static class DBCache
             Put(_obj.Id, _obj);
         foreach (var _obj in dbctx.Recipes)
             Put(_obj.Id, _obj);
-        foreach(var _obj in dbctx.Ministers)
-            Put(_obj.UserId, _obj);
         foreach (var _obj in dbctx.Senators)
             Put(_obj.DistrictId, _obj);
         foreach (var _obj in dbctx.Corporations)
@@ -229,21 +254,10 @@ public static class DBCache
 
     public static async Task SaveAsync()
     {
-        if (false) {
-            dbctx.Groups.UpdateRange(GetAll<Group>());
-            dbctx.GroupRoles.UpdateRange(GetAll<GroupRole>());
-            dbctx.Users.UpdateRange(GetAll<SVUser>());
-            dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
-            dbctx.SVItemOwnerships.UpdateRange(GetAll<SVItemOwnership>());
-            dbctx.ItemDefinitions.UpdateRange(GetAll<ItemDefinition>());
-            dbctx.Factories.UpdateRange(GetAll<Factory>());
-            dbctx.TaxPolicies.UpdateRange(GetAll<TaxPolicy>());
-            dbctx.Districts.UpdateRange(GetAll<District>());
-            dbctx.Provinces.UpdateRange(GetAll<Province>());
-            dbctx.Cities.UpdateRange(GetAll<City>());
-            dbctx.Recipes.UpdateRange(GetAll<Recipe>());
-            dbctx.Ministers.UpdateRange(GetAll<Minister>());
-            dbctx.Senators.UpdateRange(GetAll<Senator>());
+        while (ItemQueue.Count > 0)
+        {
+            if (ItemQueue.TryDequeue(out var item))
+                item.AddToDB();
         }
         await dbctx.SaveChangesAsync();
     }
