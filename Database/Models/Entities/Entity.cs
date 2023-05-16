@@ -43,7 +43,22 @@ public abstract class BaseEntity
     [JsonIgnore]
     [VarChar(36)]
     public string ApiKey { get; set; }
-    public string? ImageUrl { get; set; }
+
+    [NotMapped]
+    public string? ImageUrl
+    {
+        get
+        {
+            return _ImageUrl is null ? "https://app.valour.gg/_content/Valour.Client/icon-512.png" : _ImageUrl;
+        }
+        set
+        {
+            _ImageUrl = value;
+        }
+    }
+
+    [Column("imageurl")]
+    public string? _ImageUrl { get; set; }
 
     public long? DistrictId { get; set; }
 

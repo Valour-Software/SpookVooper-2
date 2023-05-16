@@ -91,7 +91,7 @@
                             </div>
                         }
 
-                        @if (user.IsMinister(MinisterType.MinisterofJournalism))
+                        @if (user.IsMinister("Minister of Journalism"))
                         {
                             <div class="p-2 align-self-center" style="text-align:center">
                                 <a asp-action="RemovePressPass" asp-controller="News" asp-route-groupid="@Model.Id" class="btn btn-outline-danger">Revoke Pass</a>
@@ -100,7 +100,7 @@
                     }
                     else
                     {
-                        if (user.IsMinister(MinisterType.MinisterofJournalism))
+                        if (user.IsMinister("Minister of Journalism"))
                         {
                             <div class="p-2 align-self-center" style="text-align:center">
                                 <a asp-action="AddPressPass" asp-controller="News" asp-route-groupid="@Model.Id" class="btn btn-outline-warning">Give Pass</a>
@@ -140,7 +140,7 @@
                                 <div class="m-2">
                                     <img class="memberpfp" src="@entity.ImageUrl" />
                                 </div>
-                                <a asp-controller="User" asp-action="Info" asp-route-svid="@entity.Id">
+                                <a asp-controller="User" asp-action="Info" asp-route-id="@entity.Id">
                                     <p class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(entity).Color">@entity.Name</p>
                                 </a>
                             </div>

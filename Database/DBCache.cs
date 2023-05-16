@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using SV2.Database.Models.Corporations;
 using SV2.Database.Models.Factories;
+using SV2.Database.Models.News;
 
 namespace SV2.Database;
 
@@ -17,6 +18,50 @@ public class DBCacheItemAddition
             DBCache.dbctx.Add((Corporation)Item);
         else if (Type == typeof(CorporationShare))
             DBCache.dbctx.Add((CorporationShare)Item);
+        else if (Type == typeof(Group))
+            DBCache.dbctx.Add((Group)Item);
+        else if (Type == typeof(GroupRole))
+            DBCache.dbctx.Add((GroupRole)Item);
+        else if (Type == typeof(SVUser))
+            DBCache.dbctx.Add((SVUser)Item);
+        else if (Type == typeof(TaxPolicy))
+            DBCache.dbctx.Add((TaxPolicy)Item);
+        else if (Type == typeof(ItemDefinition))
+            DBCache.dbctx.Add((ItemDefinition)Item);
+        else if (Type == typeof(SVItemOwnership))
+            DBCache.dbctx.Add((SVItemOwnership)Item);
+        else if (Type == typeof(Factory))
+            DBCache.dbctx.Add((Factory)Item);
+        else if (Type == typeof(Mine))
+            DBCache.dbctx.Add((Mine)Item);
+        else if (Type == typeof(UBIPolicy))
+            DBCache.dbctx.Add((UBIPolicy)Item);
+        else if (Type == typeof(Transaction))
+            DBCache.dbctx.Add((Transaction)Item);
+        else if (Type == typeof(District))
+            DBCache.dbctx.Add((District)Item);
+        else if (Type == typeof(Province))
+            DBCache.dbctx.Add((Province)Item);
+        else if (Type == typeof(Infrastructure))
+            DBCache.dbctx.Add((Infrastructure)Item);
+        else if (Type == typeof(Farm))
+            DBCache.dbctx.Add((Farm)Item);
+        else if (Type == typeof(Election))
+            DBCache.dbctx.Add((Election)Item);
+        else if (Type == typeof(Vote))
+            DBCache.dbctx.Add((Vote)Item);
+        else if (Type == typeof(Recipe))
+            DBCache.dbctx.Add((Recipe)Item);
+        else if (Type == typeof(ItemTrade))
+            DBCache.dbctx.Add((ItemTrade)Item);
+        else if (Type == typeof(Senator))
+            DBCache.dbctx.Add((Senator)Item);
+        else if (Type == typeof(NewsPost))
+            DBCache.dbctx.Add((NewsPost)Item);
+        else if (Type == typeof(BuildingRequest))
+            DBCache.dbctx.Add((BuildingRequest)Item);
+        else if (Type == typeof(State))
+            DBCache.dbctx.Add((State)Item);
         else if (Type == typeof(CorporationShareClass))
             DBCache.dbctx.Add((CorporationShareClass)Item);
     }

@@ -57,8 +57,6 @@ public class GroupController : SVController
         if (user is null) 
             return Redirect("/account/login");
 
-        using var dbctx = VooperDB.DbFactory.CreateDbContext();
-
         model.Name = model.Name.Trim();
 
         if (DBCache.GetAll<Group>().Any(x => x.Name == model.Name))
@@ -75,9 +73,7 @@ public class GroupController : SVController
             OwnerId = user.Id
         };
 
-        DBCache.Put(group.Id, group);
-        DBCache.dbctx.Groups.Add(group);
-        //await dbctx.SaveChangesAsync();
+        DBCache.AddNew(group.Id, group);
 
         return Redirect($"/group/view/{group.Id}");
     }

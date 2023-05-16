@@ -22,7 +22,7 @@
     <div class="col-12">
         <h3 style="text-align:center">Net Raw Resource Usage Per Produced Good</h3>
         <div class="recipes">
-            @foreach (var recipe in GameDataManager.BaseBuildingObjs.Values.Where(x => x.type == BuildingType.Factory).SelectMany(x => x.Recipes))
+            @foreach (var recipe in GameDataManager.BaseBuildingObjs.Values.Where(x => x.type == BuildingType.Factory || x.type == BuildingType.ResearchLab).SelectMany(x => x.Recipes))
             {
                 <div class="recipe">
                     <span>@recipe.Name</span>

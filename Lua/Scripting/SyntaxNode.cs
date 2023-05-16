@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Xml.Linq;
 using SV2.Scripting;
+using SV2.Scripting.LuaObjects;
 using SV2.Scripting.Parser;
 
 namespace SV2.Scripting;
@@ -33,9 +35,10 @@ public class ExecutionState
     public District District { get; set; }
     public Province? Province { get; set; }
     public ProducingBuilding Building { get; set; }
+    public LuaResearch Research { get; set; }
     public Dictionary<string, decimal> ChangeSystemVarsBy { get; set; }
     public ScriptScopeType? ParentScopeType { get; set; }
-    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, ProducingBuilding? building = null)
+    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, ProducingBuilding? building = null, LuaResearch? research = null)
     {
         Locals = new();
         District = district;
@@ -43,6 +46,7 @@ public class ExecutionState
         ChangeSystemVarsBy = changesystemvarsby ?? new();
         ParentScopeType = parentscopetype;
         Building = building;
+        Research = research;
     }
 }
 
@@ -313,6 +317,11 @@ public class SystemVar : SyntaxNode
                     "totaloftype" => (decimal)state.Province.GetLevelsOfBuildingsOfType(levels[3])
                 }
             },
+            "research" => levels[1].ToLower() switch
+            {
+                "level" => state.Research.Level
+            },
+            "get_local" => state.Locals[levels[1]],
             _ => 0.00m
         };
         if (state.ChangeSystemVarsBy.Count > 0)
@@ -465,7 +474,8 @@ public enum ScriptScopeType
 {
     District,
     Province,
-    Building
+    Building,
+    Research
 }
 
 public class ChangeScopeNode : EffectNode

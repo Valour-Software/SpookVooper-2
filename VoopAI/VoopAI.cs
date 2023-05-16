@@ -16,7 +16,7 @@ class VoopAI
     public static List<string> RankNames = new() { "Spleen", "Crab", "Gaty", "Corgi", "Oof", "Unranked" };
     public static Dictionary<string, long> RankRoleIds = new();
     public static Dictionary<string, PlanetRole> DistrictRoles = new();
-    public static long PlanetId = 14735182234910720;
+    public static long PlanetId = 17161193956048896;
 
     public static async Task Main()
     {
@@ -49,8 +49,11 @@ class VoopAI
             RankRoleIds[role.Name] = role.Id;
         
         var districtsnames = DBCache.GetAll<District>().Select(x => x.Name).ToList();
-        foreach (var role in (await (await Planet.FindAsync(PlanetId)).GetRolesAsync()).Where(x => districtsnames.Contains(x.Name + " District")))
+        foreach (var role in (await (await Planet.FindAsync(PlanetId)).GetRolesAsync()).Where(x => districtsnames.Contains(x.Name.Replace(" District", ""))))
+        {
+            DistrictRoles[role.Name] = role;
             RankRoleIds[role.Name] = role.Id;
+        }
 
         await CheckRoles();
 
@@ -131,11 +134,11 @@ class VoopAI
         foreach (var role in (await (await Planet.FindAsync(PlanetId)).GetRolesAsync()).Where(x => RankNames.Contains(x.Name)))
             RankRoleIds[role.Name] = role.Id;
 
-        foreach (var role in (await (await Planet.FindAsync(PlanetId)).GetRolesAsync()).Where(x => districtsnames.Contains(x.Name + " District")))
-            RankRoleIds[role.Name] = role.Id;
+        //foreach (var role in (await (await Planet.FindAsync(PlanetId)).GetRolesAsync()).Where(x => districtsnames.Contains(x.Name + " District")))
+        //    RankRoleIds[role.Name] = role.Id;
     }
 
-    public static async void UpdateRanks()
+    public static async Task UpdateRanks()
     {
         Console.WriteLine("Doing rank job");
 
@@ -159,11 +162,13 @@ class VoopAI
         c -= oofcount;
         int unrankedcount = (int)c;
 
-        var InactivityTaxPolicy = DBCache.GetAll<TaxPolicy>().First(x => x.DistrictId == 100 && x.taxType == TaxType.Inactivity);
+        var InactivityTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == 100 && x.taxType == TaxType.Inactivity);
 
         foreach (var user in users)
         {
-            var member = await PlanetMember.FindAsyncByUser(user.Id, PlanetId);
+            PlanetMember member = await PlanetMember.FindAsyncByUser(user.ValourId, PlanetId);
+            if (member is null)
+                continue;
             if (spleencount > 0)
             {
                 spleencount -= 1;
@@ -195,7 +200,7 @@ class VoopAI
             }
 
             // inactivity tax
-            if (Math.Abs(user.LastSentMessage.Subtract(DateTime.UtcNow).TotalDays) > 14)
+            if (Math.Abs(user.LastSentMessage.Subtract(DateTime.UtcNow).TotalDays) > 14 && InactivityTaxPolicy is not null)
             {
                 decimal tax = InactivityTaxPolicy.GetTaxAmount(user.Credits);
 
@@ -220,6 +225,6 @@ class VoopAI
 
         // TODO: add patron role management
 
-        Console.WriteLine("Finished rank system");
+        Console.WriteLine("Finished rank job");
     }
 }

@@ -10,6 +10,7 @@ using SV2.Database.Models.Districts;
 using System.Xml.Linq;
 using SV2.Database.Managers;
 using SV2.Scripting.Parser;
+using SV2.Database.Models.Government;
 
 namespace SV2.Controllers
 {
@@ -104,6 +105,8 @@ namespace SV2.Controllers
 
             var oldgovernor = DBCache.Get<SVUser>(district.GovernorId);
             var newgovernor = DBCache.Get<SVUser>(GovernorId);
+            if (newgovernor is null)
+                return RedirectBack("User not found!");
 
             if (oldgovernor is not null) {
                 var roles = district.Group.GetMemberRoles(oldgovernor);
@@ -118,6 +121,40 @@ namespace SV2.Controllers
             district.Group.AddEntityToRole(DBCache.Get<Group>(100), newgovernor, district.Group.Roles.First(x => x.Name == "Governor"), true);
 
             return RedirectBack($"Successfully changed the governorship of this district to {BaseEntity.Find(GovernorId).Name}");
+        }
+
+
+        [HttpPost("/District/ChangeSenator/{id}")]
+        [ValidateAntiForgeryToken]
+        [UserRequired]
+        public async Task<IActionResult> ChangeSenator(long id, long SenatorId)
+        {
+            District? district = DBCache.Get<District>(id);
+            if (district is null)
+                return Redirect("/");
+
+            var user = HttpContext.GetUser();
+            if (!(await user.IsGovernmentAdmin()))
+                return RedirectBack("You must be a government admin to change the senator of a district!");
+
+            if (DBCache.Get<SVUser>(SenatorId) is null)
+                return RedirectBack("User not found!");
+
+            var senobj = DBCache.GetAll<Senator>().FirstOrDefault(x => x.DistrictId == district.Id);
+            if (senobj is null)
+            {
+                DBCache.AddNew(district.Id, new Senator()
+                {
+                    DistrictId = district.Id,
+                    UserId = SenatorId
+                });
+            }
+            else
+            {
+                senobj.UserId = SenatorId;
+            }
+
+            return RedirectBack($"Successfully changed the senatorship of this district to {BaseEntity.Find(SenatorId).Name}");
         }
 
         [UserRequired]

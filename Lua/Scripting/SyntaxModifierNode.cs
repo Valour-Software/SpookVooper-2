@@ -97,7 +97,7 @@ public class SyntaxModifierNode : SyntaxNode
             || (buildingModifierType is not null && buildingModifierType.ToString().Contains("Factor")))
             valuestring = $"{(value * 100):n2}%";
         else
-            valuestring = $"{value:n2}";
+            valuestring = $"{value:n3}";
 
         return $"<span class='{GetColorClassForModifier(value)}'>{sign}{valuestring}</span><span class='modifier-tooltip-listitem-name'> {GetHumanReadableName()}</span>";
     }

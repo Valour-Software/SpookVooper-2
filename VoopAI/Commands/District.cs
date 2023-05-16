@@ -20,25 +20,6 @@ class DistrictCommands : CommandModuleBase
     public class DistrictGroup : CommandModuleBase
     {
 
-        [Command("budget")]
-        public async Task CreateGroup(CommandContext ctx, [Remainder] string districtName)
-        {
-            SVUser? user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
-            if (user is null)
-            {
-                await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
-                return;
-            }
-
-            District? district = DBCache.GetAll<District>().FirstOrDefault(x => x.Name == districtName);
-
-            if (district is null)
-            {
-                await ctx.ReplyAsync($"Could not find district with name {districtName}");
-                return;
-            }
-
-            // jacob needs to make Text Sections & dropdowns for Valour Embeds first
-        }
+        
     }
 }

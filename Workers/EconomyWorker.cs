@@ -39,7 +39,7 @@ namespace SV2.Workers
                             {
                                 decimal amount = (decimal)Defines.NDistrict[NDistrict.DISTRICT_FUNDING_BASE];
                                 amount += (decimal)((double)district.Citizens.Count * Defines.NDistrict[NDistrict.DISTRICT_FUNDING_PER_CITIZEN]);
-                                Transaction tran = new Transaction(100, district.GroupId, amount/30/24, TransactionType.FreeMoney, $"Imperial District Funding");
+                                Transaction tran = new Transaction(100, district.GroupId, amount/30/24, TransactionType.FreeMoney, $"Imperial District Funding for {district.Name}");
                                 TaskResult result = await tran.Execute();
                             }
                             List<GroupRole>? roles = DBCache.GetAll<GroupRole>().ToList();

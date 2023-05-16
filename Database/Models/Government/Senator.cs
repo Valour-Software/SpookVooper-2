@@ -9,11 +9,9 @@ public class Senator
     [Key]
     public long DistrictId { get; set; }
 
-    [ForeignKey(nameof(DistrictId))]
-    public District District { get; set; }
+    public District District => DBCache.Get<District>(DistrictId)!;
 
     public long UserId { get; set; }
 
-    [ForeignKey(nameof(UserId))]
-    public SVUser User { get; set; }
+    public SVUser User => DBCache.Get<SVUser>(UserId)!;
 }

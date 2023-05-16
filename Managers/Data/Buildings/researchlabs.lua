@@ -6,7 +6,7 @@ building_research_lab = {
 		steel = 50000
 		simple_components = 25000
 		advanced_components = 7500
-		chips = 4500
+		computer_chips = 4500
 	}
 	type = "ResearchLab"
 }

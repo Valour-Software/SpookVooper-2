@@ -1,8 +1,10 @@
 ﻿using SV2.Scripting.LuaObjects;
 using SV2.Helpers.TreeHelper;
-using System.Drawing;
 using SV2.Database.Models.Districts;
+using System.Drawing;
 using SV2.Scripting;
+using SV2.Scripting.Parser;
+using Valour.Api.Models.Messages.Embeds.Styles;
 
 namespace SV2.Helpers;
 
@@ -40,7 +42,7 @@ public class TechTreeVisualizer
     public string GenerateTooltip(LuaResearch research)
     {
         string html = $@"<span class='modifier-tooltip-name'><b>{research.Name}</b></span>";
-        var state = new ExecutionState(null, null);
+        var state = new ExecutionState(null, null, parentscopetype: ScriptScopeType.Research, research: research);
         if (research.LuaResearchPrototype is not null && research.LuaResearchPrototype.ModifierNodes is not null)
         {
             foreach (var item in research.LuaResearchPrototype.ModifierNodes)
@@ -48,6 +50,17 @@ public class TechTreeVisualizer
                 html += "<br/>" + item.GenerateHTMLForListing(state);
             }
         }
+
+        if (research.LuaResearchPrototype!.Costs is not null) { 
+            state = new ExecutionState(null, null, parentscopetype: ScriptScopeType.Research, research: research);
+            foreach (var item in research.LuaResearchPrototype!.Costs.Evaluate(state))
+            {
+                var color = new Valour.Api.Models.Messages.Embeds.Styles.Color(LuaResearch.ResearchPointTypeToColor(item.Key));
+                var colorpart = true ? "#ffffff" : $"rgba({color.Red}, {color.Green}, {color.Blue}, 0.4)";
+                html += $@"<br/><span style='color: {colorpart};'>{item.Value:n0} {item.Key.ToTitleCase()}</span>";
+            }
+        }
+        
         return html;
     }
 
@@ -59,10 +72,10 @@ public class TechTreeVisualizer
         return $@"<rect x='{x}px' y='{y}px' width='{width}px' height='{height}px' style='fill: #{color};opacity:{opacity};' data-bs-toggle=""tooltip"" data-bs-html=""true"" data-bs-custom-class=""modifier-tooltip-div"" data-bs-sanitize=""false"" data-bs-title=""{GenerateTooltip(research)}""></rect>";
     }
 
-    public string GenerateText(string text, int x, int y)
+    public string GenerateText(string text, int x, int y, LuaResearch research)
     {
         //return $@"<text x='{x}px' y='{y}px'><tspan x='{x}' dy='25'>{text}</tspan></text>";
-        return $@"<text x='{x}px' y='{y}px' dominant-baseline='middle' text-anchor='middle'>{text}</text>";
+        return $@"<text x='{x}px' y='{y}px' dominant-baseline='middle' text-anchor='middle' data-bs-toggle=""tooltip"" data-bs-html=""true"" data-bs-custom-class=""modifier-tooltip-div"" data-bs-sanitize=""false"" data-bs-title=""{GenerateTooltip(research)}"">{text}</text>";
     }
 
     public string GenerateLine(int x1, int y1, int x2, int y2, bool arrowhead, bool fliparrowhead)
@@ -81,7 +94,7 @@ public class TechTreeVisualizer
 
         var nodeRectHtml = GenerateRect(nodeRect.X, nodeRect.Y, nodeRect.Width, nodeRect.Height, node.Item.LuaResearchPrototype.Color, node.Item);
 
-        nodeRectHtml += GenerateText(node.Item.Name, nodeRect.X + (nodeRect.Width / 2), nodeRect.Y + (nodeRect.Height / 2));
+        nodeRectHtml += GenerateText(node.Item.Name, nodeRect.X + (nodeRect.Width / 2), nodeRect.Y + (nodeRect.Height / 2), node.Item);
 
         // draw line to parent
         if (node.Parent != null)

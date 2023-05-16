@@ -41,8 +41,6 @@ using SV2.Scripting.Parser;
 
 Defines.Load();
 
-await VoopAI.Main();
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel((context, options) =>
@@ -116,6 +114,8 @@ catch (Exception e)
 VooperDB.RawSqlQuery<string>(sql, null, true);
 
 await DBCache.LoadAsync();
+
+await VoopAI.Main();
 
 builder.Services.AddDbContextPool<VooperDB>(options =>
 {

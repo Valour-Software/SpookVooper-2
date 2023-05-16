@@ -134,6 +134,8 @@ public class LuaParser
         return new(value, i);
     }
 
+    public static string[] Operators = "*,+,-,^,/".Split(",");
+
     public (int returni, LuaObject obj) HandleSinglePartofExpression(List<Token<LuaTokenType>> tokens, int i)
     {
         // we want
@@ -143,7 +145,7 @@ public class LuaParser
         LuaObject obj = null;
 
         var oldi = i;
-        while (tokens[i].Type == LuaTokenType.Whitespace)
+        while (tokens[i].Type == LuaTokenType.Whitespace || Operators.Contains(tokens[i].Value))
             i += 1;
 
         if (tokens[i].Type == LuaTokenType.OpenRoundBracket)
@@ -186,7 +188,7 @@ public class LuaParser
                 Parent = CurrentParent,
                 LineNumber = CurrentLineNumber,
                 type = ObjType.String,
-                Value = tokens[i + 3].Value,
+                Value = tokens[i].Value+"."+tokens[i + 3].Value,
                 IPosition = i
             };
             i += 6;

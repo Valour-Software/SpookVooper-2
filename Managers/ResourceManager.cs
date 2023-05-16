@@ -54,7 +54,7 @@ public class BaseRecipe
             }
             else
             {
-                foreach (var pair in GameDataManager.BaseBuildingObjs.Values.Where(x => x.type == BuildingType.Factory || x.type == BuildingType.Mine)
+                foreach (var pair in GameDataManager.BaseBuildingObjs.Values.Where(x => x.type == BuildingType.Factory || x.type == BuildingType.Mine || x.type == BuildingType.ResearchLab)
                     .SelectMany(x => x.Recipes)
                     .First(x => x.Outputs.First().Key == input.Key).GetRawResourceConsumption(depth + 1))
                 {

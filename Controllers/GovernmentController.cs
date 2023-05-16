@@ -26,11 +26,17 @@ public class GovernmentController : SVController {
         GovernmentIndexModel model = new GovernmentIndexModel();
 
         using var dbctx = VooperDB.DbFactory.CreateDbContext();
-        model.Emperor = await dbctx.Users.FirstOrDefaultAsync(x => x.ValourId == 12200448886571008);
-        //model.Chancellor = await dbctx.Users.FirstOrDefaultAsync(x => x.ValourId == );
-        model.CFV = await dbctx.Users.FirstOrDefaultAsync(x => x.ValourId == 12201879245422592);
+        model.Emperor = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == 12200448886571008);
         model.Justices = new();
-        model.Senators = await dbctx.Senators.Include(x => x.User).Include(x => x.District).ToListAsync();
+        foreach (SVUser user in DBCache.GetAll<SVUser>())
+        {
+            if (await user.IsPrimeMinister())
+                model.PrimeMinister = user;
+            if (await user.IsSupremeCourtJustice())
+                model.Justices.Add(user);
+        }
+        model.CFV = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == 12201879245422592);
+        model.Senators = DBCache.GetAll<Senator>().ToList();
 
         return View(model);
     }

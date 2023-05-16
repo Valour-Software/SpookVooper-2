@@ -200,24 +200,33 @@ public class SVUser : BaseEntity
 
         var districtrole = VoopAI.VoopAI.DistrictRoles[District.Name + " District"];
         if (!roles.Any(x => x.Id == districtrole.Id))
-            await member.Node.PostAsync($"api/members/{member.Id}/roles/{districtrole.Id}", null);
+        {
+            var result = await member.Node.PostAsync($"api/members/{member.Id}/roles/{districtrole.Id}", null);
+            Console.WriteLine(result.Message);
+        }
         if (roles.Any(x => VoopAI.VoopAI.DistrictRoles.ContainsKey(x.Name) && x.Id != districtrole.Id))
             await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{districtrole.Id}");
     }
 
-    public string GetPfpRingColor()
+    public async ValueTask<string> GetPfpRingColor()
     {
         if (IsEmperor()) return "4FEDF0";
         if (IsCFV()) return "1cbabd";
-        if (IsChancellor()) return "03A1A4";
-        //if (IsJustice()) return "4FEDF0";
+        if (await IsPrimeMinister()) return "03A1A4";
+        if (await IsSupremeCourtJustice()) return "4FEDF0";
         if (IsSenator()) return "1bf278";
         return "1bd9f2";
     }
 
     public bool IsEmperor() => ValourId == 12200448886571008;
-    public bool IsChancellor() => ValourId == 12949574998032384;
+    public async ValueTask<bool> IsPrimeMinister() {
+        return (await GetValourRolesAsync()).Any(x => x.Name == "Prime Minister");
+    }
+    public async ValueTask<bool> IsSupremeCourtJustice()
+    {
+        return (await GetValourRolesAsync()).Any(x => x.Name == "Supreme Court Justice");
+    }
+
     public bool IsCFV() => ValourId == 12201879245422592;
-    public bool IsJustice() => false;
     public bool IsSenator() => DBCache.GetAll<Senator>().Any(x => x.UserId == Id);
 }

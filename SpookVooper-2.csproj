@@ -21,11 +21,20 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.2" />
     <PackageReference Include="Npgsql" Version="7.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1" />
-	<PackageReference Include="Valour.Net" Version="0.6.7.5" />
-	<PackageReference Include="Valour.Api" Version="0.1.7" />
   </ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup Condition="false">
+		<PackageReference Include="Valour.Net" Version="0.6.7.5" />
+		<PackageReference Include="Valour.Api" Version="0.1.7" />
+	</ItemGroup>
+	
+	<ItemGroup Condition="true">
+		<ProjectReference Include="..\..\Valour\Valour\API\Valour.Api.csproj" />
+		<ProjectReference Include="..\..\Valour\Valour\Shared\Valour.Shared.csproj" />
+		<ProjectReference Include="..\..\Valour.Net\Valour.Net\Valour.Net.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
     <Folder Include="Database\Models\Research\" />
   </ItemGroup>
 

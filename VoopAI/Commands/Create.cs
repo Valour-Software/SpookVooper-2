@@ -25,38 +25,6 @@ public class CreateCommands : CommandModuleBase
                 .AddText("Element Xp", "By combining elements, you will earn xp depending on how difficult the combination was.");
             return ctx.ReplyAsync(embed);
         }
-
-        [Command("elements")]
-        public Task ElementsInfo(CommandContext ctx)
-        {
-            var embed = new EmbedBuilder().AddPage().AddRow()
-                .AddText("gg5", "323232");
-            return ctx.ReplyAsync(embed);
-        }
-    }
-
-    [Group("create")]
-    public class CreateGroup : CommandModuleBase
-    {
-        [Command("account")]
-        public async Task _CreateAccount(CommandContext ctx)
-        {
-            SVUser? _user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
-            if (_user is not null)
-            {
-                await ctx.ReplyAsync("You already have a SV account!");
-                return;
-            }
-            using var dbctx = VooperDB.DbFactory.CreateDbContext();
-
-            SVUser user = new SVUser(ctx.Member.Nickname, ctx.Member.UserId);
-            user.ImageUrl = (await ctx.Member.GetUserAsync()).PfpUrl;
-            DBCache.Put(user.Id, user);
-
-            DBCache.dbctx.Users.Add(user);
-            //await dbctx.SaveChangesAsync();
-            await ctx.ReplyAsync("Successfully created SV account.");
-        }
     }
 
     [Command("create")]

@@ -3,7 +3,8 @@
 public enum WhoCanResearch
 {
     District,
-    NonDistrict
+    NonDistrict,
+    Anyone
 }
 
 public class LuaResearchPrototype : LuaResearchHasChildren
@@ -29,4 +30,13 @@ public class LuaResearch
     public string ParentId { get; set; }
 
     public List<LuaResearch> Children { get; set; }
+
+    public static string ResearchPointTypeToColor (string type)
+    {
+        return type switch
+        {
+            "production_research_points" => "BD5D3F",
+            "civil_research_points" => "7FB5B5"
+        };
+    }
 }

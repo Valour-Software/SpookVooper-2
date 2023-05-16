@@ -379,6 +379,10 @@ public static class LuaHandler
                 expr.Body.Add(new Add() { Value = valuenode, LineNumber = obj.LineNumber });
             else if (obj.Name == "factor")
                 expr.Body.Add(new Factor() { Value = valuenode, LineNumber = obj.LineNumber });
+            else if (obj.Name == "raiseto")
+                expr.Body.Add(new RaiseTo() { Value = valuenode, LineNumber = obj.LineNumber });
+            else if (obj.Name == "subtract")
+                expr.Body.Add(new Subtract() { Value = valuenode, LineNumber = obj.LineNumber });
             else if (obj.Name == "divide")
                 expr.Body.Add(new Divide() { Value = valuenode, LineNumber = obj.LineNumber });
             else if (obj.Name == "get_local")
