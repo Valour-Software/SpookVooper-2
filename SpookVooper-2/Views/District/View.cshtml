@@ -154,6 +154,7 @@
                     <div class="p-2 align-self-center" style="text-align:center">
                         <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#changegovernor">Change Governor</button>
                         <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#changesenator">Change Senator</button>
+                        <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#viewusers">View Users</button>
                     </div>
                 }
  
@@ -373,6 +374,13 @@
             i += 1;
         }
     </center>
+</bootstrap-modal>
+
+<bootstrap-modal asp-modal-id="viewusers" asp-modal-title="Users in this district">
+    @foreach (var item in Model.Citizens)
+    {
+        <div>@item.Name</div>
+    }
 </bootstrap-modal>
 
 @if (user is not null && await user.IsGovernmentAdmin())
