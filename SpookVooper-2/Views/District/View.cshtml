@@ -1,5 +1,6 @@
 @using SV2.Database;
 @using SV2.Database.Models.Districts;
+@using SpookVooper_2.Blazor.Components;
 @model SV2.Database.Models.Districts.District
 
 @{ 
@@ -187,13 +188,13 @@
                         <svg id="svg" viewBox="@(mapdata.LowestXPos-10) @(mapdata.LowestYPos) @((mapdata.HighestXPos-mapdata.LowestXPos)+30) @((mapdata.HighestYPos-mapdata.LowestYPos)+25)"
                              style="/* transform: scale(0.75);transform-origin: 50% 0%; */width: 75%;height: 75%;">
                             <style>
-                                path {
+                                .province {
                                     fill: white;
                                     stroke: black;
                                     stroke-width: 0.5px;
                                 }
 
-                                path:hover {
+                                province:hover {
                                     /* filter: brightness(0.75); */
                                     stroke-width: 1.5px;
                                 }
@@ -243,7 +244,6 @@
                                 }
                                 else
                                 {
-                                        
                                     <a href="/Province/View/@province.Id" data-bs-toggle="tooltip" data-placement="top" title="@dbprovince.Name" data-sv-show="@ShowCityCircle">
                                         <path d="@province.D" id="@province.Id" style="fill:@dbprovince.GetDevelopmentColorForMap()" class="province"></path>
                                         @if (ShowCityCircle)
@@ -266,6 +266,10 @@
                                 //        </foreignObject>
                                //     }
                                // }
+                            }
+                            @if (false)
+                            {
+                                <component type="typeof(NATOInfantryComponent)" render-mode="WebAssemblyPrerendered" param-X="1663.5-6" param-Y="489.0+1"  param-Health="0.7"/>
                             }
                         </svg>
                     </div>

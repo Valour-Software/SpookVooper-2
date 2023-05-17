@@ -1,4 +1,6 @@
-﻿@{
+﻿@using SpookVooper_2.Blazor.Pages
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -27,6 +29,13 @@
             </div>
             <div class="col-2"></div>
         </div>
+    </div>
+
+    <div>
+        @if (false)
+        {
+            <component type="typeof(Counter)" render-mode="WebAssemblyPrerendered" />
+        }
     </div>
 
     <hr />

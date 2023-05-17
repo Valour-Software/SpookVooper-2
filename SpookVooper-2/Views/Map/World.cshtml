@@ -1,0 +1,80 @@
+﻿@model List<SV2.Models.Map.MapState>
+@using SpookVooper_2.Blazor.Components
+@{
+    ViewData["Title"] = "World Map";
+}
+
+<style>
+    .province {
+    }
+    body {
+        overflow-y: hidden;
+    }
+    main {
+        overflow-y: clip;
+        overflow-x: clip;
+    }
+
+    #svg {
+        /*transform: scale(1.2);
+            position: absolute;*/
+        top: 0px;
+        left: 0px;
+        height: 100%;
+        /*opacity: 0.5;*/
+    }
+
+    .window {
+        /*position: relative;*/
+    }
+
+    #background {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<div class="container" style="max-width:100vw;">
+    <center>
+        <h2>Districts of SpookVooper</h2>
+    </center>
+    <div class="window" id="window">
+        @if (false)
+        {
+            <img src="~/media/map/woketexture.png" id="background" />
+        }
+        <svg id="svg" viewBox="0 0 2560 1280">
+            <style>
+                path {
+                    fill: white;
+                    stroke: black;
+                }
+                path:hover {
+                    filter: brightness(0.75);
+                }
+            </style>
+            @foreach(var province in Model)
+            {
+                @if (province.IsOcean)
+                {
+                    <path d="@province.D" id="@province.Id" style="fill: #040d14; stroke: #040d14" class="province"></path>
+                }
+                else {
+                    @if (province.District is not null) 
+                    {
+                        <a href="/District/View/@province.District.Name">
+                            @if (true)
+                            {
+                                <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;stroke: #@province.District.Color !important" class="province"></path>
+                            }
+                            else
+                            {
+                                <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;" class="province"></path>
+                            }
+                        </a>
+                    }
+                }
+            }
+        </svg>
+    </div>
+</div>
