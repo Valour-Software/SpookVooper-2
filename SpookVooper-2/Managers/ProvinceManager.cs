@@ -66,10 +66,10 @@ public class ProvinceManager
     public static void LoadMap()
     {
         using var dbctx = VooperDB.DbFactory.CreateDbContext();
-        string data = System.IO.File.ReadAllText("Managers/Data/dystopia.json");
+        string data = System.IO.File.ReadAllText("Data/dystopia.json");
         var mapdata = JsonSerializer.Deserialize<MapDataJson>(data);
 
-        data = System.IO.File.ReadAllText("Managers/Data/province_metadata.json");
+        data = System.IO.File.ReadAllText("Data/province_metadata.json");
         var items = JsonSerializer.Deserialize<Dictionary<string, ProvinceMetadata>>(data);
         foreach (string key in items.Keys)
         {
@@ -80,7 +80,7 @@ public class ProvinceManager
 
         XmlDocument doc = new XmlDocument();
         doc.PreserveWhitespace = true;
-        doc.LoadXml(System.IO.File.ReadAllText("Managers/Data/mapfromtool.svg"));
+        doc.LoadXml(System.IO.File.ReadAllText("Data/mapfromtool.svg"));
         List<MapState> mapStates = new();
 
         var n = doc.ChildNodes.Item(0);
@@ -114,7 +114,7 @@ public class ProvinceManager
             }
         }
 
-        var provincestringdata = System.IO.File.ReadAllText("Managers/Data/definition.csv");
+        var provincestringdata = System.IO.File.ReadAllText("Data/definition.csv");
         foreach (var line in provincestringdata.Split('\n'))
         {
             if (line.Contains("sea"))
