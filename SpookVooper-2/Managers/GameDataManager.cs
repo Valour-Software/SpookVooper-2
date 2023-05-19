@@ -96,9 +96,9 @@ public static class GameDataManager
 
     public static async Task Load()
     {
-        LuaHandler.HandleProvinceDevelopmentStagesFile(File.ReadAllText("Managers/Data/ProvinceDevelopmentStages.lua"), "Managers/Data/ProvinceDevelopmentStages.lua");
+        LuaHandler.HandleProvinceDevelopmentStagesFile(File.ReadAllText("Data/ProvinceDevelopmentStages.lua"), "Data/ProvinceDevelopmentStages.lua");
 
-        LuaHandler.HandleResourcesFile(File.ReadAllText("Managers/Data/Resources.lua"), "Managers/Data/Resources.lua");
+        LuaHandler.HandleResourcesFile(File.ReadAllText("Data/Resources.lua"), "Data/Resources.lua");
 
         foreach (var path in ResourceManager.GetFilePaths("Recipes")) {
             LuaHandler.HandleRecipeFile(File.ReadAllText(path), path);

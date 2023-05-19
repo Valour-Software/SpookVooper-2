@@ -36,11 +36,14 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-    <Folder Include="Database\Models\Research\" />
-  </ItemGroup>
-	
-	<ItemGroup>
 	  <ProjectReference Include="..\SpookVooper-2.Blazor\SpookVooper-2.Blazor.csproj" />
 	</ItemGroup>
+
+  <ItemGroup>
+      <Content Remove="Data\**\*.json" />
+      <Content Include="Data\**">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+  </ItemGroup>
 
 </Project>

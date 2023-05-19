@@ -127,15 +127,7 @@ public static class Defines
         using (Lua lua = new Lua())
         {
             //lua.State.Encoding = Encoding.UTF8;
-            string text = "";
-            try
-            {
-                text = File.ReadAllText("../../../../Managers/Data/Defines.lua");
-            }
-            catch
-            {
-                text = File.ReadAllText("Managers/Data/Defines.lua");
-            }
+            string text = File.ReadAllText("Data/Defines.lua");
             //var data  = LuaHandler.PreProcessLua(text);
             //File.WriteAllText("../../../../Database/LuaDump.lua", text);
             lua.DoString(text);

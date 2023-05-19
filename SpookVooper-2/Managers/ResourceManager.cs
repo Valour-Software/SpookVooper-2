@@ -98,13 +98,6 @@ public static class ResourceManager
         {
             return Directory.GetFiles(path).ToList();
         }
-        try
-        {
-            return Directory.GetFiles($"../../../Managers/Data/{path}").ToList();
-        }
-        catch
-        {
-            return Directory.GetFiles($"Managers/Data/{path}").ToList();
-        }
+        return Directory.GetFiles($"Data/{path}").ToList();
     }
 }
