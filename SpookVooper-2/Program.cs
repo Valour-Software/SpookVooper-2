@@ -41,7 +41,17 @@ using SV2.Scripting.Parser;
 
 Defines.Load();
 
+
 var builder = WebApplication.CreateBuilder(args);
+
+var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+
+builder.Configuration.GetSection("Valour").Get<ValourConfig>();
+builder.Configuration.GetSection("Database").Get<DBConfig>();
+
 
 builder.WebHost.ConfigureKestrel((context, options) =>
 {
@@ -59,41 +69,46 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 #endif
 });
 
-string CONF_LOC = "SV2Config/";
-string DBCONF_FILE = "DBConfig.json";
-
-// Add services to the container.
-builder.Services.AddMvc(options => {
-    options.Filters.Add<UserRequiredAttribute>();
-}
-).AddRazorRuntimeCompilation();
-
-// Create directory if it doesn't exist
-if (!Directory.Exists(CONF_LOC))
+if (false)
 {
-    Directory.CreateDirectory(CONF_LOC);
-}
+    string CONF_LOC = "SV2Config/";
+    string DBCONF_FILE = "DBConfig.json";
 
-// Load database settings
-DBConfig dbconfig;
-if (File.Exists(CONF_LOC + DBCONF_FILE))
-{
-    // If there is a config, read it
-    dbconfig = await JsonSerializer.DeserializeAsync<DBConfig>(File.OpenRead(CONF_LOC + DBCONF_FILE));
-}
-else
-{
-    // Otherwise create a config with default values and write it to the location
-    dbconfig = new DBConfig()
+    // Add services to the container.
+    builder.Services.AddMvc(options =>
     {
-        Database = "database",
-        Host = "host",
-        Password = "password",
-        Username = "user"
-    };
+        options.Filters.Add<UserRequiredAttribute>();
+    }
+    ).AddRazorRuntimeCompilation();
 
-    File.WriteAllText(CONF_LOC + DBCONF_FILE, JsonSerializer.Serialize(dbconfig));
-    Console.WriteLine("Error: No DB config was found. Creating file...");
+    // Create directory if it doesn't exist
+    if (!Directory.Exists(CONF_LOC))
+    {
+        Directory.CreateDirectory(CONF_LOC);
+    }
+
+    // Load database settings
+    DBConfig dbconfig;
+    if (File.Exists(CONF_LOC + DBCONF_FILE))
+    {
+        // If there is a config, read it
+        dbconfig = await JsonSerializer.DeserializeAsync<DBConfig>(File.OpenRead(CONF_LOC + DBCONF_FILE));
+    }
+    else
+    {
+        // Otherwise create a config with default values and write it to the location
+        dbconfig = new DBConfig()
+        {
+            Database = "database",
+            Host = "host",
+            Password = "password",
+            Username = "user"
+        };
+
+        File.WriteAllText(CONF_LOC + DBCONF_FILE, JsonSerializer.Serialize(dbconfig));
+        Console.WriteLine("Error: No DB config was found. Creating file...");
+    }
+
 }
 
 VooperDB.DbFactory = VooperDB.GetDbFactory();
@@ -149,6 +164,8 @@ builder.Services.AddSession(options =>
     options.Cookie.MaxAge = TimeSpan.FromDays(90);
     options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddMvc().AddSessionStateTempDataProvider();
 
 var app = builder.Build();
 

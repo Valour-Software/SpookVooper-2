@@ -11,6 +11,7 @@ using Valour.Api.Client;
 using System.Web;
 using System.Text.Json;
 using SV2.Helpers;
+using Valour.Api.Nodes;
 
 namespace SV2.Controllers
 {
@@ -23,18 +24,6 @@ namespace SV2.Controllers
         private static string Redirecturl = "https://dev.spookvooper.com/callback";
 #endif
         private readonly ILogger<AccountController> _logger;
-
-        private readonly List<long> AllowedUsers = new List<long>() {
-            12641943911399424,
-            12201879245422592,
-            12607949301874688,
-            12448715201314816,
-            12935924224884736,
-            12643519258427392,
-            12445268604092416,
-            12200448886571008,
-            16056885832056832
-        };
         
         [TempData]
         public string StatusMessage { get; set; }
@@ -90,33 +79,27 @@ namespace SV2.Controllers
         }
 
         [Route("/callback")]
-        public async Task<IActionResult> Callback(string code, string state)
+        public async Task<IActionResult> Callback(string code, string state, string node)
         {
             if (!OAuthStates.Contains(state))
                 return Forbid();
 
             var url = $"api/oauth/token?client_id={ValourConfig.instance.OAuthClientId}&client_secret={ValourConfig.instance.OAuthClientSecret}&grant_type=authorization_code&code={code}&redirect_uri={HttpUtility.UrlEncode(Redirecturl)}&state={state}";
 
-
-            var result = await ValourClient.GetJsonAsync<Valour.Api.Models.AuthToken>(url);
+            var result = await ValourClient.GetJsonAsync<Valour.Api.Models.AuthToken>(url, http: NodeManager.GetNodeFromName(node)?.HttpClient);
             //Console.WriteLine(result.Data);
             if (!result.Success)
                 Console.WriteLine(result.Message);
             var token = result.Data;
             var valouruser = await Valour.Api.Models.User.FindAsync(token.UserId);
 
-            if (!AllowedUsers.Contains(valouruser.Id)) {
-                return Redirect("/dev/lackaccess");
-            }
-
             var user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == token.UserId);
             if (user is null)
             {
                 using var dbctx = VooperDB.DbFactory.CreateDbContext();
                 user = new SVUser(valouruser.Name, valouruser.Id);
-                DBCache.Put(user.Id, user);
+                DBCache.AddNew(user.Id, user);
 
-                DBCache.dbctx.Users.Add(user);
                 //await dbctx.SaveChangesAsync();
             }
 
