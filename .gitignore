@@ -223,3 +223,5 @@ project.lock.json
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)
 #####
 SpookVooper-2/SV2Config
+/SpookVooper-2/appsettings.json
+/SpookVooper-2/appsettings.json
