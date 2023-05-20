@@ -206,7 +206,10 @@
     <br />
     <br />
 
-    @await Html.PartialAsync("/Views/Shared/Components/ResourceOwnershipTable.cshtml", Model.Group)
+    @if (false)
+    {
+        @await Html.PartialAsync("/Views/Shared/Components/ResourceOwnershipTable.cshtml", Model.Group)
+    }
 
     <br />
     @if (Model.Group.OwnerId == user.Id)

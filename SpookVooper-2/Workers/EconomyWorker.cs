@@ -30,6 +30,7 @@ namespace SV2.Workers
             {
                 Task task = Task.Run(async () =>
                 {
+                    return;
                     while (true)
                     {
                         try
