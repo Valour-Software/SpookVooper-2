@@ -12,6 +12,8 @@ using System.Web;
 using System.Text.Json;
 using SV2.Helpers;
 using Valour.Api.Nodes;
+using SV2.NonDBO;
+using Valour.Shared;
 
 namespace SV2.Controllers
 {
@@ -78,15 +80,33 @@ namespace SV2.Controllers
             return Redirect("/");
         }
 
+        public static List<string> NodeNames = new()
+        {
+            "emma",
+            "jeff"
+        };
+
         [Route("/callback")]
-        public async Task<IActionResult> Callback(string code, string state, string node)
+        public async Task<IActionResult> Callback(string code, string state, string node = "")
         {
             if (!OAuthStates.Contains(state))
                 return Forbid();
 
             var url = $"api/oauth/token?client_id={ValourConfig.instance.OAuthClientId}&client_secret={ValourConfig.instance.OAuthClientSecret}&grant_type=authorization_code&code={code}&redirect_uri={HttpUtility.UrlEncode(Redirecturl)}&state={state}";
 
-            var result = await ValourClient.GetJsonAsync<Valour.Api.Models.AuthToken>(url, http: NodeManager.GetNodeFromName(node)?.HttpClient);
+            TaskResult<Valour.Api.Models.AuthToken> result;
+            if (node != "")
+                result = await ValourClient.GetJsonAsync<Valour.Api.Models.AuthToken>(url, http: NodeManager.GetNodeFromName(node)?.HttpClient);
+            else
+            {
+                result = new();
+                foreach (var name in NodeNames)
+                {
+                    result = await ValourClient.GetJsonAsync<Valour.Api.Models.AuthToken>(url, http: NodeManager.GetNodeFromName(name)?.HttpClient);
+                    if (result.Success)
+                        break;
+                }
+            }
             //Console.WriteLine(result.Data);
             if (!result.Success)
                 Console.WriteLine(result.Message);
