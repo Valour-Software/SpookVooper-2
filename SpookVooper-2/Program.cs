@@ -62,7 +62,7 @@ builder.WebHost.ConfigureKestrel((context, options) =>
         listenOptions.UseHttps();
     });
 #else
-    options.Listen(IPAddress.Any, 5000, listenOptions =>
+    options.Listen(IPAddress.Any, 80, listenOptions =>
     {
         listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
     });
