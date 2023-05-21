@@ -27,6 +27,7 @@ public class ProvinceConsumerGoodsData
     public string ConsumerGood { get; set; }
     public double AmountNeeded { get; set; }
     public double BuffToBirthRate { get; set; }
+    public double BuffToGrowth { get; set; }
 }
 
 public class Province
@@ -379,6 +380,7 @@ public class Province
         var governor = GetGovernor();
         List<ProvinceConsumerGoodsData> consumerGoodsData = new();
         var rate_for_consumergood = (double)Population / 10_000 * (1 + GetModifierValue(ProvinceModifierType.ConsumerGoodsConsumptionFactor));
+        double totalgrowthbuff = 0;
         foreach (var consumergood in GameDataManager.ConsumerGoods)
         {
             var toconsume = rate_for_consumergood * consumergood.consumerGood.PopConsumptionRate;
@@ -386,13 +388,16 @@ public class Province
             {
                 ConsumerGood = consumergood.Name,
                 AmountNeeded = toconsume,
+                BuffToGrowth = 0,
                 BuffToBirthRate = 0
             };
             if (await governor.HasEnoughResource(consumergood.LowerCaseName, toconsume))
             {
                 var buff = consumergood.consumerGood.PopGrowthRateModifier * (1 + GetModifierValue(ProvinceModifierType.ConsumerGoodsModifierFactor));
-                BirthRate += buff;
-                data.BuffToBirthRate = buff;
+                totalgrowthbuff += buff;
+                BirthRate += Math.Sqrt(buff*100)/150;
+                data.BuffToBirthRate = Math.Sqrt(buff * 100) / 150;
+                data.BuffToGrowth = buff;
                 if (UseResources)
                 {
                     await governor.ChangeResourceAmount(consumergood.LowerCaseName, -toconsume, $"Consumer Good Usage for Province with name: {Name}");
@@ -411,6 +416,8 @@ public class Province
 
         double PopulationGrowth = BirthRate * Population;
         PopulationGrowth -= DeathRate * Population;
+        PopulationGrowth *= totalgrowthbuff;
+
         return new(PopulationGrowth, consumerGoodsData);
     }
 

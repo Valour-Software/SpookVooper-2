@@ -34,13 +34,13 @@ advanced_factory_throughput_upgrade = {
         add_locals = {
 			cost_increase = 1.3^building.level
 		}
-		steel = 10000 * get_local("cost_increase")
-		simple_components = 4000 * get_local("cost_increase")
-		advanced_components = 700 * get_local("cost_increase")
+		steel = 9000 * get_local("cost_increase")
+		simple_components = 5000 * get_local("cost_increase")
+		advanced_components = 900 * get_local("cost_increase")
     }
     modifiers = {
         building.throughputfactor = 0.2
-		building.efficiencyfactor = -0.03
+		building.efficiencyfactor = -0.04
     }
 }
 

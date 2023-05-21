@@ -244,7 +244,7 @@ public abstract class ProducingBuilding : BuildingBase
                 foreach (var modifiernode in upgrade.LuaBuildingUpgradeObj.ModifierNodes)
                 {
                     var value = (double)modifiernode.GetValue(executionstate);
-                    UpdateOrAddModifier((BuildingModifierType)modifiernode.provinceModifierType!, value);
+                    UpdateOrAddModifier((BuildingModifierType)modifiernode.buildingModifierType!, value);
                 }
             }
         }

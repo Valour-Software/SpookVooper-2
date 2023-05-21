@@ -37,8 +37,7 @@ public class DivisionEquipment
     public Division Division { get; set; }
 }
 
-// NOTE: there can only be 1 Regiment of a type per Division
-// an Infantry Regiment might have 5k or 500k troops in it
+// for example, an Infantry Regiment might have 5k or 500k troops in it
 public class Regiment
 {
     [Key]
