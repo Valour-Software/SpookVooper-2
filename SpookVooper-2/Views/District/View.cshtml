@@ -218,9 +218,12 @@
                             {
                                 var dbprovince = DBCache.Get<Province>(province.Id);
                                 bool ShowCityCircle = false;
-                                if ((dbprovince.CurrentDevelopmentStage.Name == "City" || dbprovince.CurrentDevelopmentStage.Name == "Megacity") && dbprovince.Name != "")
+                                if (!(dbprovince.CurrentDevelopmentStage is null))
                                 {
-                                    ShowCityCircle = true;
+                                    if ((dbprovince.CurrentDevelopmentStage.Name == "City" || dbprovince.CurrentDevelopmentStage.Name == "Megacity") && dbprovince.Name != "")
+                                    {
+                                        ShowCityCircle = true;
+                                    }
                                 }
                                 @if (resourcetomap is not null) {
                                     var buildingobj = GameDataManager.BaseBuildingObjs.Values.First(x => x.MustHaveResource == resourcetomap);
