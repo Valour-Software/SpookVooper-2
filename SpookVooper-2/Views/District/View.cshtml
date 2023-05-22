@@ -142,7 +142,7 @@
                         <h3>Log in to move!</h3>
                     </div>
                 }
-                if (user!.Id == Model.GovernorId) {
+                if (user is not null && user!.Id == Model.GovernorId) {
                     <div class="p-2 align-self-center" style="text-align:center">
                         <a asp-controller="District" asp-action="Manage" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
                         <a asp-controller="District" asp-action="EditPolicies" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit Policies</a>
