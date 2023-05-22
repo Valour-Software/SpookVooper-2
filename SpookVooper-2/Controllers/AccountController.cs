@@ -23,7 +23,7 @@ namespace SV2.Controllers
 #if DEBUG
         private static string Redirecturl = "https://localhost:7186/callback";
 #else
-        private static string Redirecturl = "https://dev.spookvooper.com/callback";
+        private static string Redirecturl = "https://spookvooper.com/callback";
 #endif
         private readonly ILogger<AccountController> _logger;
         
@@ -127,35 +127,6 @@ namespace SV2.Controllers
 
             HttpContext.Response.Cookies.Append("svid", user.Id.ToString());
             return Redirect("/");
-        }
-
-        public async Task<IActionResult> Login()
-        {
-            var oauthstate = Guid.NewGuid().ToString();
-
-            AuthorizeModel model = new()
-            {
-                ClientId = ValourConfig.instance.OAuthClientId,
-                RedirectUri = HttpUtility.UrlEncode(Redirecturl),
-                UserId = ValourNetClient.BotId,
-                ResponseType = "",
-                Scope = UserPermissions.Minimum.Value,
-                Code = "",
-                State = oauthstate
-            };
-
-            string url = $"https://app.valour.gg/authorize?client_id={ValourConfig.instance.OAuthClientId}";
-            url += $"&response_type=code&redirect_uri={HttpUtility.UrlEncode(Redirecturl)}&state={oauthstate}";
-            OAuthStates.Add(oauthstate);
-            return Redirect(url);
-            //Console.WriteLine(oauthstate);
-
-           // var result = await ValourClient.PostAsyncWithResponse<string>($"api/oauth/authorize", model);
-           // if (!result.Success)
-           //     Console.WriteLine(result.Message);
-            //var url = result.Data;
-           // OAuthStates.Add(oauthstate);
-            //return Redirect(url);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
