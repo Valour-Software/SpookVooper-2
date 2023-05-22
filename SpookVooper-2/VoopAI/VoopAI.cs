@@ -7,7 +7,7 @@ using Valour.Shared.Authorization;
 using Valour.Api.Models.Messages.Embeds.Styles;
 using System.Xml.Linq;
 using Valour.Api.Client;
-using Valour.Api.Models.Economy;
+//using Valour.Api.Models.Economy;
 
 namespace SV2.VoopAI;
 class VoopAI
@@ -19,7 +19,7 @@ class VoopAI
     public static Dictionary<string, PlanetRole> DistrictRoles = new();
     public static long PlanetId = 17161193956048896;
     public static long SVCurrencyId = 0;
-    public static Currency SVCurrency = null;
+    //public static Currency SVCurrency = null;
 
     public static async Task Main()
     {
