@@ -195,8 +195,13 @@ public class SVUser : BaseEntity
         var rankname = Rank.ToString();
         if (!roles.Any(x => x.Name == rankname))
             await member.Node.PostAsync($"api/members/{member.Id}/roles/{VoopAI.VoopAI.RankRoleIds[rankname]}", null);
-        if (roles.Any(x => VoopAI.VoopAI.RankNames.Contains(x.Name) && x.Name != rankname))
-            await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{VoopAI.VoopAI.RankRoleIds[rankname]}");
+        foreach (var role in roles.Where(x => VoopAI.VoopAI.RankNames.Contains(x.Name)))
+        {
+            if (role.Name != rankname)
+            {
+                await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{VoopAI.VoopAI.RankRoleIds[role.Name]}");
+            }
+        }
 
         var districtrole = VoopAI.VoopAI.DistrictRoles[District.Name + " District"];
         if (!roles.Any(x => x.Id == districtrole.Id))
