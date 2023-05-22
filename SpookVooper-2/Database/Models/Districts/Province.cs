@@ -83,10 +83,10 @@ public class Province
     public ProvinceDevelopmentStage CurrentDevelopmentStage { get; set; }
 
     [NotMapped]
-    public Dictionary<ProvinceModifierType, ProvinceModifier> Modifiers { get; set; }
+    public Dictionary<ProvinceModifierType, ProvinceModifier> Modifiers { get; set; } = new();
 
     [Column("staticmodifiers", TypeName = "jsonb[]")]
-    public List<StaticModifier> StaticModifiers { get; set; }
+    public List<StaticModifier> StaticModifiers { get; set; } = new();
 
     [NotMapped]
     public ProvinceMetadata Metadata => ProvinceManager.ProvincesMetadata[Id];
