@@ -7,6 +7,7 @@ using Valour.Shared.Authorization;
 using Valour.Api.Models.Messages.Embeds.Styles;
 using System.Xml.Linq;
 using Valour.Api.Client;
+using Valour.Api.Models.Economy;
 
 namespace SV2.VoopAI;
 class VoopAI
@@ -17,35 +18,59 @@ class VoopAI
     public static Dictionary<string, long> RankRoleIds = new();
     public static Dictionary<string, PlanetRole> DistrictRoles = new();
     public static long PlanetId = 17161193956048896;
+    public static long SVCurrencyId = 0;
+    public static Currency SVCurrency = null;
 
     public static async Task Main()
     {
-        ValourConfig valourConfig;
-        if (File.Exists("./SV2Config/ValourConfig.json"))
+        if (false)
         {
-            // If there is a config, read it
-            valourConfig = await JsonSerializer.DeserializeAsync<ValourConfig>(File.OpenRead("./SV2Config/ValourConfig.json"));
-        }
-        else
-        {
-            // Otherwise create a config with default values and write it to the location
-            valourConfig = new ValourConfig()
+            ValourConfig valourConfig;
+            if (File.Exists("./SV2Config/ValourConfig.json"))
             {
-                Email = "",
-                BotPassword = ""
-            };
+                // If there is a config, read it
+                valourConfig = await JsonSerializer.DeserializeAsync<ValourConfig>(File.OpenRead("./SV2Config/ValourConfig.json"));
+            }
+            else
+            {
+                // Otherwise create a config with default values and write it to the location
+                valourConfig = new ValourConfig()
+                {
+                    Email = "",
+                    BotPassword = ""
+                };
 
-            File.WriteAllText("./SV2Config/ValourConfig.json", JsonSerializer.Serialize(valourConfig));
-            Console.WriteLine("Error: No DB config was found. Creating file...");
+                File.WriteAllText("./SV2Config/ValourConfig.json", JsonSerializer.Serialize(valourConfig));
+                Console.WriteLine("Error: No DB config was found. Creating file...");
+            }
         }
         //if (prod) LoadSVIDNameCache();
 
+        //ValourNetClient.BaseUrl = "http://localhost:5000/";
         ValourNetClient.AddPrefix("/");
         ValourNetClient.ExecuteMessagesInParallel = false;
 
-        await ValourNetClient.Start(valourConfig.Email,valourConfig.BotPassword);
+        await ValourNetClient.Start(ValourConfig.instance.Email, ValourConfig.instance.BotPassword);
 
-        foreach(var role in (await (await Planet.FindAsync(PlanetId)).GetRolesAsync()).Where(x => RankNames.Contains(x.Name)))
+        //SVCurrency = await Currency.FindAsync(SVCurrencyId, PlanetId);
+        //if (SVCurrency is null)
+        //{
+        //    SVCurrency = new()
+         //   {
+        //        PlanetId = PlanetId,
+        //        Name = "Credit",
+        //        PluralName = "Credits",
+        //        ShortCode = "VEC",
+        //        Symbol = "¢",
+        //        DecimalPlaces = 3,
+         //   };
+         //   var result = await Currency.CreateAsync<Currency>(SVCurrency);
+         //   Console.WriteLine(result.Message);
+         //   SVCurrency = result.Data;
+        //    Console.WriteLine($"Currency Id: {SVCurrency.Id}");
+       // }
+
+        foreach (var role in (await (await Planet.FindAsync(PlanetId)).GetRolesAsync()).Where(x => RankNames.Contains(x.Name)))
             RankRoleIds[role.Name] = role.Id;
         
         var districtsnames = DBCache.GetAll<District>().Select(x => x.Name).ToList();
