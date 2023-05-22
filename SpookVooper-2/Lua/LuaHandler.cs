@@ -170,8 +170,10 @@ public static class LuaHandler
     public static StreamWriter errorfile = new StreamWriter("Managers/ScriptErrors.txt");
     public static void HandleError(string filename, int linenumber, string error, string message)
     {
-        errorfile.WriteLine($"{filename.Split("/").Last()}:{linenumber} {error}: {message}");
+        var text = $"{filename.Split("/").Last()}:{linenumber} {error}: {message}";
+        errorfile.WriteLine(text);
         errorfile.Flush();
+        Console.WriteLine(text);
     }
     public static (string content, List<string> tables) PreProcessLua(string Lua)
     {

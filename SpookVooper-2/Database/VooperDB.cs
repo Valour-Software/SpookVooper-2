@@ -184,8 +184,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
             Vooperia.Id = 100;
             Vooperia.GroupType = GroupTypes.NonProfit;
             Vooperia.Credits = 1_500_000.0m;
-            DBCache.Put(Vooperia.Id, Vooperia);
-            DBCache.dbctx.Groups.Add(Vooperia);
+            DBCache.AddNew(Vooperia.Id, Vooperia);
         }
 
         string[] districtnames = new []{
@@ -255,10 +254,8 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
                 };
 
                 district_object.Modifiers = new();
-                DBCache.Put(district.Id, district);
-                DBCache.dbctx.Groups.Add(district);
-                DBCache.Put(district_object.Id, district_object);
-                DBCache.dbctx.Districts.Add(district_object);
+                DBCache.AddNew(district.Id, district);
+                DBCache.AddNew(district_object.Id, district_object);
             }
             i += 1;
         }
@@ -275,8 +272,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
                     Salary = 0.0m,
                     MembersIds = new()
                 };
-                DBCache.Put(role.Id, role);
-                DBCache.dbctx.GroupRoles.Add(role);
+                DBCache.AddNew(role.Id, role);
             }
         }
     }
