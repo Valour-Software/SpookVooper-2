@@ -78,7 +78,7 @@ public class District
     public double? PropertyTaxPerSize { get; set; }
 
     [Column("staticmodifiers", TypeName = "jsonb[]")]
-    public List<StaticModifier> StaticModifiers { get; set; }
+    public List<StaticModifier> StaticModifiers { get; set; } = new();
 
     [Column("titleforprovince")]
     public string? TitleForProvince { get; set; }
