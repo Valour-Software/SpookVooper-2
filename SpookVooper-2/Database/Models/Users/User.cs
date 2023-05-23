@@ -209,8 +209,13 @@ public class SVUser : BaseEntity
             var result = await member.Node.PostAsync($"api/members/{member.Id}/roles/{districtrole.Id}", null);
             Console.WriteLine(result.Message);
         }
-        if (roles.Any(x => VoopAI.VoopAI.DistrictRoles.ContainsKey(x.Name) && x.Id != districtrole.Id))
-            await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{districtrole.Id}");
+        foreach (var role in roles.Where(x => VoopAI.VoopAI.DistrictRoles.ContainsKey(x.Name)))
+        {
+            if (role.Id != districtrole.Id)
+            {
+                await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{role.Id}");
+            }
+        }
     }
 
     public async ValueTask<string> GetPfpRingColor()

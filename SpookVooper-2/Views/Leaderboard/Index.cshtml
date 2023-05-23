@@ -1,4 +1,5 @@
-﻿@model SV2.Models.Leaderboard.LeaderboardIndexModel
+﻿@using SV2.VoopAI
+@model SV2.Models.Leaderboard.LeaderboardIndexModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
@@ -76,10 +77,11 @@
 
                     var style = isUser ? "font-weight:bold;" : "";
 
-                    //if (rank != null)
-                    //{
-                    //    style += $"background-color:rgba({rank.Color.R},{rank.Color.G},{rank.Color.B},0.1);";
-                    //}
+                    if (item.Rank != Rank.Unranked)
+                    {
+                        var color = new Valour.Api.Models.Messages.Embeds.Styles.Color(VoopAI.GetRankColor(item.Rank));
+                        style += $"background-color:rgba({color.Red},{color.Green},{color.Blue},0.1);";
+                    }
 
                     <tr style="@style">
                         <td>
@@ -87,7 +89,7 @@
                         </td>
                         <td>@($"{item.Xp:n0}")</td>
                         <td>
-                            <a asp-controller="User" asp-action="Info" asp-route-svid="@item.Id" style="text-decoration: none;">
+                            <a asp-controller="User" asp-action="Info" asp-route-id="@item.Id" style="text-decoration: none;">
                                 @item.Name
                             </a>
                         </td>

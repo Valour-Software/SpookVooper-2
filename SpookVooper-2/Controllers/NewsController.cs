@@ -92,7 +92,7 @@ public class NewsController : SVController
         return Redirect($"/News/ViewPost/{model.Id}");
     }
 
-    [IsMinister("Minister Of Journalism")]
+    [IsMinister("Minister of Journalism")]
     public async Task<IActionResult> AddPressPass(long groupid)
     {
         Group? group = DBCache.Get<Group>(groupid);
@@ -104,7 +104,7 @@ public class NewsController : SVController
         return Redirect($"/Group/View/{groupid}");
     }
 
-    [IsMinister("Minister Of Journalism")]
+    [IsMinister("Minister of Journalism")]
     public async Task<IActionResult> RemovePressPass(long groupid)
     {
         Group? group = DBCache.Get<Group>(groupid);

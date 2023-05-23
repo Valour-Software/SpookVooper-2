@@ -240,7 +240,7 @@ public class Group : BaseEntity, IHasOwner
             if (role is null)
                 return new TaskResult(false, "Error: The role value was empty.");
 
-            if (Roles.Any(x => x.MembersIds.Contains(target.Id)))
+            if (Roles.Any(x => x.Id == role.Id && x.MembersIds.Contains(target.Id)))
                 return new TaskResult(false, "Error: The entity already has this role.");
 
             if (role.GroupId != Id)

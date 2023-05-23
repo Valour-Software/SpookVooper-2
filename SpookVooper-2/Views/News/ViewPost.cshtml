@@ -28,13 +28,13 @@
                     <h1 class="display-4" style="font-size:40px">@Model.Title</h1>
                     <h5>
                         by
-                        <a asp-controller="User" asp-action="Info" asp-route-svid="@Model.AuthorId">
+                        <a asp-controller="User" asp-action="Info" asp-route-id="@Model.AuthorId">
                             <i style="color:white">
                                 @author.Name
                             </i>
                         </a>
                         with
-                        <a asp-controller="Group" asp-action="View" asp-route-groupid="@Model.GroupId">
+                        <a asp-controller="Group" asp-action="View" asp-route-id="@Model.GroupId">
                             <b style="color:white">
                                 @group.Name
                             </b>

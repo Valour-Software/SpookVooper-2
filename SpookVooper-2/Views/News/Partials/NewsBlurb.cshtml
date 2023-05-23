@@ -24,7 +24,7 @@
 
         <!-- Text portion -->
         <div class="newstitletext">
-            <a asp-controller="News" asp-action="View" asp-route-postid="@Model.Id"><h4>@Model.Title</h4></a>
+            <a asp-controller="News" asp-action="ViewPost" asp-route-id="@Model.Id"><h4>@Model.Title</h4></a>
             <h6>
                 by
                 <a asp-controller="User" asp-action="Info" asp-route-id="@Model.AuthorId">
@@ -33,7 +33,7 @@
                     </i>
                 </a>
                 with
-                <a asp-controller="Group" asp-action="View" asp-route-groupid="@Model.GroupId">
+                <a asp-controller="Group" asp-action="View" asp-route-id="@Model.GroupId">
                     <b style="color:white">
                         @group.Name
                     </b>
