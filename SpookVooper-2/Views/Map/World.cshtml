@@ -34,9 +34,33 @@
     }
 </style>
 
+@{
+    string resourcetomap = "";
+    if (!Context.Request.Query.TryGetValue("resource", out var _resourcetomap))
+        resourcetomap = null;
+    else
+        resourcetomap = _resourcetomap.ToString();
+    if (resourcetomap == "") resourcetomap = null;
+}
+
 <div class="container" style="max-width:100vw;">
     <center>
         <h2>Districts of SpookVooper</h2>
+    </center>
+    <center>
+        @{
+            var devmapmode = Context.Request.QueryString.Value.Contains("devmapmode=true");
+            double maxresource = 0;
+            if (resourcetomap is not null)
+            {
+                maxresource = DBCache.GetAll<Province>().Max(x => x.GetMiningResourceProduction(resourcetomap));
+            }
+            <button class='btn @(resourcetomap is null ? "btn-outline-primary" : "btn-primary")' data-bs-toggle="modal" data-bs-target="#showresources" style="margin-top: 6px;">View Resource Density</button>
+            @if (resourcetomap is not null)
+            {
+                <p>Currently showing resource density for @resourcetomap</p>
+            }
+        }
     </center>
     <div class="window" id="window">
         @if (false)
@@ -53,24 +77,32 @@
                     filter: brightness(0.75);
                 }
             </style>
-            @foreach(var province in Model)
+            @if (resourcetomap is null)
             {
-                @if (province.IsOcean)
+                @foreach (var province in Model)
                 {
-                    <path d="@province.D" id="@province.Id" style="fill: #040d14; stroke: #040d14" class="province"></path>
+                    <a href="/District/View/@province.District.Name">
+                        <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;stroke: #@province.District.Color !important" class="province"></path>
+                    </a>
                 }
-                else {
-                    @if (province.District is not null) 
+            }
+            else 
+            {
+                @foreach (var province in Model)
+                {
+                    <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;stroke: #@province.District.Color !important" class="province"></path>
+                }
+                @foreach(var district in MapController.DistrictMaps)
+                {
+                    @foreach (var province in district.Provinces)
                     {
-                        <a href="/District/View/@province.District.Name">
-                            @if (true)
-                            {
-                                <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;stroke: #@province.District.Color !important" class="province"></path>
-                            }
-                            else
-                            {
-                                <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;" class="province"></path>
-                            }
+                        var dbprovince = DBCache.Get<Province>(province.Id);
+                        var buildingobj = GameDataManager.BaseBuildingObjs.Values.First(x => x.MustHaveResource == resourcetomap);
+                        var production = $"{dbprovince.GetMiningResourceProduction(resourcetomap) / 10550.0 * buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value:n2}";
+
+                        var colorstring = $"{dbprovince.GetMapColorForResourceDensity(maxresource, resourcetomap, true)}, 0.8";
+                        <a href="/Province/View/@province.Id" data-bs-toggle="tooltip" data-placement="top" title="@production @(resourcetomap.ToLower())/h" data-sv-show="false">
+                            <path d="@province.D" id="@province.Id" style="fill:rgba(@colorstring);stroke: black;stroke-width: 0.5px;" class="province"></path>
                         </a>
                     }
                 }
@@ -78,3 +110,59 @@
         </svg>
     </div>
 </div>
+
+<bootstrap-modal asp-modal-id="showresources" asp-modal-title="View Resource Density">
+    <center>
+        <span>Click below to view the density map for that resource.</span>
+        <br />
+        <br />
+        @{
+            var i = 0;
+        }
+        @foreach (var building in GameDataManager.BaseBuildingObjs.Values.Where(x => x.MustHaveResource is not null))
+        {
+            @if (i == 3)
+            {
+                <br />
+                i = 0;
+            }
+            <a href="/Map/World?resource=@building.MustHaveResource" style="text-decoration: none;">
+                <button style="margin-bottom: 10px;" class='btn @(resourcetomap == building.MustHaveResource ? "btn-primary" : "btn-outline-primary")'>@building.MustHaveResource.Replace("_", " ")</button>
+            </a>
+            i += 1;
+        }
+    </center>
+</bootstrap-modal>
+
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = []
+    for (i = 0; i < tooltipTriggerList.length; i++) {
+        el = tooltipTriggerList[i]
+        if (el.getAttribute("data-sv-show") == "True") {
+            el.setAttribute("data-bs-trigger", "manual")
+            el.setAttribute("data-bs-offset", "0, -22")
+            e = new bootstrap.Tooltip(el)
+            tooltipList.push(e)
+            e.show()
+            if (false) {
+                e.tip.addEventListener("mouseleave", function (event) {
+                    event.currentTarget.classList.remove("tooltip-dontshow");
+                }, false);
+
+                e.tip.addEventListener("mouseover", function (event) {
+                    event.currentTarget.classList.add("tooltip-dontshow");
+                }, false);
+            }
+            if (true) {
+                e.tip.addEventListener("mouseup", function (event) {
+                    event.currentTarget.style += "display:none;";
+                }, false);
+            }
+        }
+        else {
+            e = new bootstrap.Tooltip(el)
+            tooltipList.push(e)
+        }
+    }
+</script>

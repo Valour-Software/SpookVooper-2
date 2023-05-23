@@ -191,7 +191,7 @@ public class Province
                 }
             }
         }
-        if (IncludeDevStage) {
+        if (IncludeDevStage && CurrentDevelopmentStage is not null) {
             foreach (var node in CurrentDevelopmentStage.ModifierNodes) {
                 if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.districtModifierType == districttype && node.districtModifierType is not null)) {
                     (string modifiername, double value) item = new() {
@@ -218,7 +218,7 @@ public class Province
         return Metadata.Resources[resource] * modifiervalue;
     }
 
-    public string GetMapColorForResourceDensity(double max, string resource)
+    public string GetMapColorForResourceDensity(double max, string resource, bool returnraw = false)
     {
         Color color = new(0, 0, 0);
         if (Metadata.Resources.ContainsKey(resource) && max > 0.01)
@@ -229,7 +229,14 @@ public class Province
             color.G = (int)(255 * scale);
             color.B = (int)(255 * scale);
         }
-        return $"rgb({color.R}, {color.G}, {color.B})";
+        if (!returnraw)
+        {
+            return $"rgb({color.R}, {color.G}, {color.B})";
+        }
+        else
+        {
+            return $"{color.R}, {color.G}, {color.B}";
+        }
     }
 
     public string GetDevelopmentColorForMap()

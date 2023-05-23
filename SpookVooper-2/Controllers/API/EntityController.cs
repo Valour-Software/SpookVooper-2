@@ -68,7 +68,7 @@ namespace SV2.API
             results.AddRange(entities.Select(x => new SearchResult()
             {
                 Name = x.Name,
-                Id = x.Id,
+                Id = x.Id.ToString(),
                 imageUrl = x.ImageUrl,
                 EntityType = x.EntityType
             }));
@@ -80,7 +80,7 @@ namespace SV2.API
     public class SearchResult
     {
         public string Name { get; set; }
-        public long Id { get; set; }
+        public string Id { get; set; }
         public string imageUrl { get; set; }
         public EntityType EntityType { get; set; }
     }
