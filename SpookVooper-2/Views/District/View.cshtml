@@ -142,6 +142,9 @@
                         <h3>Log in to move!</h3>
                     </div>
                 }
+                <div class="p-2 align-self-center" style="text-align:center">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewusers">View Citizens</button>
+                </div>
                 if (user is not null && user!.Id == Model.GovernorId) {
                     <div class="p-2 align-self-center" style="text-align:center">
                         <a asp-controller="District" asp-action="Manage" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
@@ -154,7 +157,6 @@
                     <div class="p-2 align-self-center" style="text-align:center">
                         <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#changegovernor">Change Governor</button>
                         <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#changesenator">Change Senator</button>
-                        <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#viewusers">View Users</button>
                     </div>
                 }
  

@@ -46,10 +46,7 @@
                         Valour Messages
                     </th>
                     <th>
-                        Post Likes
-                    </th>
-                    <th>
-                        Comment Likes
+                        District
                     </th>
                     <th>
                         Credits
@@ -95,9 +92,8 @@
                         </td>
                         <td>@($"{item.MessageXp:n0}")</td>
                         <td>@($"{item.Messages:n0}")</td>
-                        <td>@($"{item.PostLikes:n0}")</td>
-                        <td>@($"{item.CommentLikes:n0}")</td>
                         <td>@($"{item.Credits:n0}")</td>
+                        <td>@(item.DistrictId is not null ? item.District.Name : "Offworld")</td>
                     </tr>
                 }
 

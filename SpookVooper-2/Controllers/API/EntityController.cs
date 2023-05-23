@@ -41,7 +41,7 @@ namespace SV2.API
             await ctx.Response.WriteAsync(account.Credits.ToString());
         }
 
-        private static async Task<IEnumerable<BaseEntity>> Search(string name, int amount = 20)
+        private static async Task<IEnumerable<SearchResult>> Search(string name, int amount = 20)
         {
             List<BaseEntity> entities = new();
 
@@ -50,7 +50,7 @@ namespace SV2.API
                 amount = 20;
 
             if (name == null)
-                return entities;
+                return new List<SearchResult>();
 
             name = name.ToLower();
 
@@ -64,7 +64,24 @@ namespace SV2.API
 
             //snaps.Reverse();
 
-            return entities;
+            var results = new List<SearchResult>();
+            results.AddRange(entities.Select(x => new SearchResult()
+            {
+                Name = x.Name,
+                Id = x.Id,
+                imageUrl = x.ImageUrl,
+                EntityType = x.EntityType
+            }));
+
+            return results;
         }
+    }
+
+    public class SearchResult
+    {
+        public string Name { get; set; }
+        public long Id { get; set; }
+        public string imageUrl { get; set; }
+        public EntityType EntityType { get; set; }
     }
 }
