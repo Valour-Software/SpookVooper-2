@@ -140,6 +140,7 @@ builder.Services.AddDbContextPool<VooperDB>(options =>
 builder.Services.AddHostedService<EconomyWorker>();
 builder.Services.AddHostedService<TransactionWorker>();
 builder.Services.AddHostedService<ItemTradeWorker>();
+builder.Services.AddHostedService<TimeWorker>();
 builder.Services.AddHostedService<DistrictUpdateWorker>();
 
 builder.Services.AddDataProtection().PersistKeysToDbContext<VooperDB>();

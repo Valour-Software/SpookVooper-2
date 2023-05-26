@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using SV2.Database.Models.Corporations;
 using SV2.Database.Models.Factories;
+using SV2.Database.Models.Misc;
 using SV2.Database.Models.News;
 
 namespace SV2.Database;
@@ -62,6 +63,8 @@ public class DBCacheItemAddition
             DBCache.dbctx.Add((BuildingRequest)Item);
         else if (Type == typeof(State))
             DBCache.dbctx.Add((State)Item);
+        else if (Type == typeof(CurrentTime))
+            DBCache.dbctx.Add((CurrentTime)Item);
         else if (Type == typeof(CorporationShareClass))
             DBCache.dbctx.Add((CorporationShareClass)Item);
     }
@@ -79,6 +82,8 @@ public static class DBCache
     public static VooperDB dbctx { get; set; }
 
     public static Group Vooperia => Get<Group>(100)!;
+
+    public static CurrentTime CurrentTime { get; set; }
 
     /// <summary>
     /// ProvinceId : List<ProducingBuilding>
@@ -294,6 +299,15 @@ public static class DBCache
         foreach (var _obj in dbctx.States)
             Put(_obj.Id, _obj);
 
+        CurrentTime = await dbctx.CurrentTimes.FirstOrDefaultAsync(x => x.Id == 100);
+        if (CurrentTime is null)
+        {
+            var time = new DateTime(2314, 5, 28, 0, 0, 0, DateTimeKind.Utc);
+
+            AddNew(100, new CurrentTime() { Id = 100, Time = time });
+
+            CurrentTime = Get<CurrentTime>(100)!;
+        }
         //#endif
     }
 
