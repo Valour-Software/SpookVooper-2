@@ -77,18 +77,10 @@ namespace SV2.API
                 return;
             }
 
-            if (fromentity.Id != entity.Id) {
+            if (!fromentity.HasPermission(entity, GroupPermissions.Resources))
+            {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"The apikey must be the same as the owner of this item's!");
-                return;
-            }
-
-            // check if entity is the owner of the item
-            // TODO: add checking for oauth key
-            
-            if (fromentity.Id != item.OwnerId) {
-                ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"You do not own this item!");
+                await ctx.Response.WriteAsync($"You lack permission to send resources!");
                 return;
             }
 

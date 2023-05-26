@@ -66,7 +66,7 @@ recipe_gold_mining_base = {
 	outputs = {
 		gold = 1
 	}
-	perhour = 1
+	perhour = 1.5
     editable = false
 }
 
@@ -78,18 +78,18 @@ recipe_crystallite_mining_base = {
 	outputs = {
 		crystallite = 1
 	}
-	perhour = 0.25
+	perhour = 0.45
     editable = false
 }
 
 recipe_oil_well_mining_base = {
 	name = "Oil Production"
     inputs = {
-        tools = 0.5
+        tools = 0.3
     }
 	outputs = {
 		oil = 1
 	}
-	perhour = 2.5
+	perhour = 3.5
     editable = false
 }

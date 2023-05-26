@@ -54,7 +54,7 @@ recipe_tool_factory_base = {
 	name = "Tool Production"
 	inputs = {
 		computer_chips = 0.2
-		advanced_components = 0.05
+		simple_components = 0.2
 		steel = 2
 	}
 	outputs = {

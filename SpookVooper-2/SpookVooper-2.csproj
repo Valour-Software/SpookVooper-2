@@ -36,6 +36,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <ProjectReference Include="..\Shared\Shared.csproj" />
 	  <ProjectReference Include="..\SpookVooper-2.Blazor\SpookVooper-2.Blazor.csproj" />
 	</ItemGroup>
 
