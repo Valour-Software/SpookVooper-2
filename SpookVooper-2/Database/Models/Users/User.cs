@@ -194,7 +194,10 @@ public class SVUser : BaseEntity
         // check rank role
         var rankname = Rank.ToString();
         if (!roles.Any(x => x.Name == rankname))
-            await member.Node.PostAsync($"api/members/{member.Id}/roles/{VoopAI.VoopAI.RankRoleIds[rankname]}", null);
+        {
+            var result = await member.Node.PostAsync($"api/members/{member.Id}/roles/{VoopAI.VoopAI.RankRoleIds[rankname]}", null);
+            Console.WriteLine(result);
+        }
         foreach (var role in roles.Where(x => VoopAI.VoopAI.RankNames.Contains(x.Name)))
         {
             if (role.Name != rankname)

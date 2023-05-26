@@ -59,7 +59,7 @@ public class DistrictUpdateWorker : BackgroundService
                         if (times%168 == 0)
                             Console.WriteLine(times);
                         //await Task.Delay(1000 * 60 * 60);
-                        VoopAI.VoopAI.UpdateRanks();
+                        await VoopAI.VoopAI.UpdateRanks();
                         await Task.Delay(1000 * 60 * 5);
                     }
                     catch(System.Exception e)

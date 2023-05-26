@@ -189,6 +189,13 @@ class VoopAI
 
         var InactivityTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == 100 && x.taxType == TaxType.Inactivity);
 
+        Console.WriteLine($"Spleen Count: {spleencount}");
+        Console.WriteLine($"Crab Count: {crabcount}");
+        Console.WriteLine($"Gaty Count: {gatycount}");
+        Console.WriteLine($"Corgi Count: {corgicount}");
+        Console.WriteLine($"Oof Count: {oofcount}");
+        Console.WriteLine($"Unranked Count: {unrankedcount}");
+
         foreach (var user in users)
         {
             PlanetMember member = await PlanetMember.FindAsyncByUser(user.ValourId, PlanetId);
@@ -223,6 +230,8 @@ class VoopAI
             {
                 user.Rank = Rank.Unranked;
             }
+
+            Console.WriteLine($"Setting {user.Name}'s rank to {user.Rank}");
 
             // inactivity tax
             if (Math.Abs(user.LastSentMessage.Subtract(DateTime.UtcNow).TotalDays) > 14 && InactivityTaxPolicy is not null)
