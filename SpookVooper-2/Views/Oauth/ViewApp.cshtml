@@ -1,0 +1,35 @@
+﻿@model SV2.Database.Models.OAuth2.OauthApp
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h1 style="text-align:center" class="display-4">@Model.Name</h1>
+        <h2 style="text-align:center" class="display-3">Uses: @Model.Uses</h2>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8 col-sm-offset-4">
+                    <div>
+                        <br />
+                        <img class="govpfp" style="max-width:90%; max-height:90%;" src="@Model.Image_Url" />
+                        <br />
+                    </div>
+                    <div style="text-align:center">
+                        <p>Client Id:</p>
+                        <input class="form-control" value="@Model.Id" disabled />
+                        <br />
+                        <a asp-action="ViewSecret" asp-controller="Oauth" asp-route-appid="@Model.Id" class="btn btn-outline-warning">View Secret</a>
+                    </div>
+                </div>
+                <div class="col-sm-2"></div>
+            </div>
+        </div>
+    </div>
+</div>

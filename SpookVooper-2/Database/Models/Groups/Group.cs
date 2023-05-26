@@ -142,7 +142,7 @@ public class Group : BaseEntity, IHasOwner
         return false;
     }
 
-    public bool HasPermission(BaseEntity entity, GroupPermission permission)
+    public override bool HasPermission(BaseEntity entity, GroupPermission permission)
     {
         if (entity.Id == OwnerId)
             return true;

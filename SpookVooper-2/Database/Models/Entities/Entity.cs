@@ -106,16 +106,6 @@ public abstract class BaseEntity
     }
 
     public async Task Create() {
-        Dictionary<string, double> keyValuePairs = new() {
-            { "steel", 1_000_000 },
-            { "tools", 1_000_000 },
-            { "aluminium", 1_000_000 },
-            { "simple_components", 1_000_000 },
-            { "advanced_components", 1_000_000 }
-        };
-        foreach ((var resource, var amount) in keyValuePairs) {
-            await ChangeResourceAmount(resource, amount, "");
-        }
     }
 
     public double GetHourlyProductionOfResource(string resource) 
@@ -239,7 +229,7 @@ public abstract class BaseEntity
         }
     }
 
-    public bool HasPermission(BaseEntity entity, GroupPermission permission)
+    public virtual bool HasPermission(BaseEntity entity, GroupPermission permission)
     {
         return false;
     }

@@ -1,0 +1,110 @@
+﻿@inject VooperDB context
+@model SV2.Models.Oauth.AuthorizeModel
+
+@{
+    ViewData["Title"] = "Log in";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+    <link rel="~/media/apple-touch-icon" sizes="180x180" href="~/media/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/media/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/media/favicon-16x16.png">
+    <link rel="manifest" href="~/media/site.webmanifest">
+    <link rel="mask-icon" href="~/media/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#2d89ef">
+    <meta name="description" content="Log in to SpookVooper!">
+    <meta name="keywords" content="Gaming,YouTube,Community,Forums,Login">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta property="og:site_name" content="SpookVooper">
+    <meta name="twitter:site" content="@@SpikeViperYT">
+    <meta name="twitter:image:alt" content="Potato soldiers on a planet">
+    <meta name="theme-color" content="#3948ed">
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
+              crossorigin="anonymous"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" />
+    </environment>
+    <link rel="stylesheet" href="~/css/site.css?id=488gf" />
+</head>
+
+<body class="login-background">
+    <div class="login-box">
+        <div class="col-md-12">
+            <section>
+                <h2>Authorize App</h2>
+                <br />
+
+                @{
+                    var app = await context.OauthApps.FindAsync(Model.ClientID);
+                }
+                <form method="post">
+                    <div style="text-align:center">
+                        <img class="govpfp" style="max-width:90%; max-height:90%;" src="@app.Image_Url" />
+                        <h5>@app.Name</h5>
+                        <br />
+                        <p>By clicking authorize, you are giving access to:</p>
+                        @foreach(string scope in Model.GetScopeDesc()){
+                            <p>@scope</p>
+                        }
+                    </div>
+
+                    <label> What entity do you wish for @app.Name to be granted the above scopes for?</label>
+                    <select asp-for="EntityId" asp-items="Model.CanSelect" class="form-select form-control"></select>
+
+                    <br />
+                    <p></p>
+                
+
+                    @Html.HiddenFor(x => Model.ReponseType)
+                    @Html.HiddenFor(x => Model.ClientID)
+                    @Html.HiddenFor(x => Model.UserID)
+                    @Html.HiddenFor(x => Model.Redirect)
+                    @Html.HiddenFor(x => Model.Scope)
+                    @Html.HiddenFor(x => Model.State)
+                    @Html.HiddenFor(x => Model.Code)
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Authorize</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
+        </script>
+    </environment>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</body>
+</html>

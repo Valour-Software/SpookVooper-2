@@ -55,6 +55,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
             options.EnableRetryOnFailure();
         });
         options.ReplaceService<ISqlGenerationHelper, NpgsqlSqlGenerationLowercasingHelper>();
+        //options.EnableSensitiveDataLogging();
         options.UseLowerCaseNamingConvention();
     }
 
@@ -163,6 +164,9 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<BuildingRequest> BuildingRequests { get; set; }
     public DbSet<EntityBalanceRecord> EntityBalanceRecords { get; set; }
     public DbSet<State> States { get; set; }
+
+    public DbSet<OauthApp> OauthApps { get; set; }
+    public DbSet<AuthToken> AuthTokens { get; set; }
 
     public VooperDB(DbContextOptions options)
     {

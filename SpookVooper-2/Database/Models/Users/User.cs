@@ -134,7 +134,7 @@ public class SVUser : BaseEntity
         return false;
     }
 
-    public bool HasPermission(BaseEntity entity, GroupPermission permission)
+    public override bool HasPermission(BaseEntity entity, GroupPermission permission)
     {
         if (entity.Id == Id) {
             return true;

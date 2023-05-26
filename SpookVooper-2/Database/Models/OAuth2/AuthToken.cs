@@ -11,6 +11,9 @@ public class AuthToken
     public long AppId { get; set; }
 
     public long UserId { get; set; }
+
+    public long EntityId { get; set; }
+    public EntityType EntityType { get; set; }
     public string Scope { get; set; }
     public DateTime Time { get; set; }
 }

@@ -166,7 +166,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddMvc().AddSessionStateTempDataProvider();
+builder.Services.AddMvc().AddSessionStateTempDataProvider().AddRazorRuntimeCompilation();
 
 var app = builder.Build();
 

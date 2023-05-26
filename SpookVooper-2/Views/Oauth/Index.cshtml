@@ -1,0 +1,33 @@
+﻿@model SVUser
+@inject VooperDB context
+
+@{
+    ViewData["Title"] = "Oauth2 Home";
+
+    var apps = context.OauthApps.AsQueryable().Where(x => x.OwnerId == Model.Id);
+}
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h1 style="text-align:center">Oauth2 Integration</h1>
+        <h2 style="text-align:center">For the few developers interested.</h2>
+
+        <br />
+        <h3>Your apps:</h3>
+
+        @foreach (var app in apps)
+        {
+            <div>
+                <img src="@app.Image_Url" style="width:64px" />
+                <a asp-action="ViewApp" asp-controller="Oauth" asp-route-appid="@app.Id">@app.Name</a>
+            </div>
+            <br />
+        }
+
+        <a asp-action="RegisterApp" asp-controller="Oauth" class="btn btn-outline-primary">Create App</a>
+
+    </div>
+</div>
