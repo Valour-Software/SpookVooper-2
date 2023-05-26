@@ -191,6 +191,7 @@ public class SVUser : BaseEntity
     public async Task CheckRoles(PlanetMember member)
     {
         var roles = await member.GetRolesAsync();
+
         // check rank role
         var rankname = Rank.ToString();
         if (!roles.Any(x => x.Name == rankname))
@@ -206,17 +207,20 @@ public class SVUser : BaseEntity
             }
         }
 
-        var districtrole = VoopAI.VoopAI.DistrictRoles[District.Name + " District"];
-        if (!roles.Any(x => x.Id == districtrole.Id))
+        if (DistrictId is not null)
         {
-            var result = await member.Node.PostAsync($"api/members/{member.Id}/roles/{districtrole.Id}", null);
-            Console.WriteLine(result.Message);
-        }
-        foreach (var role in roles.Where(x => VoopAI.VoopAI.DistrictRoles.ContainsKey(x.Name)))
-        {
-            if (role.Id != districtrole.Id)
+            var districtrole = VoopAI.VoopAI.DistrictRoles[District.Name + " District"];
+            if (!roles.Any(x => x.Id == districtrole.Id))
             {
-                await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{role.Id}");
+                var result = await member.Node.PostAsync($"api/members/{member.Id}/roles/{districtrole.Id}", null);
+                Console.WriteLine(result.Message);
+            }
+            foreach (var role in roles.Where(x => VoopAI.VoopAI.DistrictRoles.ContainsKey(x.Name)))
+            {
+                if (role.Id != districtrole.Id)
+                {
+                    await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{role.Id}");
+                }
             }
         }
     }

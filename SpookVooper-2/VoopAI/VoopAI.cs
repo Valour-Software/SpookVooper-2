@@ -231,7 +231,7 @@ class VoopAI
                 user.Rank = Rank.Unranked;
             }
 
-            Console.WriteLine($"Setting {user.Name}'s rank to {user.Rank}");
+            //Console.WriteLine($"Setting {user.Name}'s rank to {user.Rank}");
 
             // inactivity tax
             if (Math.Abs(user.LastSentMessage.Subtract(DateTime.UtcNow).TotalDays) > 14 && InactivityTaxPolicy is not null)
