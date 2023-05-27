@@ -65,17 +65,17 @@ public class OauthController : SVController
 
             var canselect = new List<SelectListItem>();
             canselect.Add(new(user.Name, user.Id.ToString(), true));
-            foreach (var group in DBCache.GetAll<Group>())
+            foreach (var group in user.GetGroupsIn(user))
             {
+                if (canselect.Any(x => x.Value == group.Id.ToString()))
+                    continue;
                 bool hasperm = true;
                 foreach (var _scope in scopes)
                 {
-                    if (scope == "eco" && !group.HasPermission(user, GroupPermissions.Eco))
+                    if (_scope == "eco" && !group.HasPermission(user, GroupPermissions.Eco))
                         hasperm = false;
-                    if (scope == "resources" && !group.HasPermission(user, GroupPermissions.Resources))
+                    if (_scope == "resources" && !group.HasPermission(user, GroupPermissions.Resources))
                         hasperm = false;
-                    if (!hasperm)
-                        break;
                 }
                 if (hasperm)
                     canselect.Add(new(group.Name, group.Id.ToString(), false));
@@ -160,7 +160,7 @@ public class OauthController : SVController
             var entity = DBCache.FindEntity(auth.EntityId);
             if (!(entity.EntityType == EntityType.User))
             {
-                foreach (var scope in auth.Scope.Split(','))
+                foreach (var scope in auth.Scope.Split('|'))
                 {
                     if (scope == "eco" && !(entity.HasPermission(user, GroupPermissions.Eco)))
                         return Unauthorized("You lack permission!");

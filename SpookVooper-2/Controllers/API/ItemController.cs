@@ -64,7 +64,7 @@ namespace SV2.API
             }
 
             // get Entity with the api key
-            BaseEntity? entity = BaseEntity.FindByApiKey(apikey);
+            BaseEntity? entity = await BaseEntity.FindByApiKey(apikey, db);
 
             if (entity is null) {
                 ctx.Response.StatusCode = 401;

@@ -19,6 +19,9 @@ namespace SV2.API
 
         private static async Task SendTransaction(HttpContext ctx, VooperDB db, long fromid, long toid, string apikey, decimal amount, string detail, TransactionType trantype)
         {
+            // get Entity with the api key
+            BaseEntity? entity = await BaseEntity.FindByApiKey(apikey, db);
+
             BaseEntity? fromentity = BaseEntity.Find(fromid);
             if (fromentity == null)
             {
@@ -35,12 +38,10 @@ namespace SV2.API
                 return;
             }
 
-            // check if the apikey matches the fromentity.Apikey
-            // TODO: add checking for oauth key
-            
-            if (fromentity.ApiKey != apikey) {
+            if (!fromentity.HasPermission(entity, GroupPermissions.Eco))
+            {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"Invalid api key!");
+                await ctx.Response.WriteAsync($"You lack permission to send transactions!");
                 return;
             }
 

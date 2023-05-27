@@ -234,12 +234,33 @@ public abstract class BaseEntity
         return false;
     }
 
-    public static BaseEntity? FindByApiKey(string apikey)
+    public List<Group> GetGroupsIn(BaseEntity entity)
+    {
+        var groups = new List<Group>();
+        foreach (var group in DBCache.GetAll<Group>().Where(x => x.MembersIds.Contains(entity.Id)))
+        {
+            groups.Add(group);
+            groups.AddRange(group.GetGroupsIn(group));
+        }
+        return groups;
+    }
+
+    public static async Task<BaseEntity?> FindByApiKey(string apikey, VooperDB dbctx)
     {
         BaseEntity? entity = DBCache.GetAll<Group>().FirstOrDefault(x => x.ApiKey == apikey);
         if (entity is null) {
             entity = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ApiKey == apikey);
         }
+
+        if (entity is null)
+        {
+            var token = await dbctx.AuthTokens.FindAsync(apikey);
+            if (token is not null)
+            {
+                entity = BaseEntity.Find(token.EntityId);
+            }
+        }
+
         return entity;
     }
 
