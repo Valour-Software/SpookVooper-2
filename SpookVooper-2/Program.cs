@@ -44,6 +44,19 @@ Defines.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "ApiPolicy",
+        policy =>
+        {
+            policy
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed(_ => true)
+                .AllowAnyOrigin();
+        });
+});
+
 var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
@@ -166,19 +179,6 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: "ApiPolicy",
-        policy =>
-        {
-            policy
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .SetIsOriginAllowed(_ => true)
-                .AllowAnyOrigin();
-        });
-});
-
 builder.Services.AddMvc().AddSessionStateTempDataProvider().AddRazorRuntimeCompilation();
 
 var app = builder.Build();
@@ -198,23 +198,22 @@ else
 app.UseBlazorFrameworkFiles();
 app.MapFallbackToFile("index.html");
 
-app.UseCors();
-
-//BaseAPI       .AddRoutes(app);
-ItemAPI        .AddRoutes(app);
-EcoAPI         .AddRoutes(app);
-EntityAPI      .AddRoutes(app);
-DevAPI         .AddRoutes(app);
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseSession();
 
-app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRouting();
+
+app.UseCors();
+
+//BaseAPI       .AddRoutes(app);
+ItemAPI.AddRoutes(app);
+EcoAPI.AddRoutes(app);
+EntityAPI.AddRoutes(app);
+DevAPI.AddRoutes(app);
 
 app.MapControllerRoute(
     name: "default",

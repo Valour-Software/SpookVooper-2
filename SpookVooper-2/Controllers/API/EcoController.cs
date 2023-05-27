@@ -14,7 +14,7 @@ namespace SV2.API
     {
         public static void AddRoutes(WebApplication app)
         {
-            app.MapGet   ("api/eco/transaction/send", SendTransaction);
+            app.MapGet   ("api/eco/transaction/send", SendTransaction).RequireCors("ApiPolicy");
         }
 
         private static async Task SendTransaction(HttpContext ctx, VooperDB db, long fromid, long toid, string apikey, decimal amount, string detail, TransactionType trantype)

@@ -14,10 +14,10 @@ namespace SV2.API
         private static IdManager idManager = new(1);
         public static void AddRoutes(WebApplication app)
         {
-            app.MapGet   ("api/item/{itemid}", GetItem);
-            app.MapGet   ("api/item/{itemid}/give", Give);
-            app.MapGet   ("api/item/{itemid}/owner", GetOwner);
-            app.MapGet   ("api/definition/{definitionid}/items", GetItemsFromDefinition);
+            app.MapGet   ("api/item/{itemid}", GetItem).RequireCors("ApiPolicy");
+            app.MapGet   ("api/item/{itemid}/give", Give).RequireCors("ApiPolicy");
+            app.MapGet   ("api/item/{itemid}/owner", GetOwner).RequireCors("ApiPolicy");
+            app.MapGet   ("api/definition/{definitionid}/items", GetItemsFromDefinition).RequireCors("ApiPolicy");
         }
 
         private static async Task GetItemsFromDefinition(HttpContext ctx, VooperDB db, long definitionid)

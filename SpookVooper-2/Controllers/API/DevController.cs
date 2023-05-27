@@ -10,15 +10,14 @@ using Microsoft.AspNetCore.Cors;
 
 namespace SV2.API
 {
-    [EnableCors("ApiPolicy")]
     public class DevAPI : BaseAPI
     {
         public static void AddRoutes(WebApplication app)
         {
             //app.MapGet   ("api/dev/database/sql", GetSQL);
-            app.MapGet("api/dev/lackaccess", LackAccess);
-            app.MapGet("api/dev/getdistrictproduction", GetDistrictProduction);
-            app.MapGet("api/dev/gettime", GetTime);
+            app.MapGet("api/dev/lackaccess", LackAccess).RequireCors("ApiPolicy");
+            app.MapGet("api/dev/getdistrictproduction", GetDistrictProduction).RequireCors("ApiPolicy");
+            app.MapGet("api/dev/gettime", GetTime).RequireCors("ApiPolicy");
         }
 
         private static async Task LackAccess(HttpContext ctx) {

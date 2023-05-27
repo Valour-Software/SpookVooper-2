@@ -12,9 +12,9 @@ namespace SV2.API
     {
         public static void AddRoutes(WebApplication app)
         {
-            app.MapGet   ("api/entity/{svid}/name", GetName);
-            app.MapGet   ("api/entity/{svid}/credits", GetCredits);
-            app.MapGet   ("api/entity/search", Search);
+            app.MapGet   ("api/entity/{svid}/name", GetName).RequireCors("ApiPolicy");
+            app.MapGet   ("api/entity/{svid}/credits", GetCredits).RequireCors("ApiPolicy");
+            app.MapGet   ("api/entity/search", Search).RequireCors("ApiPolicy");
         }
 
         private static async Task GetName(HttpContext ctx, VooperDB db, long svid)
