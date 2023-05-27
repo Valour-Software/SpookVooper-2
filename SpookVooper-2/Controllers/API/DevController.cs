@@ -16,6 +16,7 @@ namespace SV2.API
             //app.MapGet   ("api/dev/database/sql", GetSQL);
             app.MapGet("api/dev/lackaccess", LackAccess);
             app.MapGet("api/dev/getdistrictproduction", GetDistrictProduction);
+            app.MapGet("api/dev/gettime", GetTime);
         }
 
         private static async Task LackAccess(HttpContext ctx) {
@@ -53,6 +54,11 @@ namespace SV2.API
             }
 
             await ctx.Response.WriteAsync(sum.ToString());
+        }
+
+        private static async Task GetTime(HttpContext ctx)
+        {
+            await ctx.Response.WriteAsync(DBCache.CurrentTime.Time.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds.ToString());
         }
     }
 }
