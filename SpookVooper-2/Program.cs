@@ -166,6 +166,19 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "ApiPolicy",
+        policy =>
+        {
+            policy
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed(_ => true)
+                .AllowAnyOrigin();
+        });
+});
+
 builder.Services.AddMvc().AddSessionStateTempDataProvider().AddRazorRuntimeCompilation();
 
 var app = builder.Build();
@@ -184,6 +197,8 @@ else
 
 app.UseBlazorFrameworkFiles();
 app.MapFallbackToFile("index.html");
+
+app.UseCors();
 
 //BaseAPI       .AddRoutes(app);
 ItemAPI        .AddRoutes(app);

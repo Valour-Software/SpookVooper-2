@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SV2.Database.Models.Entities;
@@ -133,6 +134,7 @@ public class OauthController : SVController
     }
 
     [HttpGet]
+    [EnableCors("ApiPolicy")]
     public async Task<IActionResult> RequestToken(string grant_type, string code, string redirect_uri,
                                                     long client_id, string client_secret)
     {

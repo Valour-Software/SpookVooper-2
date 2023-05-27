@@ -4,9 +4,11 @@ using System.Diagnostics;
 using SV2.Database;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Items;
+using Microsoft.AspNetCore.Cors;
 
 namespace SV2.API
 {
+    [EnableCors("ApiPolicy")]
     public class ItemAPI : BaseAPI
     {
         private static IdManager idManager = new(1);

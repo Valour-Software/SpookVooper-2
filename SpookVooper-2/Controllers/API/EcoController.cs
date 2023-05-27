@@ -5,9 +5,11 @@ using SV2.Database;
 using SV2.Database.Models.Entities;
 using SV2.Web;
 using SV2.Database.Models.Economy;
+using Microsoft.AspNetCore.Cors;
 
 namespace SV2.API
 {
+    [EnableCors("ApiPolicy")]
     public class EcoAPI : BaseAPI
     {
         public static void AddRoutes(WebApplication app)
