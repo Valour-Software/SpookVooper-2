@@ -31,7 +31,7 @@ public abstract class BaseEntity
     [VarChar(64)]
     public string Name { get; set; }
 
-    [VarChar(512)]
+    [VarChar(2048)]
     public string? Description { get; set; }
 
     [DecimalType]

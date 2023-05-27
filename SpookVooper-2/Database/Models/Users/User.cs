@@ -223,6 +223,11 @@ public class SVUser : BaseEntity
                 }
             }
         }
+
+        if (roles.Any(x => x.Name == "Senator") && !IsSenator())
+            await member.Node.DeleteAsync($"api/members/{member.Id}/roles/18993953105772544");
+        if (!roles.Any(x => x.Name == "Senator") && IsSenator())
+            await member.Node.PostAsync($"api/members/{member.Id}/roles/18993953105772544", null);
     }
 
     public async ValueTask<string> GetPfpRingColor()

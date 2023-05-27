@@ -59,6 +59,9 @@ public class GroupController : SVController
 
         model.Name = model.Name.Trim();
 
+        if (model.Description.Length >= 2048)
+            return RedirectBack("Group's description can not be longer than 2048 chars!");
+
         if (DBCache.GetAll<Group>().Any(x => x.Name == model.Name))
             return RedirectBack($"Error: Name {model.Name} is already taken!");
         
