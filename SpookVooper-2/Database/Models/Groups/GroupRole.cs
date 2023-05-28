@@ -37,7 +37,7 @@ public class GroupRole
 
     public static GroupRole Default = new GroupRole()
     {
-        Color = "",
+        Color = "ffffff",
         GroupId = 0,
         Name = "Default Role",
         Authority = int.MinValue,

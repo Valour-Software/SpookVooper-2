@@ -189,6 +189,11 @@ namespace SV2.Controllers
             if (user.Id != district.GovernorId)
                 return Redirect("/");
 
+            if (model.MapColor is null)
+                return RedirectBack("Mapcolor must be inputed.");
+            if (model.MapColor.Length != 6)
+                return RedirectBack("Mapcolor must be in hex format");
+
             var state = new State() {
                 Name = model.Name,
                 Description = model.Description,

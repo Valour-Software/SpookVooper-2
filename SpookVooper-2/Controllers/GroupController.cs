@@ -10,6 +10,7 @@ using SV2.Models.Groups;
 using Valour.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using SV2.Models.Manage;
+using System.Data;
 
 namespace SV2.Controllers;
 
@@ -384,6 +385,85 @@ public class GroupController : SVController
 
         var result = group.RemoveEntityFromRole(user, target, role);
         return RedirectBack(result.Info);
+    }
+
+    [HttpGet("/Group/TransferGroup/{groupid}")]
+    [UserRequired]
+    public IActionResult TransferGroup(long groupid)
+    {
+        SVUser user = HttpContext.GetUser();
+
+        // Retrieve group
+        Group group = DBCache.Get<Group>(groupid);
+
+        if (group == null)
+            return NotFound($"Error: Could not find {groupid}");
+
+        if (!group.IsOwner(user))
+            return Forbid($"Error: You do not own {group.Name}");
+
+        TransferGroupModel model = new TransferGroupModel()
+        {
+            User = user,
+            Group = group
+        };
+
+        return View(model);
+    }
+
+    [HttpPost("/Group/TransferGroup/{groupid}")]
+    [ValidateAntiForgeryToken]
+    [UserRequired]
+    public IActionResult TransferGroup(long groupid, long EntityId)
+    {
+        Group? group = DBCache.Get<Group>(groupid);
+        if (group is null)
+            return Redirect("/");
+
+        var user = HttpContext.GetUser();
+        if (!group.IsOwner(user))
+            return Forbid($"Error: You do not own {group.Name}");
+
+        var toentity = BaseEntity.Find(EntityId);
+
+        if (toentity is null)
+            return RedirectBack("To Entity not found!");
+
+        BaseEntity owner = toentity;
+
+        if (groupid == EntityId)
+        {
+            return RedirectBack($"You cannot give a group to itself!");
+        }
+
+        // Case for crazy people who want to watch the world burn
+        if (toentity is Group)
+        {
+            if (group.IsOwnerCheck(toentity))
+            {
+                return RedirectBack($"You cannot give a group to a group it owns, because that would give me a severe headache.");
+            }
+        }
+
+        // Detect ownership loops
+        while (owner is Group)
+        {
+            if (owner.Id == group.Id)
+                return RedirectBack($"This would result in an ownership loop.");
+
+            owner = ((Group)owner).Owner;
+        }
+
+        foreach (var role in group.Roles)
+        {
+            if (role.MembersIds.Contains(group.OwnerId))
+                group.RemoveEntityFromRole(null, group.Owner, role, true);
+        }
+        group.MembersIds.Remove(group.OwnerId);
+        group.OwnerId = toentity.Id;
+        group.MembersIds.Add(toentity.Id);
+
+        return RedirectBack($"Successfully transferred group ownership to {toentity.Name}");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

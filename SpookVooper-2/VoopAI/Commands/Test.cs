@@ -29,4 +29,19 @@ class TestCommands : CommandModuleBase
         itemtrade.NonAsyncExecute(true);
         await ctx.ReplyAsync($"Added {amount} of {resource} to Jacob.");
     }
+
+    [Command("createresource")]
+    public async Task CreateResource(CommandContext ctx, string resource, int amount, long svid)
+    {
+        if (ctx.Member.UserId != 12201879245422592)
+        {
+            await ctx.ReplyAsync("Only Jacob can use this command!");
+            return;
+        }
+        BaseEntity? entity = DBCache.GetAll<BaseEntity>().FirstOrDefault(x => x.Id == svid);
+        var itemdefid = GameDataManager.ResourcesToItemDefinitions[resource].Id;
+        ItemTrade itemtrade = new(ItemTradeType.Server, null, entity.Id, amount, itemdefid, "From Valour - /creatresource command");
+        itemtrade.NonAsyncExecute(true);
+        await ctx.ReplyAsync($"Added {amount} of {resource} to {entity.Name}.");
+    }
 }

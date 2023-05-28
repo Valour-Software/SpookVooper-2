@@ -212,16 +212,16 @@
     }
 
     <br />
-    @if (Model.Group.OwnerId == user.Id)
+    @if (Model.Group.IsOwner(user))
     {
-        <p>These do not work right now</p>
         <div class="row">
             <div class="col-12 align-content-center text-center mb-2">
+                <p>This do not work right now</p>
                 <a asp-action="Delete" asp-controller="Group" asp-route-groupid="@Model.Id" class="btn btn-danger">Delete Group Permanently</a>
             </div>
             
             <div class="col-12 align-content-center text-center">
-                <a asp-action="TransferGroup" asp-controller="Group" asp-route-group_svid="@Model.Id" class="btn btn-danger">Transfer Group</a>
+                <a asp-action="TransferGroup" asp-controller="Group" asp-route-groupid="@Model.Id" class="btn btn-danger">Transfer Group</a>
             </div>
         </div>
     }

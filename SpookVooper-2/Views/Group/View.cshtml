@@ -134,15 +134,51 @@
                 <br />
                 <div class="container">
                     <div class="row">
-                        @foreach (BaseEntity entity in Model.Members)
+                        <div class="col-6 memberbox">
+                            <div class="m-2">
+                                <img class="memberpfp" src="@Model.Owner.ImageUrl" />
+                            </div>
+                            @if (Model.Owner.EntityType == EntityType.User)
+                            {
+                                <a asp-controller="User" asp-action="Info" asp-route-id="@Model.Owner.Id" style="text-decoration: none;">
+                                    <span class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(Model.Owner).Color;">@Model.Owner.Name</span>
+                                    <span class="nametext" style="max-width:60%;color:white">(Owner)</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Group" asp-action="View" asp-route-id="@Model.Owner.Id">
+                                    <span class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(Model.Owner).Color;">@Model.Owner.Name</span>
+                                    <span class="nametext" style="max-width:60%;color:white">(Owner)</span>
+                                </a>
+                            }
+                        </div>
+                        @foreach (BaseEntity entity in Model.Members.Where(x => x.Id != Model.OwnerId))
                         {
                             <div class="col-6 memberbox">
                                 <div class="m-2">
                                     <img class="memberpfp" src="@entity.ImageUrl" />
                                 </div>
-                                <a asp-controller="User" asp-action="Info" asp-route-id="@entity.Id">
-                                    <p class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(entity).Color">@entity.Name</p>
-                                </a>
+                                @if (entity.EntityType == EntityType.User)
+                                {
+                                    <a asp-controller="User" asp-action="Info" asp-route-id="@entity.Id">
+                                        <span class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(entity).Color;">@entity.Name</span>
+                                        @if (Model.GetHighestRole(entity).GroupId != 0)
+                                        {
+                                            <span class="nametext" style="max-width:60%;color:white">(@Model.GetHighestRole(entity).Name)</span>
+                                        }
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Group" asp-action="View" asp-route-id="@entity.Id">
+                                        <span class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(entity).Color;">@entity.Name</span>
+                                        @if (Model.GetHighestRole(entity).GroupId != 0)
+                                        {
+                                            <span class="nametext" style="max-width:60%;color:white">(@Model.GetHighestRole(entity).Name)</span>
+                                        }
+                                    </a>
+                                }
                             </div>
                         }
                     </div>

@@ -78,6 +78,32 @@ public class Group : BaseEntity, IHasOwner
         return MembersIds.Contains(user.Id);
     }
 
+    public bool IsOwnerCheck(BaseEntity entity)
+    {
+        BaseEntity owner = BaseEntity.Find(OwnerId);
+
+        // While the owner is a group
+        while (owner is Group)
+        {
+            // Check if it matches
+            if (owner.Id == entity.Id)
+            {
+                return true;
+            }
+
+            // Move up to next layer of ownership
+            owner = BaseEntity.Find(((Group)owner).OwnerId);
+        }
+
+        // At this point the owner must be a user
+        if (owner != null)
+        {
+            return owner.Id == entity.Id;
+        }
+
+        return false;
+    }
+
     public Group()
     {
 
