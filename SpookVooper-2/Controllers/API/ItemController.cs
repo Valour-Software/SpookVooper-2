@@ -15,7 +15,7 @@ namespace SV2.API
         public static void AddRoutes(WebApplication app)
         {
             app.MapGet   ("api/item/{itemid}", GetItem).RequireCors("ApiPolicy");
-            app.MapGet   ("api/item/{itemid}/give", Give).RequireCors("ApiPolicy");
+            app.MapGet   ("api/items/{itemdefid}/give", Give).RequireCors("ApiPolicy");
             app.MapGet   ("api/item/{itemid}/owner", GetOwner).RequireCors("ApiPolicy");
             app.MapGet   ("api/definition/{definitionid}/items", GetItemsFromDefinition).RequireCors("ApiPolicy");
         }
