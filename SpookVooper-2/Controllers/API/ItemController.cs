@@ -53,13 +53,13 @@ namespace SV2.API
             await ctx.Response.WriteAsJsonAsync(item.Owner);
         }
 
-        private static async Task Give(HttpContext ctx, VooperDB db, long itemid, string apikey, long fromid, long toid, int amount)
+        private static async Task Give(HttpContext ctx, VooperDB db, long itemdefid, string apikey, long fromid, long toid, int amount)
         {
             // find Item
-            SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.Id == itemid);
+            SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.DefinitionId == itemdefid);
             if (item is null) {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"Could not find item with id {itemid}");
+                await ctx.Response.WriteAsync($"Could not find item with definition id {itemdefid}");
                 return;
             }
 
