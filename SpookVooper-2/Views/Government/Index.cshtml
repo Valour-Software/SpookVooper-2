@@ -33,24 +33,6 @@
             <br />
         }
 
-        @if (Model.CFV != null)
-        {
-            <div class="row">
-                <div class="col-sm-4"></div>
-                <div class="col-sm-4 col-sm-offset-4">
-                    <div>
-                        <h2 style="text-align:center">Chief Financier of Vooperia @Model.CFV.Name</h2>
-                        <br />
-                        <img class="govpfp" style="box-shadow: 0px 0px 0px 7px #1cbabd; width:128px;height:128px;" src="@Model.CFV.ImageUrl" />
-                    </div>
-                </div>
-                <div class="col-sm-4"></div>
-            </div>
-
-            <hr />
-            <br />
-        }
-
         @if (Model.PrimeMinister != null)
         {
             <div class="row">
@@ -83,6 +65,25 @@
                     </div>
                 </div>
             }
+            
+        @if (Model.CFV != null)
+        {
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4 col-sm-offset-4">
+                    <div>
+                        <h2 style="text-align:center">Chief Financier of Vooperia @Model.CFV.Name</h2>
+                        <br />
+                        <img class="govpfp" style="box-shadow: 0px 0px 0px 7px #1cbabd; width:128px;height:128px;" src="@Model.CFV.ImageUrl" />
+                    </div>
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+
+            <hr />
+            <br />
+        }
+            
         </div>
 
         <hr />
