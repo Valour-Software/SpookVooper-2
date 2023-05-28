@@ -38,6 +38,13 @@ namespace SV2.API
                 return;
             }
 
+            if (entity.Id != fromentity.Id)
+            {
+                ctx.Response.StatusCode = 401;
+                await ctx.Response.WriteAsync($"You can not use one entity's api key or oauth key to send a transaction from another entity!");
+                return;
+            }
+
             if (!fromentity.HasPermission(entity, GroupPermissions.Eco))
             {
                 ctx.Response.StatusCode = 401;

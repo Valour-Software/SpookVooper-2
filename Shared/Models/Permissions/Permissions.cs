@@ -1,4 +1,4 @@
-namespace SV2.Database.Models.Permissions;
+namespace Shared.Models.Permissions;
 
 /// <summary>
 /// This class contains all group permissions and helper methods for working
@@ -59,6 +59,7 @@ public static class GroupPermissions
 
 public class GroupPermission : Permission
 {
+    public override string ReadableName => "Group";
     public GroupPermission(long value, string name, string description) : base(value, name, description)
     {
     }
@@ -89,6 +90,8 @@ public class Permission
     /// The value of this permission
     /// </summary>
     public long Value { get; set; }
+
+    public virtual string ReadableName => "Base";
 
     /// <summary>
     /// Initializes the permission

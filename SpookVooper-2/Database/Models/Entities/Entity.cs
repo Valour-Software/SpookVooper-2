@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using SV2.Database.Models.Users;
-using SV2.Database.Models.Permissions;
 using SV2.Database.Models.Economy;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;

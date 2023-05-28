@@ -2,7 +2,6 @@
 using SV2.Models;
 using SV2.Managers;
 using SV2.Database.Models.Users;
-using SV2.Database.Models.Permissions;
 using System.Diagnostics;
 using SV2.Helpers;
 using SV2.Extensions;

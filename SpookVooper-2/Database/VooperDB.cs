@@ -196,15 +196,10 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
         }
 
         string[] districtnames = new []{
-            //"ardenti-terra",
-            //"avalon",
-            //"kogi",
             "elysian-katonia",
             "lanatia",
             "landing-cove",
-            //"los-vooperis",
             "new-avalon",
-            //"new-spudland",
             "new-vooperis",
             "novastella",
             "old-king",
@@ -213,15 +208,10 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
             "voopmont"
         };
         int[] districtids = new[] {
-            //101,
-            //102,
-           // 103,
             104,
             105,
             106,
-           // 107,
             108,
-            //109,
             110,
             111,
             112,

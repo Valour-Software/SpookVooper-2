@@ -16,6 +16,7 @@ namespace SV2.API
         {
             app.MapGet   ("api/item/{itemid}", GetItem).RequireCors("ApiPolicy");
             app.MapGet   ("api/items/{itemdefid}/give", Give).RequireCors("ApiPolicy");
+            app.MapGet   ("api/items/{itemdefid}/ownership/{entityid}", GetOwnership).RequireCors("ApiPolicy");
             app.MapGet   ("api/item/{itemid}/owner", GetOwner).RequireCors("ApiPolicy");
             app.MapGet   ("api/definition/{definitionid}/items", GetItemsFromDefinition).RequireCors("ApiPolicy");
         }
@@ -53,13 +54,43 @@ namespace SV2.API
             await ctx.Response.WriteAsJsonAsync(item.Owner);
         }
 
-        private static async Task Give(HttpContext ctx, VooperDB db, long itemdefid, string apikey, long fromid, long toid, int amount)
+        private static async Task GetOwnership(HttpContext ctx, long itemdefid, long entityid)
         {
             // find Item
             SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.DefinitionId == itemdefid);
-            if (item is null) {
+            if (item is null)
+            {
                 ctx.Response.StatusCode = 401;
                 await ctx.Response.WriteAsync($"Could not find item with definition id {itemdefid}");
+                return;
+            }
+
+            BaseEntity? entity = BaseEntity.Find(entityid);
+            if (entity is null)
+            {
+                ctx.Response.StatusCode = 401;
+                await ctx.Response.WriteAsync($"Could not find entity with svid {entityid}!");
+                return;
+            }
+
+            await ctx.Response.WriteAsync((entity.SVItemsOwnerships.ContainsKey(itemdefid) ? entity.SVItemsOwnerships[itemdefid].Amount : 0).ToString());
+        }
+
+        private static async Task Give(HttpContext ctx, VooperDB db, long itemdefid, string apikey, long fromid, long toid, int amount, string detail)
+        {
+            // find Item
+            var def = DBCache.Get<ItemDefinition>(itemdefid);
+            if (def is null) {
+                ctx.Response.StatusCode = 401;
+                await ctx.Response.WriteAsync($"Could not find item definition with definition id {itemdefid}");
+                return;
+            }
+
+            SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.OwnerId == fromid && x.DefinitionId == itemdefid);
+            if (def is null)
+            {
+                ctx.Response.StatusCode = 401;
+                await ctx.Response.WriteAsync($"Could not find item!");
                 return;
             }
 
@@ -76,6 +107,13 @@ namespace SV2.API
             if (fromentity is null) {
                 ctx.Response.StatusCode = 401;
                 await ctx.Response.WriteAsync($"Could not find entity with svid {fromid}!");
+                return;
+            }
+
+            if (entity.Id != fromentity.Id)
+            {
+                ctx.Response.StatusCode = 401;
+                await ctx.Response.WriteAsync($"You can not use one entity's api key or oauth key to send a item from another entity!");
                 return;
             }
 
@@ -109,7 +147,7 @@ namespace SV2.API
                 ToId = toid,
                 Time = DateTime.UtcNow,
                 DefinitionId = item.DefinitionId,
-                Details = "Item Trade from API",
+                Details = detail,
             };
 
             await ctx.Response.WriteAsync((await trade.Execute()).Info);

@@ -343,6 +343,19 @@ public static class LuaHandler
         return dict;
     }
 
+    public static Dictionary<string, long> DistrictNamesToIds = new() {
+        { "elysian_katonia", 104 },
+        { "lanatia", 105 },
+        { "landing_cove", 106 },
+        { "new_avalon", 108 },
+        { "new_vooperis", 110 },
+        { "novastella", 111 },
+        { "old_king", 112 },
+        { "san_vooperisco", 113 },
+        { "thesonica", 114 },
+        { "voopmont", 115 }
+    };
+
     public static ExpressionNode HandleSyntaxExpression(LuaTable table, string parentname = null, SyntaxNode parent = null)
     {
         var expr = new ExpressionNode();
@@ -400,6 +413,12 @@ public static class LuaHandler
                     ChangeTo = spliced[1],
                     LineNumber = obj.LineNumber
                 };
+
+                if (node.scopeType == ScriptScopeType.District)
+                {
+                    node.ChangeTo = DistrictNamesToIds[node.ChangeTo].ToString();
+                }
+
                 if (parentname == "effects")
                 {
                     exprnode = new();

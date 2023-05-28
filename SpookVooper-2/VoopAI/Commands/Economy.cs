@@ -4,7 +4,6 @@ using Valour.Net.ModuleHandling;
 using Valour.Net.CommandHandling;
 using Valour.Net.CommandHandling.Attributes;
 using SV2.Database.Models.Economy;
-using SV2.Database.Models.Permissions;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Users;
 using System.Linq;

@@ -24,7 +24,7 @@ public interface IHasOwner
     public BaseEntity Owner { get; }
 }
 
-public abstract class BaseEntity
+public abstract class BaseEntity : Item
 {
     [Key]
     public long Id { get; set; }
@@ -43,10 +43,31 @@ public abstract class BaseEntity
 
     public Dictionary<long, SVItemOwnership> SVItemsOwnerships { get; set; }
 
-    public EntityType EntityType { get; set; }
+    public virtual EntityType EntityType { get; set; }
+
+    public static async ValueTask<BaseEntity> FindAsync(long id)
+    {
+        int _id = (int)id;
+        Group group = await Group.FindAsync(_id);
+        if (group is not null)
+            return group;
+
+        SVUser user = await SVUser.FindAsync(_id);
+        if (user is not null)
+            return user;
+
+        return null;
+    }
 }
 
 public class Entity : BaseEntity
 {
 
+}
+
+public enum EntityModifierType
+{
+    FactoryThroughputFactor,
+    FactoryEfficiencyFactor,
+    FactoryQuantityCapFactor
 }

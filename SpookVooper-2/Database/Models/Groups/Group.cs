@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
-using SV2.Database.Models.Permissions;
 using SV2.Database.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using SV2.Web;
@@ -144,6 +143,8 @@ public class Group : BaseEntity, IHasOwner
 
     public override bool HasPermission(BaseEntity entity, GroupPermission permission)
     {
+        if (entity.Id == Id)
+            return true;
         if (entity.Id == OwnerId)
             return true;
 

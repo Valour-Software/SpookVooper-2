@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Users;
-using SV2.Database.Models.Permissions;
 
 namespace SV2.Database.Models.Groups;
 

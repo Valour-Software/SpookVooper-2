@@ -80,8 +80,8 @@ namespace SV2.Controllers
                 return RedirectBack("District's Property Tax per size must be 2,000 or less!");
 
             district.Description = model.Description;
-            district.TitleForProvince = model.NameForProvince is null ? null : model.NameForProvince.ToTitleCase();
-            district.TitleForState = model.NameForState is null ? null : model.NameForState.ToTitleCase();
+            district.TitleForProvince = model.NameForProvince?.ToTitleCase();
+            district.TitleForState = model.NameForState?.ToTitleCase();
             district.TitleForGovernorOfProvince = model.NameForGovernorOfAProvince is null ? null : model.NameForGovernorOfAProvince.ToTitleCase();
             district.TitleForGovernorOfState = model.NameForGovernorOfAState is null ? null : model.NameForGovernorOfAState.ToTitleCase();
             district.BasePropertyTax = model.BasePropertyTax;

@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
-using SV2.Database.Models.Permissions;
 using Valour.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;

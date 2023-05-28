@@ -492,7 +492,8 @@ public class ChangeScopeNode : EffectNode
 
         if (scopeType == ScriptScopeType.District)
         {
-            var district = DBCache.GetAll<District>().FirstOrDefault(x => x.ScriptName == ChangeTo);
+            var _changeto = long.Parse(ChangeTo);
+            var district = DBCache.GetAll<District>().FirstOrDefault(x => x.Id == _changeto);
             if (district is null)
                 HandleError("Could not find district", $"key: {ChangeTo}");
             newstate.District = district;
@@ -501,7 +502,8 @@ public class ChangeScopeNode : EffectNode
 
         else if (scopeType == ScriptScopeType.Province)
         {
-            var province = DBCache.GetAll<Province>().FirstOrDefault(x => x.Id == long.Parse(ChangeTo));
+            var _changeto = long.Parse(ChangeTo);
+            var province = DBCache.GetAll<Province>().FirstOrDefault(x => x.Id == _changeto);
             if (province is null)
                 HandleError("Could not find province", $"key: {ChangeTo}");
             newstate.Province = province;
