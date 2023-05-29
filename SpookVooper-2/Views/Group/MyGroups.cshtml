@@ -6,34 +6,23 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-6">
-            <h2>Groups Owned:</h2>
-            <br />
-            <div class="container">
-                <div class="row">
-                    @foreach (Group group in await user.GetOwnedGroupsAsync())
-                    {
-                        <div class="col-12 srow">
-                            <div class="p-1">
-                                <img class="smallpfp" style="margin-left: 10px; margin-right:10px; float:right" src="@group.ImageUrl" />
-                            </div>
-                            <a asp-controller="Group" asp-action="View" asp-route-id="@group.Id">
-                                <p class="forumtable-text">@group.Name</p>
-                            </a>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-        <div class="col-6">
-            <h2>Member Of:</h2>
-            <br />
-            <div class="container">
-                <div class="row">
-                    @foreach (Group group in await user.GetJoinedGroupsAsync())
-                    {
-                        if (group != null)
+        @if (user is not null)
+        {
+            <div class="col-6">
+                <h2>Groups Owned:</h2>
+                <br />
+                <div class="container">
+                    <div class="row">
+                        @{
+                            var alreadydone = new List<Group>();
+                        }
+                        @foreach (Group group in await user.GetOwnedGroupsAsync())
                         {
+                            if (alreadydone.Any(x => x.Id == group.Id))
+                            {
+                                continue;
+                            }
+                            alreadydone.Add(group);
                             <div class="col-12 srow">
                                 <div class="p-1">
                                     <img class="smallpfp" style="margin-left: 10px; margin-right:10px; float:right" src="@group.ImageUrl" />
@@ -43,9 +32,31 @@
                                 </a>
                             </div>
                         }
-                    }
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="col-6">
+                <h2>Member Of:</h2>
+                <br />
+                <div class="container">
+                    <div class="row">
+                        @foreach (Group group in await user.GetJoinedGroupsAsync())
+                        {
+                            if (group != null)
+                            {
+                                <div class="col-12 srow">
+                                    <div class="p-1">
+                                        <img class="smallpfp" style="margin-left: 10px; margin-right:10px; float:right" src="@group.ImageUrl" />
+                                    </div>
+                                    <a asp-controller="Group" asp-action="View" asp-route-id="@group.Id">
+                                        <p class="forumtable-text">@group.Name</p>
+                                    </a>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>

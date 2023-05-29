@@ -37,6 +37,16 @@
         {
             <div class="row">
                 <div class="col-sm-4"></div>
+                @if (Model.PrimeMinister != null)
+                {
+                    <div class="col-sm-4 col-sm-offset-4">
+                        <div>
+                        <h2 style="text-align:center">Prime Minister @Model.PrimeMinister.Name</h2>
+                        <br />
+                        <img class="govpfp" style="box-shadow: 0px 0px 0px 7px #03A1A4; width:128px;height:128px" src="@Model.PrimeMinister.ImageUrl" />
+                    </div>
+                </div>
+                }
                 <div class="col-sm-4 col-sm-offset-4">
                     <div>
                         <h2 style="text-align:center">Chief Financier of Vooperia @Model.CFV.Name</h2>
@@ -46,25 +56,6 @@
                 </div>
                 <div class="col-sm-4"></div>
             </div>
-
-            <hr />
-            <br />
-        }
-
-        @if (Model.PrimeMinister != null)
-        {
-            <div class="row">
-                <div class="col-sm-4"></div>
-                <div class="col-sm-4 col-sm-offset-4">
-                    <div>
-                        <h2 style="text-align:center">Prime Minister @Model.PrimeMinister.Name</h2>
-                        <br />
-                        <img class="govpfp" style="box-shadow: 0px 0px 0px 7px #03A1A4; width:128px;height:128px" src="@Model.PrimeMinister.ImageUrl" />
-                    </div>
-                </div>
-                <div class="col-sm-4"></div>
-            </div>
-
 
             <hr />
             <br />

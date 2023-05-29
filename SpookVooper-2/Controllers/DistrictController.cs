@@ -319,7 +319,7 @@ namespace SV2.Controllers
 
             SVUser user = HttpContext.GetUser();
 
-            var daysWaited = Math.Round(DateTime.Now.Subtract(user.LastMoved).TotalDays, 0);
+            var daysWaited = (int)(DateTime.UtcNow.Subtract(user.LastMoved).TotalDays);
 
             if (daysWaited < 60)
                 return RedirectBack($"Error: You must wait another {60 - daysWaited} days to move again!");

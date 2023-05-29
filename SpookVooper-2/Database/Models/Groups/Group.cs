@@ -261,7 +261,7 @@ public class Group : BaseEntity, IHasOwner
         if (!force) {
 
             // Authority check
-            if (role.Authority > GetAuthority(target))
+            if (role.Authority > GetAuthority(caller))
                 return new TaskResult(false, $"{role.Name} has more authority than you!");
 
             if (role is null)

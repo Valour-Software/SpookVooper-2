@@ -176,7 +176,7 @@ public class SVUser : BaseEntity
 
         using var dbctx = VooperDB.DbFactory.CreateDbContext();
 
-        var topGroups = await dbctx.Groups.Where(x => x.OwnerId == Id).ToListAsync();
+        var topGroups = await dbctx.Groups.Where(x => x.IsOwner(this)).ToListAsync();
 
         foreach (Group group in topGroups)
         {

@@ -7,4 +7,5 @@ public class GovernmentIndexModel
     public SVUser? CFV;
     public List<Senator> Senators;
     public List<SVUser> Justices;
+    public List<SVUser> PanelMembers;
 }
