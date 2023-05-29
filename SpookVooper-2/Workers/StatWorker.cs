@@ -1,4 +1,5 @@
 using IdGen;
+using Microsoft.EntityFrameworkCore;
 using SV2.Database;
 using SV2.Database.Managers;
 using SV2.Database.Models.Economy;
@@ -35,15 +36,22 @@ public class StatWorker : BackgroundService
                 {
                     try
                     {
+                        var laststat = await _dbctx.Stats.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
+                        if (laststat is not null) {
+                            while (DateTime.UtcNow.Subtract(laststat.Date).TotalMinutes < 60)
+                            {
+                                await Task.Delay(60_000);
+                            }
+                        }
                         // just do global ones for now
-                        _dbctx.Add(new Stat() { 
+                        _dbctx.Stats.Add(new Stat() { 
                             Date = DateTime.UtcNow, 
                             Id = IdManagers.StatIdGenerator.Generate(), 
                             TargetType = TargetType.Global, 
                             StatType = StatType.Population,
                             Value = DBCache.GetAll<Province>().Sum(x => x.Population)});
 
-                        _dbctx.Add(new Stat()
+                        _dbctx.Stats.Add(new Stat()
                         {
                             Date = DateTime.UtcNow,
                             Id = IdManagers.StatIdGenerator.Generate(),
@@ -52,7 +60,7 @@ public class StatWorker : BackgroundService
                             Value = DBCache.GetAll<Province>().Sum(x => x.BuildingSlotsUsed)
                         });
 
-                        _dbctx.Add(new Stat()
+                        _dbctx.Stats.Add(new Stat()
                         {
                             Date = DateTime.UtcNow,
                             Id = IdManagers.StatIdGenerator.Generate(),
@@ -60,6 +68,8 @@ public class StatWorker : BackgroundService
                             StatType = StatType.TotalBuildingSlots,
                             Value = DBCache.GetAll<Province>().Sum(x => x.BuildingSlots)
                         });
+
+                        await _dbctx.SaveChangesAsync();
 
 
                         //await Task.Delay(1000 * 60 * 60);
@@ -78,14 +88,7 @@ public class StatWorker : BackgroundService
 
             while (!task.IsCompleted)
             {
-                _logger.LogInformation("Economy Worker running at: {time}", DateTimeOffset.Now);
-                // for right now, just save cache to database every 2 minutes
-                await DBCache.SaveAsync();
-#if DEBUG
-                await Task.Delay(10_000, stoppingToken);
-#else
-                await Task.Delay(30_000, stoppingToken);
-#endif
+                await Task.Delay(60_000, stoppingToken);
             }
 
             _logger.LogInformation("Economy Worker task stopped at: {time}", DateTimeOffset.Now);

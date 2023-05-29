@@ -146,7 +146,6 @@ public class District
 
     public void HourlyTick()
     {
-        return;
         double totalattractionpoints = Provinces.Sum(x => Math.Pow(x.MigrationAttraction, 1.025));
 
         // do migration

@@ -142,6 +142,18 @@ namespace SV2.Workers
                                 amount += (building.Province.PropertyTaxPerSize ?? 0) * building.Size;
                                 entitytaxes[id] += amount;
 
+                                // now we do state property taxes
+                                if (building.Province.StateId is not null)
+                                {
+                                    var stateid = (long)building.Province.StateId;
+                                    if (!entitytaxes.ContainsKey(stateid))
+                                        entitytaxes[stateid] = 0.00;
+
+                                    amount = building.Province.State!.BasePropertyTax ?? 0;
+                                    amount += (building.Province.State!.PropertyTaxPerSize ?? 0) * building.Size;
+                                    entitytaxes[stateid] += amount;
+                                }
+
                                 // now we do district property taxes
                                 if (!entitytaxes.ContainsKey(building.DistrictId))
                                     entitytaxes[building.DistrictId] = 0.00;

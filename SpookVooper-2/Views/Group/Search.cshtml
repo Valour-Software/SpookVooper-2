@@ -1,0 +1,69 @@
+﻿@model GroupSearchModel
+
+@{
+    ViewData["Title"] = "Group Search";
+}
+
+<div class="container vw-100">
+    <div class="col-12">
+        <h1 style="text-align:left" class="display-4">Group Search</h1>
+        <form method="post">
+            <div>
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div>
+                    @if (Model.ExcludeProvinceGroups)
+                    {
+                        <button type="submit" class="btn btn-warning btn-rounded" value="false" name="ExcludeProvinceGroups">Exclude Province Groups</button>
+                    }
+                    else {
+                        <button type="submit" class="btn btn-outline-warning btn-rounded" value="true" name="ExcludeProvinceGroups">Exclude Province Groups</button>
+                    }
+                </div>
+                <br />
+                <div class="input-group">
+                    <input asp-for="search" class="form-control" style="margin-bottom:20px; display:inline-block; max-width:750px;"/>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-primary" style="display:inline-block;margin-bottom:20px;">Search</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <br />
+
+        @{
+            if (!String.IsNullOrWhiteSpace(Model.search))
+            {
+                List<Group> groups = DBCache.GetAll<Group>().Where(x => ((Model.ExcludeProvinceGroups && x.GroupType != GroupTypes.Province) || !Model.ExcludeProvinceGroups) && x.Name.ToLower().Contains(Model.search.ToLower())).OrderByDescending(u => u.Name.ToLower().StartsWith(Model.search.ToLower())).ToList();
+
+                if (groups != null && groups.Count > 0)
+                {
+                    <table id="userTable">
+                        @foreach (Group group in groups)
+                        {
+                            <tr>
+
+                                <td>
+                                    <a asp-controller="Group" asp-action="View" asp-route-id="@group.Id">
+                                        <img class="smallpfp" style="margin-right: 10px" src="@group.ImageUrl" />
+                                    </a>
+                                </td>
+                                <td style="font-size:30px;">
+                                    <a asp-controller="Group" asp-action="View" asp-route-id="@group.Id">
+                                        @group.Name
+                                    </a>
+                                </td>
+
+                            </tr>
+                        }
+                    </table>
+                }
+                else
+                {
+                    <h1 style="text-align:left">No groups found!</h1>
+                }
+            }
+
+
+        }
+</div>

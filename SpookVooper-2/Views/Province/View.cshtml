@@ -191,13 +191,30 @@
                     <th class="infobox-row-name">Migration Attraction</th>
                     <td class="infobox-row-value">@($"{Model.MigrationAttraction:n0}") (@Model.RankByMigrationAttraction.ToStringWithOrdinal() in District)</td>
                 </tr>
+                @{
+                    var totalbase = Model.BasePropertyTax ?? 0 + (Model.State is not null ? Model.State.BasePropertyTax ?? 0 : 0) + Model.District.BasePropertyTax ?? 0;
+                    var totalpersize = Model.PropertyTaxPerSize ?? 0 + (Model.State is not null ? Model.State.PropertyTaxPerSize ?? 0: 0) + Model.District.PropertyTaxPerSize ?? 0;
+                }
                 <tr class="mergedrow dividertop">
                     <th class="infobox-row-name">Base Property Tax</th>
-                    <td class="infobox-row-value">@($"¢{Model.BasePropertyTax:n0}")</td>
+                    @if (Model.State is not null)
+                    {
+                        <td class="infobox-row-value">@($"¢{totalbase:n0}") @($"(¢{Model.BasePropertyTax ?? 0:n0} + ¢{Model.State.BasePropertyTax ?? 0:n0} + ¢{Model.District.BasePropertyTax ?? 0:n0})")</td>
+                    }
+                    else {
+                        <td class="infobox-row-value">@($"¢{totalbase:n0}")</td>
+                    }
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Property Tax per Building Size</th>
-                    <td class="infobox-row-value">@($"¢{Model.PropertyTaxPerSize:n0}")</td>
+                    @if (Model.State is not null)
+                    {
+                        <td class="infobox-row-value">@($"¢{totalpersize:n0}") @($"(¢{Model.PropertyTaxPerSize ?? 0:n0} + ¢{Model.State.PropertyTaxPerSize ?? 0:n0} + ¢{Model.District.PropertyTaxPerSize ?? 0:n0})")</td>
+                    }
+                    else
+                    {
+                        <td class="infobox-row-value">@($"¢{totalpersize:n0}")</td>
+                    }
                 </tr>
             </tbody>
         </table>

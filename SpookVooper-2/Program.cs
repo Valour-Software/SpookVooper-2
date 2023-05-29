@@ -156,6 +156,8 @@ builder.Services.AddHostedService<TransactionWorker>();
 builder.Services.AddHostedService<ItemTradeWorker>();
 builder.Services.AddHostedService<TimeWorker>();
 builder.Services.AddHostedService<DistrictUpdateWorker>();
+builder.Services.AddHostedService<VoopAIWorker>();
+builder.Services.AddHostedService<StatWorker>();
 
 builder.Services.AddDataProtection().PersistKeysToDbContext<VooperDB>();
 

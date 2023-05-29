@@ -14,7 +14,6 @@ using Valour.Api.Models.Messages.Embeds;
 using Valour.Api.Models.Messages.Embeds.Styles.Basic;
 
 namespace SV2.VoopAI.Commands;
-
 class UBICommands : CommandModuleBase
 {
     [Interaction(EmbedIteractionEventType.FormSubmitted)]

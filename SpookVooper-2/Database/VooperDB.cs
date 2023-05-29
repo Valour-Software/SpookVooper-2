@@ -16,6 +16,7 @@ using System.Text;
 using SV2.Database.Models.News;
 using SV2.Database.Models.Corporations;
 using SV2.Database.Models.Misc;
+using SV2.Database.Models.Stats;
 
 /*  Valour - A free and secure chat client
  *  Copyright (C) 2021 Vooper Media LLC
@@ -167,6 +168,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
 
     public DbSet<OauthApp> OauthApps { get; set; }
     public DbSet<AuthToken> AuthTokens { get; set; }
+    public DbSet<Stat> Stats { get; set; }
 
     public VooperDB(DbContextOptions options)
     {

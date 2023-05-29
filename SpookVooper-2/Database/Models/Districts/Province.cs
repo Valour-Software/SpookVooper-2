@@ -457,7 +457,6 @@ public class Province
 
     public async ValueTask HourlyTick()
     {
-        return;
         if (Population < 2500) Population = 2500;
         // update modifiers now
         UpdateModifiers();

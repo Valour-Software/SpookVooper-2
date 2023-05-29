@@ -31,6 +31,27 @@ public class GroupController : SVController
         return View();
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Search(string id = "", bool excludeprovincegroups = false)
+    {
+        GroupSearchModel model = new GroupSearchModel()
+        {
+            search = id,
+            ExcludeProvinceGroups = excludeprovincegroups
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Search(GroupSearchModel model)
+    {
+        return RedirectToAction(nameof(Search), routeValues: new { 
+            id = model.search, 
+            excludeprovincegroups = model.ExcludeProvinceGroups 
+        });
+    }
+
     public IActionResult View(long id)
     {
         Group? group = Group.Find(id);

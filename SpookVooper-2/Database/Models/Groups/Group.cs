@@ -18,7 +18,8 @@ public enum GroupTypes
     NonProfit = 2,
     PoliticalParty = 3,
     District = 4,
-    State = 5
+    State = 5,
+    Province = 6
 }
 
 public enum ReadableGroupTypes {

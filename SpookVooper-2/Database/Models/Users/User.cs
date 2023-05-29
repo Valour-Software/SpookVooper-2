@@ -198,7 +198,7 @@ public class SVUser : BaseEntity
             var result = await member.Node.PostAsync($"api/members/{member.Id}/roles/{VoopAI.VoopAI.RankRoleIds[rankname]}", null);
             Console.WriteLine(result);
         }
-        foreach (var role in roles.Where(x => VoopAI.VoopAI.RankNames.Contains(x.Name)))
+        foreach (var role in roles.Where(x => VoopAI.VoopAI.RankNames.Contains(x.Name)).ToList())
         {
             if (role.Name != rankname)
             {
@@ -214,7 +214,7 @@ public class SVUser : BaseEntity
                 var result = await member.Node.PostAsync($"api/members/{member.Id}/roles/{districtrole.Id}", null);
                 Console.WriteLine(result.Message);
             }
-            foreach (var role in roles.Where(x => VoopAI.VoopAI.DistrictRoles.ContainsKey(x.Name)))
+            foreach (var role in roles.Where(x => VoopAI.VoopAI.DistrictRoles.ContainsKey(x.Name)).ToList())
             {
                 if (role.Id != districtrole.Id)
                 {

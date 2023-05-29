@@ -33,6 +33,16 @@ public class State {
     [NotMapped]
     public BaseEntity? Governor => BaseEntity.Find(GovernorId);
 
+    /// <summary>
+    /// In monthly rate
+    /// </summary>
+    public double? BasePropertyTax { get; set; }
+
+    /// <summary>
+    /// In monthly rate
+    /// </summary>
+    public double? PropertyTaxPerSize { get; set; }
+
     [NotMapped]
     public IEnumerable<Province> Provinces => DBCache.GetAll<Province>().Where(x => x.StateId == Id);
 
