@@ -57,8 +57,8 @@ namespace SV2.API
         private static async Task GetOwnership(HttpContext ctx, long itemdefid, long entityid)
         {
             // find Item
-            SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.DefinitionId == itemdefid);
-            if (item is null)
+            ItemDefinition? itemdef = DBCache.Get<ItemDefinition>(itemdefid);
+            if (itemdef is null)
             {
                 ctx.Response.StatusCode = 401;
                 await ctx.Response.WriteAsync($"Could not find item with definition id {itemdefid}");
