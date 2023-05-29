@@ -423,7 +423,7 @@ public class Province
 
         double PopulationGrowth = BirthRate * Population;
         PopulationGrowth -= DeathRate * Population;
-        PopulationGrowth *= totalgrowthbuff;
+        PopulationGrowth *= totalgrowthbuff + 1;
 
         return new(PopulationGrowth, consumerGoodsData);
     }

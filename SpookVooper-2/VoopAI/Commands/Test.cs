@@ -31,7 +31,7 @@ class TestCommands : CommandModuleBase
     }
 
     [Command("createresource")]
-    public async Task CreateResource(CommandContext ctx, string resource, int amount, long svid)
+    public async Task CreateResource(CommandContext ctx, int amount, long svid, [Remainder] string resource)
     {
         if (ctx.Member.UserId != 12201879245422592)
         {

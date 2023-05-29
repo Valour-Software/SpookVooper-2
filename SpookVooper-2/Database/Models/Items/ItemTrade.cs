@@ -119,8 +119,8 @@ public class ItemTrade
                 DefinitionId = DefinitionId,
                 Amount = 0
             };
-            DBCache.Put(toitem.Id, toitem);
-            DBCache.dbctx.SVItemOwnerships.Add(toitem);
+            DBCache.AddNew(toitem.Id, toitem);
+            //DBCache.dbctx.SVItemOwnerships.Add(toitem);
             toEntity.SVItemsOwnerships[toitem.DefinitionId] = toitem;
         }
 

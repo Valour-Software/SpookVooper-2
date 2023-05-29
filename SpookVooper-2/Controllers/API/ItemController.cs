@@ -87,10 +87,10 @@ namespace SV2.API
             }
 
             SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.OwnerId == fromid && x.DefinitionId == itemdefid);
-            if (def is null)
+            if (item is null)
             {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"Could not find item!");
+                await ctx.Response.WriteAsync($"Could not find item! Maybe fromid does not own any of this item?");
                 return;
             }
 

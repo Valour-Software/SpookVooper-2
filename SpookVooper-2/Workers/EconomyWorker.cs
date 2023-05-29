@@ -95,6 +95,7 @@ namespace SV2.Workers
                                         }
                                         rate *= increase+1;
                                     }
+                                    rate = policy.Rate * 5.0m;
                                     Transaction tran = new Transaction(fromId, user.Id, rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
                                     tran.NonAsyncExecute();
                                 }

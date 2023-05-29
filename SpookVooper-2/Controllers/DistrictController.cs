@@ -319,10 +319,13 @@ namespace SV2.Controllers
 
             SVUser user = HttpContext.GetUser();
 
-            var daysWaited = (int)(DateTime.UtcNow.Subtract(user.LastMoved).TotalDays);
+            if (false)
+            {
+                var daysWaited = (int)(DateTime.UtcNow.Subtract(user.LastMoved).TotalDays);
 
-            if (daysWaited < 60)
-                return RedirectBack($"Error: You must wait another {60 - daysWaited} days to move again!");
+                if (daysWaited < 60)
+                    return RedirectBack($"Error: You must wait another {60 - daysWaited} days to move again!");
+            }
 
             user.DistrictId = district.Id;
 
