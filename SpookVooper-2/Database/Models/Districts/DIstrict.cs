@@ -202,6 +202,10 @@ public class District
                 var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleBy);
                 UpdateOrAddModifier((DistrictModifierType)modifiernode.districtModifierType!, value);
             }
+            if (staticmodifier.BaseStaticModifiersObj.EffectBody is not null)
+            {
+                staticmodifier.BaseStaticModifiersObj.EffectBody.Execute(new(this, null, parentscopetype: ScriptScopeType.District));
+            }
         }
     }
 }

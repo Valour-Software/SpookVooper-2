@@ -17,6 +17,7 @@ public class BaseRecipe
     public Dictionary<string, double> Inputs { get; set; }
     public Dictionary<string, double> Outputs { get; set; }
     public string Id { get; set; }
+    public long IdAsLong { get; set; }
     public double PerHour { get; set; }
     public bool Editable { get; set; }
     public bool Inputcost_Scaleperlevel { get; set; }

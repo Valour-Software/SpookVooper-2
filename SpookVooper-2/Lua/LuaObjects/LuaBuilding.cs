@@ -133,6 +133,8 @@ public class LuaBuilding
             }
         }
 
+        district.UpdateModifiers();
+
         return new(true, $"Successfully built {levels} levels of {PrintableName}.", building);
     }
 }

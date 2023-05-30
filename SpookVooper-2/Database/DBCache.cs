@@ -245,18 +245,22 @@ public static class DBCache
         }
         foreach(Factory _obj in dbctx.Factories) {
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
+            if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
             Put(_obj.Id, _obj);
         }
         foreach(Farm _obj in dbctx.Farms) {
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
+            if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
             Put(_obj.Id, _obj);
         }
         foreach(Mine _obj in dbctx.Mines) {
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
+            if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
             Put(_obj.Id, _obj);
         }
         foreach(Infrastructure _obj in dbctx.Infrastructures) {
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
+            if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
             Put(_obj.Id, _obj);
         }
         foreach(UBIPolicy policy in dbctx.UBIPolicies) {

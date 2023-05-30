@@ -10,5 +10,15 @@ on_server_start = {
 				}
 			}
 		}
+		district:elysian_katonia = {
+			add_static_modifier_if_not_already_added = {
+				name = "elysian_katonia_chips_industry"
+			}
+		}
+		district:old_king = {
+			add_static_modifier_if_not_already_added = {
+				name = "old_king_steel_industry"
+			}
+		}
 	}
 }

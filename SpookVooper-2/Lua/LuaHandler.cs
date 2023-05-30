@@ -366,6 +366,10 @@ public static class LuaHandler
             Console.WriteLine($"{obj.Name}: {obj.type}");
             SyntaxNode valuenode = null;
             ExpressionNode exprnode = null;
+            if (obj.Name == "every_scope_building")
+            {
+                Console.WriteLine("hello!");
+            }
             if (obj.type == ObjType.String)
                 valuenode = new SystemVar() { Value = obj.Value };
             else if (obj.type == ObjType.LuaTable)
@@ -404,6 +408,14 @@ public static class LuaHandler
                 expr.Body.Add(new GetLocal() { Name = ((SystemVar)valuenode).Value, LineNumber = obj.LineNumber });
             else if (obj.Name == "effects")
                 expr.Body.Add(new EffectBody() { Body = exprnode.Body.Select(x => (IEffectNode)x).ToList(), LineNumber = obj.LineNumber });
+            else if (obj.Name == "limit")
+                expr.Body.Add(new ConditionalStatement() { Conditionals = exprnode.Body.Select(x => (ConditionalSyntaxNode)x).ToList(), LineNumber = obj.LineNumber });
+            else if (obj.Name == "AND")
+                expr.Body.Add(new ConditionalLogicBlockStatement() {Type = ConditionalLogicBlockType.AND, Children = exprnode.Body.Select(x => (ConditionalSyntaxNode)x).ToList(), LineNumber = obj.LineNumber });
+            else if (obj.Name == "NOT")
+                expr.Body.Add(new ConditionalLogicBlockStatement() { Type = ConditionalLogicBlockType.NOT, Children = exprnode.Body.Select(x => (ConditionalSyntaxNode)x).ToList(), LineNumber = obj.LineNumber });
+            else if (obj.Name == "hasstaticmodifier")
+                expr.Body.Add(new HasStaticModifierStatement() { StaticModifierId = ((SystemVar)valuenode).Value, LineNumber = obj.LineNumber });
             else if (obj.Name.Contains(":"))
             {
                 var spliced = obj.Name.Split(":");
@@ -460,7 +472,17 @@ public static class LuaHandler
                     ifstatement.ValueNode.Body.Add(node);
                 }
 
-                expr.Body.Add(expr);
+                expr.Body.Add(ifstatement);
+            }
+            else if (parentname == "limit" || parentname == "AND" || parentname == "NOT")
+            {
+                var statement = new ConditionalStatementComparison()
+                {
+                    comparisonType = ComparisonType.EQUAL,
+                    LeftSide = new SystemVar() { Value = obj.Name },
+                    RightSide = new SystemVar() { Value = obj.Value }
+                };
+                expr.Body.Add(statement);
             }
             else if (parentname == "add_locals")
             {
@@ -474,10 +496,28 @@ public static class LuaHandler
             }
             else if (parentname == "effects")
             {
-                var effectbody_table = (LuaTable)obj;
 
-                if (obj.Name == "add_static_modifier_if_not_already_added" || obj.Name == "add_static_modifier")
+                if (obj.Name == "remove_static_modifier")
                 {
+                    var modifiernode = new RemoveStaticModifierNode()
+                    {
+                        ModifierName = obj.Value
+                    };
+                    expr.Body.Add(modifiernode);
+                }
+
+                else if (obj.Name == "every_scope_building")
+                {
+                    var modifiernode = new EveryScopeBuildingNode()
+                    {
+                        Body = HandleSyntaxExpression((LuaTable)obj, obj.Name).Body
+                    };
+                    expr.Body.Add(modifiernode);
+                }
+
+                else if (obj.Name == "add_static_modifier_if_not_already_added" || obj.Name == "add_static_modifier")
+                {
+                    var effectbody_table = (LuaTable)obj;
                     var addmodifiernode = new AddStaticModifierNode()
                     {
                         ModifierName = effectbody_table["name"].Value,
@@ -596,6 +636,7 @@ public static class LuaHandler
                 else
                     recipe.Outputs[output] = Convert.ToDouble(outputs[output]);
             }
+            recipe.IdAsLong = GameDataManager.BaseRecipeObjs.Count;
             GameDataManager.BaseRecipeObjs[recipe.Id] = recipe;
         }
     }
@@ -654,9 +695,12 @@ public static class LuaHandler
                 Description = table.GetValue("description"),
                 Stackable = Convert.ToBoolean(table["stackable"].Value),
                 Icon = table.GetValue("icon") ?? "~",
-                ModifierNodes = HandleModifierNodes((LuaTable)table["modifiers"]),
+                ModifierNodes = HandleModifierNodes((LuaTable)table["modifiers"] ?? null),
                 IsGood = Convert.ToBoolean(table.GetValue("isgood"))
             };
+            if (table.ContainsKey("effects"))
+                modifier.EffectBody = (EffectBody)HandleSyntaxExpression((LuaTable)table["effects"], "effects");
+
             GameDataManager.BaseStaticModifiersObjs[name] = modifier;
         }
     }

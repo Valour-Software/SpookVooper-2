@@ -34,6 +34,15 @@ public class SyntaxModifierNode : SyntaxNode
                 _ => "[No Loc]"
             };
         }
+        else if (buildingModifierType is not null)
+        {
+            return buildingModifierType switch
+            {
+                BuildingModifierType.ThroughputFactor => "Throughput",
+                BuildingModifierType.EfficiencyFactor => "Efficiency",
+                _ => "[No Loc]"
+            };
+        }
         else if (entityModifierType is not null)
         {
             return entityModifierType switch
@@ -62,6 +71,15 @@ public class SyntaxModifierNode : SyntaxNode
                 DistrictModifierType.BuildingSlotsExponent => GetColorClass(false, value),
                 DistrictModifierType.BuildingSlotsFactor => GetColorClass(false, value),
                 DistrictModifierType.OverPopulationModifierExponent => GetColorClass(true, value),
+                _ => "modifier-tooltip-modifier-listitem-neutral"
+            };
+        }
+        else if (buildingModifierType is not null)
+        {
+            return buildingModifierType switch
+            {
+                BuildingModifierType.ThroughputFactor => GetColorClass(false, value),
+                BuildingModifierType.EfficiencyFactor => GetColorClass(false, value),
                 _ => "modifier-tooltip-modifier-listitem-neutral"
             };
         }

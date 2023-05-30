@@ -331,6 +331,19 @@
                             <td>@($"{runningtotal * runningtotalforstacking:n2}")</td>
                         </tr>
                     }
+
+                    runningtotalforstacking = 1;
+                    var state = new ExecutionState(Model.Building.District, Model.Building.Province, parentscopetype: ScriptScopeType.Building, building: Model.Building);
+                    @foreach (var item in Model.Building.StaticModifiers.Where(x => x.BaseStaticModifiersObj.ModifierNodes.Any(n => n.buildingModifierType == BuildingModifierType.ThroughputFactor)))
+                    {
+                        var node = item.BaseStaticModifiersObj.ModifierNodes.FirstOrDefault(x => x.buildingModifierType == BuildingModifierType.ThroughputFactor);
+                        runningtotalforstacking += (double)node.GetValue(state);
+                        <tr>
+                            <td>@item.BaseStaticModifiersObj.Name</td>
+                            <td>+@($"{node.GetValue(state):n2}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n2}")</td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

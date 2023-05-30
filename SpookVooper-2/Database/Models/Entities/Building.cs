@@ -84,7 +84,7 @@ public class BuildingUpgrade
 public abstract class ProducingBuilding : BuildingBase
 {
     public ProducingBuilding() {
-
+        
     }
     public long? EmployeeId { get; set; }
     public double Quantity { get; set; }
@@ -94,6 +94,9 @@ public abstract class ProducingBuilding : BuildingBase
 
     [Column("upgrades", TypeName = "jsonb[]")]
     public List<BuildingUpgrade>? Upgrades { get; set; } = new();
+
+    [Column("staticmodifiers", TypeName = "jsonb[]")]
+    public List<StaticModifier>? StaticModifiers { get; set; }
 
     [NotMapped]
     public double QuantityHourlyGrowth {
@@ -156,7 +159,7 @@ public abstract class ProducingBuilding : BuildingBase
             if (BuildingObj.ApplyStackingBonus)
                 basevalue += Math.Min(Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Size, Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"]);
 
-            basevalue *= GetModifierValue(BuildingModifierType.EfficiencyFactor) + 1.00;
+            basevalue *= GetModifierValue(BuildingModifierType.ThroughputFactor) + 1.00;
             basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;
             basevalue *= District.GetModifierValue(DistrictModifierType.AllProducingBuildingThroughputFactor) + 1.00;
             
@@ -230,6 +233,25 @@ public abstract class ProducingBuilding : BuildingBase
             Modifiers[type] = value;
         else
             Modifiers[type] += value;
+    }
+
+    public void UpdateModifiers()
+    {
+        Modifiers = new();
+        var value_executionstate = new ExecutionState(District, Province, parentscopetype: ScriptScopeType.Building, building: this);
+        //var scaleby_executionstate = new ExecutionState(District, this);
+        foreach (var staticmodifier in StaticModifiers)
+        {
+            foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes)
+            {
+                var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleBy);
+                UpdateOrAddModifier((BuildingModifierType)modifiernode.buildingModifierType!, value);
+            }
+            if (staticmodifier.BaseStaticModifiersObj.EffectBody is not null)
+            {
+                staticmodifier.BaseStaticModifiersObj.EffectBody.Execute(new(District, Province, parentscopetype: ScriptScopeType.Building, building: this));
+            }
+        }
     }
 
     public async ValueTask<TaskResult> TickRecipe() {

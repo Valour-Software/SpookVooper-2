@@ -92,9 +92,16 @@ public class BuildingController : SVController
             return Redirect("/");
         }
 
+        var recipeidbefore = building.RecipeId;
         building.Name = model.Name;
         building.Description = model.Description;
         building.RecipeId = model.RecipeId;
+
+        if (recipeidbefore != model.RecipeId)
+        {
+            building.District.UpdateModifiers();
+            building.UpdateModifiers();
+        }
 
         return RedirectBack($"Successfully updated {model.Name}'s info");
     }

@@ -12,7 +12,9 @@ public enum EffectType
 	None,
 	AddStaticModifier,
 	AddMoney,
-	AddStaticModifierIfNotAlreadyAdded
+	AddStaticModifierIfNotAlreadyAdded,
+	EveryScopeBuilding,
+	RemoveStaticModifier
 }
 
 public abstract class EffectSyntaxNode : SyntaxNode
@@ -50,6 +52,34 @@ public class AddMoneyNode : EffectNode
 	}
 }
 
+public class RemoveStaticModifierNode : EffectNode
+{
+    public EffectType effectType => EffectType.RemoveStaticModifier;
+    public string ModifierName { get; set; }
+
+    public override void Execute(ExecutionState state)
+    {
+		if (state.ParentScopeType == ScriptScopeType.District)
+		{
+			var modifier = state.District.StaticModifiers.FirstOrDefault(x => x.LuaStaticModifierObjId == ModifierName);
+			if (modifier is not null)
+				state.District.StaticModifiers.Remove(modifier);
+		}
+		else if (state.ParentScopeType == ScriptScopeType.Province)
+		{
+            var modifier = state.Province.StaticModifiers.FirstOrDefault(x => x.LuaStaticModifierObjId == ModifierName);
+            if (modifier is not null)
+                state.Province.StaticModifiers.Remove(modifier);
+        }
+		else if (state.ParentScopeType == ScriptScopeType.Building)
+		{
+            var modifier = state.Building.StaticModifiers.FirstOrDefault(x => x.LuaStaticModifierObjId == ModifierName);
+            if (modifier is not null)
+                state.Building.StaticModifiers.Remove(modifier);
+        }
+    }
+}
+
 public class AddStaticModifierNode : EffectNode
 {
 	public EffectType effectType => EffectType.AddStaticModifier;
@@ -75,6 +105,8 @@ public class AddStaticModifierNode : EffectNode
 			state.District.StaticModifiers.Add(dbmodifier);
         else if (state.ParentScopeType == ScriptScopeType.Province)
             state.Province.StaticModifiers.Add(dbmodifier);
+        else if (state.ParentScopeType == ScriptScopeType.Building)
+            state.Building.StaticModifiers.Add(dbmodifier);
     }
 }
 
@@ -89,7 +121,67 @@ public class AddStaticModifierIfNotAlreadyExistsNode : EffectNode {
             if (state.Province.StaticModifiers.Any(x => x.LuaStaticModifierObjId == AddStaticModifierNode.ModifierName))
                 return;
         }
-		AddStaticModifierNode.Execute(state);
+        else if (state.ParentScopeType == ScriptScopeType.Building)
+        {
+            if (state.Building.StaticModifiers.Any(x => x.LuaStaticModifierObjId == AddStaticModifierNode.ModifierName))
+                return;
+        }
+        AddStaticModifierNode.Execute(state);
+		Console.WriteLine("hhh");
+    }
+}
+
+public class EveryScopeBuildingNode : EffectNode
+{
+	public EffectType effectType => EffectType.EveryScopeBuilding;
+	public List<SyntaxNode> Body = new();
+	public override void Execute(ExecutionState state)
+	{
+        if (state.ParentScopeType == ScriptScopeType.District)
+        {
+            ExecutionState _state = new(state.District, null, null, ScriptScopeType.Building, null, null);
+			_state.Locals = state.Locals;
+            foreach (var province in state.District.Provinces)
+			{
+				foreach (var building in DBCache.ProvincesBuildings[province.Id]) {
+					_state.Building = building;
+					_state.Province = province;
+					foreach (var node in Body)
+					{
+						if (node.NodeType == NodeType.EFFECTBODY)
+						{
+							var _node = (EffectBody)node;
+							_node.Execute(_state);
+						}
+						else if (node.NodeType == NodeType.IFSTATEMENT)
+						{
+							var _node = (IfStatement)node;
+							_node.Execute(_state);
+						}
+					}
+				}
+			}
+        }
+        else if (state.ParentScopeType == ScriptScopeType.Province)
+        {
+            foreach (var building in DBCache.ProvincesBuildings[state.Province.Id])
+            {
+                ExecutionState _state = new(state.District, state.Province, null, ScriptScopeType.Building, building, null);
+                foreach (var node in Body)
+                {
+                    if (node.NodeType == NodeType.EFFECTBODY)
+                    {
+                        var _node = (EffectBody)node;
+                        _node.Execute(_state);
+                    }
+                    else if (node.NodeType == NodeType.IFSTATEMENT)
+                    {
+                        var _node = (IfStatement)node;
+                        _node.Execute(_state);
+                    }
+                }
+            }
+        }
     }
 }
 

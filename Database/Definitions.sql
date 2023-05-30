@@ -134,6 +134,7 @@ CREATE TABLE IF NOT EXISTS factories (
     employeeid bigint NULL,
     quantity double precision NOT NULL,
     upgrades jsonb[] NULL,
+    staticmodifiers jsonb[] NULL,
     CONSTRAINT pk_factories PRIMARY KEY (id)
 );
 
@@ -152,6 +153,7 @@ CREATE TABLE IF NOT EXISTS farms (
     employeeid bigint NULL,
     quantity double precision NOT NULL,
     upgrades jsonb[] NULL,
+    staticmodifiers jsonb[] NULL,
     CONSTRAINT pk_farms PRIMARY KEY (id)
 );
 
@@ -202,6 +204,7 @@ CREATE TABLE IF NOT EXISTS infrastructures (
     employeeid bigint NULL,
     quantity double precision NOT NULL,
     upgrades jsonb[] NULL,
+    staticmodifiers jsonb[] NULL,
     CONSTRAINT pk_infrastructures PRIMARY KEY (id)
 );
 
@@ -246,6 +249,7 @@ CREATE TABLE IF NOT EXISTS mines (
     employeeid bigint NULL,
     quantity double precision NOT NULL,
     upgrades jsonb[] NULL,
+    staticmodifiers jsonb[] NULL,
     CONSTRAINT pk_mines PRIMARY KEY (id)
 );
 

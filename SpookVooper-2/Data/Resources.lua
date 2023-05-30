@@ -41,6 +41,8 @@ raw = {
 	}
 	oil = {
 	}
+	bauxite = {
+	}
 }
 
 building_materials = {

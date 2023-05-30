@@ -26,7 +26,8 @@ public enum NodeType
     DICTNODE,
     ADDLOCALSNODE,
     GETLOCAL,
-    DIVIDE
+    DIVIDE,
+    HASSTATICMODIFIER
 }
 
 public class ExecutionState
@@ -65,7 +66,6 @@ public abstract class SyntaxNode
 
 public abstract class ConditionalSyntaxNode : SyntaxNode
 {
-    public NodeType NodeType;
     public override decimal GetValue(ExecutionState state) => 0.00m;
     public abstract bool IsTrue(ExecutionState state);
 }
@@ -228,6 +228,26 @@ public class ConditionalLogicBlockStatement : ConditionalSyntaxNode
     }
 }
 
+public class HasStaticModifierStatement : ConditionalSyntaxNode
+{
+    public string StaticModifierId { get; set; }
+    public HasStaticModifierStatement()
+    {
+        NodeType = NodeType.HASSTATICMODIFIER;
+    }
+
+    public override bool IsTrue(ExecutionState state)
+    {
+        return state.ParentScopeType switch
+        {
+            ScriptScopeType.District => state.District.StaticModifiers.Any(x => x.LuaStaticModifierObjId == StaticModifierId),
+            ScriptScopeType.Province => state.Province.StaticModifiers.Any(x => x.LuaStaticModifierObjId == StaticModifierId),
+            ScriptScopeType.Building => state.Building.StaticModifiers.Any(x => x.LuaStaticModifierObjId == StaticModifierId),
+            _ => false
+        };
+    }
+}
+
 public class ConditionalStatement : ConditionalSyntaxNode
 {
     public List<ConditionalSyntaxNode> Conditionals;
@@ -251,7 +271,7 @@ public class IfStatement : ConditionalSyntaxNode, IEffectNode
 
     public IfStatement()
     {
-        NodeType = NodeType.FACTOR;
+        NodeType = NodeType.IFSTATEMENT;
     }
 
     public void Execute(ExecutionState state)
@@ -281,7 +301,7 @@ public class IfStatement : ConditionalSyntaxNode, IEffectNode
 
     public override bool IsTrue(ExecutionState state)
     {
-        return true;
+        return Limit.IsTrue(state);
     }
 }
 
@@ -321,9 +341,19 @@ public class SystemVar : SyntaxNode
             {
                 "level" => state.Research.Level
             },
+            "building" => levels[1].ToLower() switch
+            {
+                "recipe" => state.Building.Recipe.IdAsLong
+            },
+            "recipes" => GameDataManager.BaseRecipeObjs.ContainsKey(levels[1]) ? GameDataManager.BaseRecipeObjs[levels[1]].IdAsLong : 0,
             "get_local" => state.Locals[levels[1]],
             _ => 0.00m
         };
+        if (levels[0] == "recipes")
+        {
+            if (!GameDataManager.BaseRecipeObjs.ContainsKey(levels[1]))
+                HandleError("Could not find recipe with id", levels[1]);
+        }
         if (state.ChangeSystemVarsBy.Count > 0)
         {
             if (state.ChangeSystemVarsBy.ContainsKey(Value))
@@ -487,7 +517,7 @@ public class ChangeScopeNode : EffectNode
 
     public ExecutionState GetExecutionState(ExecutionState state)
     {
-        var newstate = new ExecutionState(state.District, state.Province, state.ChangeSystemVarsBy);
+        var newstate = new ExecutionState(state.District, state.Province, state.ChangeSystemVarsBy, null, state.Building, state.Research);
         newstate.Locals = state.Locals;
 
         if (scopeType == ScriptScopeType.District)
@@ -508,6 +538,11 @@ public class ChangeScopeNode : EffectNode
                 HandleError("Could not find province", $"key: {ChangeTo}");
             newstate.Province = province;
             newstate.ParentScopeType = scopeType;
+        }
+
+        else if (scopeType == ScriptScopeType.Building)
+        {
+
         }
         return newstate;
     }
