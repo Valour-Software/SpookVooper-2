@@ -103,8 +103,8 @@ public class SVTransaction
             return new TaskResult(false, "Transaction must have a value.");
         if (FromId == ToId)
             return new TaskResult(false, $"An entity cannot send credits to itself.");
-        if (FromEntity == null) { return new TaskResult(false, $"Failed to find sender {FromId}."); }
-        if (ToEntity == null) { return new TaskResult(false, $"Failed to find reciever {ToId}."); }
+        if (FromEntity == null || FromEntity.EcoAccountId == 0) { return new TaskResult(false, $"Failed to find sender {FromId}."); }
+        if (ToEntity == null || ToEntity.EcoAccountId == 0) { return new TaskResult(false, $"Failed to find reciever {ToId}."); }
 
         if (!Force && (await FromEntity.GetCreditsAsync()) < Credits)
             return new TaskResult(false, $"{FromEntity.Name} cannot afford to send ¢{Credits}");
@@ -112,11 +112,11 @@ public class SVTransaction
 
 
         var FromUserId = ValourNetClient.BotId;
-        if (FromEntity.EntityType == EntityType.User && false)
+        if (FromEntity.EntityType == EntityType.User)
             FromUserId = ((SVUser)FromEntity).ValourId;
 
         var ToUserId = ValourNetClient.BotId;
-        if (ToEntity.EntityType == EntityType.User && false)
+        if (ToEntity.EntityType == EntityType.User)
             ToUserId = ((SVUser)ToEntity).ValourId;
 
         var transaction = new Transaction()
@@ -231,7 +231,8 @@ public class SVTransaction
         dbctx.Transactions.Add(this);
 
 
-        return new TaskResult(_result is not null, $"Successfully sent ¢{Credits} to {ToEntity.Name} with ¢{totaltaxpaid} tax.");
+        var worked = _result is not null;
+        return new TaskResult(worked, worked ? $"Successfully sent ¢{Credits} to {ToEntity.Name} with ¢{totaltaxpaid} tax." : "Failed");
     }
 
     public async Task<TaskResult> OldExecuteFromManager(VooperDB dbctx, bool Force = false)
