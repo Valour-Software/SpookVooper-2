@@ -42,7 +42,7 @@ public static class TransactionManager
         string success = "SUCC";
         if (!result.Succeeded) success = "FAIL";
 
-        Console.WriteLine($"[{success}] Processed {tran.Details} for {tran.Credits}.");
+        Console.WriteLine($"[{success}] Processed {tran.Details} for {tran.Credits}. INFO: {result.Info}");
 
         LastTransactionSent = DateTime.UtcNow;
         TransactionsProcessed += 1;
