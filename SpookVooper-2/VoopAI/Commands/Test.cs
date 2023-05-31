@@ -45,6 +45,31 @@ class TestCommands : CommandModuleBase
         await ctx.ReplyAsync($"Added {amount} of {resource} to {entity.Name}.");
     }
 
+    [Command("minevoucher")]
+    public async Task MineVouchers(CommandContext ctx, int amount, long svid)
+    {
+        if (ctx.Member.UserId != 12201879245422592)
+        {
+            await ctx.ReplyAsync("Only Jacob can use this command!");
+            return;
+        }
+        BaseEntity? entity = BaseEntity.Find(svid);
+        var resources = new Dictionary<string, int>()
+        {
+            { "steel", 2000 },
+            { "simple_components", 2000 },
+            { "advanced_components", 200 }
+        };
+
+        foreach (var resource in resources)
+        {
+            var itemdefid = GameDataManager.ResourcesToItemDefinitions[resource.Key].Id;
+            ItemTrade itemtrade = new(ItemTradeType.Server, null, entity.Id, resource.Value*amount, itemdefid, "From Valour - /minevoucher command");
+            itemtrade.NonAsyncExecute(true);
+        }
+        await ctx.ReplyAsync($"Gave {amount} mine voucher to {entity.Name}.");
+    }
+
     [Command("givexp")]
     public async Task CreateResource(CommandContext ctx, int amount, long svid)
     {
