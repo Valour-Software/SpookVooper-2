@@ -109,11 +109,12 @@ public class SVTransaction
         if (!Force && (await FromEntity.GetCreditsAsync()) < Credits)
             return new TaskResult(false, $"{FromEntity.Name} cannot afford to send ¢{Credits}");
 
-
-
         var FromUserId = ValourNetClient.BotId;
-        if (FromEntity.EntityType == EntityType.User)
+        string oauthkey = null;
+        if (FromEntity.EntityType == EntityType.User) {
+            oauthkey = ((SVUser)FromEntity).OAuthToken;
             FromUserId = ((SVUser)FromEntity).ValourId;
+        }
 
         var ToUserId = ValourNetClient.BotId;
         if (ToEntity.EntityType == EntityType.User)
@@ -134,7 +135,7 @@ public class SVTransaction
             Fingerprint = Guid.NewGuid().ToString()
         };
 
-        var _result = await ValourNetClient.SendTransactionRequestAsync(transaction);
+        var _result = await ValourNetClient.SendTransactionRequestAsync(transaction, oauthkey);
 
         decimal totaltaxpaid = 0.0m;
 
