@@ -16,6 +16,9 @@ public class Mine : ProducingBuilding
         if (Quantity <= 0.01)
             Quantity = 0.01;
 
+        if (Quantity < 1)
+            Quantity = 1;
+
         if (Quantity < QuantityCap)
         {
             Quantity += QuantityHourlyGrowth;
