@@ -79,6 +79,8 @@ public class LuaBuilding
                 BuildingType.Farm => new Farm(),
                 BuildingType.Infrastructure => new Infrastructure()
             };
+            building.StaticModifiers = new();
+            building.Modifiers = new();
             building.Id = IdManagers.GeneralIdGenerator.Generate();
             building.OwnerId = buildas.Id;
             building.DistrictId = district.Id;
