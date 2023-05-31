@@ -56,9 +56,10 @@ class VoopAI
         //if (prod) LoadSVIDNameCache();
 
         ValourNetClient.EnablePlanetEconomies = true;
+        ValourNetClient.ExecuteTransactionsInParallel = true;
         //ValourNetClient.BaseUrl = "http://localhost:5000/";
         ValourNetClient.AddPrefix("/");
-        ValourNetClient.ExecuteMessagesInParallel = false;
+        ValourNetClient.ExecuteMessagesInParallel = true;
 
         await ValourNetClient.Start(ValourConfig.instance.Email, ValourConfig.instance.BotPassword);
 
