@@ -317,6 +317,9 @@ public class GroupController : SVController
         if (!group.HasPermission(user, GroupPermissions.CreateRole))
             return RedirectBack("You lack the CreateRole permission!");
 
+        if (model.Salary < 0.0m)
+            return RedirectBack("A role's salary can not be under 0!");
+
         long permcode = 0;
 
         if (model.CreateRole) { permcode |= GroupPermissions.CreateRole.Value; }

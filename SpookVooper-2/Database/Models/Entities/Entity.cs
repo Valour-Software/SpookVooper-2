@@ -100,7 +100,7 @@ public abstract class BaseEntity
 
     public async ValueTask<bool> HasEnoughResource(string resource, double amount) 
     {
-        return await GetOwnershipOfResource(resource)+0.1 >= amount;
+        return await GetOwnershipOfResource(resource)+0.00000000000000000001 >= amount;
     }
 
     public async ValueTask<bool> ChangeResourceAmount(string resource, double by, string details) {

@@ -48,6 +48,11 @@ public class BuildingController : SVController
     {
         var user = HttpContext.GetUser();
         var building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == id);
+
+        if (building is null)
+        {
+            return RedirectBack("Could not find building!");
+        }
     
         if (!(building.OwnerId == user.Id || (building.Owner.EntityType != EntityType.User && ((Group)building.Owner).HasPermission(user, GroupPermissions.ManageBuildings))))
         {    
