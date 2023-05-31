@@ -1,7 +1,7 @@
 recipe_iron_mining_base = {
 	name = "Iron Mining"
 	inputs = {
-        tools = 0.1
+        tools = 0.05
     }
     outputs = {
 		iron_ore = 1
@@ -13,7 +13,7 @@ recipe_iron_mining_base = {
 recipe_copper_mining_base = {
 	name = "Copper Mining"
     inputs = {
-        tools = 0.15
+        tools = 0.1
     }
 	outputs = {
 		copper_ore = 1
@@ -25,7 +25,7 @@ recipe_copper_mining_base = {
 recipe_silicon_mining_base = {
 	name = "Silicon Mining"
     inputs = {
-        tools = 0.15
+        tools = 0.1
     }
 	outputs = {
 		silicon = 1
@@ -37,7 +37,7 @@ recipe_silicon_mining_base = {
 recipe_bauxite_mining_base = {
 	name = "Bauxite Mining"
     inputs = {
-        tools = 0.20
+        tools = 0.15
     }
 	outputs = {
 		bauxite = 1
@@ -49,7 +49,7 @@ recipe_bauxite_mining_base = {
 recipe_coal_mining_base = {
 	name = "Coal Mining"
     inputs = {
-        tools = 0.075
+        tools = 0.05
     }
 	outputs = {
 		coal = 1
@@ -61,7 +61,7 @@ recipe_coal_mining_base = {
 recipe_gold_mining_base = {
 	name = "Gold Mining"
     inputs = {
-        tools = 0.2
+        tools = 0.15
     }
 	outputs = {
 		gold = 1
@@ -73,7 +73,7 @@ recipe_gold_mining_base = {
 recipe_crystallite_mining_base = {
 	name = "Crystallite Mining"
     inputs = {
-        tools = 0.2
+        tools = 0.15
     }
 	outputs = {
 		crystallite = 1
@@ -85,7 +85,7 @@ recipe_crystallite_mining_base = {
 recipe_oil_well_mining_base = {
 	name = "Oil Production"
     inputs = {
-        tools = 0.3
+        tools = 0.15
     }
 	outputs = {
 		oil = 1
