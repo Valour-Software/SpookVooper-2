@@ -48,9 +48,9 @@ class TestCommands : CommandModuleBase
     [Command("minevoucher")]
     public async Task MineVouchers(CommandContext ctx, int amount, long svid)
     {
-        if (ctx.Member.UserId != 12201879245422592)
+        if (ctx.Member.UserId != 12201879245422592 && ctx.Member.UserId != 12500452716576768)
         {
-            await ctx.ReplyAsync("Only Jacob can use this command!");
+            await ctx.ReplyAsync("Only TalkinTurtle can use this command!");
             return;
         }
         BaseEntity? entity = BaseEntity.Find(svid);
