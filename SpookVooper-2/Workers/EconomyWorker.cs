@@ -177,8 +177,8 @@ namespace SV2.Workers
                                 }
                             }
 
-                            //await Task.Delay(1000 * 60 * 60);
-                            await Task.Delay(1000 * 60 * 5);
+                            await Task.Delay(1000 * 60 * 60);
+                            //await Task.Delay(1000 * 60 * 5);
                         }
                         catch(System.Exception e)
                         {
