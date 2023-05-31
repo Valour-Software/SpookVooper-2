@@ -141,7 +141,8 @@ namespace SV2.Controllers
                 RedirectUri = HttpUtility.UrlEncode(Redirecturl),
                 UserId = ValourNetClient.BotId,
                 ResponseType = "",
-                Scope = UserPermissions.Minimum.Value | UserPermissions.View.Value | UserPermissions.EconomyViewPlanet.Value | UserPermissions.EconomySendPlanet.Value,
+                Scope = UserPermissions.Minimum.Value | UserPermissions.View.Value | UserPermissions.EconomyViewPlanet.Value | UserPermissions.EconomySendPlanet.Value
+                | UserPermissions.EconomyViewGlobal.Value | UserPermissions.EconomySendGlobal.Value,
                 Code = "",
                 State = oauthstate
             };
