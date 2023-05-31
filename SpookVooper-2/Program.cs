@@ -252,9 +252,12 @@ int i = 0;
 foreach (var entity in entities)
 {
     i += 1;
-    await entity.Create();
+    if (entity.EcoAccountId == 0)
+    {
+        await entity.Create();
+        await Task.Delay(210);
+    }
     Console.WriteLine($"Migrated {i}/{entities.Count}");
-    await Task.Delay(210);
 }
 
 app.Run();
