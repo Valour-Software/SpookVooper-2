@@ -38,9 +38,12 @@ public abstract class BuildingBase : IHasOwner, ITickable
     public string? Description { get; set; }
     public long ProvinceId { get; set; }
     public long OwnerId { get; set; }
+
+    [JsonIgnore]
     public BaseEntity Owner => BaseEntity.Find(OwnerId)!;
 
     [NotMapped]
+    [JsonIgnore]
     public Province Province => DBCache.Get<Province>(ProvinceId)!;
 
     [NotMapped]
@@ -50,6 +53,7 @@ public abstract class BuildingBase : IHasOwner, ITickable
     public LuaBuilding BuildingObj => GameDataManager.BaseBuildingObjs[LuaBuildingObjId];
 
     [NotMapped]
+    [JsonIgnore]
     public District District => DBCache.Get<District>(DistrictId)!;
 
     public static BuildingBase Find(long? id)
@@ -75,7 +79,6 @@ public class BuildingUpgrade
     public string LuaBuildingUpgradeId { get; set; }
 
     [NotMapped]
-    [JsonIgnore]
     public LuaBuildingUpgrade LuaBuildingUpgradeObj => GameDataManager.BaseBuildingUpgradesObjs[LuaBuildingUpgradeId];
 
     public int Level { get; set; }

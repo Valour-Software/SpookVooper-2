@@ -333,6 +333,7 @@ public class GroupController : SVController
         if (model.Eco) { permcode |= GroupPermissions.Eco.Value; }
         if (model.News) { permcode |= GroupPermissions.News.Value; }
         if (model.ManageProvinces) { permcode |= GroupPermissions.ManageProvinces.Value; }
+        if (model.ManageBuildings) { permcode |= GroupPermissions.ManageBuildings.Value; }
         if (model.ManageBuildingRequests) { permcode |= GroupPermissions.ManageBuildingRequests.Value; }
         if (model.Build) { permcode |= GroupPermissions.Build.Value; }
         if (model.Resources) { permcode |= GroupPermissions.Resources.Value; }

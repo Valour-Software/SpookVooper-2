@@ -223,6 +223,7 @@ ItemAPI.AddRoutes(app);
 EcoAPI.AddRoutes(app);
 EntityAPI.AddRoutes(app);
 DevAPI.AddRoutes(app);
+BuildingAPI.AddRoutes(app);
 
 app.MapControllerRoute(
     name: "default",
