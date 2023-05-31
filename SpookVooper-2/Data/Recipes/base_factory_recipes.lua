@@ -46,7 +46,7 @@ recipe_steel_factory_base = {
 	outputs = {
 		steel = 2.5
 	}
-	perhour = 7
+	perhour = 15
     editable = false
 }
 
