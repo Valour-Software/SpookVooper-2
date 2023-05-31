@@ -77,7 +77,13 @@ public abstract class BaseEntity
 
     public virtual async ValueTask<EcoAccount> GetEcoAccountAsync() => await EcoAccount.FindAsync(EcoAccountId, VoopAI.VoopAI.PlanetId);
 
-    public async ValueTask<decimal> GetCreditsAsync() => (await GetEcoAccountAsync()).BalanceValue;
+    public async ValueTask<decimal> GetCreditsAsync()
+    {
+        var account = await GetEcoAccountAsync();
+        if (account is not null)
+            return account.BalanceValue;
+        return 0.0m;
+    }
 
     public async Task<bool> SetCreditsAsync(decimal credits)
     {
