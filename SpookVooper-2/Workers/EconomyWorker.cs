@@ -51,7 +51,7 @@ namespace SV2.Workers
                                     TaxCreditPolicy taxcredit = DBCache.GetAll<TaxCreditPolicy>().FirstOrDefault(x => x.DistrictId == role.Group.DistrictId && x.taxCreditType == TaxCreditType.Employee);
                                     decimal amount = 0.00m;
                                     foreach(long Id in role.MembersIds) {
-                                        var tran = new SVTransaction(BaseEntity.Find(role.GroupId), BaseEntity.Find(Id), role.Salary/24, TransactionType.Paycheck, $"{role.Name} Salary");
+                                        var tran = new SVTransaction(BaseEntity.Find(role.GroupId), BaseEntity.Find(Id), role.Salary, TransactionType.Paycheck, $"{role.Name} Salary");
                                         TaskResult result = await tran.Execute();
                                         if (!result.Succeeded) {
                                             // no sense to keep paying these members since the group has ran out of credits
