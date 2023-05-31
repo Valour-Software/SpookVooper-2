@@ -87,7 +87,6 @@ public class LuaBuilding
             building.ProvinceId = province.Id;
             building.RecipeId = Recipes.First().Id;
             building.LuaBuildingObjId = Name;
-            building.Quantity = 1;
             building.Size = levels;
             building.Name = IdManagers.GeneralIdGenerator.Generate().ToString();
             switch (type) {
@@ -124,6 +123,7 @@ public class LuaBuilding
                     province.UpdateModifiersAfterBuildingTick();
                     break;
             }
+            building.Quantity = 1;
         }
 
         else {

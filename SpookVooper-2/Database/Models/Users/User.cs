@@ -102,6 +102,10 @@ public class SVUser : BaseEntity
                 EcoAccountId = result.Data.Id;
             }
         }
+        else
+        {
+            EcoAccountId = account.Id;
+        }
     }
 
     public static string RemoveWhitespace(string input)
