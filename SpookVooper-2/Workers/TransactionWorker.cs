@@ -31,6 +31,8 @@ namespace SV2.Workers
                     {
                         try
                         {
+                            while (DateTime.UtcNow.Subtract(TransactionManager.LastTransactionSent).TotalMilliseconds <= 210)
+                                await Task.Delay(10);
                             if (!(await TransactionManager.Run(dbctx)))
                             {
                                 await Task.Delay(10);

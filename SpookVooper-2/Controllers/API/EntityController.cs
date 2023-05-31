@@ -40,7 +40,7 @@ public class EntityAPI : BaseAPI
             return;
         }
 
-        await ctx.Response.WriteAsync(account.Credits.ToString());
+        await ctx.Response.WriteAsync((await account.GetCreditsAsync()).ToString());
     }
 
     private static async Task<IEnumerable<SearchResult>> Search(string name, int amount = 20)

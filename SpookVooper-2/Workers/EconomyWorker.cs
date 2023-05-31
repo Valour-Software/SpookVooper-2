@@ -24,13 +24,14 @@ namespace SV2.Workers
             _dbctx = VooperDB.DbFactory.CreateDbContext();
         }
 
+        // TODO: optimize this to heck
+        // it is very unoptimized because I am just trying to get this shipped
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
                 Task task = Task.Run(async () =>
                 {
-                    return;
                     while (true)
                     {
                         try
@@ -40,7 +41,7 @@ namespace SV2.Workers
                             {
                                 decimal amount = (decimal)Defines.NDistrict[NDistrict.DISTRICT_FUNDING_BASE];
                                 amount += (decimal)((double)district.Citizens.Count * Defines.NDistrict[NDistrict.DISTRICT_FUNDING_PER_CITIZEN]);
-                                Transaction tran = new Transaction(100, district.GroupId, amount/30/24, TransactionType.FreeMoney, $"Imperial District Funding for {district.Name}");
+                                var tran = new SVTransaction(BaseEntity.Find(100), BaseEntity.Find(district.GroupId), amount/30/24, TransactionType.FreeMoney, $"Imperial District Funding for {district.Name}");
                                 TaskResult result = await tran.Execute();
                             }
                             List<GroupRole>? roles = DBCache.GetAll<GroupRole>().ToList();
@@ -50,7 +51,7 @@ namespace SV2.Workers
                                     TaxCreditPolicy taxcredit = DBCache.GetAll<TaxCreditPolicy>().FirstOrDefault(x => x.DistrictId == role.Group.DistrictId && x.taxCreditType == TaxCreditType.Employee);
                                     decimal amount = 0.00m;
                                     foreach(long Id in role.MembersIds) {
-                                        Transaction tran = new Transaction(role.GroupId, Id, role.Salary, TransactionType.Paycheck, $"{role.Name} Salary");
+                                        var tran = new SVTransaction(BaseEntity.Find(role.GroupId), BaseEntity.Find(Id), role.Salary, TransactionType.Paycheck, $"{role.Name} Salary");
                                         TaskResult result = await tran.Execute();
                                         if (!result.Succeeded) {
                                             // no sense to keep paying these members since the group has ran out of credits
@@ -62,7 +63,7 @@ namespace SV2.Workers
                                     }
                                     if (taxcredit is not null && amount > 0.00m)
                                     {
-                                        Transaction TaxCreditTran = new Transaction(taxcredit.DistrictId!, role.GroupId, amount * taxcredit.Rate, TransactionType.TaxCreditPayment, $"Employee Tax Credit Payment");
+                                        var TaxCreditTran = new SVTransaction(BaseEntity.Find(taxcredit.DistrictId!), BaseEntity.Find(role.GroupId), amount * taxcredit.Rate, TransactionType.TaxCreditPayment, $"Employee Tax Credit Payment");
                                         TaxCreditTran.NonAsyncExecute();
                                     }
                                 }  
@@ -96,7 +97,7 @@ namespace SV2.Workers
                                         rate *= increase+1;
                                     }
                                     rate = policy.Rate * 5.0m;
-                                    Transaction tran = new Transaction(fromId, user.Id, rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
+                                    var tran = new SVTransaction(BaseEntity.Find(fromId), BaseEntity.Find(user.Id), rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
                                     tran.NonAsyncExecute();
                                 }
                             }
@@ -111,7 +112,7 @@ namespace SV2.Workers
                                     records.Add(new() {
                                         EntityId = entity.Id,
                                         Time = DateTime.UtcNow,
-                                        Balance = entity.Credits,
+                                        Balance = await entity.GetCreditsAsync(),
                                         TaxableBalance = entity.TaxAbleBalance
                                     });
                                 }
@@ -171,7 +172,7 @@ namespace SV2.Workers
                                 foreach (var governorid in paymentpergovernorid.Keys)
                                 {
                                     if (paymentpergovernorid[governorid] <= 0) break;
-                                    Transaction tran = new Transaction(entityid, governorid, (decimal)(paymentpergovernorid[governorid]/30/24), TransactionType.TaxPayment, $"Property Tax Payment");
+                                    var tran = new SVTransaction(BaseEntity.Find(entityid), BaseEntity.Find(governorid), (decimal)(paymentpergovernorid[governorid]/30/24), TransactionType.TaxPayment, $"Property Tax Payment");
                                     tran.NonAsyncExecute();
                                 }
                             }

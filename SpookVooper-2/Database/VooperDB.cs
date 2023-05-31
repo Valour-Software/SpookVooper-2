@@ -144,7 +144,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<Factory> Factories { get; set; }
     public DbSet<Mine> Mines { get; set; }
     public DbSet<UBIPolicy> UBIPolicies { get; set; }
-    public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<SVTransaction> Transactions { get; set; }
     public DbSet<District> Districts { get; set; }
     public DbSet<Province> Provinces { get; set; }
     public DbSet<Infrastructure> Infrastructures { get; set; }
@@ -193,7 +193,7 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
             Group Vooperia = new Group("Vooperia", 100);
             Vooperia.Id = 100;
             Vooperia.GroupType = GroupTypes.NonProfit;
-            Vooperia.Credits = 1_500_000.0m;
+            await Vooperia.SetCreditsAsync(1_500_000.0m);
             DBCache.AddNew(Vooperia.Id, Vooperia);
         }
 
@@ -241,9 +241,10 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
                 // owner is Vooperia
                 Group district = new(name, 100)
                 {
-                    Id = id,
-                    Credits = 300_000.0m
+                    Id = id
                 };
+
+                await district.SetCreditsAsync(300_000.0m);
 
 
                 District district_object = new()

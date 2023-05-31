@@ -194,7 +194,7 @@
     <div class="row">
         <div class="col-12 align-content-center text-center">
             <h4 style="text-align:center">Credit Management</h4>
-            <h5 style="text-align:center">Credits: ¢@Math.Round(Model.Group.Credits, 2)</h5>
+            <h5 style="text-align:center">Credits: ¢@Math.Round(await Model.Group.GetCreditsAsync(), 2)</h5>
             <br />
 
             <p>This does not work right now</p>

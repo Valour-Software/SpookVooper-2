@@ -136,13 +136,13 @@ public class ItemTrade
             if (FromDistrictTaxPolicy is not null) {
                 decimal taxamount = FromDistrictTaxPolicy.GetTaxAmountForResource((decimal)Amount);
                 string detail = $"Tax payment for item id: {Id}, Tax Id: {FromDistrictTaxPolicy.Id}, Tax Type: {FromDistrictTaxPolicy.taxType}";
-                Transaction tran = new Transaction((long)FromId, FromDistrictTaxPolicy!.DistrictId!, taxamount, TransactionType.TaxPayment, detail);
+                var tran = new SVTransaction(fromEntity, BaseEntity.Find(FromDistrictTaxPolicy!.DistrictId!), taxamount, TransactionType.TaxPayment, detail);
                 tran.Execute(true);
             }
             if (ToDistrictTaxPolicy is not null) {
                 decimal taxamount = ToDistrictTaxPolicy.GetTaxAmountForResource((decimal)Amount);
                 string detail = $"Tax payment for item trade id: {Id}, Tax Id: {ToDistrictTaxPolicy.Id}, Tax Type: {ToDistrictTaxPolicy.taxType}";
-                Transaction tran = new Transaction((long)FromId!, ToDistrictTaxPolicy!.DistrictId!, taxamount, TransactionType.TaxPayment, detail);
+                var tran = new SVTransaction(toEntity, BaseEntity.Find(ToDistrictTaxPolicy!.DistrictId!), taxamount, TransactionType.TaxPayment, detail);
                 tran.Execute(true);
             }
         }

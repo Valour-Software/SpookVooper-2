@@ -36,7 +36,7 @@ class GroupCommands : CommandModuleBase
         int i = 0;
         foreach(Group group in groups)
         {
-            embed.AddText(group.Name, $"¢{Math.Round(group.Credits, 2)}");
+            embed.AddText(group.Name, $"¢{Math.Round(await group.GetCreditsAsync(), 2)}");
             i += 1;
             if (i >= 3) {
                 embed.AddRow();

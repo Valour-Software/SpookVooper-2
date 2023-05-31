@@ -17,14 +17,18 @@ public static class TransactionManager
 {
     static public HashSet<long> ActiveSvids = new();
 
-    static public ConcurrentQueue<Transaction> transactionQueue = new();
+    static public ConcurrentQueue<SVTransaction> transactionQueue = new();
     static public VooperDB TransactionVooperDB;
+    static public DateTime LastTransactionSent = DateTime.UtcNow;
+    static public long TransactionsProcessed = 0;
 
+
+    // TODO: add support for sending bulk transactions
     static public async Task<bool> Run(VooperDB dbctx)
     {
         if (transactionQueue.IsEmpty) return false;
 
-        Transaction tran;
+        SVTransaction tran;
         bool dequeued = transactionQueue.TryDequeue(out tran);
 
         if (!dequeued) return false;
@@ -39,6 +43,15 @@ public static class TransactionManager
         if (!result.Succeeded) success = "FAIL";
 
         Console.WriteLine($"[{success}] Processed {tran.Details} for {tran.Credits}.");
+
+        LastTransactionSent = DateTime.UtcNow;
+        TransactionsProcessed += 1;
+        if (TransactionsProcessed % 100 == 0)
+            Console.WriteLine($"Transactions Processed: {TransactionsProcessed:n0}");
+        if (transactionQueue.Count > 10 && TransactionsProcessed%100 == 0)
+        {
+            Console.WriteLine($"Transaction Queue Length: {transactionQueue.Count}");
+        }
 
         return true;
 

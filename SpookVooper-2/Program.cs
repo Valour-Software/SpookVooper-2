@@ -16,6 +16,7 @@ global using SV2.Managers;
 global using SV2.Database.Models.Districts.Modifiers;
 global using System.Net.Http.Json;
 global using Valour.Net.Client;
+global using Valour.Api.Models.Economy;
 global using SV2.Http;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
@@ -82,6 +83,11 @@ builder.WebHost.ConfigureKestrel((context, options) =>
     });
 #endif
 });
+
+//builder.Services.AddMvc(options =>
+//{
+//    options.Filters.Add<UserRequiredAttribute>();
+//});
 
 if (false)
 {
@@ -234,6 +240,21 @@ ProvinceManager.LoadMap();
 foreach (var onaction in GameDataManager.LuaOnActions[SV2.Scripting.LuaObjects.OnActionType.OnServerStart]) {
     // OnServerStart actions MUST change scope
     onaction.EffectBody.Execute(new(null, null));
+}
+
+List<BaseEntity> entities = new();
+entities.AddRange(DBCache.GetAll<SVUser>());
+entities.AddRange(DBCache.GetAll<Group>());
+
+Console.WriteLine("Migrating Eco");
+Console.WriteLine($"Total Entites to migrate: {entities.Count}");
+int i = 0;
+foreach (var entity in entities)
+{
+    i += 1;
+    await entity.Create();
+    Console.WriteLine($"Migrated {i}/{entities.Count}");
+    await Task.Delay(210);
 }
 
 app.Run();

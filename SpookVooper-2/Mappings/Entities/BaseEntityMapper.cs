@@ -21,7 +21,7 @@ public static class BaseEntityMapper
             Id = entity.Id,
             Name = entity.Name,
             Description = entity.Description,
-            Credits = entity.Credits,
+            Credits = 0.0m,//entity.Credits,
             TaxAbleBalance = entity.TaxAbleBalance,
             ApiKey = entity.ApiKey,
             ImageUrl = entity.ImageUrl,

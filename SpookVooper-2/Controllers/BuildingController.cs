@@ -152,7 +152,6 @@ public class BuildingController : SVController
     [ValidateAntiForgeryToken]
     [HttpPost]
     public async ValueTask<JsonResult> Build(CreateBuildingRequestModel model) {
-        return Json(new TaskResult(false, "Error: Building is disabled!"));
         Province? province = DBCache.Get<Province>(model.ProvinceId);
         if (province is null)
             return Json(new TaskResult(false, "Province is null"));

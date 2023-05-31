@@ -5,6 +5,8 @@ using SV2.Database.Models.Users;
 using SV2.Database.Models.Economy;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
+using Valour.Api.Client;
+using Valour.Api.Items;
 
 namespace SV2.Database.Models.Entities;
 
@@ -34,14 +36,13 @@ public abstract class BaseEntity
     public string? Description { get; set; }
 
     [DecimalType]
-    public decimal Credits { get; set;}
-
-    [DecimalType]
     public decimal TaxAbleBalance { get; set;}
     
     [JsonIgnore]
     [VarChar(36)]
     public string ApiKey { get; set; }
+
+    public long EcoAccountId { get; set; } = 0;
 
     [NotMapped]
     public string? ImageUrl
@@ -74,6 +75,15 @@ public abstract class BaseEntity
 
     public static BaseEntity? Find(long? Id) => DBCache.FindEntity(Id);
 
+    public virtual async ValueTask<EcoAccount> GetEcoAccountAsync() => await EcoAccount.FindAsync(EcoAccountId, VoopAI.VoopAI.PlanetId);
+
+    public async ValueTask<decimal> GetCreditsAsync() => (await GetEcoAccountAsync()).BalanceValue;
+
+    public async Task<bool> SetCreditsAsync(decimal credits)
+    {
+        return false;
+    }
+
     // these methods will simply call Valour.API methods once Valour adds the Community Item System
     public async ValueTask<double> GetOwnershipOfResource(string resource) 
     {
@@ -104,7 +114,23 @@ public abstract class BaseEntity
         return new();
     }
 
-    public async Task Create() {
+    public virtual async Task Create() {
+        if (EcoAccountId == 0)
+        {
+            var ecoaccount = new EcoAccount()
+            {
+                Name = $"{Id}",
+                AccountType = Valour.Shared.Models.Economy.AccountType.Planet,
+                UserId = ValourNetClient.BotId,
+                PlanetId = VoopAI.VoopAI.PlanetId,
+                CurrencyId = VoopAI.VoopAI.SVCurrencyId,
+                BalanceValue = 0
+            };
+            var result = await Item.CreateAsync(ecoaccount);
+            Console.WriteLine(result.Message);
+            if (result.Success)
+                EcoAccountId = result.Data.Id;
+        }
     }
 
     public double GetHourlyProductionOfResource(string resource) 
@@ -138,7 +164,7 @@ public abstract class BaseEntity
         return await dbctx.EntityBalanceRecords.Where(x => x.EntityId == Id && x.Time > timetocheck).AverageAsync(x => x.TaxableBalance);
     }
 
-    public async Task DoIncomeTax(VooperDB dbctx)
+    public async ValueTask DoIncomeTax(VooperDB dbctx)
     {
         // districts do not pay income tax
         if (EntityType == EntityType.Group && DBCache.Get<District>(Id) is not null)
@@ -185,7 +211,7 @@ public abstract class BaseEntity
             }
             if (totaldue > 0.1m)
             {
-                Transaction taxtrans = new Transaction(Id, (long)DistrictId, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
+                var taxtrans = new SVTransaction(this, BaseEntity.Find((long)DistrictId), totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
                 taxtrans.NonAsyncExecute(true);
             }
 
@@ -212,16 +238,16 @@ public abstract class BaseEntity
                 break;
         }
         if (totaldue > 0.1m) {
-            Transaction taxtrans = new Transaction(Id, 100, totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
+            SVTransaction taxtrans = new SVTransaction(this, BaseEntity.Find(100), totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
             taxtrans.NonAsyncExecute(true);
         }
 
         // do district level balance tx
         TaxPolicy? _policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == DistrictId && x.taxType == TaxType.UserBalance);
         if (_policy is not null) {
-            totaldue = _policy.GetTaxAmount(Credits);
+            totaldue = _policy.GetTaxAmount(await GetCreditsAsync());
             if (totaldue > 0.1m) {
-                Transaction taxtrans = new(Id, (long)DistrictId, totaldue, TransactionType.TaxPayment, $"Balance Tax Payment tax id: {_policy.Id}");
+                var taxtrans = new SVTransaction(this, BaseEntity.Find((long)DistrictId), totaldue, TransactionType.TaxPayment, $"Balance Tax Payment tax id: {_policy.Id}");
                 taxtrans.NonAsyncExecute(true);
                 _policy.Collected += totaldue;
             }

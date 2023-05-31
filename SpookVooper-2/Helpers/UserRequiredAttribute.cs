@@ -24,7 +24,7 @@ public class UserRequiredAttribute : ActionFilterAttribute
         {
             SVUser? user = UserManager.GetUser(context.HttpContext);
             SVController controller = (SVController)context.Controller;
-            if (user is null)
+            if (user is null || user.OAuthToken is null)
                 context.Result = controller.Redirect("/Account/Login");
             context.HttpContext.Items["user"] = user;
         }

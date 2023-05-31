@@ -58,7 +58,7 @@ namespace SV2.API
                 return;
             }
 
-            Transaction tran = new Transaction(fromid, toid, amount, trantype, detail);
+            var tran = new SVTransaction(fromentity, toentity, amount, trantype, detail);
 
             TaskResult result = await tran.Execute();
 

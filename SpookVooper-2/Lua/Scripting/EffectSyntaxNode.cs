@@ -46,7 +46,7 @@ public class AddMoneyNode : EffectNode
 
 	public override void Execute(ExecutionState state)
 	{
-		var tran = new Transaction(100, state.District.GroupId, Amount.GetValue(state), TransactionType.FreeMoney, "From Effect Node");
+		var tran = new SVTransaction(BaseEntity.Find(100), BaseEntity.Find(state.District.GroupId), Amount.GetValue(state), TransactionType.FreeMoney, "From Effect Node");
 		tran.NonAsyncExecute();
 		Console.WriteLine("Executed AddMoneyNode!");
 	}

@@ -17,8 +17,17 @@ class VoopAI
     public static List<string> RankNames = new() { "Spleen", "Crab", "Gaty", "Corgi", "Oof", "Unranked" };
     public static Dictionary<string, long> RankRoleIds = new();
     public static Dictionary<string, PlanetRole> DistrictRoles = new();
+#if DEBUG
+    public static long PlanetId = 14735182234910720;
+#else
     public static long PlanetId = 17161193956048896;
-    public static long SVCurrencyId = 0;
+#endif
+
+#if DEBUG
+    public static long SVCurrencyId = 19697833228894208;
+#else
+    public static long SVCurrencyId = 19653360100048896;
+#endif
     //public static Currency SVCurrency = null;
 
     public static async Task Main()
@@ -27,7 +36,7 @@ class VoopAI
         {
             ValourConfig valourConfig;
             if (File.Exists("./SV2Config/ValourConfig.json"))
-            {
+            { 
                 // If there is a config, read it
                 valourConfig = await JsonSerializer.DeserializeAsync<ValourConfig>(File.OpenRead("./SV2Config/ValourConfig.json"));
             }
@@ -46,29 +55,35 @@ class VoopAI
         }
         //if (prod) LoadSVIDNameCache();
 
+        ValourNetClient.EnablePlanetEconomies = true;
         //ValourNetClient.BaseUrl = "http://localhost:5000/";
         ValourNetClient.AddPrefix("/");
         ValourNetClient.ExecuteMessagesInParallel = false;
 
         await ValourNetClient.Start(ValourConfig.instance.Email, ValourConfig.instance.BotPassword);
 
+        await EcoAccount.GetPlanetUserAccountsAsync(PlanetId);
+
+        //var currency = await Currency.FindByPlanetAsync(17161193956048896);
+        //Console.WriteLine(currency);
+
         //SVCurrency = await Currency.FindAsync(SVCurrencyId, PlanetId);
         //if (SVCurrency is null)
         //{
         //    SVCurrency = new()
-         //   {
+        //   {
         //        PlanetId = PlanetId,
         //        Name = "Credit",
         //        PluralName = "Credits",
         //        ShortCode = "VEC",
         //        Symbol = "¢",
         //        DecimalPlaces = 3,
-         //   };
-         //   var result = await Currency.CreateAsync<Currency>(SVCurrency);
-         //   Console.WriteLine(result.Message);
-         //   SVCurrency = result.Data;
+        //   };
+        //   var result = await Currency.CreateAsync<Currency>(SVCurrency);
+        //   Console.WriteLine(result.Message);
+        //   SVCurrency = result.Data;
         //    Console.WriteLine($"Currency Id: {SVCurrency.Id}");
-       // }
+        // }
 
         foreach (var role in (await (await Planet.FindAsync(PlanetId)).GetRolesAsync()).Where(x => RankNames.Contains(x.Name)))
             RankRoleIds[role.Name] = role.Id;
@@ -236,9 +251,9 @@ class VoopAI
             // inactivity tax
             if (Math.Abs(user.LastSentMessage.Subtract(DateTime.UtcNow).TotalDays) > 14 && InactivityTaxPolicy is not null)
             {
-                decimal tax = InactivityTaxPolicy.GetTaxAmount(user.Credits);
+                decimal tax = InactivityTaxPolicy.GetTaxAmount(await user.GetCreditsAsync());
 
-                Transaction tran = new Transaction(user.Id, 100, tax, TransactionType.TaxPayment, "Inactivity Tax");
+                var tran = new SVTransaction(user, BaseEntity.Find(100), tax, TransactionType.TaxPayment, "Inactivity Tax");
 
                 await tran.Execute(true);
 

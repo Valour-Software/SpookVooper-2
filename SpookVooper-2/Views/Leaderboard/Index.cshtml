@@ -98,7 +98,7 @@
                         </td>
                         <td>@($"{item.MessageXp:n0}")</td>
                         <td>@($"{item.Messages:n0}")</td>
-                        <td>@($"{item.Credits:n0}")</td>
+                        <td>@($"{await item.GetCreditsAsync():n0}")</td>
                         <td>@(item.DistrictId is not null ? item.District.Name : "Offworld")</td>
                     </tr>
                 }

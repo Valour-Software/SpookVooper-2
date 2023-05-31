@@ -6,6 +6,9 @@ using Valour.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using SV2.VoopAI;
+using Valour.Api.Client;
+using Valour.Api.Nodes;
+using SV2.Scripting.Tokens;
 
 namespace SV2.Database.Models.Users;
 
@@ -48,6 +51,8 @@ public class SVUser : BaseEntity
 
     public DateTime LastMoved { get; set; }
 
+    public string? OAuthToken { get; set; }
+
     [NotMapped]
     public float Xp => MessageXp + ForumXp;
 
@@ -62,6 +67,41 @@ public class SVUser : BaseEntity
 
     public async ValueTask<bool> IsGovernmentAdmin() {
         return (await GetValourRolesAsync()).Any(x => x.Name == "Government Admin");
+    }
+
+    public override async Task Create()
+    {
+        if (OAuthToken is null || EcoAccountId != 0)
+            return;
+        var account = ValourCache.GetAll<EcoAccount>().FirstOrDefault(x => x.PlanetId == VoopAI.VoopAI.PlanetId && x.UserId == ValourId && x.AccountType == Valour.Shared.Models.Economy.AccountType.User);
+        if (account is null) {
+            var ecoaccount = new EcoAccount()
+            {
+                Name = $"{Id}",
+                AccountType = Valour.Shared.Models.Economy.AccountType.User,
+                UserId = ValourId,
+                PlanetId = VoopAI.VoopAI.PlanetId,
+                CurrencyId = VoopAI.VoopAI.SVCurrencyId,
+                BalanceValue = 0.0m
+            };
+
+            var http = new HttpClient()
+            {
+                BaseAddress = new Uri("https://app.valour.gg")
+            };
+
+            http.DefaultRequestHeaders.Add("Authorization", OAuthToken);
+            // Set node to primary node for main http client
+            http.DefaultRequestHeaders.Add("X-Server-Select", (await NodeManager.GetNodeForPlanetAsync(ecoaccount.PlanetId)).Name);
+
+            var result = await ValourClient.PostAsyncWithResponse<EcoAccount>(ecoaccount.BaseRoute, ecoaccount, http);
+            //var result = await EcoAccount.CreateAsync(ecoaccount);
+            Console.WriteLine(result.Message);
+            if (result.Success)
+            {
+                EcoAccountId = result.Data.Id;
+            }
+        }
     }
 
     public static string RemoveWhitespace(string input)
@@ -153,7 +193,6 @@ public class SVUser : BaseEntity
         CommentLikes = 0;
         TaxAbleBalance = 0.00m;
         ApiKey = Guid.NewGuid().ToString();
-        Credits = 500.0m;
         Rank = Rank.Unranked;
         Created = DateTime.UtcNow;
         Joined = DateTime.UtcNow;

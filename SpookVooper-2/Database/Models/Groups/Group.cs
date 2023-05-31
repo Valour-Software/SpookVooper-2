@@ -115,7 +115,6 @@ public class Group : BaseEntity, IHasOwner
         Id = IdManagers.GroupIdGenerator.Generate();
         Name = name;
         ApiKey = Guid.NewGuid().ToString();
-        Credits = 0.0m;
         TaxAbleBalance = 0.0m;
         OwnerId = ownerId;
         Open = false;

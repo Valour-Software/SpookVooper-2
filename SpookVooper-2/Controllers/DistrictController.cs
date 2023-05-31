@@ -201,8 +201,7 @@ namespace SV2.Controllers
                 DistrictId = district.Id
             };
             Group stategroup = new(model.Name, district.GroupId) {
-                Id = IdManagers.GroupIdGenerator.Generate(),
-                Credits = 0.0m
+                Id = IdManagers.GroupIdGenerator.Generate()
             };
 
             DBCache.Put(stategroup.Id, stategroup);

@@ -124,6 +124,8 @@ namespace SV2.Controllers
             }
 
             user.ImageUrl = valouruser.PfpUrl;
+            user.OAuthToken = token.Id;
+            await user.Create();
 
             HttpContext.Response.Cookies.Append("svid", user.Id.ToString());
             return Redirect("/");
@@ -139,13 +141,13 @@ namespace SV2.Controllers
                 RedirectUri = HttpUtility.UrlEncode(Redirecturl),
                 UserId = ValourNetClient.BotId,
                 ResponseType = "",
-                Scope = UserPermissions.Minimum.Value,
+                Scope = UserPermissions.Minimum.Value | UserPermissions.View.Value | UserPermissions.EconomyViewPlanet.Value | UserPermissions.EconomySendPlanet.Value,
                 Code = "",
                 State = oauthstate
             };
 
             string url = $"https://app.valour.gg/authorize?client_id={ValourConfig.instance.OAuthClientId}";
-            url += $"&response_type=code&redirect_uri={HttpUtility.UrlEncode(Redirecturl)}&state={oauthstate}";
+            url += $"&response_type=code&redirect_uri={HttpUtility.UrlEncode(Redirecturl)}&state={oauthstate}&scope={model.Scope}";
             OAuthStates.Add(oauthstate);
             return Redirect(url);
             //Console.WriteLine(oauthstate);

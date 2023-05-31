@@ -23,7 +23,7 @@ class EconomyCommands : CommandModuleBase
             await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
             return;
         }
-        await ctx.ReplyAsync($"{ctx.Member.Nickname}'s balance: ¢{Math.Round(user.Credits, 2)}");
+        await ctx.ReplyAsync($"{ctx.Member.Nickname}'s balance: ¢{Math.Round(await user.GetCreditsAsync(), 2)}");
     }
 
     [Command("addmoney")]
@@ -35,7 +35,7 @@ class EconomyCommands : CommandModuleBase
         }
         SVUser? user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (user is not null) {
-            user.Credits += amount;
+            await user.SetCreditsAsync(await user.GetCreditsAsync() + amount);
         }
         await ctx.ReplyAsync($"Added ¢{amount} to Jacob's balance.");
     }
@@ -45,7 +45,7 @@ class EconomyCommands : CommandModuleBase
     {
         SVUser? from = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (from is null) {
-            await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
+            await ctx.ReplyAsync("You do not have a SV account! Login into SV to create one, https://spookvooper.com");
             return;
         }
 
@@ -54,7 +54,7 @@ class EconomyCommands : CommandModuleBase
             await ctx.ReplyAsync("The user you are trying to send credits to lacks a SV account!");
             return;
         }
-        Transaction tran = new Transaction(from.Id, to!.Id, amount, TransactionType.Payment, "Payment from Valour");
+        var tran = new SVTransaction(from, to, amount, TransactionType.Payment, "Payment from Valour");
         await ctx.ReplyAsync((await tran.Execute()).Info);
     }
 
@@ -83,7 +83,7 @@ class EconomyCommands : CommandModuleBase
             await ctx.ReplyAsync("The user you are trying to send credits to lacks a SV account!");
             return;
         }
-        Transaction tran = new Transaction(from!.Id, to!.Id, amount, TransactionType.Payment, "Payment from Valour");
+        var tran = new SVTransaction(from, to, amount, TransactionType.Payment, "Payment from Valour");
         await ctx.ReplyAsync((await tran.Execute()).Info);
     }
 
@@ -97,7 +97,7 @@ class EconomyCommands : CommandModuleBase
         }
 
         Group? to = null;
-        Transaction transaction = null;
+        SVTransaction transaction = null;
 
         if (groupname.Contains(",")) {
             string[] splited = groupname.Split(",");
@@ -116,7 +116,7 @@ class EconomyCommands : CommandModuleBase
                 await ctx.ReplyAsync($"You lack permission to send credits using this group!");
                 return;
             }
-            transaction = new Transaction(from!.Id, to!.Id, amount, TransactionType.Payment, "Payment from Valour");
+            transaction = new SVTransaction(from, to, amount, TransactionType.Payment, "Payment from Valour");
             await ctx.ReplyAsync((await transaction.Execute()).Info);
             return;
         }
@@ -126,7 +126,7 @@ class EconomyCommands : CommandModuleBase
             await ctx.ReplyAsync($"Could not find {groupname}");
             return;
         }
-        transaction = new Transaction(fromuser.Id, to!.Id, amount, TransactionType.Payment, "Payment from Valour");
+        transaction = new SVTransaction(fromuser, to, amount, TransactionType.Payment, "Payment from Valour");
         await ctx.ReplyAsync((await transaction.Execute()).Info);
     }
 
@@ -150,7 +150,7 @@ class EconomyCommands : CommandModuleBase
                 effected = effected.Where(x => x.Rank == policy.ApplicableRank).ToList();
             }
             foreach(var user in effected) {
-                Transaction tran = new Transaction(fromId, user.Id, policy.Rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
+                var tran = new SVTransaction(BaseEntity.Find(fromId), BaseEntity.Find(user.Id), policy.Rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
                 TaskResult result = await tran.Execute();
                 if (!result.Succeeded) {
                     // no sense to keep paying these members since the group has ran out of credits
@@ -159,6 +159,6 @@ class EconomyCommands : CommandModuleBase
             }
         }
 
-        ctx.ReplyAsync("Forced UBI Payout!");
+        await ctx.ReplyAsync("Forced UBI Payout!");
     }
 }
