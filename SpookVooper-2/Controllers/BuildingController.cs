@@ -182,7 +182,7 @@ public class BuildingController : SVController
             model.BuildAsId = building.OwnerId;
         }
 
-        if (luabuildingobj.OnlyGovernorCanBuild || province.CanManageBuildingRequests(user)) {
+        if (luabuildingobj.OnlyGovernorCanBuild && province.CanManageBuildingRequests(user)) {
             var buildas = BaseEntity.Find(model.BuildAsId);
             ProducingBuilding? building = null;
             if (model.AlreadyExistingBuildingId is not null) {
