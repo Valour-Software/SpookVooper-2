@@ -97,9 +97,9 @@ recipe_simple_components_factory_base = {
 recipe_advanced_components_factory_base = {
 	name = "Advanced Component Production"
 	inputs = {
-		simple_components = 4
-		steel = 4
-		crystallite = 2.5
+		simple_components = 3
+		steel = 3
+		crystallite = 1
 	}
 	outputs = {
 		advanced_components = 1
@@ -149,7 +149,7 @@ recipe_cars_factory_base = {
 	outputs = {
 		cars = 1
 	}
-	perhour = 35
+	perhour = 5
     editable = false
 }
 

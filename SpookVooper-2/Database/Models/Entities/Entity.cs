@@ -268,10 +268,19 @@ public abstract class BaseEntity
     public List<Group> GetGroupsIn(BaseEntity entity)
     {
         var groups = new List<Group>();
-        foreach (var group in DBCache.GetAll<Group>().Where(x => x.MembersIds.Contains(entity.Id)))
+        var groupstolookin = DBCache.GetAll<Group>().Where(x => x.MembersIds.Contains(entity.Id)).ToList();
+
+        while (groupstolookin.Count > 0)
         {
+            var group = groupstolookin.First();
+            if (groupstolookin.Contains(group) || groups.Contains(group))
+            {
+                groupstolookin.Remove(group);
+                continue;
+            }
+
             groups.Add(group);
-            groups.AddRange(group.GetGroupsIn(group));
+            groupstolookin.AddRange(DBCache.GetAll<Group>().Where(x => x.MembersIds.Contains(group.Id)));
         }
         return groups;
     }
