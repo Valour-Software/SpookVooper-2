@@ -1,6 +1,6 @@
 food = {
 	food = {
-		-- added to birth rate (0.01 is 1%)
+		-- (0.01 is 1%), buff directly to pop growth speed, so 0.5 will boost pop gorwth by 50%
 		popgrowthratemodifier = 0
 
 		-- the score per 10k citizens that have this good filled
