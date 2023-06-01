@@ -279,9 +279,9 @@ public abstract class BaseEntity
 
             foreach (var grouptoadd in toadd)
             {
-                if (groupstolookin.Contains(group) || groups.Contains(group))
+                if (groupstolookin.Contains(grouptoadd) || groups.Contains(grouptoadd))
                     continue;
-                groupstolookin.Add(group);
+                groupstolookin.Add(grouptoadd);
             }
         }
         return groups;
