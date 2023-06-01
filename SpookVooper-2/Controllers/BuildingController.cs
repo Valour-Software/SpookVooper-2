@@ -14,6 +14,7 @@ using SV2.Scripting.LuaObjects;
 using Valour.Shared;
 using SV2.Database.Models.Districts;
 using SV2.Database.Models.Buildings;
+using SV2.Models.Groups;
 
 namespace SV2.Controllers;
 
@@ -31,13 +32,52 @@ public class BuildingController : SVController
 
     [HttpGet]
     [UserRequired]
-    public IActionResult MyBuildings() {
+    public async Task<IActionResult> MyBuildings() {
         var user = HttpContext.GetUser();
 
         List<long> canbuildasids = new() { user.Id };
         canbuildasids.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.ManageBuildings)).Select(x => x.Id).ToList());
 
         var buildings = DBCache.GetAllProducingBuildings().Where(x => canbuildasids.Contains(x.OwnerId));
+
+        // filiter for jacob
+        if (user.ValourId == 12201879245422592)
+        {
+            var jacobsjoinedgroups = (await user.GetJoinedGroupsAsync()).ToList();
+            var newbuildings = new List<ProducingBuilding>();
+            foreach (var building in buildings)
+            {
+                var owner = building.Owner;
+                if (owner.EntityType == EntityType.Group)
+                {
+                    var groupowner = (Group)owner;
+                    var district = DBCache.Get<District>(groupowner.Id);
+                    if (district is not null)
+                    {
+                        if (district.Name != "New Vooperis")
+                            continue;
+                    }
+
+                    var state = DBCache.Get<State>(groupowner.Id);
+                    if (state is not null)
+                    {
+                        if (state.District.Name != "New Vooperis")
+                        {
+                            if (state.GovernorId is not null && state.Governor.EntityType == EntityType.Group)
+                            {
+                                if (!jacobsjoinedgroups.Any(x => x.Id == state.GovernorId))
+                                {
+                                    // if the governor is NOT in any groups joined by Jacob
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+                newbuildings.Add(building);
+            }
+            buildings = newbuildings;
+        }
 
         return View(buildings.ToList());
     }
@@ -221,13 +261,78 @@ public class BuildingController : SVController
             };
 
             if (model.AlreadyExistingBuildingId is not null)
-                request.BuildingName = model.Name;
+            {
+                var building = DBCache.ProvincesBuildings[model.ProvinceId].FirstOrDefault(x => x.Id == (long)model.AlreadyExistingBuildingId);
+                request.BuildingName = building.Name;
+            }
 
             _dbctx.BuildingRequests.Add(request);
             await _dbctx.SaveChangesAsync();
 
             return Json(new TaskResult(true, "Successfully created and sent your building request."));
         }
+    }
+
+    [HttpGet("/Building/TransferBuilding/{buildingid}")]
+    [UserRequired]
+    public IActionResult TransferBuilding(long buildingid)
+    {
+        SVUser user = HttpContext.GetUser();
+
+        ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == buildingid);
+
+        if (building == null)
+            return NotFound($"Error: Could not find {buildingid}");
+
+        if (building.Owner.EntityType == EntityType.User && building.OwnerId != user.Id)
+            return RedirectBack("You must be owner of the building to transfer it!");
+
+        if (building.Owner.EntityType == EntityType.Group)
+        {
+            var group = (Group)building.Owner;
+            if (!group.IsOwner(user))
+                return RedirectBack("You must be owner of the group that owns the building to transfer it! Or the owner of the group that owns the group, and so on!");
+        }
+
+        TransferBuildingModel model = new TransferBuildingModel()
+        {
+            User = user,
+            Building = building
+        };
+
+        return View(model);
+    }
+
+    [HttpPost("/Building/TransferBuilding/{buildingid}")]
+    [ValidateAntiForgeryToken]
+    [UserRequired]
+    public IActionResult TransferBuilding(long buildingid, long EntityId)
+    {
+        var user = HttpContext.GetUser();
+        ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == buildingid);
+
+        if (building == null)
+            return NotFound($"Error: Could not find {buildingid}");
+
+        if (building.Owner.EntityType == EntityType.User && building.OwnerId != user.Id)
+            return RedirectBack("You must be owner of the building to transfer it!");
+
+        if (building.Owner.EntityType == EntityType.Group)
+        {
+            var group = (Group)building.Owner;
+            if (!group.IsOwner(user))
+                return RedirectBack("You must be owner of the group that owns the building to transfer it! Or the owner of the group that owns the group, and so on!");
+        }
+
+        var toentity = BaseEntity.Find(EntityId);
+
+        if (toentity is null)
+            return RedirectBack("To Entity not found!");
+
+        building.OwnerId = toentity.Id;
+
+        StatusMessage = $"Successfully transferred building ownership to {toentity.Name}";
+        return Redirect("/Building/MyBuildings");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

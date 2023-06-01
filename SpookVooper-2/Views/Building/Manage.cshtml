@@ -109,6 +109,15 @@
         </form>
         <br />
 
+        @if ((Model.Building.Owner.EntityType == EntityType.User && Model.Building.OwnerId == user.Id) || ((Group)Model.Building.Owner).IsOwner(user))
+        {
+            <div class="row">
+                <div class="col-12 align-content-center text-center">
+                    <a asp-action="TransferBuilding" asp-controller="Building" asp-route-buildingid="@Model.Building.Id" class="btn btn-danger">Transfer Building</a>
+                </div>
+            </div>
+        }
+
         <br />
         <br />
     </div>
