@@ -296,11 +296,11 @@
             <tr>
                 <td>Base</td>
                 <td></td>
-                <td>10</td>
+                <td>1</td>
             </tr>
 
             double BuildingSlotsFromPopulation = Math.Ceiling((Math.Pow(Model.Population, buildingslots_exponent) * Defines.NProvince["BUILDING_SLOTS_FACTOR"]));
-            runningtotal += BuildingSlotsFromPopulation + 10;
+            runningtotal += BuildingSlotsFromPopulation + 1;
             <tr>
                 <td>From <span class="has-expanded-info" data-bs-toggle="modal" data-bs-target="#Test">Population</span></td>
                 <td>+@($"{BuildingSlotsFromPopulation:n1}")</td>

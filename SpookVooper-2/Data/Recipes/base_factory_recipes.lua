@@ -2,12 +2,12 @@ recipe_iron_smeltery_base = {
 	name = "Iron Smelting"
 	inputs = {
 		iron_ore = 1
-		tools = 0.0075
+		tools = 0.005
 	}
 	outputs = {
 		iron = 1
 	}
-	perhour = 50
+	perhour = 125
     editable = false
 }
 
@@ -15,12 +15,12 @@ recipe_copper_smeltery_base = {
 	name = "Copper Smelting"
 	inputs = {
 		copper_ore = 1
-		tools = 0.0075
+		tools = 0.005
 	}
 	outputs = {
 		copper = 1
 	}
-	perhour = 50
+	perhour = 125
     editable = false
 }
 
@@ -46,7 +46,9 @@ recipe_steel_factory_base = {
 	outputs = {
 		steel = 2.5
 	}
-	perhour = 16
+
+	-- was 16
+	perhour = 20
     editable = false
 }
 
@@ -60,7 +62,7 @@ recipe_tool_factory_base = {
 	outputs = {
 		tools = 3
 	}
-	perhour = 7
+	perhour = 8
     editable = false
 }
 
@@ -86,7 +88,9 @@ recipe_simple_components_factory_base = {
 	outputs = {
 		simple_components = 1.25
 	}
-	perhour = 14
+
+	-- was 16
+	perhour = 20
     editable = false
 }
 
@@ -95,12 +99,13 @@ recipe_advanced_components_factory_base = {
 	inputs = {
 		simple_components = 4
 		steel = 4
-		crystallite = 1
+		crystallite = 2.5
 	}
 	outputs = {
 		advanced_components = 1
 	}
-	perhour = 3
+	-- was 4
+	perhour = 6
     editable = false
 }
 
