@@ -192,8 +192,8 @@
                     <td class="infobox-row-value">@($"{Model.MigrationAttraction:n0}") (@Model.RankByMigrationAttraction.ToStringWithOrdinal() in District)</td>
                 </tr>
                 @{
-                    var totalbase = Model.BasePropertyTax ?? 0 + (Model.State is not null ? Model.State.BasePropertyTax ?? 0 : 0) + Model.District.BasePropertyTax ?? 0;
-                    var totalpersize = Model.PropertyTaxPerSize ?? 0 + (Model.State is not null ? Model.State.PropertyTaxPerSize ?? 0: 0) + Model.District.PropertyTaxPerSize ?? 0;
+                    var totalbase = (Model.BasePropertyTax ?? 0) + (Model.State is not null ? Model.State.BasePropertyTax ?? 0 : 0) + (Model.District.BasePropertyTax ?? 0);
+                    var totalpersize = (Model.PropertyTaxPerSize ?? 0) + (Model.State is not null ? Model.State.PropertyTaxPerSize ?? 0: 0) + (Model.District.PropertyTaxPerSize ?? 0);
                 }
                 <tr class="mergedrow dividertop">
                     <th class="infobox-row-name">Base Property Tax</th>
