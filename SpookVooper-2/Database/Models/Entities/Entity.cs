@@ -273,14 +273,16 @@ public abstract class BaseEntity
         while (groupstolookin.Count > 0)
         {
             var group = groupstolookin.First();
-            if (groupstolookin.Contains(group) || groups.Contains(group))
-            {
-                groupstolookin.Remove(group);
-                continue;
-            }
 
             groups.Add(group);
-            groupstolookin.AddRange(DBCache.GetAll<Group>().Where(x => x.MembersIds.Contains(group.Id)));
+            var toadd = DBCache.GetAll<Group>().Where(x => x.MembersIds.Contains(group.Id));
+
+            foreach (var grouptoadd in toadd)
+            {
+                if (groupstolookin.Contains(group) || groups.Contains(group))
+                    continue;
+                groupstolookin.Add(group);
+            }
         }
         return groups;
     }
