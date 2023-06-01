@@ -14,7 +14,7 @@ recipe_infrastructure_roads = {
 			province.buildingslotsexponent = 0.0002
 			province.migrationattraction = 0.25
 			province.developmentvalue = 0.2
-			province.factorythroughputfactor = 0.0025
+			province.factories.factorythroughputfactor = 0.0025
 		}
 	}
 	inputcost_scaleperlevel = false
