@@ -4,6 +4,7 @@ using System.Diagnostics;
 using SV2.Database;
 using SV2.Database.Models.Entities;
 using Microsoft.AspNetCore.Cors;
+using System.Text.Json;
 
 namespace SV2.API;
 
@@ -15,8 +16,9 @@ public class RecipeAPI : BaseAPI
         app.MapGet   ("api/recipes/getall", GetAllAsync).RequireCors("ApiPolicy");
     }
 
-    private static async Task<IResult> GetAllAsync(HttpContext ctx)
+    private static async Task GetAllAsync(HttpContext ctx)
     {
-        return Results.Json(GameDataManager.BaseRecipeObjs.Values);
+        var recipes = GameDataManager.BaseRecipeObjs.Values.ToList();
+        await ctx.Response.WriteAsync(JsonSerializer.Serialize(recipes));
     }
 }
