@@ -273,6 +273,7 @@ public abstract class BaseEntity
         while (groupstolookin.Count > 0)
         {
             var group = groupstolookin.First();
+            groupstolookin.Remove(group);
 
             groups.Add(group);
             var toadd = DBCache.GetAll<Group>().Where(x => x.MembersIds.Contains(group.Id));
