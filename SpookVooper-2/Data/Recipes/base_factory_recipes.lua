@@ -126,9 +126,9 @@ recipe_computer_chips_factory_base = {
 recipe_televisions_factory_base = {
 	name = "Television Production"
 	inputs = {
-		computer_chips = 5
-		steel = 1
-		plastic = 5
+		computer_chips = 8
+		steel = 2
+		plastic = 20
 	}
 	outputs = {
 		televisions = 1
@@ -144,7 +144,7 @@ recipe_cars_factory_base = {
 		steel = 5
 		plastic = 40
 		aluminium = 80
-		crystallite = 0.5
+		crystallite = 6
 	}
 	outputs = {
 		cars = 1

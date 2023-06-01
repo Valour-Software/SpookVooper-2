@@ -18,9 +18,6 @@ public class OauthController : SVController
 
     public static List<AuthorizeModel> authModels = new List<AuthorizeModel>();
 
-    [TempData]
-    public string StatusMessage { get; set; }
-
     public OauthController(
         VooperDB context)
     {

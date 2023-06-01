@@ -13,14 +13,14 @@ food = {
 
 consumer_goods = {
 	televisions = {
-		popgrowthratemodifier = 0.05
+		popgrowthratemodifier = 0.3
 		economicscore = 1
-		consumptionrate = 0.15
+		consumptionrate = 0.0075
 	}
 	cars = {
-		popgrowthratemodifier = 0.1
-		economicscore = 2.5
-		consumptionrate = 2.25
+		popgrowthratemodifier = 0.75
+		economicscore = 5
+		consumptionrate = 0.005
 	}
 }
 

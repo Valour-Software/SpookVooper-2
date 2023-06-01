@@ -25,24 +25,24 @@ recipe_copper_mining_base = {
 recipe_silicon_mining_base = {
 	name = "Silicon Mining"
     inputs = {
-        tools = 0.05
+        tools = 0.04
     }
 	outputs = {
 		silicon = 1
 	}
-	perhour = 12.5
+	perhour = 15
     editable = false
 }
 
 recipe_bauxite_mining_base = {
 	name = "Bauxite Mining"
     inputs = {
-        tools = 0.05
+        tools = 0.025
     }
 	outputs = {
 		bauxite = 1
 	}
-	perhour = 2.5
+	perhour = 30
     editable = false
 }
 
@@ -54,7 +54,7 @@ recipe_coal_mining_base = {
 	outputs = {
 		coal = 1
 	}
-	perhour = 10
+	perhour = 25
     editable = false
 }
 
@@ -66,7 +66,7 @@ recipe_gold_mining_base = {
 	outputs = {
 		gold = 1
 	}
-	perhour = 1.5
+	perhour = 7.5
     editable = false
 }
 
