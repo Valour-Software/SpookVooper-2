@@ -163,7 +163,7 @@ public abstract class ProducingBuilding : BuildingBase
                 basevalue += Math.Min(Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Size, Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"]);
 
             if (BuildingType == BuildingType.Factory)
-                basevalue *= 2.5;
+                basevalue *= 4;
 
             basevalue *= GetModifierValue(BuildingModifierType.ThroughputFactor) + 1.00;
             basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;

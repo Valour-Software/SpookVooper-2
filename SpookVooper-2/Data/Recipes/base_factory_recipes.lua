@@ -46,7 +46,7 @@ recipe_steel_factory_base = {
 	outputs = {
 		steel = 2.5
 	}
-	perhour = 25
+	perhour = 16
     editable = false
 }
 
@@ -84,9 +84,9 @@ recipe_simple_components_factory_base = {
 		copper = 1
 	}
 	outputs = {
-		simple_components = 1
+		simple_components = 1.25
 	}
-	perhour = 12
+	perhour = 14
     editable = false
 }
 
