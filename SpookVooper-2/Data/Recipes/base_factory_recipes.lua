@@ -86,7 +86,7 @@ recipe_simple_components_factory_base = {
 	outputs = {
 		simple_components = 1
 	}
-	perhour = 8
+	perhour = 12
     editable = false
 }
 
@@ -100,7 +100,7 @@ recipe_advanced_components_factory_base = {
 	outputs = {
 		advanced_components = 1
 	}
-	perhour = 1.5
+	perhour = 3
     editable = false
 }
 
