@@ -9,6 +9,7 @@ using SV2.Database.Models.Users;
 using System.Linq;
 using SV2.Web;
 using Valour.Api.Models;
+using Valour.Api.Models.Messages.Embeds;
 
 namespace SV2.VoopAI.Commands;
 
@@ -20,10 +21,50 @@ class EconomyCommands : CommandModuleBase
     {
         SVUser? user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == ctx.Member.UserId);
         if (user is null) {
-            await ctx.ReplyAsync("You do not have a SV account! Create one by doing /create account");
+            await ctx.ReplyAsync("You do not have a SV account!");
             return;
         }
         await ctx.ReplyAsync($"{ctx.Member.Nickname}'s balance: ¢{Math.Round(await user.GetCreditsAsync(), 2)}");
+    }
+
+    [Command("balance")]
+    [Alias("bal")]
+    public async Task Balance(CommandContext ctx, [Remainder] string entityname)
+    {
+        BaseEntity? entity = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.Name == entityname);
+        if (entity is null)
+            entity = DBCache.GetAll<Group>().FirstOrDefault(x => x.Name == entityname);
+        if (entity is null)
+        {
+            await ctx.ReplyAsync($"Could not find entity (group or user) with name: {entityname}");
+            return;
+        }
+        await ctx.ReplyAsync($"{entityname}'s balance: ¢{Math.Round(await entity.GetCreditsAsync(), 2)}");
+    }
+
+    [Command("budget")]
+    public async Task SeeDistrictTaxInfo(CommandContext ctx, [Remainder] string districtname)
+    {
+        var district = DBCache.GetAll<District>().FirstOrDefault(x => x.Name.ToLower() == districtname.ToLower());
+        if (district is null)
+        {
+            await ctx.ReplyAsync($"Could not find district with name: {districtname}");
+            return;
+        }
+
+        var buildings = DBCache.GetAllProducingBuildings().Where(x => x.DistrictId == district.Id && x.BuildingType != BuildingType.Infrastructure && x.OwnerId != district.GroupId);
+
+        var embed = new EmbedBuilder()
+            .AddPage($"{district.Name} Income (monthly)")
+                .AddRow()
+                    .AddText("Buildings", $"{buildings.Count():n0}")
+                    .AddText("Total Building Levels", $"{buildings.Sum(x => x.Size):n0}")
+                .AddRow()
+                    .AddText("Base Property Taxes", $"¢{buildings.Sum(x => district.BasePropertyTax ?? 0):n0}")
+                .AddRow()
+                    .AddText("Per Level Property Taxes", $"¢{buildings.Sum(x => district.PropertyTaxPerSize * x.Size ?? 0):n0}");
+
+        await ctx.ReplyAsync(embed);
     }
 
     [Command("addmoney")]

@@ -58,9 +58,9 @@ recipe_tool_factory_base = {
 		steel = 2
 	}
 	outputs = {
-		tools = 1.5
+		tools = 3
 	}
-	perhour = 3
+	perhour = 7
     editable = false
 }
 
