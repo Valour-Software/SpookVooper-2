@@ -225,6 +225,7 @@ public class BuildingController : SVController
                 }
             }
             model.BuildAsId = building.OwnerId;
+            model.Name = building.Name;
         }
 
         if (luabuildingobj.OnlyGovernorCanBuild && province.CanManageBuildingRequests(user)) {
@@ -259,12 +260,6 @@ public class BuildingController : SVController
                 LevelsBuilt = 0,
                 BuildingName = model.Name
             };
-
-            if (model.AlreadyExistingBuildingId is not null)
-            {
-                var building = DBCache.ProvincesBuildings[model.ProvinceId].FirstOrDefault(x => x.Id == (long)model.AlreadyExistingBuildingId);
-                request.BuildingName = building.Name;
-            }
 
             _dbctx.BuildingRequests.Add(request);
             await _dbctx.SaveChangesAsync();
