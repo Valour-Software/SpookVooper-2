@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpookVooper-2", "SpookVoope
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpookVooper-2.Blazor", "SpookVooper-2.Blazor\SpookVooper-2.Blazor.csproj", "{D01E06B9-EF35-4327-A51C-A2F18EA27749}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valour.Net", "..\..\Valour.Net\Valour.Net\Valour.Net.csproj", "{DFADD3F1-D582-4937-854C-8FF507109B33}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{BE696402-2EAE-4673-9183-6B611CB0D15B}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{D01E06B9-EF35-4327-A51C-A2F18EA27749}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D01E06B9-EF35-4327-A51C-A2F18EA27749}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D01E06B9-EF35-4327-A51C-A2F18EA27749}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DFADD3F1-D582-4937-854C-8FF507109B33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DFADD3F1-D582-4937-854C-8FF507109B33}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DFADD3F1-D582-4937-854C-8FF507109B33}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DFADD3F1-D582-4937-854C-8FF507109B33}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BE696402-2EAE-4673-9183-6B611CB0D15B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BE696402-2EAE-4673-9183-6B611CB0D15B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE696402-2EAE-4673-9183-6B611CB0D15B}.Release|Any CPU.ActiveCfg = Release|Any CPU

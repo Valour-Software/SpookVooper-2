@@ -34,6 +34,12 @@
 		<PackageReference Include="Valour.Api" Version="0.1.9" />
 	</ItemGroup>
 	
+	<ItemGroup Condition="false">
+		<ProjectReference Include="..\..\..\Valour\Valour\API\Valour.Api.csproj" />
+		<ProjectReference Include="..\..\..\Valour\Valour\Shared\Valour.Shared.csproj" />
+		<ProjectReference Include="..\..\..\Valour.Net\Valour.Net\Valour.Net.csproj" />
+	</ItemGroup>
+	
 	<ItemGroup>
 	  <ProjectReference Include="..\Shared\Shared.csproj" />
 	  <ProjectReference Include="..\SpookVooper-2.Blazor\SpookVooper-2.Blazor.csproj" />
