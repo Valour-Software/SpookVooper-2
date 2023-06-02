@@ -1,7 +1,7 @@
 recipe_iron_mining_base = {
 	name = "Iron Mining"
 	inputs = {
-        tools = 0.03
+        tools = 0.01
     }
     outputs = {
 		iron_ore = 1
@@ -13,7 +13,7 @@ recipe_iron_mining_base = {
 recipe_copper_mining_base = {
 	name = "Copper Mining"
     inputs = {
-        tools = 0.05
+        tools = 0.02
     }
 	outputs = {
 		copper_ore = 1
@@ -42,7 +42,7 @@ recipe_bauxite_mining_base = {
 	outputs = {
 		bauxite = 1
 	}
-	perhour = 30
+	perhour = 10
     editable = false
 }
 

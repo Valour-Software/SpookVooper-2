@@ -7,7 +7,7 @@ recipe_iron_smeltery_base = {
 	outputs = {
 		iron = 1
 	}
-	perhour = 125
+	perhour = 100
     editable = false
 }
 
@@ -20,7 +20,7 @@ recipe_copper_smeltery_base = {
 	outputs = {
 		copper = 1
 	}
-	perhour = 125
+	perhour = 100
     editable = false
 }
 
@@ -113,13 +113,14 @@ recipe_computer_chips_factory_base = {
 	name = "Computer Chip Production"
 	inputs = {
 		silicon = 2
-		copper = 3
-		gold = 0.15
+		copper = 2.5
+		gold = 0.25
 	}
 	outputs = {
-		computer_chips = 1
+		computer_chips = 1.5
 	}
-	perhour = 1.5
+	-- was 1.5
+	perhour = 15
     editable = false
 }
 

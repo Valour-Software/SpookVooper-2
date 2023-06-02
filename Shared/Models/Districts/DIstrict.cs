@@ -62,9 +62,6 @@ public class District : Item
         return Modifiers[modifierType].Amount;
     }
 
-    public List<Province> ProvincesByDevelopmnet { get; set; }
-    public List<Province> ProvincesByMigrationAttraction { get; set; }
-
     /// <summary>
     /// Returns the item for the given id
     /// </summary>
@@ -81,6 +78,12 @@ public class District : Item
 
         if (item is not null)
             await item.AddToCache();
+
+        // put provinces and states into cache
+        foreach (var province in item.Provinces)
+            await SVCache.Put(province.Id, province, true);
+        foreach (var state in item.States)
+            await SVCache.Put(state.Id, state, true);
 
         return item;
     }
@@ -102,5 +105,10 @@ public class District : Item
                 UpdateOrAddModifier((DistrictModifierType)modifiernode.districtModifierType!, value);
             }
         }
+    }
+
+    public override async Task AddToCache()
+    {
+        await SVCache.Put(Id, this);
     }
 }

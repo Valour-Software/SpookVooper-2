@@ -99,6 +99,11 @@ public class Province : Item
 
         return item;
     }
+
+    public override async Task AddToCache()
+    {
+        await SVCache.Put(Id, this);
+    }
 }
 
 public class ProvinceMetadata

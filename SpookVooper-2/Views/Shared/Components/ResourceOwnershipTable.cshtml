@@ -39,6 +39,8 @@
             <th>Resource Production (monthly)</th>
             <th>Resource Usage (daily)</th>
             <th>Resource Usage (monthly)</th>
+            <th>Net (daily)</th>
+            <th>Net (monthly)</th>
         </tr>
     </thead>
     <tbody>
@@ -50,11 +52,14 @@
                     @{
                         var hourlyproduction = Model.GetHourlyProductionOfResource(resource.Definition.Name.Replace(" ", "_").ToLower());
                         var hourlyusage = Model.GetHourlyUsageOfResource(resource.Definition.Name.Replace(" ", "_").ToLower());
+                        var hourlydiff = hourlyproduction - hourlyusage;
                     }
                     <td>@($"{hourlyproduction*24:n1}")</td>
                     <td>@($"{(hourlyproduction*24*30):n0}")</td>
                     <td>@($"{hourlyusage * 24:n1}")</td>
                     <td>@($"{(hourlyusage * 24 * 30):n0}")</td>
+                    <td>@($"{hourlydiff * 24:n1}")</td>
+                    <td>@($"{(hourlydiff * 24 * 30):n0}")</td>
                 </tr>
             }
         }

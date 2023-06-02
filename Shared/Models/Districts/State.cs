@@ -29,4 +29,9 @@ public class State : Item
 
         return item;
     }
+
+    public override async Task AddToCache()
+    {
+        await SVCache.Put(Id, this);
+    }
 }
