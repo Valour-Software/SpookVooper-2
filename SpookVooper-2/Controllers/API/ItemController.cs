@@ -19,7 +19,7 @@ namespace SV2.API
             app.MapGet   ("api/items/{itemdefid}/ownership/{entityid}", GetOwnership).RequireCors("ApiPolicy");
             app.MapGet   ("api/item/{itemid}/owner", GetOwner).RequireCors("ApiPolicy");
             app.MapGet   ("api/definition/{definitionid}/items", GetItemsFromDefinition).RequireCors("ApiPolicy");
-            app.MapGet   ("api/items/{entityid/getallitemsowned}", GetAllItemsOwned).RequireCors("ApiPolicy");
+            app.MapGet   ("api/items/{entityid}/getallitemsowned", GetAllItemsOwned).RequireCors("ApiPolicy");
         }
 
         private static async Task GetAllItemsOwned(HttpContext ctx, long entityid)
