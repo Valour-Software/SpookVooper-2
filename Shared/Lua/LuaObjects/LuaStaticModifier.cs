@@ -9,5 +9,6 @@ public class LuaStaticModifier
     public required string Icon { get; set; }
     public required bool Stackable { get; set; }
     public required bool IsGood { get; set; }
+    public EffectBody? EffectBody { get; set; }
     public required List<SyntaxModifierNode> ModifierNodes { get; set; }
 }

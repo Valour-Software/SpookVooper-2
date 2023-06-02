@@ -18,6 +18,7 @@ using SV2.Models.Groups;
 
 namespace SV2.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class BuildingController : SVController
 {
     private readonly ILogger<BuildingController> _logger;

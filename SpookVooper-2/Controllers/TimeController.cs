@@ -17,6 +17,7 @@ using Valour.Shared;
 
 namespace SV2.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class TimeController : SVController 
 {
     private readonly ILogger<TimeController> _logger;

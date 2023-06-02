@@ -1,0 +1,97 @@
+﻿@if (Show)
+{
+    <MudTable Items="@Buildings" Breakpoint="Breakpoint.Sm" Hover="true" SortLabel="Sort By" GroupBy="@_groupDefinition" Dense="true">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProducingBuilding, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x=>x.BuildingType)">Type</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x=>x.Size)">Level</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x => x.District.Name)">District</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x => x.Province.Name)">Province</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x => x.Recipe.Name)">Recipe Name</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x => x.Owner.Name)">Owner</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">
+                <a href="/Building/Manage/@context.Id">@(context.Name is null || context.Name == "" ? "No Name Set" : context.Name)</a>
+            </MudTd>
+            <MudTd DataLabel="Type">
+                @if (context.LuaBuildingObjId != "building_advanced_factory")
+                {
+                    @context.BuildingType.ToString()
+                }
+                else
+                {
+                    @("Advanced Factory");
+                }
+            </MudTd>
+            <MudTd DataLabel="Level">@context.Size</MudTd>
+            <MudTd DataLabel="District">@context.District.Name</MudTd>
+            <MudTd DataLabel="Province">@context.Province.Name</MudTd>
+            <MudTd DataLabel="Recipe">@context.Recipe.Name</MudTd>
+            <MudTd DataLabel="Owner">
+                @if (context.Owner.EntityType == EntityType.User)
+                {
+                    <a href="/User/Info/@context.OwnerId">@context.Owner.Name</a>
+                }
+                else
+                {
+                    <a href="/Group/View/@context.OwnerId">>@context.Owner.Name</a>
+                }
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{50, 100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private TableGroupDefinition<ProducingBuilding> _groupDefinition = new()
+    {
+        GroupName = "Owner",
+        Indentation = false,
+        Expandable = true,
+        IsInitiallyExpanded = false,
+        Selector = (e) => e.Owner.Name
+    };
+
+    [Parameter]
+    public string BuildingData { get; set; }
+
+    [Parameter]
+    public string DistrictData { get; set; }
+
+    public List<ProducingBuilding> Buildings { get; set; }
+    public List<District> Districts { get; set; }
+
+    public bool Show = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Buildings = JsonSerializer.Deserialize<List<ProducingBuilding>>(BuildingData);
+        Districts = JsonSerializer.Deserialize<List<District>>(DistrictData);
+
+        foreach (var district in Districts)
+        {
+            await SVCache.Put(district.Id, district, true);
+
+            // put provinces and states into cache
+            foreach (var province in district.Provinces)
+                await SVCache.Put(province.Id, province, true);
+            foreach (var state in district.States)
+                await SVCache.Put(state.Id, state, true);
+        }
+
+        foreach (var building in Buildings)
+        {
+            building.Owner = await building.GetOwnerAsync();
+            building.District = await building.GetDistrictAsync();
+            building.Province = await building.GetProvinceAsync();
+
+            if (building.Recipe is null)
+                building.Recipe = await building.GetRecipeAsync();
+        }
+
+        Show = true;
+    }
+}

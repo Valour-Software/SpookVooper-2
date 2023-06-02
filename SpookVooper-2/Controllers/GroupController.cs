@@ -14,6 +14,7 @@ using System.Data;
 
 namespace SV2.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class GroupController : SVController
 {
     private readonly ILogger<GroupController> _logger;

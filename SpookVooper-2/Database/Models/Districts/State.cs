@@ -1,6 +1,7 @@
 ﻿using Shared.Models.Districts;
 using SV2.Database.Models.Groups;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace SV2.Database.Models.Districts;
 public class State {
@@ -26,6 +27,7 @@ public class State {
     public long DistrictId { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public District District => DBCache.Get<District>(DistrictId)!;
 
     [Column("governorid")]

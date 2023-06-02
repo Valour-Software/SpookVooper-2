@@ -9,6 +9,7 @@ using IdGen;
 using SV2.Database.Managers;
 using SV2.Helpers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class MapController : SVController {
     private readonly ILogger<MapController> _logger;
 

@@ -3,6 +3,7 @@ using SV2.Helpers;
 
 namespace SV2.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class MiscController : SVController
 {
     public IActionResult NetResourcesForRecipes()

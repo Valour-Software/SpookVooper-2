@@ -8,6 +8,6 @@ global using Shared.Extensions;
 global using Shared.Models.Entities;
 global using Shared.Models.Users;
 global using Shared.Models.Permissions;
+global using Shared.Models.Buildings;
 
-// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+Console.WriteLine("hello!");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using System.Xml.Linq;
 using SV2.Scripting;
 using SV2.Scripting.LuaObjects;
@@ -51,6 +52,9 @@ public class ExecutionState
     }
 }
 
+
+[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
+[JsonDerivedType(typeof(Base))]
 public abstract class SyntaxNode
 {
     public NodeType NodeType;

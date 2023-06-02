@@ -16,8 +16,8 @@ public class DistrictAPI : BaseAPI
         app.MapGet   ("api/districts/{id}", GetDistrictAsync).RequireCors("ApiPolicy");
     }
 
-    private static async Task GetDistrictAsync(HttpContext ctx, long districtid)
+    private static async Task GetDistrictAsync(HttpContext ctx, long id)
     {
-        await ctx.Response.WriteAsJsonAsync(DBCache.Get<District>(districtid));
+        await ctx.Response.WriteAsJsonAsync(DBCache.Get<District>(id));
     }
 }

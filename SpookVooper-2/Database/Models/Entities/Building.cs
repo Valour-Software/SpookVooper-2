@@ -84,11 +84,13 @@ public class BuildingUpgrade
     public int Level { get; set; }
 }
 
+[JsonDerivedType(typeof(Factory), typeDiscriminator: 1)]
+[JsonDerivedType(typeof(Mine), typeDiscriminator: 2)]
+[JsonDerivedType(typeof(Farm), typeDiscriminator: 3)]
+[JsonDerivedType(typeof(Infrastructure), typeDiscriminator: 4)]
 public abstract class ProducingBuilding : BuildingBase
 {
-    public ProducingBuilding() {
-        
-    }
+    public ProducingBuilding() { }
     public long? EmployeeId { get; set; }
     public double Quantity { get; set; }
 

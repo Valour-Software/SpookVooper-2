@@ -13,6 +13,7 @@ public class SyntaxModifierNode : SyntaxNode
     public DistrictModifierType? districtModifierType { get; set; }
     public ProvinceModifierType? provinceModifierType { get; set; }
     public EntityModifierType? entityModifierType { get; set; }
+    public BuildingModifierType? buildingModifierType { get; set; }
     public SyntaxNode Value { get; set; }
 
     public string GetColorClass(bool flip, decimal value)

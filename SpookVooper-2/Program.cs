@@ -32,6 +32,8 @@ using SV2.Database.Managers;
 using System.Net;
 using SV2.Helpers;
 using SV2.Scripting.Parser;
+using Microsoft.OpenApi.Models;
+using SV2.Web;
 
 //LuaParser parser = new();
 
@@ -157,6 +159,19 @@ builder.Services.AddDbContextPool<VooperDB>(options =>
     options.UseNpgsql(VooperDB.ConnectionString, options => options.EnableRetryOnFailure());
 });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SpookVooper API", Description = "The official SpookVooper API", Version = "v1.0" });
+    c.AddSecurityDefinition("Apikey", new OpenApiSecurityScheme()
+    {
+        Description = "The apikey used for authorizing your account.",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Apikey"
+    });
+});
+
 builder.Services.AddHostedService<EconomyWorker>();
 builder.Services.AddHostedService<TransactionWorker>();
 builder.Services.AddHostedService<ItemTradeWorker>();
@@ -204,6 +219,8 @@ else
     app.UseWebAssemblyDebugging();
 }
 
+app.UseSwagger();
+
 app.UseBlazorFrameworkFiles();
 app.MapFallbackToFile("index.html");
 
@@ -226,11 +243,16 @@ DevAPI.AddRoutes(app);
 BuildingAPI.AddRoutes(app);
 RecipeAPI.AddRoutes(app);
 DistrictAPI.AddRoutes(app);
+UserAPI.AddRoutes(app);
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+});
 
 // ensure districts & Vooperia are created
 await VooperDB.Startup();

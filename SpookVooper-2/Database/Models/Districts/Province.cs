@@ -41,6 +41,7 @@ public class Province
     public long DistrictId { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public District District { get; set; }
 
     public long? CityId { get; set; }
@@ -59,6 +60,7 @@ public class Province
     public long? StateId { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public State? State => DBCache.Get<State>(StateId);
 
     /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using System.Xml.Linq;
 using Shared.Lua;
 using Shared.Lua.LuaObjects;
@@ -34,10 +35,11 @@ public class ExecutionState
     public Dictionary<string, decimal> Locals { get; set; }
     public District District { get; set; }
     public Province? Province { get; set; }
+    public ProducingBuilding? Building { get; set; }
     public LuaResearch Research { get; set; }
     public Dictionary<string, decimal> ChangeSystemVarsBy { get; set; }
     public ScriptScopeType? ParentScopeType { get; set; }
-    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, LuaResearch? research = null)
+    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, ProducingBuilding? building = null, LuaResearch? research = null)
     {
         Locals = new();
         District = district;
@@ -45,9 +47,12 @@ public class ExecutionState
         ChangeSystemVarsBy = changesystemvarsby ?? new();
         ParentScopeType = parentscopetype;
         Research = research;
+        Building = building;
     }
 }
 
+[JsonDerivedType(typeof(Base), typeDiscriminator: 1)]
+[JsonDerivedType(typeof(Add), typeDiscriminator: 2)]
 public abstract class SyntaxNode
 {
     public NodeType NodeType;
@@ -61,6 +66,8 @@ public abstract class SyntaxNode
     }
 }
 
+[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
+[JsonDerivedType(typeof(Base))]
 public abstract class ConditionalSyntaxNode : SyntaxNode
 {
     public NodeType NodeType;

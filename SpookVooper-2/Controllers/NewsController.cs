@@ -12,6 +12,7 @@ using SV2.Database.Models.News;
 
 namespace SV2.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class NewsController : SVController
 {
     private readonly ILogger<NewsController> _logger;

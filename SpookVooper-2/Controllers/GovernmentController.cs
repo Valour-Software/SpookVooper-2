@@ -9,6 +9,7 @@ using SV2.Helpers;
 
 namespace SV2.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class GovernmentController : SVController {
     private readonly ILogger<GovernmentController> _logger;
     

@@ -25,6 +25,7 @@ public class OauthController : SVController
     }
 
     [UserRequired]
+    [HttpGet]
     public async Task<IActionResult> Index()
     {
         return View(HttpContext.GetUser());

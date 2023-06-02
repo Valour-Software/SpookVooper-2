@@ -52,6 +52,7 @@ public class Province : Item
     /// </summary>
     public double? PropertyTaxPerSize { get; set; }
     public Dictionary<ProvinceModifierType, ProvinceModifier> Modifiers { get; set; }
+
     public List<StaticModifier> StaticModifiers { get; set; }
     public ProvinceMetadata Metadata { get; set; }
     public int MonthlyEstimatedMigrants { get; set; }
@@ -80,9 +81,6 @@ public class Province : Item
         //return GetBuildings().Where(x => x.BuildingType == buildingtype).Sum(x => x.Size);
     }
 
-    /// <summary>
-    /// Returns the item for the given id
-    /// </summary>
     public static async ValueTask<Province> FindAsync(long id, bool refresh = false)
     {
         if (!refresh)

@@ -16,6 +16,7 @@ using SV2.Database.Models.Districts;
 
 namespace SV2.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class ProvinceController : SVController
 {
     private readonly ILogger<ProvinceController> _logger;

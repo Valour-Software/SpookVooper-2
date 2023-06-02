@@ -17,6 +17,7 @@ using Valour.Shared;
 
 namespace SV2.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class AccountController : SVController {
     private static List<string> OAuthStates = new();
 
