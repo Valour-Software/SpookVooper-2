@@ -262,4 +262,16 @@ foreach (var entity in entities)
     Console.WriteLine($"Migrated {i}/{entities.Count}");
 }
 
+foreach (var state in DBCache.GetAll<State>())
+{
+    if (state.GovernorId is not null)
+    {
+        BaseEntity entity = BaseEntity.Find(state.GovernorId);
+        if (!state.Group.MembersIds.Contains((long)state.GovernorId))
+            state.Group.MembersIds.Add((long)state.GovernorId);
+
+        state.Group.AddEntityToRole(DBCache.Get<Group>(100), entity, state.Group.Roles.First(x => x.Name == "Governor"), true);
+    }
+}
+
 app.Run();

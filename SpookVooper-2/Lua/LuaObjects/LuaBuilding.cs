@@ -3,6 +3,7 @@ using SV2.Database.Managers;
 using SV2.Managers;
 using SV2.Scripting;
 using SV2.Scripting.Parser;
+using System.Text.Json.Serialization;
 using Valour.Shared;
 
 namespace SV2.Scripting.LuaObjects;
@@ -13,6 +14,8 @@ public class LuaBuilding
     public string Name { get; set; }
     public DictNode BuildingCosts { get; set; }
     public BuildingType type { get; set; }
+
+    [JsonIgnore]
     public List<BaseRecipe> Recipes { get; set; }
     public string PrintableName => Name.Replace("building_", "").Replace("_", " ").ToTitleCase();
     public bool OnlyGovernorCanBuild { get; set; }

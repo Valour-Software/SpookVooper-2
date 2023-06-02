@@ -274,7 +274,8 @@ public class Group : BaseEntity, IHasOwner
                 return new TaskResult(false, "Error: The role does not belong to this group!");
         }
 
-        role.MembersIds.Add(target.Id);
+        if (!role.MembersIds.Contains(target.Id))
+            role.MembersIds.Add(target.Id);
         return new(true, $"Successfully added {target.Name} to {role.Name}");
     }
 
@@ -302,7 +303,8 @@ public class Group : BaseEntity, IHasOwner
                 return new TaskResult(false, "Error: The role does not belong to this group!");
         }
 
-        role.MembersIds.Remove(target.Id);
+        if (role.MembersIds.Contains(target.Id))
+            role.MembersIds.Remove(target.Id);
         return new(true, $"Successfully removed {target.Name} from {role.Name}");
     }
 

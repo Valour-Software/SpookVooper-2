@@ -1,4 +1,5 @@
-﻿using SV2.Database.Models.Groups;
+﻿using Shared.Models.Districts;
+using SV2.Database.Models.Groups;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SV2.Database.Models.Districts;

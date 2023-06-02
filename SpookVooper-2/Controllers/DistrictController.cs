@@ -204,8 +204,7 @@ namespace SV2.Controllers
                 Id = IdManagers.GroupIdGenerator.Generate()
             };
 
-            DBCache.Put(stategroup.Id, stategroup);
-            DBCache.dbctx.Add(stategroup);
+            DBCache.AddNew(stategroup.Id, stategroup);
             state.GroupId = stategroup.Id;
             state.Id = stategroup.Id;
 
@@ -219,11 +218,9 @@ namespace SV2.Controllers
                 Salary = 0.0m,
                 MembersIds = new()
             };
-            DBCache.Put(role.Id, role);
-            DBCache.dbctx.GroupRoles.Add(role);
+            DBCache.AddNew(role.Id, role);
 
-            DBCache.Put(state.Id, state);
-            DBCache.dbctx.Add(state);
+            DBCache.AddNew(state.Id, state);
 
             return RedirectBack("Successfully create state.");
         }

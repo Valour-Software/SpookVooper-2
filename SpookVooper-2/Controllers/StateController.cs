@@ -86,7 +86,23 @@ namespace SV2.Controllers
             if (state.District.GovernorId != user.Id)
                 return RedirectBack("You must be governor of the district to change the governor of a province!");
 
+            BaseEntity entity = BaseEntity.Find(GovernorId);
+
+            BaseEntity prevgovernor = BaseEntity.Find(state.GovernorId);
             state.GovernorId = GovernorId;
+
+            if (GovernorId is not null)
+            {
+                if (!state.Group.MembersIds.Contains((long)GovernorId))
+                    state.Group.MembersIds.Add((long)GovernorId);
+
+                state.Group.AddEntityToRole(DBCache.Get<Group>(100), entity, state.Group.Roles.First(x => x.Name == "Governor"), true);
+            }
+
+            if (prevgovernor is not null)
+            {
+                state.Group.RemoveEntityFromRole(DBCache.Get<Group>(100), prevgovernor, state.Group.Roles.First(x => x.Name == "Governor"), true);
+            }
 
             if (GovernorId is not null)
                 return RedirectBack($"Successfully changed the governorship of this province to {BaseEntity.Find(GovernorId).Name}");
