@@ -102,10 +102,11 @@ recipe_advanced_components_factory_base = {
 		crystallite = 1
 	}
 	outputs = {
-		advanced_components = 1
+		-- was 1
+		advanced_components = 2
 	}
 	-- was 4
-	perhour = 6
+	perhour = 7
     editable = false
 }
 
