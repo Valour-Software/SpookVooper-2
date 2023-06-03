@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS districts (
     titleforstate text NULL,
     titleforgovernorofaprovince text NULL,
     titleforgovernorofastate text NULL,
+    capitalprovinceid bigint NULL,
     CONSTRAINT pk_districts PRIMARY KEY (id)
 );
 

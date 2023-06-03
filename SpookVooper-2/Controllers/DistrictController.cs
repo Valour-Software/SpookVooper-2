@@ -89,7 +89,38 @@ public class DistrictController : SVController
         district.PropertyTaxPerSize = model.PropertyTaxPerSize;
 
         StatusMessage = "Successfully saved your changes.";
-        return Redirect($"/State/View/{district.Id}");
+        return Redirect($"/District/View/{district.Id}");
+    }
+
+    [HttpGet("/District/{districtid}/SetAsCapital/{provinceid}")]
+    [UserRequired]
+    public IActionResult SetAsCapital(long districtid, long provinceid)
+    {
+        District district = DBCache.Get<District>(districtid);
+        if (district is null)
+            return Redirect("/");
+
+        var user = HttpContext.GetUser();
+        if (district.GovernorId != user.Id)
+            return RedirectBack("You must be governor of the district to change the details of the district!");
+
+        var prevcapital = district.CapitalProvinceId;
+        district.CapitalProvinceId = provinceid;
+
+        foreach (var province in district.Provinces)
+        {
+            if (province.Id == prevcapital)
+            {
+                province.UpdateModifiers();
+                province.UpdateModifiersAfterBuildingTick();
+            }
+        }
+
+        DBCache.Get<Province>(provinceid).UpdateModifiers();
+        DBCache.Get<Province>(provinceid).UpdateModifiersAfterBuildingTick();
+
+        StatusMessage = $"Successfully set {DBCache.Get<Province>(provinceid).Name} as the Capital of {district.Name}.";
+        return Redirect($"/Province/Edit/{provinceid}");
     }
 
     [HttpPost("/District/ChangeGovernor/{id}")]

@@ -241,13 +241,14 @@ public class Province
         }
     }
 
-    public string GetDevelopmentColorForMap()
+    public string GetDevelopmentColorForMap(double scaleRequiredDevValueBy)
     {
         DevelopmentMapColor currentmapcolor = null;
         DevelopmentMapColor nextmapcolor = null;
+        scaleRequiredDevValueBy = 1 / scaleRequiredDevValueBy;
 
         int index = 0;
-        while (nextmapcolor is null || nextmapcolor.MaxValue < DevelopmentValue)
+        while ((nextmapcolor is null || nextmapcolor.MaxValue < DevelopmentValue*scaleRequiredDevValueBy) && index < ProvinceManager.DevelopmentMapColors.Count)
         {
             currentmapcolor = nextmapcolor;
             nextmapcolor = ProvinceManager.DevelopmentMapColors[index];
@@ -258,7 +259,7 @@ public class Province
         if (currentmapcolor is not null)
         {
             int diff = nextmapcolor.MaxValue - currentmapcolor.MaxValue;
-            float progress = ((float)(DevelopmentValue - currentmapcolor.MaxValue) / (float)diff);
+            float progress = ((float)((DevelopmentValue*scaleRequiredDevValueBy) - currentmapcolor.MaxValue) / (float)diff);
             color = new()
             {
                 R = (int)(currentmapcolor.color.R * (1 - progress)),
@@ -427,6 +428,9 @@ public class Province
         PopulationGrowth -= DeathRate * Population;
         PopulationGrowth *= totalgrowthbuff + 1;
 
+        if (District.CapitalProvinceId == Id)
+            PopulationGrowth *= 2.5;
+
         return new(PopulationGrowth, consumerGoodsData);
     }
 
@@ -457,6 +461,9 @@ public class Province
             muit = Math.Max(muit, 0.6);
             attraction *= muit;
         }
+
+        if (District.CapitalProvinceId == Id)
+            attraction *= 1.5;
 
         return (int)attraction;
     }
@@ -578,6 +585,13 @@ public class Province
                 var value = (double)modifiernode.GetValue(value_executionstate, 1);
                 UpdateOrAddModifier((ProvinceModifierType)modifiernode.provinceModifierType!, value);
             }
+        }
+
+        if (Id == District.CapitalProvinceId)
+        {
+            UpdateOrAddModifier(ProvinceModifierType.BuildingSlots, 10);
+            UpdateOrAddModifier(ProvinceModifierType.BuildingSlotsFactor, 0.2);
+            UpdateOrAddModifier(ProvinceModifierType.OverPopulationModifierExponent, -0.01);
         }
     }
 

@@ -103,6 +103,16 @@
         </!form>
         <br />
         <br />
+        @if (user.Id == Model.District.GovernorId)
+        {
+            <center>
+                <a href="/District/@Model.DistrictId/SetAsCapital/@Model.Id">
+                    <button type="submit" class="btn btn-outline-primary">Set as District Capital</button>
+                </a>
+            </center>
+        }
+        <br />
+        <br />
         <!form method="post" action="/Province/ChangeGovernor/@Model.Id">
             @Html.AntiForgeryToken()
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">

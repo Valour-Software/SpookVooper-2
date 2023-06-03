@@ -310,6 +310,16 @@
                 <td>@($"{runningtotal:n0}")</td>
             </tr>
             
+            @if (Model.Id == Model.District.CapitalProvinceId)
+            {
+                runningtotal += 10;
+                <tr>
+                    <td>Capital City</td>
+                    <td>+10</td>
+                    <td>@($"{runningtotal:n1}")</td>
+                </tr>
+            }
+
             runningtotal += slotsfrominfrastructures;
             @if (slotsfrominfrastructures > 1) {
                 <tr>
@@ -324,6 +334,16 @@
                 <tr>
                     <td>@item.modifiername</td>
                     <td>+@($"{item.value:n0}")</td>
+                    <td>@($"{runningtotal:n1}")</td>
+                </tr>
+            }
+
+            @if (Model.Id == Model.District.CapitalProvinceId)
+            {
+                runningtotal *= 1.2;
+                <tr>
+                    <td>Capital City</td>
+                    <td>x1.2</td>
                     <td>@($"{runningtotal:n1}")</td>
                 </tr>
             }

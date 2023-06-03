@@ -169,7 +169,17 @@
                 <center>
                     @{
                         var devmapmode = Context.Request.QueryString.Value.Contains("devmapmode=true");
+                        var scalebymaxindistrict = Context.Request.QueryString.Value.Contains("scalebymaxindistrict=true");
                         double maxresource = 0;
+                        double scaledevmapvaluesby = 1;
+                        if (scalebymaxindistrict)
+                            scaledevmapvaluesby = Model.Provinces.Max(x => x.DevelopmentValue) / 250.0;
+                        else
+                            scaledevmapvaluesby = DBCache.GetAll<Province>().Max(x => x.DevelopmentValue) / 250.0;
+                        if (scaledevmapvaluesby < 0.000001)
+                            scaledevmapvaluesby = 0.000001;
+                        if (scaledevmapvaluesby > 1.0)
+                            scaledevmapvaluesby = 1;
                         if (resourcetomap is not null) {
                             maxresource = DBCache.GetAll<Province>().Max(x => x.GetMiningResourceProduction(resourcetomap));
                         }
@@ -177,8 +187,11 @@
                     <a href="/District/View/@Model.Name">
                         <button class='btn @(devmapmode || resourcetomap != null ? "btn-outline-primary" : "btn-primary")'>Normal Mode</button>
                     </a>
+                    <a href="/District/View/@Model.Name?devmapmode=true&scalebymaxindistrict=true">
+                        <button class='btn @((devmapmode && scalebymaxindistrict) ? "btn-primary" : "btn-outline-primary")'>View Development Relative to District Max</button>
+                    </a>
                     <a href="/District/View/@Model.Name?devmapmode=true">
-                        <button class='btn @(devmapmode ? "btn-primary" : "btn-outline-primary")'>View Development</button>
+                        <button class='btn @((devmapmode && !scalebymaxindistrict)? "btn-primary" : "btn-outline-primary")'>View Development Relative to Global Max</button>
                     </a>
                     <button class='btn @(resourcetomap is null ? "btn-outline-primary" : "btn-primary")' data-bs-toggle="modal" data-bs-target="#showresources">View Resource Density</button>
                     @if (resourcetomap is not null) {
@@ -251,7 +264,7 @@
                                 else
                                 {
                                     <a href="/Province/View/@province.Id" data-bs-toggle="tooltip" data-placement="top" title="@dbprovince.Name" data-sv-show="@ShowCityCircle">
-                                        <path d="@province.D" id="@province.Id" style="fill:@dbprovince.GetDevelopmentColorForMap()" class="province"></path>
+                                        <path d="@province.D" id="@province.Id" style="fill:@dbprovince.GetDevelopmentColorForMap(scaledevmapvaluesby)" class="province"></path>
                                         @if (ShowCityCircle)
                                         {
                                             <circle cx="@(province.XPos)" cy="@(province.YPos+8)" r="3" style="fill: white;" />

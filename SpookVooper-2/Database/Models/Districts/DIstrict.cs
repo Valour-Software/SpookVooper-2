@@ -92,6 +92,9 @@ public class District
     [Column("titleforgovernorofastate")]
     public string? TitleForGovernorOfState { get; set; }
 
+    [Column("capitalprovinceid")]
+    public long? CapitalProvinceId { get; set; }
+
     [NotMapped]
     public string NameForState => TitleForState is null ? "State" : TitleForState;
 

@@ -199,7 +199,7 @@ public class ProvinceController : SVController
         oldprovince.PropertyTaxPerSize = newprovince.PropertyTaxPerSize;
 
         StatusMessage = "Successfully saved your changes.";
-        return Redirect($"/State/View/{oldprovince.Id}");
+        return Redirect($"/Province/View/{oldprovince.Id}");
     }
 
     [HttpPost("/Province/ChangeGovernor/{id}")]
