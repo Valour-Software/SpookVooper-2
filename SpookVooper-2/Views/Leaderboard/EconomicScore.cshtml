@@ -1,0 +1,69 @@
+﻿<style>
+    .limit-width {
+        max-width: 200px;
+    }
+
+    input {
+        width: 100%;
+    }
+
+    thead, tbody, tfoot, tr, td, th {
+        border-style: none;
+    }
+
+        tr:nth-child(odd) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        tr:nth-child(even), .header {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+    th {
+        background-color: unset !important;
+    }
+</style>
+
+<center>
+    <h4 style="text-align:center">Districts by Economic Score</h4>
+</center>
+
+<div class="container vw-100">
+    <div class="col-12">
+        <table class="table">
+            <thead>
+                <tr class="header">
+                    <th>District</th>
+                    <th>Economic Score</th>
+                    <th>Population</th>
+                    <th>Levels of Mines</th>
+                    <th>Levels of Simple Factories</th>
+                    <th>Levels of Advanced Factories</th>
+                    <th>Levels of Infrastructure</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var models = new List<EconomicScoreReturnModel>();
+                    foreach (var district in DBCache.GetAll<District>())
+                    {
+                        models.Add(await district.GetEconomicScore());
+                    }
+                    models = models.OrderByDescending(x => x.Score).ToList();
+                    foreach (var _model in models)
+                    {
+                        <tr>
+                            <td>@_model.District.Name</td>
+                            <td>@($"{_model.Score:n0}")</td>
+                            <td>@($"{_model.District.TotalPopulation:n0}")</td>
+                            <td>@_model.Mines</td>
+                            <td>@_model.SimpleFactories</td>
+                            <td>@_model.AdvancedFactories</td>
+                            <td>@_model.Infrastructure</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

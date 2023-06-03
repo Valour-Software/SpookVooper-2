@@ -12,7 +12,8 @@ using SV2.Helpers;
 namespace SV2.Controllers;
 
 [ApiExplorerSettings(IgnoreApi = true)]
-public class LeaderboardController : SVController {
+public class LeaderboardController : SVController 
+{
     private readonly ILogger<LeaderboardController> _logger;
 
     public LeaderboardController(ILogger<LeaderboardController> logger)
@@ -30,5 +31,10 @@ public class LeaderboardController : SVController {
         };
 
         return View(model);
+    }
+
+    public async Task<IActionResult> EconomicScore()
+    {
+        return View();
     }
 }

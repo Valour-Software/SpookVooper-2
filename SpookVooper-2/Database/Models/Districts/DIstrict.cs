@@ -208,4 +208,63 @@ public class District
             }
         }
     }
+
+    public async Task<EconomicScoreReturnModel> GetEconomicScore()
+    {
+        var score = 0.0;
+        score += Math.Pow(TotalPopulation, Defines.NScore[NScore.ECONOMIC_SCORE_FROM_POPULATION_EXPONENT]) / Defines.NScore[NScore.ECONOMIC_SCORE_FROM_POPULATION_DIVISOR];
+        int mines = 0;
+        int simplefactories = 0;
+        int advancedfactories = 0;
+        int infrastructure = 0;
+        foreach (var province in Provinces)
+        {
+            foreach (var building in province.GetBuildings())
+            {
+                if (building.BuildingType == BuildingType.Mine) mines += building.Size;
+                if (building.BuildingType == BuildingType.Factory)
+                {
+                    if (building.LuaBuildingObjId.Contains("advanced")) advancedfactories += building.Size;
+                    else simplefactories += building.Size;
+                }
+
+                if (building.BuildingType == BuildingType.Infrastructure) infrastructure += building.Size;
+            }
+
+            var governor = province.GetGovernor();
+            var rate_for_consumergood = (double)province.Population / 10_000 * (1 + province.GetModifierValue(ProvinceModifierType.ConsumerGoodsConsumptionFactor));
+            double totalgrowthbuff = 0;
+            foreach (var consumergood in GameDataManager.ConsumerGoods)
+            {
+                var toconsume = rate_for_consumergood * consumergood.consumerGood.PopConsumptionRate;
+                if (await governor.HasEnoughResource(consumergood.LowerCaseName, toconsume))
+                {
+                    score += consumergood.consumerGood.EconomicScoreModifier * province.Population / 10_000.0;
+                }
+            }
+        }
+        score += mines * Defines.NScore[NScore.ECONOMIC_SCORE_PER_MINE];
+        score += simplefactories * Defines.NScore[NScore.ECONOMIC_SCORE_PER_SIMPLE_FACTORY];
+        score += advancedfactories * Defines.NScore[NScore.ECONOMIC_SCORE_PER_ADVANCED_FACTORY];
+        score += infrastructure * Defines.NScore[NScore.ECONOMIC_SCORE_PER_INFRASTRUCTURE];
+        return new()
+        {
+            District = this,
+            Score = score,
+            Mines = mines,
+            SimpleFactories = simplefactories,
+            AdvancedFactories = advancedfactories,
+            Infrastructure = infrastructure
+        };
+    }
+}
+
+public class EconomicScoreReturnModel
+{
+    public District District { get; set; }
+    public double Score { get; set; }
+    public int Mines { get; set; }
+    public int SimpleFactories { get; set; }
+    public int AdvancedFactories { get; set; }
+    public int Infrastructure { get; set; }
 }

@@ -10,7 +10,7 @@ using Valour.Api.Client;
 //using Valour.Api.Models.Economy;
 
 namespace SV2.VoopAI;
-class VoopAI
+public class VoopAI
 {
     public static bool prod;
     public static List<string> prefixes;

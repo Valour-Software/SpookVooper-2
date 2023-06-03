@@ -77,6 +77,16 @@ public enum NProvince
     DEVELOPMENT_COASTAL_FACTOR
 }
 
+public enum NScore
+{
+    ECONOMIC_SCORE_FROM_POPULATION_EXPONENT,
+    ECONOMIC_SCORE_FROM_POPULATION_DIVISOR,
+    ECONOMIC_SCORE_PER_MINE,
+    ECONOMIC_SCORE_PER_SIMPLE_FACTORY,
+    ECONOMIC_SCORE_PER_ADVANCED_FACTORY,
+    ECONOMIC_SCORE_PER_INFRASTRUCTURE
+}
+
 public class Define<T> where T : struct
 {
     private Dictionary<T, double> Values = new();
@@ -123,6 +133,7 @@ public static class Defines
     public static Define<NProduction> NProduction = new();
     public static Define<Military> NMilitary = new();
     public static Define<NProvince> NProvince = new();
+    public static Define<NScore> NScore = new();
 
     public static bool FirstUpdate = true;
 
@@ -151,6 +162,10 @@ public static class Defines
             table = (LuaTable)lua["NProduction"];
             foreach (string key in table.Keys)
                 NProduction[Enum.Parse<NProduction>(key)] = Convert.ToDouble(table[key]);
+
+            table = (LuaTable)lua["NScore"];
+            foreach (string key in table.Keys)
+                NScore[Enum.Parse<NScore>(key)] = Convert.ToDouble(table[key]);
 
         }
     }

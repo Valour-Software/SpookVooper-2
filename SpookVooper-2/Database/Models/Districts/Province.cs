@@ -287,7 +287,7 @@ public class Province
         return GetBuildings().Where(x => x.BuildingType == buildingtype).Sum(x => x.Size);
     }
 
-    public IEnumerable<BuildingBase> GetBuildings()
+    public IEnumerable<ProducingBuilding> GetBuildings()
     {
         return DBCache.ProvincesBuildings[Id];
     }
