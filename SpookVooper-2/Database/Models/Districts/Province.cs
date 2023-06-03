@@ -447,6 +447,10 @@ public class Province
 
         attraction *= GetModifierValue(ProvinceModifierType.MigrationAttractionFactor) + 1;
 
+        var used = (double)BuildingSlotsUsed;
+        var ratio = used / (double)BuildingSlots;  
+        attraction *= Math.Max(0, ratio - 0.3) + 1;
+
         if (GetOverpopulationModifier() > 0.25)
         {
             var muit = 1 - ((GetOverpopulationModifier() - 0.25) * 3);
