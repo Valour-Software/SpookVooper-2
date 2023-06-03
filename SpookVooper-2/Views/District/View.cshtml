@@ -173,9 +173,9 @@
                         double maxresource = 0;
                         double scaledevmapvaluesby = 1;
                         if (scalebymaxindistrict)
-                            scaledevmapvaluesby = Model.Provinces.Max(x => x.DevelopmentValue) / 250.0;
+                            scaledevmapvaluesby = Model.Provinces.Max(x => x.DevelopmentValue) / 150.0;
                         else
-                            scaledevmapvaluesby = DBCache.GetAll<Province>().Max(x => x.DevelopmentValue) / 250.0;
+                            scaledevmapvaluesby = DBCache.GetAll<Province>().Max(x => x.DevelopmentValue) / 150.0;
                         if (scaledevmapvaluesby < 0.000001)
                             scaledevmapvaluesby = 0.000001;
                         if (scaledevmapvaluesby > 1.0)
