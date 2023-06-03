@@ -260,7 +260,7 @@ public class GroupController : SVController
             return Redirect($"/group/edit/{prevgroup.Id}");
         }
 
-        if (prevgroup.OwnerId == user.Id)
+        if (prevgroup.HasPermission(user, GroupPermissions.Edit))
         {
             prevgroup.Name = model.Name;
             prevgroup.ImageUrl = model.ImageUrl;
