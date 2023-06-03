@@ -239,7 +239,7 @@ public class District
                 var toconsume = rate_for_consumergood * consumergood.consumerGood.PopConsumptionRate;
                 if (await governor.HasEnoughResource(consumergood.LowerCaseName, toconsume))
                 {
-                    score += consumergood.consumerGood.EconomicScoreModifier * province.Population / 10_000.0;
+                    score += consumergood.consumerGood.EconomicScoreModifier * province.Population / 10_000.0 / 10;
                 }
             }
         }

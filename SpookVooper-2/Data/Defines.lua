@@ -78,6 +78,7 @@ NProvince = {
 }
 
 NScore = {
+    -- district.population ^ 0.5 / 10
     ECONOMIC_SCORE_FROM_POPULATION_EXPONENT = 0.5
     ECONOMIC_SCORE_FROM_POPULATION_DIVISOR = 10
     ECONOMIC_SCORE_PER_MINE = 5
