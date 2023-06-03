@@ -71,7 +71,7 @@
                         @Html.HiddenFor(x => x.Description)
                     }
 
-                    @if (Model.Group.OwnerId == user.Id)
+                    @if (Model.Group.HasPermission(user, GroupPermissions.Edit))
                     {
                         <div class="form-group">
                             <label asp-for="ImageUrl"></label>
