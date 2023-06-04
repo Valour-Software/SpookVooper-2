@@ -79,7 +79,7 @@ recipe_crystallite_mining_base = {
 		crystallite = 1
 	}
 	-- was 0.45
-	perhour = 0.7
+	perhour = 0.9
     editable = false
 }
 

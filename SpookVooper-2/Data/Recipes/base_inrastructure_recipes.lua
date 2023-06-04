@@ -8,8 +8,10 @@ recipe_infrastructure_roads = {
     }
     outputs = {
 		modifiers = {
-			province.buildingslots = 0.25
-			province.buildingslotsfactor = 0.0075
+			-- was 0.25
+			province.buildingslots = 0.5
+			-- was 0.0075
+			province.buildingslotsfactor = 0.01
 			province.overpopulationmodifierpopulationbase = -30000
 			province.buildingslotsexponent = 0.0002
 			province.migrationattraction = 0.25

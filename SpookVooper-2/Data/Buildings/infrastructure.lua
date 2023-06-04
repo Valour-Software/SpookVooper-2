@@ -11,13 +11,13 @@ building_infrastructure = {
 			}
 		}
 		steel = {
-			base = 750
+			base = 500
 			factor = { 
 				get_local = "cost_increase"
 			}
 		}
 		simple_components = {
-			base = 200
+			base = 125
 			factor = { 
 				get_local = "cost_increase"
 			}
