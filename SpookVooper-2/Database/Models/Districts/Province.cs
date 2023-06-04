@@ -372,6 +372,8 @@ public class Province
         var exponent = Defines.NProvince[NProvince.OVERPOPULATION_MODIFIER_EXPONENT];
         exponent += GetModifierValue(ProvinceModifierType.OverPopulationModifierExponent);
         exponent += District.GetModifierValue(DistrictModifierType.OverPopulationModifierExponent);
+        if (Id == District.CapitalProvinceId)
+            exponent -= 0.01;
         var population = Population + GetModifierValue(ProvinceModifierType.OverPopulationModifierPopulationBase);
         if (population < 2500) population = 2500;
         var rate = Math.Pow(population, exponent) / 100.0;
@@ -544,9 +546,13 @@ public class Province
 
         var slots = (Defines.NProvince["BASE_BUILDING_SLOTS"] + Math.Ceiling(Math.Pow(Population, buildingslots_exponent) * Defines.NProvince["BUILDING_SLOTS_FACTOR"]));
 
-        // province level
+        if (Id == District.CapitalProvinceId)
+            slots += 10;
+            // province level
         slots += GetModifierValue(ProvinceModifierType.BuildingSlots);
         slots *= 1 + GetModifierValue(ProvinceModifierType.BuildingSlotsFactor);
+        if (Id == District.CapitalProvinceId)
+            slots *= 1.2;
 
         // district level
         slots *= 1 + District.GetModifierValue(DistrictModifierType.BuildingSlotsFactor);
@@ -585,13 +591,6 @@ public class Province
                 var value = (double)modifiernode.GetValue(value_executionstate, 1);
                 UpdateOrAddModifier((ProvinceModifierType)modifiernode.provinceModifierType!, value);
             }
-        }
-
-        if (Id == District.CapitalProvinceId)
-        {
-            UpdateOrAddModifier(ProvinceModifierType.BuildingSlots, 10);
-            UpdateOrAddModifier(ProvinceModifierType.BuildingSlotsFactor, 0.2);
-            UpdateOrAddModifier(ProvinceModifierType.OverPopulationModifierExponent, -0.01);
         }
     }
 
