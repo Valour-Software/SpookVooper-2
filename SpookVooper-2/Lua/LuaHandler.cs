@@ -289,6 +289,10 @@ public static class LuaHandler
                         {
                             "throughputfactor" => ProvinceModifierType.FactoryThroughputFactor
                         },
+                        "mines" => levels[2] switch
+                        {
+                            "throughputfactor" => ProvinceModifierType.MineThroughputFactor
+                        },
                         "consumergoods" => levels[2] switch
                         {
                             "consumptionfactor" => ProvinceModifierType.ConsumerGoodsConsumptionFactor,
