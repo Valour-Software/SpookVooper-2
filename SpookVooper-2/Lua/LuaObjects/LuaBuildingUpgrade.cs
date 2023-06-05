@@ -16,7 +16,7 @@ public class LuaBuildingUpgrade
         Dictionary<string, double> totalresources = new();
         Dictionary<string, decimal> changesystemvarsby = new Dictionary<string, decimal>() {
             { @"province.buildings.totaloftype[""infrastructure""]", 0.0m },
-            { "upgrade.level", (decimal)(upgrade is not null ? upgrade.Level : 0) }
+            { "upgrade.level", (decimal)(upgrade is not null ? 0-upgrade.Level : 0) }
         };
         for (int i = 0; i < levels; i++)
         {

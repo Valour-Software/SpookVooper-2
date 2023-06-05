@@ -6,24 +6,24 @@
     <span id="alert-text-@Model.PrefixForIds">something</span>
 </div>
 
-@if (Model.Province.CanManageBuildingRequests(Model.User))
+@if (Model.IncludeScript)
 {
-    if (Model.IncludeScript)
-
-    {
-        <style>
-            .buildingcosts {
-                flex-direction: column;
-                padding-left: 2px;
-            }
-
-            .buildingcosts-holder {
-                margin-left: auto;
-                margin-right: auto;
-                width: 250px;
-            }
-        </style>
+<style>
+    .buildingcosts {
+        flex-direction: column;
+        padding-left: 2px;
     }
+
+    .buildingcosts-holder {
+        margin-left: auto;
+        margin-right: auto;
+        width: 250px;
+    }
+</style>
+}
+
+@if (Model.Province.CanManageBuildingRequests(Model.User) && Model.LuaBuildingObj.type == BuildingType.Infrastructure)
+{
     <div class="buildingcosts-holder">
         @if (Model.LuaBuildingObj.type == BuildingType.Infrastructure) {
             <span class="text-warning">Note: This building's construction cost increases per level!!</span>
@@ -69,6 +69,26 @@
 
             <div asp-validation-summary="All" class="text-danger"></div>
         </div>
+
+        @if (!(Model.Province.CanManageBuildingRequests(Model.User) && Model.LuaBuildingObj.type == BuildingType.Infrastructure)) {
+            <div class="buildingcosts-holder">
+                <span>Costs to build:</span>
+                <br />
+                <div class="buildingcosts">
+                    @{
+                        ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => Model.AlreadyExistingBuildingId == x.Id);
+                    }
+                    @foreach ((var resource, var amount) in Model.LuaBuildingObj.GetConstructionCost(BaseEntity.Find(Model.RequesterId), Model.Province.District, Model.Province, building, 1))
+                    {
+                        <div class="resource-row">
+                            <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                            <span style="align-self: flex-end">@($"{amount:n0}")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            <br />
+        }
 
         @if (value == "" || value is null) {
             <label> Build As(what entity should this request be made from)</label>
