@@ -89,7 +89,7 @@ public class DistrictController : SVController
         district.PropertyTaxPerSize = model.PropertyTaxPerSize;
 
         StatusMessage = "Successfully saved your changes.";
-        return Redirect($"/District/View/{district.Id}");
+        return Redirect($"/District/View/{district.Name}");
     }
 
     [HttpGet("/District/{districtid}/SetAsCapital/{provinceid}")]

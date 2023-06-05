@@ -1,10 +1,10 @@
 recipe_infrastructure_roads = {
 	name = "Road Infrastructure"
 	inputs = {
-        tools = 0.025
-        simple_components = 0.075
+        tools = 0.02
+        simple_components = 0.05
         advanced_components = 0.01
-        steel = 0.15
+        steel = 0.1
     }
     outputs = {
 		modifiers = {

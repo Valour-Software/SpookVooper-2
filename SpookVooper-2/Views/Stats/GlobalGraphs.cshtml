@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Global Graphs";
+}
+
+<div class="container vw-100">
+    @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+    <div class="col-12">
+        <div>
+            <canvas id="lineChart1"></canvas>
+        </div>
+        <br />
+        <br />
+        <div>
+            <canvas id="lineChart2"></canvas>
+        </div>
+        <br />
+        <br />
+        <div>
+            <canvas id="lineChart3"></canvas>
+        </div>
+
+        @{
+            ChartJSCore.Models.Chart chart1 = (ChartJSCore.Models.Chart)ViewData["graph1"];
+            ChartJSCore.Models.Chart chart2 = (ChartJSCore.Models.Chart)ViewData["graph2"];
+            ChartJSCore.Models.Chart chart3 = (ChartJSCore.Models.Chart)ViewData["graph3"];
+        }
+
+        @section Scripts {
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            <script>
+                @Html.Raw(chart1.CreateChartCode("lineChart1"));
+                @Html.Raw(chart2.CreateChartCode("lineChart2"));
+                @Html.Raw(chart3.CreateChartCode("lineChart3"));
+            </script>
+        }
+    </div>
+</div>

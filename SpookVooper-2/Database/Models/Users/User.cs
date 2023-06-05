@@ -266,6 +266,19 @@ public class SVUser : BaseEntity
             }
         }
 
+        if (IsSenator())
+        {
+            var vooperia = (Group)BaseEntity.Find(100);
+            if (!vooperia.MembersIds.Contains(Id))
+                vooperia.AddEntityToRole(vooperia, this, vooperia.Roles.First(x => x.Name == "Imperial Senator"), true);
+        }
+        else
+        {
+            var vooperia = (Group)BaseEntity.Find(100);
+            if (vooperia.MembersIds.Contains(Id))
+                vooperia.RemoveEntityFromRole(vooperia, this, vooperia.Roles.First(x => x.Name == "Imperial Senator"), true);
+        }
+
         if (roles.Any(x => x.Name == "Senator") && !IsSenator())
             await member.Node.DeleteAsync($"api/members/{member.Id}/roles/18993953105772544");
         if (!roles.Any(x => x.Name == "Senator") && IsSenator())

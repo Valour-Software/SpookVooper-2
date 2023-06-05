@@ -151,7 +151,7 @@ public class ItemTrade
         if (FromId is not null)
             fromitem.Amount -= Amount;
 
-        VooperDB.Instance.ItemTrades.Add(this);
+        dbctx.ItemTrades.Add(this);
 
         return new TaskResult(true, $"Successfully gave {Amount} of {toitem.Definition.Name} to {toEntity!.Name}.");
     }

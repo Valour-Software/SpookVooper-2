@@ -20,7 +20,8 @@ public enum TransactionType
     TaxCreditPayment = 6,
     TaxPayment = 7,
     FreeMoney = 8,
-    LoanRepayment = 9
+    LoanRepayment = 9,
+    DividendPayment = 10
 }
 
 public class SVTransaction
@@ -348,7 +349,7 @@ public class SVTransaction
         //fromEntity.Credits -= Credits;
         //toEntity.Credits += Credits;
 
-        if (transactionType == TransactionType.ItemTrade || transactionType == TransactionType.Paycheck || transactionType == TransactionType.Payment || transactionType == TransactionType.StockTrade)
+        if (transactionType == TransactionType.DividendPayment || transactionType == TransactionType.ItemTrade || transactionType == TransactionType.Paycheck || transactionType == TransactionType.Payment || transactionType == TransactionType.StockTrade)
         {
             fromEntity.TaxAbleBalance -= Credits;
             toEntity.TaxAbleBalance += Credits;
