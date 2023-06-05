@@ -204,6 +204,8 @@ public class StatsController : SVController
             .OrderByDescending(x => x.Date)
             .Take(24 * 30)
             .ToListAsync();
+
+        statsobjects.Reverse();
         GenerateGraph(ViewData, "Global Total Building Slots (30 days)", "Total Building Slots", "graph2", statsobjects.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), statsobjects.Select(x => (double?)x.Value).ToList());
 
         statsobjects = await _dbctx.Stats
@@ -211,6 +213,8 @@ public class StatsController : SVController
             .OrderByDescending(x => x.Date)
             .Take(24 * 30)
             .ToListAsync();
+
+        statsobjects.Reverse();
         GenerateGraph(ViewData, "Global Used Building Slots (30 days)", "Used Building", "graph3", statsobjects.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), statsobjects.Select(x => (double?)x.Value).ToList());
 
         return View();
@@ -244,6 +248,7 @@ public class StatsController : SVController
 
             List<double?> data = new();
             var objects = districtdata.Items;
+            objects.Reverse();
             Data.Add(objects.Select(x => (double?)x.Value).ToList());
         }
 
@@ -273,6 +278,7 @@ public class StatsController : SVController
 
             List<double?> data = new();
             var objects = districtdata.Items;
+            objects.Reverse();
             Data.Add(objects.Select(x => (double?)x.Value).ToList());
         }
         GenerateGraphWithMoreThanOneDataSet(ViewData, "Districts Total Building Slots (30 days)", DistrictColors, DataTitles, "graph2", statsobjects.First().Items.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), Data);
@@ -301,6 +307,7 @@ public class StatsController : SVController
 
             List<double?> data = new();
             var objects = districtdata.Items;
+            objects.Reverse();
             Data.Add(objects.Select(x => (double?)x.Value).ToList());
         }
         GenerateGraphWithMoreThanOneDataSet(ViewData, "Districts Used Building Slots (30 days)", DistrictColors, DataTitles, "graph3", statsobjects.First().Items.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), Data);
