@@ -32,5 +32,9 @@ building_advanced_factory = {
 		simple_components = 20000
 		advanced_components = 5000
 	}
+	upgrades = [
+		advanced_factory_throughput_upgrade
+		advanced_factory_efficiency_upgrade
+	]
 	type = "Factory"
 }
