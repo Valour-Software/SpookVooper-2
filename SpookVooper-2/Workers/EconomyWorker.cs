@@ -193,7 +193,7 @@ namespace SV2.Workers
 
                 while (!task.IsCompleted)
                 {
-                    _logger.LogInformation("Economy Worker running at: {time}", DateTimeOffset.Now);
+                    //_logger.LogInformation("Economy Worker running at: {time}", DateTimeOffset.Now);
                     // for right now, just save cache to database every 2 minutes
                     await DBCache.SaveAsync();
 #if DEBUG
