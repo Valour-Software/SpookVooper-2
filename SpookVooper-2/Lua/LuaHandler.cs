@@ -243,7 +243,8 @@ public static class LuaHandler
                         {
                             "buildingslotsfactor" => DistrictModifierType.BuildingSlotsFactor,
                             "buildingslotsexponent" => DistrictModifierType.BuildingSlotsExponent,
-                            "overpopulationmodifierexponent" => DistrictModifierType.OverPopulationModifierExponent
+                            "overpopulationmodifierexponent" => DistrictModifierType.OverPopulationModifierExponent,
+                            "populationgrowthspeedfactor" => DistrictModifierType.PopulationGrowthSpeedFactor
                         }
                     }
                 };

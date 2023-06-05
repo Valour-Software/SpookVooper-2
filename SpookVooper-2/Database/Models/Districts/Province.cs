@@ -430,6 +430,8 @@ public class Province
         PopulationGrowth -= DeathRate * Population;
         PopulationGrowth *= totalgrowthbuff + 1;
 
+        PopulationGrowth *= District.GetModifierValue(DistrictModifierType.PopulationGrowthSpeedFactor) + 1;
+
         if (District.CapitalProvinceId == Id)
             PopulationGrowth *= 2.5;
 

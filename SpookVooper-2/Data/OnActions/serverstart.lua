@@ -10,6 +10,11 @@ on_server_start = {
 				}
 			}
 		}
+		district:lanatia = {
+			add_static_modifier_if_not_already_added = {
+				name = "lanatia_lore"
+			}
+		}
 		district:elysian_katonia = {
 			add_static_modifier_if_not_already_added = {
 				name = "elysian_katonia_chips_industry"

@@ -23,7 +23,6 @@ public enum DistrictModifierType
     FactoryThroughputFactor,
     FactoryEfficiencyFactor,
     FactoryEfficiency,
-    PopulationGrowthFactor,
     ArmyAttackFactory,
     ArmyEntrenchmentFactor,
     ArmyEntrenchment,
@@ -38,5 +37,6 @@ public enum DistrictModifierType
     BuildingSlotsFactor,
     BuildingSlotsExponent,
     OverPopulationModifierExponent,
-    InfrastructureThroughputFactor
+    InfrastructureThroughputFactor,
+    PopulationGrowthSpeedFactor
 }

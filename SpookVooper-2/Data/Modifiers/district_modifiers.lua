@@ -9,6 +9,15 @@ novastella_free_market = {
 	stackable = false
 }
 
+lanatia_lore = {
+	name = "Safe Haven for Anti-Imperial People"
+	modifiers = {
+		district.provinces.populationgrowthspeedfactor = 5
+	}
+	isgood = true
+	stackable = false
+}
+
 elysian_katonia_chips_industry = {
 	name = "Booming Chip Industry"
 	description = "Every factory producing chips in Elysian Katonia receives a +15% throughput modifier"

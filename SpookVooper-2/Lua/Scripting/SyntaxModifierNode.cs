@@ -31,6 +31,7 @@ public class SyntaxModifierNode : SyntaxNode
                 DistrictModifierType.BuildingSlotsExponent => "Exponent for Building Slots from Population",
                 DistrictModifierType.BuildingSlotsFactor => "Building Slots",
                 DistrictModifierType.OverPopulationModifierExponent => "Exponent for Overpopulation",
+                DistrictModifierType.PopulationGrowthSpeedFactor => "Population Growth Speed",
                 _ => "[No Loc]"
             };
         }
@@ -70,6 +71,7 @@ public class SyntaxModifierNode : SyntaxNode
                 DistrictModifierType.AllProducingBuildingThroughputFactor => GetColorClass(false, value),
                 DistrictModifierType.BuildingSlotsExponent => GetColorClass(false, value),
                 DistrictModifierType.BuildingSlotsFactor => GetColorClass(false, value),
+                DistrictModifierType.PopulationGrowthSpeedFactor => GetColorClass(false, value),
                 DistrictModifierType.OverPopulationModifierExponent => GetColorClass(true, value),
                 _ => "modifier-tooltip-modifier-listitem-neutral"
             };
