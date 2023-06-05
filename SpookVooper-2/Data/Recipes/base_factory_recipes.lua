@@ -99,13 +99,13 @@ recipe_advanced_components_factory_base = {
 	inputs = {
 		simple_components = 3
 		steel = 3
-		crystallite = 1
+		crystallite = 1.25
 	}
 	outputs = {
 		-- was 1
 		advanced_components = 2
 	}
-	-- was 4
+	-- was 4 then 7; idk what is the actual good rate here
 	perhour = 7
     editable = false
 }

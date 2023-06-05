@@ -39,7 +39,7 @@ public class LuaBuilding
             // get total cost of resources for the upgrades
             foreach (var upgrade in building.Upgrades)
             {
-                foreach ((var resource, var amount) in upgrade.LuaBuildingUpgradeObj.GetConstructionCost(entity, district, province, building, upgrade, upgrade.Level))
+                foreach ((var resource, var amount) in upgrade.LuaBuildingUpgradeObj.GetConstructionCost(entity, district, province, building, upgrade, upgrade.Level, true))
                 {
                     if (!totalresources.ContainsKey(resource))
                         totalresources[resource] = 0;
