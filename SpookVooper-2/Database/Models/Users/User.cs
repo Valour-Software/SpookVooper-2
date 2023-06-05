@@ -280,7 +280,6 @@ public class SVUser : BaseEntity
             var vooperia = (Group)BaseEntity.Find(100);
             if (vooperia.MembersIds.Contains(Id))
             {
-                vooperia.MembersIds.Add(Id);
                 vooperia.RemoveEntityFromRole(vooperia, this, vooperia.Roles.First(x => x.Name == "Imperial Senator"), true);
             }
         }
