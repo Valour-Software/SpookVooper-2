@@ -134,6 +134,9 @@ namespace SV2.Workers
                             foreach (var building in buildings)
                             {
                                 if (building.BuildingType == BuildingType.Infrastructure) continue;
+
+                                double throughputfromupgrades = building.GetThroughputFromUpgrades();
+
                                 if (!propertytaxes.ContainsKey(building.OwnerId))
                                     propertytaxes[building.OwnerId] = new();
                                 var entitytaxes = propertytaxes[building.OwnerId];
@@ -141,7 +144,7 @@ namespace SV2.Workers
                                 if (!entitytaxes.ContainsKey(id))
                                     entitytaxes[id] = 0.00;
                                 double amount = building.Province.BasePropertyTax ?? 0;
-                                amount += (building.Province.PropertyTaxPerSize ?? 0) * building.Size;
+                                amount += (building.Province.PropertyTaxPerSize ?? 0) * building.Size * throughputfromupgrades;
                                 entitytaxes[id] += amount;
 
                                 // now we do state property taxes
@@ -152,7 +155,7 @@ namespace SV2.Workers
                                         entitytaxes[stateid] = 0.00;
 
                                     amount = building.Province.State!.BasePropertyTax ?? 0;
-                                    amount += (building.Province.State!.PropertyTaxPerSize ?? 0) * building.Size;
+                                    amount += (building.Province.State!.PropertyTaxPerSize ?? 0) * building.Size * throughputfromupgrades;
                                     entitytaxes[stateid] += amount;
                                 }
 
@@ -161,7 +164,7 @@ namespace SV2.Workers
                                     entitytaxes[building.DistrictId] = 0.00;
                                 
                                 amount = building.District.BasePropertyTax ?? 0;
-                                amount += (building.District.PropertyTaxPerSize ?? 0) * building.Size;
+                                amount += (building.District.PropertyTaxPerSize ?? 0) * building.Size * throughputfromupgrades;
                                 entitytaxes[building.DistrictId] += amount;
                             }
                             sw.Stop();

@@ -269,6 +269,33 @@ public class BuildingController : SVController
         }
     }
 
+    [HttpGet("/Building/{buildingid}/upgrade/{upgradeid}")]
+    [UserRequired]
+    public async Task<IActionResult> BuildingUpgrade(long buildingid, string upgradeid)
+    {
+        SVUser user = HttpContext.GetUser();
+
+        ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == buildingid);
+
+        if (building == null)
+            return NotFound($"Error: Could not find {buildingid}");
+
+        if (building.OwnerId != user.Id)
+        {
+            Group group = DBCache.Get<Group>(building.OwnerId);
+            if (!group.HasPermission(user, GroupPermissions.Build))
+                return RedirectBack("You lack permission to build as this group!");
+        }
+
+        LuaBuildingUpgrade luaupgradeobj = GameDataManager.BaseBuildingUpgradesObjs[upgradeid];
+        BuildingUpgrade? upgrade = building.Upgrades.FirstOrDefault(x => x.LuaBuildingUpgradeId == luaupgradeobj.Id);
+
+        TaskResult<ProducingBuilding> result = await luaupgradeobj.Build(building.Owner, user, building.District, building.Province, 1, building, upgrade);
+
+        building.UpdateModifiers();
+        return RedirectBack(result.Message);
+    }
+
     [HttpGet("/Building/TransferBuilding/{buildingid}")]
     [UserRequired]
     public IActionResult TransferBuilding(long buildingid)

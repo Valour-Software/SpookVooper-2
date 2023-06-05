@@ -100,6 +100,9 @@ public static class GameDataManager
 
         LuaHandler.HandleResourcesFile(File.ReadAllText("Data/Resources.lua"), "Data/Resources.lua");
 
+        foreach (var path in ResourceManager.GetFilePaths("BuildingUpgrades"))
+            LuaHandler.HandleBuildingUpgradeFile(File.ReadAllText(path), path);
+
         foreach (var path in ResourceManager.GetFilePaths("Recipes")) {
             LuaHandler.HandleRecipeFile(File.ReadAllText(path), path);
         }

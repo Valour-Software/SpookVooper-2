@@ -38,9 +38,10 @@ public class ExecutionState
     public Province? Province { get; set; }
     public ProducingBuilding Building { get; set; }
     public LuaResearch Research { get; set; }
+    public BuildingUpgrade BuildingUpgrade { get; set; }
     public Dictionary<string, decimal> ChangeSystemVarsBy { get; set; }
     public ScriptScopeType? ParentScopeType { get; set; }
-    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, ProducingBuilding? building = null, LuaResearch? research = null)
+    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, ProducingBuilding? building = null, LuaResearch? research = null, BuildingUpgrade? buildingUpgrade = null)
     {
         Locals = new();
         District = district;
@@ -49,6 +50,7 @@ public class ExecutionState
         ParentScopeType = parentscopetype;
         Building = building;
         Research = research;
+        BuildingUpgrade = buildingUpgrade;
     }
 }
 
@@ -348,6 +350,10 @@ public class SystemVar : SyntaxNode
             "building" => levels[1].ToLower() switch
             {
                 "recipe" => state.Building.Recipe.IdAsLong
+            },
+            "upgrade" => levels[1].ToLower() switch
+            {
+                "level" => state.BuildingUpgrade.Level
             },
             "recipes" => GameDataManager.BaseRecipeObjs.ContainsKey(levels[1]) ? GameDataManager.BaseRecipeObjs[levels[1]].IdAsLong : 0,
             "get_local" => state.Locals[levels[1]],

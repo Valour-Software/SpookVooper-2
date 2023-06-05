@@ -162,7 +162,7 @@ public abstract class ProducingBuilding : BuildingBase
             };
 
             if (BuildingObj.ApplyStackingBonus)
-                basevalue += Math.Min(Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Size, Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"]);
+                basevalue *= 1+Math.Min(Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Size, Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"]);
 
             if (BuildingType == BuildingType.Factory)
                 basevalue *= 5.5;
@@ -189,6 +189,22 @@ public abstract class ProducingBuilding : BuildingBase
                 _ => 1
             };
         }
+    }
+
+    public double GetThroughputFromUpgrades()
+    {
+        double total = 1.0;
+        foreach (var upgrade in Upgrades)
+        {
+            foreach (var node in upgrade.LuaBuildingUpgradeObj.ModifierNodes)
+            {
+                if (node.buildingModifierType == BuildingModifierType.ThroughputFactor)
+                {
+                    total += (double)node.GetValue(new(null, null)) * upgrade.Level;
+                }
+            }
+        }
+        return total;
     }
 
     public double GetProductionSpeed(bool useQuantity = true)
@@ -260,27 +276,21 @@ public abstract class ProducingBuilding : BuildingBase
                 staticmodifier.BaseStaticModifiersObj.EffectBody.Execute(new(District, Province, parentscopetype: ScriptScopeType.Building, building: this));
             }
         }
+
+        value_executionstate = new ExecutionState(District, Province, parentscopetype: ScriptScopeType.Building, building: this);
+        //var scaleby_executionstate = new ExecutionState(District, this);
+        foreach (var upgrade in Upgrades)
+        {
+            foreach (var modifiernode in upgrade.LuaBuildingUpgradeObj.ModifierNodes)
+            {
+                var value = (double)modifiernode.GetValue(value_executionstate, upgrade.Level);
+                UpdateOrAddModifier((BuildingModifierType)modifiernode.buildingModifierType!, value);
+            }
+        }
     }
 
     public async ValueTask<TaskResult> TickRecipe() {
-        Modifiers = new();
-
-        var executionstate = new ExecutionState(District, Province, parentscopetype: ScriptScopeType.Building, building: this);
-
-        if (Upgrades is not null)
-        {
-            foreach (var upgrade in Upgrades)
-            {
-                foreach (var modifiernode in upgrade.LuaBuildingUpgradeObj.ModifierNodes)
-                {
-                    var value = (double)modifiernode.GetValue(executionstate);
-                    UpdateOrAddModifier((BuildingModifierType)modifiernode.buildingModifierType!, value);
-                }
-            }
-        }
-        else
-            Upgrades = new();
-
+        UpdateModifiers();
 
         double rate = GetRateForProduction();
         if (!Recipe.Inputcost_Scaleperlevel)

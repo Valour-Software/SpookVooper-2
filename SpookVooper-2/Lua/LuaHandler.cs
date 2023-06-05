@@ -658,6 +658,7 @@ public static class LuaHandler
             {
                 Name = name,
                 Recipes = new(),
+                Upgrades = new(),
                 OnlyGovernorCanBuild = Convert.ToBoolean(table.GetValue("onlygovernorcanbuild") ?? "false"),
                 UseBuildingSlots = Convert.ToBoolean(table.GetValue("usebuildingslots") ?? "true"),
                 BuildingCosts = HandleDictExpression((LuaTable)table["buildingcosts"]),
@@ -668,11 +669,41 @@ public static class LuaHandler
             var recipes = (LuaTable)table["recipes"];
             foreach (string recipe in recipes.Values.Select(x => x.Value))
                 building.Recipes.Add(GameDataManager.BaseRecipeObjs[recipe]);
+            var upgrades = (LuaTable)table["upgrades"];
+            if (upgrades is not null)
+            {
+                foreach (string upgradeid in upgrades.Values.Select(x => x.Value))
+                    building.Upgrades.Add(GameDataManager.BaseBuildingUpgradesObjs[upgradeid]);
+            }
+
             if (table["base_efficiency"] is not null)
                 building.BaseEfficiency = HandleSyntaxExpression((LuaTable)table["base_efficiency"]);
 
             building.type = Enum.Parse<BuildingType>(table["type"].Value);
+
+            if (building.type == BuildingType.Mine)
+            {
+                building.Upgrades.Add(GameDataManager.BaseBuildingUpgradesObjs["mine_throughput_upgrade"]);
+                building.Upgrades.Add(GameDataManager.BaseBuildingUpgradesObjs["mine_efficiency_upgrade"]);
+            }
+
             GameDataManager.BaseBuildingObjs[building.Name] = building;
+        }
+    }
+
+    public static void HandleBuildingUpgradeFile(string content, string filename)
+    {
+        foreach (var (table, name) in HandleFile(content, filename))
+        {
+            var upgrade = new LuaBuildingUpgrade()
+            {
+                Id = name,
+                Name = table.GetValue("name"),
+                Costs = HandleDictExpression((LuaTable)table["costs"]),
+                ModifierNodes = HandleModifierNodes((LuaTable)table["modifiers"])
+            };
+
+            GameDataManager.BaseBuildingUpgradesObjs[upgrade.Id] = upgrade;
         }
     }
 

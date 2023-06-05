@@ -6,14 +6,9 @@ using SV2.Database.Models.Economy;
 using Microsoft.EntityFrameworkCore;
 using SV2.Database.Managers;
 using SV2.Scripting;
+using DistrictModifier = Shared.Models.Districts.DistrictModifier;
 
 namespace SV2.Database.Models.Districts;
-
-public class DistrictModifier
-{
-    public DistrictModifierType ModifierType { get; set; }
-    public double Amount { get; set; }  
-}
 
 public class District
 {

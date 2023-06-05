@@ -32,4 +32,16 @@ public class StaticModifier
             html += $"<br/><span class'modifier-tooltip-remainingtime'>1 Week left</span>";
         return html;
     }
+
+    public Shared.Models.Districts.StaticModifier ToModel()
+    {
+        return new()
+        {
+            Decay = Decay,
+            StartDate = StartDate,
+            Duration = Duration,
+            ScaleBy = ScaleBy,
+            LuaStaticModifierObjId = LuaStaticModifierObjId
+        };
+    }
 }

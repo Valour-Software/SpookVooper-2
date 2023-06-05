@@ -17,6 +17,7 @@ public class LuaBuilding
 
     [JsonIgnore]
     public List<BaseRecipe> Recipes { get; set; }
+    public List<LuaBuildingUpgrade> Upgrades { get; set; }
     public string PrintableName => Name.Replace("building_", "").Replace("_", " ").ToTitleCase();
     public bool OnlyGovernorCanBuild { get; set; }
     public ExpressionNode? BaseEfficiency { get; set; }
@@ -24,11 +25,29 @@ public class LuaBuilding
     public string MustHaveResource { get; set; }
     public bool ApplyStackingBonus { get; set; }
 
-    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, District district, Province province, int levels) {
+    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, District district, Province province, ProducingBuilding? building, int levels) {
         Dictionary<string, double> totalresources = new();
         Dictionary<string, decimal> changesystemvarsby = new Dictionary<string, decimal>() {
-            { @"province.buildings.totaloftype[""infrastructure""]", 0.0m }
+            { @"province.buildings.totaloftype[""infrastructure""]", 0.0m },
+            { "upgrade.level", 0.0m }
         };
+
+        // do we have upgrades
+        if (building is not null && building.Upgrades.Count > 0)
+        {
+            // cry a bit
+            // get total cost of resources for the upgrades
+            foreach (var upgrade in building.Upgrades)
+            {
+                foreach ((var resource, var amount) in upgrade.LuaBuildingUpgradeObj.GetConstructionCost(entity, district, province, building, upgrade, upgrade.Level))
+                {
+                    if (!totalresources.ContainsKey(resource))
+                        totalresources[resource] = 0;
+                    totalresources[resource] += ((double)amount) * levels;
+                }
+            }
+        }
+
         for (int i = 0; i < levels; i++) {
             var costs = BuildingCosts.Evaluate(new ExecutionState(district, province, changesystemvarsby));
             foreach ((var resource, var amount) in costs) {
@@ -36,19 +55,21 @@ public class LuaBuilding
                     totalresources[resource] = 0;
                 totalresources[resource] += (double)amount;
             }
-            changesystemvarsby["province.buildings.totaloftype[\"infrastructure\"]"] += 1.0m;
+
+            if (Name == "building_infrastructure")
+                changesystemvarsby["province.buildings.totaloftype[\"infrastructure\"]"] += 1.0m;
         }
         return totalresources;
     }
 
-    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, District district, Province province, int levels) {
+    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, District district, Province province, ProducingBuilding? building, int levels) {
         if (levels <= 0)
             return new(false, "The amount of levels you wish to build must be greater than 0!");
 
         if (OnlyGovernorCanBuild && !province.CanManageBuildingRequests(caller))
             return new(false, $"Only the Governor of {province.Name} can build this building!");
 
-        var costs = GetConstructionCost(buildas, district, province, levels);
+        var costs = GetConstructionCost(buildas, district, province, building, levels);
 
         // check for resources
         foreach ((var resource, var amount) in costs) {
@@ -66,11 +87,11 @@ public class LuaBuilding
     }
 
     public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, District district, Province province, int levels, ProducingBuilding? building = null) {
-        var canbuild = await CanBuild(buildas, caller, district, province, levels);
+        var canbuild = await CanBuild(buildas, caller, district, province, building, levels);
         if (!canbuild.Success)
             return new(false, canbuild.Message);
 
-        var costs = GetConstructionCost(buildas, district, province, levels);
+        var costs = GetConstructionCost(buildas, district, province, building, levels);
         foreach ((var resource, var amount) in costs) {
             await buildas.ChangeResourceAmount(resource, -amount, "Construction");
         }

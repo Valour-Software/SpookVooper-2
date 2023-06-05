@@ -11,7 +11,6 @@
 @using SV2.Models.Provinces
 @using SV2.Models.States
 @using SV2.Database.Models.Economy
-@using SV2.Database.Models.Districts.Modifiers
 @using SV2.Database.Models.Government
 @using SV2.Database.Models.Factories
 @using SV2.Scripting;
@@ -29,5 +28,8 @@
 @using SV2
 @using Humanizer.Inflections
 @using Humanizer
+@using ProvinceModifierType = Shared.Models.Districts.ProvinceModifierType;
+@using DistrictModifierType = Shared.Models.Districts.Modifiers.DistrictModifierType;
+@using ProvinceMetadata = Shared.Models.Districts.ProvinceMetadata;
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @addTagHelper *, SV2

@@ -1,8 +1,8 @@
 ﻿simple_factory_throughput_upgrade = {
-    name = "Increase Simple Factory's Throughput"
+    name = "Increase Throughput"
     costs = {
         add_locals = {
-			cost_increase = 1.3^building.level
+			cost_increase = 1.3^upgrade.level
 		}
 		steel = 3000 * get_local("cost_increase")
 		simple_components = 1500 * get_local("cost_increase")
@@ -15,10 +15,10 @@
 }
 
 simple_factory_efficiency_upgrade = {
-    name = "Increase Simple Factory's Efficiency"
+    name = "Increase Efficiency"
     costs = {
         add_locals = {
-			cost_increase = 1.4^building.level
+			cost_increase = 1.4^upgrade.level
 		}
 		simple_components = 2500 * get_local("cost_increase")
 		advanced_components = 450 * get_local("cost_increase")
@@ -29,10 +29,10 @@ simple_factory_efficiency_upgrade = {
 }
 
 advanced_factory_throughput_upgrade = {
-    name = "Increase Advanced Factory's Throughput"
+    name = "Increase Throughput"
     costs = {
         add_locals = {
-			cost_increase = 1.3^building.level
+			cost_increase = 1.3^upgrade.level
 		}
 		steel = 9000 * get_local("cost_increase")
 		simple_components = 5000 * get_local("cost_increase")
@@ -45,10 +45,10 @@ advanced_factory_throughput_upgrade = {
 }
 
 advanced_factory_efficiency_upgrade = {
-    name = "Increase Advanced Factory's Efficiency"
+    name = "Increase Efficiency"
     costs = {
         add_locals = {
-			cost_increase = 1.4^building.level
+			cost_increase = 1.4^upgrade.level
 		}
 		simple_components = 8000 * get_local("cost_increase")
 		advanced_components = 1500 * get_local("cost_increase")

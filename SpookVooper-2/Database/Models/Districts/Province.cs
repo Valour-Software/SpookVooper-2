@@ -8,19 +8,9 @@ using SV2.Managers;
 using SV2.Scripting.LuaObjects;
 using SV2.Database.Models.Users;
 using SV2.Scripting;
+using ProvinceModifier = Shared.Models.Districts.ProvinceModifier;
 
 namespace SV2.Database.Models.Districts;
-
-public enum TerrainType
-{
-    Plains = 1,
-    Mountain = 2,
-    Hills = 3,
-    Urban = 4,
-    Forests = 5,
-    River = 6,
-    Marsh = 7
-}
 
 public class ProvinceConsumerGoodsData
 {
@@ -608,42 +598,32 @@ public class Province
             }
         }
     }
-}
 
-public class ProvinceModifier
-{
-    public ProvinceModifierType ModifierType { get; set; }
-    public double Amount { get; set; }
-}
-
-/// <summary>
-/// Enum of all modifiers in the Province scope
-/// "Factor" means a % effect, if something does not have "Factor" in its name then it's just adding to the modifier
-/// </summary>
-public enum ProvinceModifierType
-{
-    BuildingSlots,
-    BuildingSlotsFactor,
-    BuildingSlotsExponent,
-    FertileLandFactor,
-    MineQuantityCap,
-    MineQuantityGrowthRateFactor,
-    MineThroughputFactor,
-    FarmQuantityCap,
-    FarmQuantityGrowthRateFactor,
-    FarmThroughputFactor,
-    FactoryQuantityCap,
-    FactoryQuantityGrowthRateFactor,
-    FactoryThroughputFactor,
-    FactoryEfficiencyFactor,
-    FactoryEfficiency,
-    AllProducingBuildingThroughputFactor,
-    MigrationAttractionFactor,
-    OverPopulationModifierExponent,
-    OverPopulationModifierPopulationBase,
-    MigrationAttraction,
-    DevelopmentValue,
-    ConsumerGoodsConsumptionFactor,
-    ConsumerGoodsModifierFactor,
-    InfrastructureThroughputFactor
+    public Shared.Models.Districts.Province ToModel()
+    {
+        return new()
+        {
+            Id = Id,
+            Name = Name,
+            DistrictId = DistrictId,
+            BuildingSlots = BuildingSlots,
+            Population = Population,
+            Description = Description,
+            GovernorId = GovernorId,
+            StateId = StateId,
+            DevelopmentValue = DevelopmentValue,
+            BaseDevelopmentValue = BaseDevelopmentValue,
+            LastTickDevelopmentValue = LastTickDevelopmentValue,
+            MigrationAttraction = MigrationAttraction,
+            BasePropertyTax = BasePropertyTax,
+            PropertyTaxPerSize = PropertyTaxPerSize,
+            Modifiers = Modifiers,
+            StaticModifiers = StaticModifiers.Select(x => x.ToModel()).ToList(),
+            Metadata = Metadata,
+            MonthlyEstimatedMigrants = MonthlyEstimatedMigrants,
+            RankByDevelopment = RankByDevelopment,
+            RankByMigrationAttraction = RankByMigrationAttraction,
+            BuildingSlotsUsed = BuildingSlotsUsed
+        };
+    }
 }

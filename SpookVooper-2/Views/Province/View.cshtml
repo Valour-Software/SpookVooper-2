@@ -197,24 +197,11 @@
                 }
                 <tr class="mergedrow dividertop">
                     <th class="infobox-row-name">Base Property Tax</th>
-                    @if (Model.State is not null)
-                    {
-                        <td class="infobox-row-value">@($"¢{totalbase:n0}") @($"(¢{Model.BasePropertyTax ?? 0:n0} + ¢{Model.State.BasePropertyTax ?? 0:n0} + ¢{Model.District.BasePropertyTax ?? 0:n0})")</td>
-                    }
-                    else {
-                        <td class="infobox-row-value">@($"¢{totalbase:n0}")</td>
-                    }
+                    <td class="infobox-row-value">@($"¢{totalbase:n0}") @($"(¢{Model.BasePropertyTax ?? 0:n0} + ¢{Model.State?.BasePropertyTax ?? 0:n0} + ¢{Model.District.BasePropertyTax ?? 0:n0})")</td>
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Property Tax per Building Size</th>
-                    @if (Model.State is not null)
-                    {
-                        <td class="infobox-row-value">@($"¢{totalpersize:n0}") @($"(¢{Model.PropertyTaxPerSize ?? 0:n0} + ¢{Model.State.PropertyTaxPerSize ?? 0:n0} + ¢{Model.District.PropertyTaxPerSize ?? 0:n0})")</td>
-                    }
-                    else
-                    {
-                        <td class="infobox-row-value">@($"¢{totalpersize:n0}")</td>
-                    }
+                    <td class="infobox-row-value">@($"¢{totalpersize:n0}") @($"(¢{Model.PropertyTaxPerSize ?? 0:n0} + ¢{Model.State?.PropertyTaxPerSize ?? 0:n0} + ¢{Model.District.PropertyTaxPerSize ?? 0:n0})")</td>
                 </tr>
             </tbody>
         </table>

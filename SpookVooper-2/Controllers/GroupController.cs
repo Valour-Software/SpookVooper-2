@@ -56,6 +56,11 @@ public class GroupController : SVController
     public IActionResult View(long id)
     {
         Group? group = Group.Find(id);
+        if (group is null)
+        {
+            StatusMessage = $"Group with id {id} not found!";
+            return Redirect("/");
+        }
         return View(group);
     }
 

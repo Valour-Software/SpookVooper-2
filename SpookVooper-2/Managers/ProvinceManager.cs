@@ -35,21 +35,6 @@ public class DevelopmentMapColor
     }
 }
 
-public class ProvinceMetadata
-{
-    [JsonIgnore]
-    public long Id { get; set; }
-
-    [JsonPropertyName("resources")]
-    public Dictionary<string, long> Resources { get; set; }
-
-    [JsonPropertyName("terrian")]
-    public string TerrianType { get; set; }
-
-    [JsonPropertyName("adjacencies")]
-    public List<long> Adjacencies { get; set; }
-}
-
 public class ProvinceManager
 {
     public static Dictionary<long, ProvinceMetadata> ProvincesMetadata = new();

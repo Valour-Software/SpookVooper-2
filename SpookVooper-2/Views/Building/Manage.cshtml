@@ -41,6 +41,33 @@
 
     .mergedrow th {
     }
+
+    .buildings {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .building {
+        width: 300px;
+        height: 285px;
+        border-radius: 18px;
+        margin: 8px;
+        background-color: rgba(0,0,0,0.3);
+        padding: 16px;
+    }
+
+    .resource-row {
+        width: 100%;
+    }
+
+    .buildingcosts {
+        flex-direction: column;
+        padding-left: 2px;
+        padding-right: 2px;
+        text-align: start;
+        margin-left: 20px;
+    }
 </style>
 
 <div class="d-flex flex-row align-content-center" style="width:100%">
@@ -120,6 +147,42 @@
 
         <br />
         <br />
+
+        <div class="d-flex justify-content-evenly">
+            @foreach (var luaupgrade in Model.Building.BuildingObj.Upgrades)
+            {
+                BuildingUpgrade? upgrade = Model.Building.Upgrades.FirstOrDefault(x => x.LuaBuildingUpgradeId == luaupgrade.Id);
+                <div class="building">
+                    <p style="text-align: center;margin: 0px;">@luaupgrade.Name (Level @(upgrade is null ? 0 : upgrade.Level))</p>
+                    <span>Effects Per Level (noncompounding):</span>
+                    <br />
+                    <div class="buildingcosts" style="margin-bottom:8px;height:50px;">
+                        @foreach (var item in luaupgrade.ModifierNodes) {
+                            @Html.Raw(item.GenerateHTMLForListing(new(null, null)));
+                            <br />
+                        }
+                    </div>
+                    <span>Costs to upgrade:</span>
+                    <br/>
+                    <div class="buildingcosts" style="height: 75px;">
+                        @foreach ((var resource, var amount) in luaupgrade.GetConstructionCost(Model.Building.Owner, Model.Building.District, Model.Building.Province, Model.Building, upgrade, 1))
+                        {
+                            <div class="resource-row">
+                                <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                                <span style="align-self: flex-end">@($"{amount:n0}")</span>
+                            </div>
+                        }
+                    </div>
+                    <div>
+                        <center>
+                            <a href="/Building/@Model.BuildingId/Upgrade/@luaupgrade.Id">
+                                <button class="btn btn-outline-warning" style="margin-top: 10px;">Upgrade</button>
+                            </a>
+                        </center>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 
     <!-- Rightmost column -->
@@ -188,7 +251,7 @@
                 }
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Throughput</th>
-                    <td class="infobox-row-value has-expanded-info" data-bs-toggle="modal" data-bs-target="#ThroughputModal">@($"{Model.Building.ThroughputFactor:n2}")x</td>
+                    <td class="infobox-row-value has-expanded-info" data-bs-toggle="modal" data-bs-target="#ThroughputModal">@($"{Model.Building.ThroughputFactor:n3}")x</td>
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Levels</th>
@@ -249,6 +312,20 @@
                         trclass = "mergedrow";
                     }
                 }
+                @{
+                    var province = Model.Building.Province;
+                    var totalbase = (province.BasePropertyTax ?? 0) + (province.State is not null ? province.State.BasePropertyTax ?? 0 : 0) + (province.District.BasePropertyTax ?? 0);
+                    var totalpersize = (province.PropertyTaxPerSize ?? 0) + (province.State is not null ? province.State.PropertyTaxPerSize ?? 0 : 0) + (province.District.PropertyTaxPerSize ?? 0);
+                    totalpersize *= Model.Building.Size * Model.Building.GetThroughputFromUpgrades();
+                }
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">Base Property Tax</th>
+                    <td class="infobox-row-value">@($"¢{totalbase:n0}")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Property Tax From Building's' Size</th>
+                    <td class="infobox-row-value">@($"¢{totalpersize:n0}")</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -288,24 +365,53 @@
                                     <span> (maxed)</span>
                                 }
                             </td>
-                            <td>+@(
-                                   $"{EconomicsofScale:n2}"
-                                   )</td>
-                            <td>@(
-                                    $"{runningtotal:n2}"
-                                    )</td>
+                            <td>+@($"{EconomicsofScale:n3}")</td>
+                            <td>@($"{runningtotal:n3}")x</td>
                         </tr>
                     }
 
-                    double runningtotalforstacking = 1;
-                    var provincetypestoget = new List<ProvinceModifierType?>() { ProvinceModifierType.AllProducingBuildingThroughputFactor };
-                    provincetypestoget.Add(Model.Building.BuildingType switch
+                    var throughputtype = Model.Building.BuildingType switch
                     {
                         BuildingType.Mine => ProvinceModifierType.MineThroughputFactor,
                         BuildingType.Factory => ProvinceModifierType.FactoryThroughputFactor,
                         BuildingType.Farm => ProvinceModifierType.FarmThroughputFactor,
                         BuildingType.Infrastructure => ProvinceModifierType.InfrastructureThroughputFactor
-                    });
+                    };
+
+                    double runningtotalforstacking = 1;
+                    if (Model.Building.Province.Modifiers.ContainsKey(throughputtype))
+                    {
+                        var value = Model.Building.Province.Modifiers[throughputtype].Amount;
+                        runningtotalforstacking += value;
+                        <tr>
+                            <td>Province's Infrastructure</td>
+                            <td>+@($"{value:n3}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n3}")x</td>
+                        </tr>
+                    }
+
+                    runningtotal *= runningtotalforstacking;
+
+                    runningtotalforstacking = 1;
+                    @foreach (var upgrade in Model.Building.Upgrades)
+                    {
+                        @foreach (var node in upgrade.LuaBuildingUpgradeObj.ModifierNodes)
+                        {
+                            @if (node.buildingModifierType == BuildingModifierType.ThroughputFactor)
+                            {
+                                var value = (double)node.GetValue(new(null, null)) * upgrade.Level;
+                                runningtotalforstacking += value;
+                                <tr>
+                                    <td>@upgrade.LuaBuildingUpgradeObj.Name (@upgrade.Level Levels)</td>
+                                    <td>+@($"{value:n3}")</td>
+                                    <td>@($"{runningtotal * runningtotalforstacking:n3}")x</td>
+                                </tr>
+                            }
+                        }
+                    }
+
+                    var provincetypestoget = new List<ProvinceModifierType?>() { ProvinceModifierType.AllProducingBuildingThroughputFactor };
+                    provincetypestoget.Add(throughputtype);
 
 
                     @foreach (var item in Model.Building.Province.GetStaticModifiersOfTypes(provincetypestoget, null, false))
@@ -313,13 +419,12 @@
                         runningtotalforstacking += item.value - 1;
                         <tr>
                             <td>@item.modifiername</td>
-                            <td>+@($"{item.value:n2}")</td>
-                            <td>@($"{runningtotal * runningtotalforstacking:n2}")</td>
+                            <td>+@($"{item.value:n3}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n3}")</td>
                         </tr>
                     }
 
                     runningtotal *= runningtotalforstacking;
-
 
                     runningtotalforstacking = 1;
                     var districttypestoget = new List<DistrictModifierType?>() { DistrictModifierType.AllProducingBuildingThroughputFactor };
@@ -336,8 +441,8 @@
                         runningtotalforstacking += item.value;
                         <tr>
                             <td>@item.modifiername</td>
-                            <td>+@($"{item.value:n2}")</td>
-                            <td>@($"{runningtotal * runningtotalforstacking:n2}")</td>
+                            <td>+@($"{item.value:n3}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n3}")</td>
                         </tr>
                     }
 
@@ -349,8 +454,8 @@
                         runningtotalforstacking += (double)node.GetValue(state);
                         <tr>
                             <td>@item.BaseStaticModifiersObj.Name</td>
-                            <td>+@($"{node.GetValue(state):n2}")</td>
-                            <td>@($"{runningtotal * runningtotalforstacking:n2}")</td>
+                            <td>+@($"{node.GetValue(state):n3}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n3}")</td>
                         </tr>
                     }
                 }

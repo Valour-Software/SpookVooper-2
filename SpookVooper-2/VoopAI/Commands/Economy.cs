@@ -62,7 +62,7 @@ class EconomyCommands : CommandModuleBase
                 .AddRow()
                     .AddText("Base Property Taxes", $"¢{buildings.Sum(x => district.BasePropertyTax ?? 0):n0}")
                 .AddRow()
-                    .AddText("Per Level Property Taxes", $"¢{buildings.Sum(x => district.PropertyTaxPerSize * x.Size ?? 0):n0}");
+                    .AddText("Per Level Property Taxes", $"¢{buildings.Sum(x => district.PropertyTaxPerSize * x.Size * x.GetThroughputFromUpgrades() ?? 0):n0}");
 
         await ctx.ReplyAsync(embed);
     }
