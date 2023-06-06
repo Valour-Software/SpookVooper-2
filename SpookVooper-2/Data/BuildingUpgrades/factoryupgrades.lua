@@ -9,7 +9,7 @@
 		advanced_components = 200 * get_local("cost_increase")
     }
     modifiers = {
-        building.throughputfactor = 0.15
+        building.throughputfactor = 0.175
 		building.efficiencyfactor = -0.03
     }
 }
@@ -36,10 +36,10 @@ advanced_factory_throughput_upgrade = {
 		}
 		steel = 9000 * get_local("cost_increase")
 		simple_components = 5000 * get_local("cost_increase")
-		advanced_components = 900 * get_local("cost_increase")
+		advanced_components = 800 * get_local("cost_increase")
     }
     modifiers = {
-        building.throughputfactor = 0.2
+        building.throughputfactor = 0.25
 		building.efficiencyfactor = -0.04
     }
 }

@@ -397,8 +397,8 @@ public class Province
             {
                 var buff = consumergood.consumerGood.PopGrowthRateModifier * (1 + GetModifierValue(ProvinceModifierType.ConsumerGoodsModifierFactor));
                 totalgrowthbuff += buff;
-                BirthRate += Math.Sqrt(buff*100)/150;
-                data.BuffToBirthRate = Math.Sqrt(buff * 100) / 150;
+                BirthRate += Math.Sqrt(buff*100)/140;
+                data.BuffToBirthRate = Math.Sqrt(buff * 100) / 140;
                 data.BuffToGrowth = buff;
                 if (UseResources)
                 {
