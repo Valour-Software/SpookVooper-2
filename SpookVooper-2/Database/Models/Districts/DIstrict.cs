@@ -215,18 +215,38 @@ public class District
         int simplefactories = 0;
         int advancedfactories = 0;
         int infrastructure = 0;
+        double minesswiththroughputfromupgrades = 0;
+        double simplefactoriesswiththroughputfromupgrades = 0;
+        double advancedfactorieswiththroughputfromupgrades = 0;
+        double infrastructurewiththroughputfromupgrades = 0;
         foreach (var province in Provinces)
         {
             foreach (var building in province.GetBuildings())
             {
-                if (building.BuildingType == BuildingType.Mine) mines += building.Size;
+                if (building.BuildingType == BuildingType.Mine)
+                {
+                    mines += building.Size;
+                    minesswiththroughputfromupgrades += building.Size * building.GetThroughputFromUpgrades();
+                }
                 if (building.BuildingType == BuildingType.Factory)
                 {
-                    if (building.LuaBuildingObjId.Contains("advanced")) advancedfactories += building.Size;
-                    else simplefactories += building.Size;
+                    if (building.LuaBuildingObjId.Contains("advanced"))
+                    {
+                        advancedfactories += building.Size;
+                        advancedfactorieswiththroughputfromupgrades += building.Size * building.GetThroughputFromUpgrades();
+                    }
+                    else
+                    {
+                        simplefactories += building.Size;
+                        simplefactoriesswiththroughputfromupgrades += building.Size * building.GetThroughputFromUpgrades();
+                    }
                 }
 
-                if (building.BuildingType == BuildingType.Infrastructure) infrastructure += building.Size;
+                if (building.BuildingType == BuildingType.Infrastructure)
+                {
+                    infrastructure += building.Size;
+                    infrastructurewiththroughputfromupgrades += building.Size * building.GetThroughputFromUpgrades();
+                }
             }
 
             var governor = province.GetGovernor();
@@ -241,10 +261,10 @@ public class District
                 }
             }
         }
-        score += mines * Defines.NScore[NScore.ECONOMIC_SCORE_PER_MINE];
-        score += simplefactories * Defines.NScore[NScore.ECONOMIC_SCORE_PER_SIMPLE_FACTORY];
-        score += advancedfactories * Defines.NScore[NScore.ECONOMIC_SCORE_PER_ADVANCED_FACTORY];
-        score += infrastructure * Defines.NScore[NScore.ECONOMIC_SCORE_PER_INFRASTRUCTURE];
+        score += minesswiththroughputfromupgrades * Defines.NScore[NScore.ECONOMIC_SCORE_PER_MINE];
+        score += simplefactoriesswiththroughputfromupgrades * Defines.NScore[NScore.ECONOMIC_SCORE_PER_SIMPLE_FACTORY];
+        score += advancedfactorieswiththroughputfromupgrades * Defines.NScore[NScore.ECONOMIC_SCORE_PER_ADVANCED_FACTORY];
+        score += infrastructurewiththroughputfromupgrades * Defines.NScore[NScore.ECONOMIC_SCORE_PER_INFRASTRUCTURE];
         return new()
         {
             District = this,

@@ -422,6 +422,10 @@ public class Province
 
         PopulationGrowth *= District.GetModifierValue(DistrictModifierType.PopulationGrowthSpeedFactor) + 1;
 
+        var used = (double)BuildingSlotsUsed;
+        var ratio = used / (double)BuildingSlots;
+        PopulationGrowth *= (Math.Max(0, ratio - 0.3) * 0.75) + 1;
+
         if (District.CapitalProvinceId == Id)
             PopulationGrowth *= 2.5;
 
@@ -447,7 +451,7 @@ public class Province
 
         var used = (double)BuildingSlotsUsed;
         var ratio = used / (double)BuildingSlots;  
-        attraction *= Math.Max(0, ratio - 0.3) + 1;
+        attraction *= (Math.Max(0, ratio - 0.3)*1.2) + 1;
 
         if (GetOverpopulationModifier() > 0.25)
         {
