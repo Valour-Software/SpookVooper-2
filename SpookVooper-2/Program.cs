@@ -271,8 +271,8 @@ foreach (var onaction in GameDataManager.LuaOnActions[SV2.Scripting.LuaObjects.O
 }
 
 List<BaseEntity> entities = new();
-entities.AddRange(DBCache.GetAll<SVUser>());
-entities.AddRange(DBCache.GetAll<Group>());
+//entities.AddRange(DBCache.GetAll<SVUser>());
+//entities.AddRange(DBCache.GetAll<Group>());
 
 Console.WriteLine("Migrating Eco");
 Console.WriteLine($"Total Entites to migrate: {entities.Count}");
