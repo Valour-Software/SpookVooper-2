@@ -20,17 +20,17 @@ public class VoopAI
 #if DEBUG
     public static long PlanetId = 14735182234910720;
 #else
-    public static long PlanetId = 17161193956048896;
+    public static long PlanetId = 14735182234910720;//17161193956048896;
 #endif
 
 #if DEBUG
-    public static long SVCurrencyId = 19697833228894208;
+	public static long SVCurrencyId = 19697833228894208;
 #else
-    public static long SVCurrencyId = 19653360100048896;
+    public static long SVCurrencyId = 19697833228894208;//19653360100048896;
 #endif
-    //public static Currency SVCurrency = null;
+	//public static Currency SVCurrency = null;
 
-    public static async Task Main()
+	public static async Task Main()
     {
         if (false)
         {
@@ -60,8 +60,9 @@ public class VoopAI
         //ValourNetClient.BaseUrl = "http://localhost:5000/";
         ValourNetClient.AddPrefix("/");
         ValourNetClient.ExecuteMessagesInParallel = true;
+		ValourNetClient.OnlyRunCommandsIfFromThisUserId = 12201879245422592;
 
-        await ValourNetClient.Start(ValourConfig.instance.Email, ValourConfig.instance.BotPassword);
+		await ValourNetClient.Start(ValourConfig.instance.Email, ValourConfig.instance.BotPassword);
 
         await EcoAccount.GetPlanetUserAccountsAsync(PlanetId);
 
