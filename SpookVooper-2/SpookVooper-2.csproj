@@ -32,7 +32,7 @@
 
 	<ItemGroup Condition="true">
 		<PackageReference Include="Valour.Net" Version="0.6.9.4" />
-		<PackageReference Include="Valour.Api" Version="0.1.9" />
+		<PackageReference Include="Valour.Api" Version="0.2.0.1" />
 	</ItemGroup>
 	
 	<ItemGroup Condition="false">
