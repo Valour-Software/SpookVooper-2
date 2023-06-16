@@ -27,7 +27,7 @@ namespace SV2.Workers
             {
                 Task task = Task.Run(async () =>
                 {
-                    while (true)
+                    while (!stoppingToken.IsCancellationRequested)
                     {
                         try
                         {
