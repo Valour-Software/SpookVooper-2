@@ -1,0 +1,103 @@
+﻿@using SV2.VoopAI
+@model SV2.Models.Users.JobOpeningsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Job Openings";
+}
+
+<div class="container vw-100">
+    <div class="col-12">
+        <div class="d-flex">
+            <div class="p-1 align-self-start flex-grow-1">
+                <h1>Job Openings</h1>
+            </div>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Building's Name</th>
+                    <th>Building Type</th>
+                    <th>Yearly Pay</th>
+                    <th>Status</th>
+                    <th>Apply</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var offer in Model.JobOpenings)
+                {
+                    <tr>
+                        <td>@offer.Building.Owner.Name</td>
+                        <td>@offer.Building.Name.Truncate(64)</td>
+                        @if (offer.Building.LuaBuildingObjId != "building_advanced_factory")
+                        {
+                            <td>@offer.Building.BuildingType.ToString()</td>
+                        }
+                        else
+                        {
+                            <td>Advanced Factory</td>
+                        }
+                        <td>@($"¢{offer.Role.Salary*24*365:n0}")</td>
+                        <td>
+                            @if (offer.JobApplication is null)
+                            {
+                                
+                            }
+                            else if (offer.JobApplication.Accepted)
+                            {
+                                <span>Accepted</span>
+                            }
+                            else
+                            {
+                                if (offer.JobApplication.Reviewed && !offer.JobApplication.Accepted)
+                                {
+                                    <span>Rejected</span>
+                                }
+                                else
+                                {
+                                    <span>Sent</span>
+                                }
+                            }
+                        </td>
+                        <td>
+                            @if (offer.JobApplication is not null)
+                            {
+                                @if (!offer.JobApplication.Reviewed)
+                                {
+                                    <a href="/User/UnApplyToJob?applicationid=@offer.JobApplication.Id">
+                                        <button class="btn btn-outline-warning">Unapply</button>
+                                    </a>
+                                }
+                                else
+                                {
+                                    if (offer.JobApplication.Accepted)
+                                    {
+                                        <a href="/User/AcceptJobOffer?applicationid=@offer.JobApplication.Id" style="text-decoration:none;">
+                                            <button class="btn btn-outline-success">Accept Job Offer</button>
+                                        </a>
+                                        <a href="/User/AcceptJobOffer?applicationid=@offer.JobApplication.Id" style="text-decoration:none;">
+                                            <button class="btn btn-outline-warning" style="display:inline-block;margin-left:6px;">Reject Job Offer</button>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="/User/RemoveJobApplication?applicationid=@offer.JobApplication.Id">
+                                            <button class="btn btn-outline-danger">Remove</button>
+                                        </a>
+                                    }
+                                }
+                            }
+                            else {
+                                <a href="/User/ApplyToJob?buildingid=@offer.Building.Id">
+                                    <button class="btn btn-outline-primary">Apply</button>
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -37,13 +37,27 @@ public class StatWorker : BackgroundService
                     try
                     {
                         var laststat = await _dbctx.Stats.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
-                        if (laststat is not null) {
+                        if (laststat is not null)
+                        {
                             while (DateTime.UtcNow.Subtract(laststat.Date).TotalMinutes < 60)
                             {
                                 await Task.Delay(60_000);
                             }
                         }
-                        // just do global ones for now
+
+                        foreach (var user in DBCache.GetAll<SVUser>())
+                        {
+                            _dbctx.Stats.Add(new Stat()
+                            {
+                                Date = DateTime.UtcNow,
+                                Id = IdManagers.StatIdGenerator.Generate(),
+                                TargetType = TargetType.User,
+                                StatType = StatType.Xp,
+                                Value = (long)user.Xp,
+                                TargetId = user.Id
+                            });
+                        }
+
                         _dbctx.Stats.Add(new Stat() { 
                             Date = DateTime.UtcNow, 
                             Id = IdManagers.StatIdGenerator.Generate(), 

@@ -129,6 +129,15 @@
                     <span asp-validation-for="RecipeId" class="text-danger"></span>
                 </div>
                 <br />
+
+                <div class="form-group">
+                    <label>Employee's Group Role</label>
+                    <span>Set to "None" to disallow people from applying to this job. You can only set to "None" if there's no employee, if there is, you must fire them using the button below!</span>
+                    <select asp-for="GroupRoleIdForEmployee" asp-items="Model.GroupRolesForEmployee" class="form-select form-control"></select>
+                    <span asp-validation-for="GroupRoleIdForEmployee" class="text-danger"></span>
+                </div>
+
+                <br />
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
@@ -138,10 +147,17 @@
 
         @if ((Model.Building.Owner.EntityType == EntityType.User && Model.Building.OwnerId == user.Id) || ((Group)Model.Building.Owner).IsOwner(user))
         {
-            <div class="row">
+
+
+            @if (Model.Building.EmployeeId is not null)
+            {
                 <div class="col-12 align-content-center text-center">
-                    <a asp-action="TransferBuilding" asp-controller="Building" asp-route-buildingid="@Model.Building.Id" class="btn btn-danger">Transfer Building</a>
+                    <a asp-action="FireEmployee" asp-controller="Building" asp-route-buildingid="@Model.Building.Id" class="btn btn-outline-danger">Fire Employee</a>
                 </div>
+                <br/>
+            }
+            <div class="col-12 align-content-center text-center">
+                <a asp-action="TransferBuilding" asp-controller="Building" asp-route-buildingid="@Model.Building.Id" class="btn btn-danger">Transfer Building</a>
             </div>
         }
 
@@ -223,6 +239,10 @@
                             <a asp-controller="Group" asp-action="View" asp-route-id="@Model.Building.OwnerId">@Model.Building.Owner.Name</a>
                         }
                     </td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Employee</th>
+                    <td class="infobox-row-value">@(Model.Building.Employee is not null ? Model.Building.Employee.Name : "No one")</td>
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Efficiency</th>
@@ -345,6 +365,16 @@
                         <td></td>
                         <td>1x</td>
                     </tr>
+
+                    @if (Model.Building.EmployeeId is not null)
+                    {
+                        runningtotal *= 1.15;
+                        <tr>
+                            <td>Employee Bonus</td>
+                            <td>x1.15</td>
+                            <td>@($"{runningtotal:n3}")x</td>
+                        </tr>
+                    }
 
                     if (Model.Building.BuildingObj.ApplyStackingBonus)
                     {

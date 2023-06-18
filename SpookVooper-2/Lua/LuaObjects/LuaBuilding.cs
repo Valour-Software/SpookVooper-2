@@ -120,6 +120,7 @@ public class LuaBuilding
                     DBCache.Put(mine.Id, mine);
                     DBCache.ProvincesBuildings[province.Id].Add(mine);
                     DBCache.dbctx.Mines.Add(mine);
+                    DBCache.ProducingBuildingsById[building.Id] = mine;
                     break;
                 case BuildingType.Factory:
                     building.Quantity = Defines.NProduction["BASE_FACTORY_QUANTITY"];
@@ -127,6 +128,7 @@ public class LuaBuilding
                     DBCache.Put(factory.Id, factory);
                     DBCache.ProvincesBuildings[province.Id].Add(factory);
                     DBCache.dbctx.Factories.Add(factory);
+                    DBCache.ProducingBuildingsById[building.Id] = factory;
                     break;
                 case BuildingType.Farm:
                     building.Quantity = Defines.NProduction["BASE_FARM_QUANTITY"];
@@ -134,6 +136,7 @@ public class LuaBuilding
                     DBCache.Put(farm.Id, farm);
                     DBCache.ProvincesBuildings[province.Id].Add(farm);
                     DBCache.dbctx.Farms.Add(farm);
+                    DBCache.ProducingBuildingsById[building.Id] = farm;
                     break;
                 case BuildingType.Infrastructure:
                     building.Quantity = 1;
@@ -141,6 +144,7 @@ public class LuaBuilding
                     DBCache.Put(infrastructure.Id, infrastructure);
                     DBCache.ProvincesBuildings[province.Id].Add(infrastructure);
                     DBCache.dbctx.Infrastructures.Add(infrastructure);
+                    DBCache.ProducingBuildingsById[building.Id] = infrastructure;
                     await building.Tick();
                     await building.TickRecipe();
                     province.UpdateModifiers();

@@ -223,7 +223,7 @@ public class StatsController : SVController
     public async Task<IActionResult> AllDistrictsGraphs()
     {
         var statsobjects = await _dbctx.Stats
-            .Where(x => x.TargetId != null)
+            .Where(x => x.TargetType == TargetType.District)
             .GroupBy(x => x.TargetId)
             .Select(x => new {
                 Key = (long)x.Key,
@@ -255,7 +255,7 @@ public class StatsController : SVController
         GenerateGraphWithMoreThanOneDataSet(ViewData, "Districts Population (30 days)", DistrictColors, DataTitles, "graph1", statsobjects.First().Items.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), Data);
 
         statsobjects = await _dbctx.Stats
-            .Where(x => x.TargetId != null)
+            .Where(x => x.TargetType == TargetType.District)
             .GroupBy(x => x.TargetId)
             .Select(x => new {
                 Key = (long)x.Key,
@@ -284,7 +284,7 @@ public class StatsController : SVController
         GenerateGraphWithMoreThanOneDataSet(ViewData, "Districts Total Building Slots (30 days)", DistrictColors, DataTitles, "graph2", statsobjects.First().Items.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), Data);
 
         statsobjects = await _dbctx.Stats
-            .Where(x => x.TargetId != null)
+            .Where(x => x.TargetType == TargetType.District)
             .GroupBy(x => x.TargetId)
             .Select(x => new {
                 Key = (long)x.Key,

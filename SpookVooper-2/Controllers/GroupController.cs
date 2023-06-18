@@ -405,7 +405,7 @@ public class GroupController : SVController
     }
 
     [UserRequired]
-    public IActionResult RemoveEntityFromRole(long groupid, long targetid, long roleid)
+    public async Task<IActionResult> RemoveEntityFromRole(long groupid, long targetid, long roleid)
     {
         var group = DBCache.Get<Group>(groupid);
         if (group == null) return RedirectBack($"Error: Group does not exist!");
@@ -413,6 +413,10 @@ public class GroupController : SVController
         var user = HttpContext.GetUser();
         var role = DBCache.Get<GroupRole>(roleid);
         var target = DBCache.FindEntity(targetid);
+
+        var buildings = DBCache.ProducingBuildingsById.Values.Where(x => x.EmployeeId == targetid && x.OwnerId == groupid && x.EmployeeGroupRoleId == roleid);
+        if (buildings.Count() > 0)
+            return RedirectBack("You can not remove a building employee from the role that was given to them by the building. You can fire the employee or change their role from the building manage page.");
 
         var result = group.RemoveEntityFromRole(user, target, role);
         return RedirectBack(result.Info);

@@ -92,7 +92,16 @@ public abstract class ProducingBuilding : BuildingBase
 {
     public ProducingBuilding() { }
     public long? EmployeeId { get; set; }
+
+    /// <summary>
+    /// The id of the group role that employees are auto-added to and get paid from
+    /// </summary>
+    [Column("employeegrouproleid")]
+    public long? EmployeeGroupRoleId { get; set; }
     public double Quantity { get; set; }
+
+    [NotMapped]
+    public SVUser? Employee => DBCache.Get<SVUser>(EmployeeId);
 
     [NotMapped]
     public Dictionary<BuildingModifierType, double> Modifiers { get; set; }
@@ -170,6 +179,9 @@ public abstract class ProducingBuilding : BuildingBase
             basevalue *= GetModifierValue(BuildingModifierType.ThroughputFactor) + 1.00;
             basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;
             basevalue *= District.GetModifierValue(DistrictModifierType.AllProducingBuildingThroughputFactor) + 1.00;
+
+            if (EmployeeId is not null)
+                basevalue *= 1.15;
             
             return basevalue;
         }

@@ -57,6 +57,11 @@ public class District
     [NotMapped]
     public Senator? Senator => DBCache.Get<Senator>(Id);
 
+    public double BasePopulationFromUsers { get; set; }
+
+    [NotMapped]
+    public double BaseProvincePopulation => BasePopulationFromUsers / Provinces.Count;
+
     [Column("governorid")]
     public long? GovernorId { get; set; }
 
@@ -144,6 +149,19 @@ public class District
 
     public void HourlyTick()
     {
+        var populationtarget = Citizens.Count() * 2_500_000.0;
+        var diff = populationtarget - BasePopulationFromUsers;
+
+        // 150,000/24 = 6250
+        if (diff > 6250 || diff < -6250)
+        {
+            var change = diff > 6250 ? 6250.0 : -6250.0;
+            change += diff * 0.005;
+            BasePopulationFromUsers += diff;
+        }
+        else
+            BasePopulationFromUsers += diff;
+
         double totalattractionpoints = Provinces.Sum(x => Math.Pow(x.MigrationAttraction, 1.025));
 
         // do migration
@@ -156,7 +174,7 @@ public class District
             double amountleavingmuit = 1;
             if (province.RankByDevelopment <= 15)
                 amountleavingmuit = 1 - (Math.Pow(17 - province.RankByDevelopment, 0.15) - 1);
-            var migration = province.Population * Defines.NProvince[NProvince.BASE_MIGRATION_RATE];
+            var migration = province.PopulationMultiplier * Defines.NProvince[NProvince.BASE_MIGRATION_RATE];
             totalmigration += migration*amountleavingmuit;
         }
 
@@ -171,15 +189,15 @@ public class District
             if (province.RankByDevelopment <= 15)
                 amountleavingmuit = 1 - (Math.Pow(17 - province.RankByDevelopment, 0.15) - 1);
 
-            double leaving = -(province.Population * Defines.NProvince[NProvince.BASE_MIGRATION_RATE] / 30 / 24);
+            double leaving = -(province.PopulationMultiplier * Defines.NProvince[NProvince.BASE_MIGRATION_RATE] / 30 / 24);
             leaving *= amountleavingmuit;
 
             double netchange = leaving;
             netchange += Math.Pow(province.MigrationAttraction, 1.025) * migrantsperattraction;
 
-            province.Population += (int)netchange;
+            province.PopulationMultiplier += netchange;
 
-            province.MonthlyEstimatedMigrants = (int)(netchange * 30 * 24);
+            province.MonthlyEstimatedMigrants = (int)(netchange * 30 * 24 * BaseProvincePopulation);
             totalchange += province.MonthlyEstimatedMigrants;
         }
     }

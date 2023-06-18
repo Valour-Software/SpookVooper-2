@@ -1,0 +1,76 @@
+﻿@using SV2.VoopAI
+@model SV2.Models.Users.JobOpeningsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "My Posted Job Openings";
+}
+
+<div class="container vw-100">
+    <div class="col-12">
+        <div class="d-flex">
+            <div class="p-1 align-self-start flex-grow-1">
+                <h1>My Posted Job Openings</h1>
+            </div>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User's name</th>
+                    <th>Boost to Throughput</th>
+                    <th>Building's Name</th>
+                    <th>Building Type</th>
+                    <th>Role</th>
+                    <th>Yearly Pay</th>
+                    <th>Accept</th>
+                    <th>Reject</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var offer in Model.JobOpenings)
+                {
+                    <tr>
+                        <th>@offer.User.Name</th>
+                        <td>15%</td>
+                        <td>@offer.Building.Name.Truncate(64)</td>
+                        @if (offer.Building.LuaBuildingObjId != "building_advanced_factory")
+                        {
+                            <td>@offer.Building.BuildingType.ToString()</td>
+                        }
+                        else
+                        {
+                            <td>Advanced Factory</td>
+                        }
+                        <td>@offer.Role.Name</td>
+                        <td>@($"¢{offer.Role.Salary * 24 * 365:n0}")</td>
+                        <td>
+                            @if (offer.JobApplication.Accepted)
+                            {
+                                <button class="btn btn-success" disabled>Accepted</button>
+                            }
+                            else
+                            {
+                                <a href="/User/AcceptUsersJobApplication?applicationid=@offer.JobApplication.Id">
+                                    <button class="btn btn-outline-success">Accept</button>
+                                </a>
+                            }
+                        </td>
+                        <td>
+                            @if (!offer.JobApplication.Accepted && offer.JobApplication.Reviewed)
+                            {
+                                <button class="btn btn-warning" disabled>Rejected</button>
+                            }
+                            else
+                            {
+                                <a href="/User/RejectUsersJobApplication?applicationid=@offer.JobApplication.Id">
+                                    <button class="btn btn-outline-warning">Reject</button>
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

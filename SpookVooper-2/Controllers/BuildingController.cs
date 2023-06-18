@@ -15,6 +15,10 @@ using Valour.Shared;
 using SV2.Database.Models.Districts;
 using SV2.Database.Models.Buildings;
 using SV2.Models.Groups;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using ChartJSCore.Models;
+using System.Linq;
 
 namespace SV2.Controllers;
 
@@ -39,7 +43,7 @@ public class BuildingController : SVController
         List<long> canbuildasids = new() { user.Id };
         canbuildasids.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.ManageBuildings)).Select(x => x.Id).ToList());
 
-        var buildings = DBCache.GetAllProducingBuildings().Where(x => canbuildasids.Contains(x.OwnerId));
+        var buildings = DBCache.ProducingBuildingsById.Values.Where(x => canbuildasids.Contains(x.OwnerId));
 
         // filiter for jacob
         if (user.ValourId == 12201879245422592)
@@ -116,20 +120,32 @@ public class BuildingController : SVController
             User = user
         };
 
-        return View(new BuildingManageModel() {
+        var managemodel = new BuildingManageModel()
+        {
             Building = building,
             Name = building.Name,
             Description = building.Description,
             RecipeId = building.RecipeId,
             BuildingId = building.Id,
-            createBuildingRequestModel = model,
-        });
+            createBuildingRequestModel = model
+        };
+
+        // only groups/corporations can have building employees
+        if (building.Owner.EntityType == EntityType.Group || building.Owner.EntityType == EntityType.Corporation) { 
+            var group = (Group)building.Owner;
+            var ownerauthority = group.GetAuthority(user);
+            managemodel.GroupRolesForEmployee = new();
+            managemodel.GroupRolesForEmployee.Add(new("None", "0"));
+            managemodel.GroupRolesForEmployee.AddRange(group.Roles.Where(x => x.Authority < ownerauthority).Select(x => new SelectListItem(x.Name, x.Id.ToString(), x.Id == building.EmployeeGroupRoleId)));
+        }
+
+        return View(managemodel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     [UserRequired]
-    public IActionResult Manage(BuildingManageModel model) {
+    public async Task<IActionResult> Manage(BuildingManageModel model) {
         var user = HttpContext.GetUser();
         var building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == model.BuildingId);
 
@@ -142,6 +158,41 @@ public class BuildingController : SVController
         building.Name = model.Name;
         building.Description = model.Description;
         building.RecipeId = model.RecipeId;
+
+        if (building.EmployeeGroupRoleId is not null)
+        {
+            if (model.GroupRoleIdForEmployee is null)
+            {
+                if (building.EmployeeGroupRoleId is not null)
+                {
+                    return RedirectBack("You must fire this building's employee before you can disable employment!");
+                }
+            }
+        }
+
+        if (model.GroupRoleIdForEmployee is not null)
+        {
+            var role = DBCache.Get<GroupRole>(model.GroupRoleIdForEmployee);
+            if (role.Salary < 2.0m)
+                return RedirectBack("The hourly pay (salary) of the role must be at or above the minimum wage (2 credits hourly)!");
+        }
+
+        if (building.EmployeeGroupRoleId is not null && model.GroupRoleIdForEmployee is null)
+        {
+            _dbctx.JobApplications.RemoveRange(await _dbctx.JobApplications.Where(x => x.BuildingId == building.Id).ToListAsync());
+            await _dbctx.SaveChangesAsync();
+        }
+
+        if (building.EmployeeId is not null && building.EmployeeGroupRoleId != model.GroupRoleIdForEmployee)
+        {
+            var fromrole = DBCache.Get<GroupRole>(building.EmployeeGroupRoleId);
+            var torole = DBCache.Get<GroupRole>(model.GroupRoleIdForEmployee);
+            var group = (Group)building.Owner;
+            group.RemoveEntityFromRole(group, building.Employee, fromrole, true);
+            torole.MembersIds.Add((long)building.EmployeeId);
+        }
+
+        building.EmployeeGroupRoleId = model.GroupRoleIdForEmployee;
 
         if (recipeidbefore != model.RecipeId)
         {
@@ -296,6 +347,32 @@ public class BuildingController : SVController
         return RedirectBack(result.Message);
     }
 
+    [HttpGet("/Building/FireEmployee/{buildingid}")]
+    [UserRequired]
+    public IActionResult FireEmployee(long buildingid)
+    {
+        SVUser user = HttpContext.GetUser();
+
+        ProducingBuilding building = DBCache.ProducingBuildingsById.Values.FirstOrDefault(x => x.Id == buildingid);
+
+        if (building == null)
+            return NotFound($"Error: Could not find {buildingid}");
+
+        var group = (Group)building.Owner;
+        var employee = building.Employee;
+
+        foreach (var role in group.Roles)
+        {
+            if (role.MembersIds.Contains(employee.Id))
+                group.RemoveEntityFromRole(group, user, role, true);
+        }
+
+        group.MembersIds.Remove(employee.Id);
+        building.EmployeeId = null;
+
+        return RedirectBack($"Fired {employee.Name}");
+    }
+
     [HttpGet("/Building/TransferBuilding/{buildingid}")]
     [UserRequired]
     public IActionResult TransferBuilding(long buildingid)
@@ -329,7 +406,7 @@ public class BuildingController : SVController
     [HttpPost("/Building/TransferBuilding/{buildingid}")]
     [ValidateAntiForgeryToken]
     [UserRequired]
-    public IActionResult TransferBuilding(long buildingid, long EntityId)
+    public async Task<IActionResult> TransferBuilding(long buildingid, long EntityId)
     {
         var user = HttpContext.GetUser();
         ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == buildingid);
@@ -351,6 +428,16 @@ public class BuildingController : SVController
 
         if (toentity is null)
             return RedirectBack("To Entity not found!");
+
+        if (building.Owner.EntityType == EntityType.Group && toentity.EntityType == EntityType.User)
+        {
+            if (building.EmployeeId is not null)
+                return RedirectBack("You must fire the building's employee before you can transfer the building!");
+
+            _dbctx.JobApplications.RemoveRange(await _dbctx.JobApplications.Where(x => x.BuildingId == buildingid).ToListAsync());
+            await _dbctx.SaveChangesAsync();
+            building.EmployeeGroupRoleId = null;
+        }
 
         building.OwnerId = toentity.Id;
 

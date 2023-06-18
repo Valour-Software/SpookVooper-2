@@ -40,6 +40,12 @@ public class Province
 
     public long Population { get; set; }
 
+    // brought to you by the Vooperians For Wokism (VFW)
+    /// <summary>
+    /// This multiples the "base population" we get from the district
+    /// </summary>
+    public double PopulationMultiplier { get; set; }
+
     public string? Description { get; set; }
 
     public long? GovernorId { get; set; }
@@ -373,6 +379,14 @@ public class Province
         return 0.00;
     }
 
+    public async ValueTask<double> GetMonthlyPopulationChangeFromGrowth()
+    {
+        // result is the monthly change in the PopulationMultiplier
+        var muitgrowth = (await GetMonthlyPopulationGrowth(false)).growthrate;
+        var ratio = muitgrowth / PopulationMultiplier;
+        return Population * ratio;
+    }
+
     public async ValueTask<(double growthrate, List<ProvinceConsumerGoodsData> ConsumerGoodsData)> GetMonthlyPopulationGrowth(bool UseResources = false)
     {
         double BirthRate = Defines.NProvince["BASE_BIRTH_RATE"];
@@ -416,8 +430,8 @@ public class Province
         if (rate > 0)
             DeathRate += rate;
 
-        double PopulationGrowth = BirthRate * Population;
-        PopulationGrowth -= DeathRate * Population;
+        double PopulationGrowth = BirthRate * PopulationMultiplier;
+        PopulationGrowth -= DeathRate * PopulationMultiplier;
         PopulationGrowth *= totalgrowthbuff + 1;
 
         PopulationGrowth *= District.GetModifierValue(DistrictModifierType.PopulationGrowthSpeedFactor) + 1;
@@ -530,12 +544,14 @@ public class Province
 
         DevelopmentValue += (int)Math.Floor(GetModifierValue(ProvinceModifierType.DevelopmentValue));
 
-        // get hourly rate
+        // get hourly rate change to PopulationMultiplier
         var PopulationGrowth = (await GetMonthlyPopulationGrowth(true)).growthrate / 30 / 24;
-        Population += (long)Math.Ceiling(PopulationGrowth);
+        PopulationMultiplier += PopulationGrowth;
+
+        if (false)
+            Population = (int)(PopulationMultiplier * District.BaseProvincePopulation);
 
         // update building slot count
-
         double buildingslots_exponent = Defines.NProvince["BUILDING_SLOTS_POPULATION_EXPONENT"];
         buildingslots_exponent += GetModifierValue(ProvinceModifierType.BuildingSlotsExponent);
         buildingslots_exponent += District.GetModifierValue(DistrictModifierType.BuildingSlotsExponent);
@@ -544,7 +560,8 @@ public class Province
 
         if (Id == District.CapitalProvinceId)
             slots += 10;
-            // province level
+
+        // province level
         slots += GetModifierValue(ProvinceModifierType.BuildingSlots);
         slots *= 1 + GetModifierValue(ProvinceModifierType.BuildingSlotsFactor);
         if (Id == District.CapitalProvinceId)

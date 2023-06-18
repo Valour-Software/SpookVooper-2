@@ -177,10 +177,10 @@
                 <tr class="mergedrow dividertop">
                     <th class="infobox-row-name">Monthly (Est.) Growth</th>
                     @if (Model.GetOverpopulationModifier() > 0.001) {
-                        <td class="infobox-row-value">@($"{((await Model.GetMonthlyPopulationGrowth()).growthrate * 1.1):n0}")</td>
+                        <td class="infobox-row-value">@($"{((await Model.GetMonthlyPopulationChangeFromGrowth()) * 1.1):n0}")</td>
                     }
                     else {
-                        <td class="infobox-row-value">@($"{(Math.Max((await Model.GetMonthlyPopulationGrowth()).growthrate * 1.1, 24 * 30)):n0}")</td>
+                        <td class="infobox-row-value">@($"{(Math.Max((await Model.GetMonthlyPopulationChangeFromGrowth()) * 1.1, 24 * 30)):n0}")</td>
                     }
                 </tr>
                 <tr class="mergedrow dividertop">

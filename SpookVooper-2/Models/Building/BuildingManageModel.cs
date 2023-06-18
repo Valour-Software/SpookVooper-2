@@ -10,4 +10,6 @@ public class BuildingManageModel {
     public long BuildingId { get; set; }
     public string RecipeId { get; set; }
     public CreateBuildingRequestModel createBuildingRequestModel { get; set; }
+    public List<SelectListItem> GroupRolesForEmployee { get; set; }
+    public long? GroupRoleIdForEmployee { get; set; }
 }

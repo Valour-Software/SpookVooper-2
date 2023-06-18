@@ -170,6 +170,8 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
     public DbSet<AuthToken> AuthTokens { get; set; }
     public DbSet<Stat> Stats { get; set; }
 
+    public DbSet<JobApplication> JobApplications { get; set; }
+
     public VooperDB(DbContextOptions options)
     {
             

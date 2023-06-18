@@ -274,6 +274,23 @@ List<BaseEntity> entities = new();
 //entities.AddRange(DBCache.GetAll<SVUser>());
 //entities.AddRange(DBCache.GetAll<Group>());
 
+// Migration district & province populations to be user based
+if (true)
+{
+    foreach (var district in DBCache.GetAll<District>())
+    {
+        district.BasePopulationFromUsers = 2_500_000.0 * district.Citizens.Count;
+
+        // handle provinces (this is the real fun part)
+        var totalPrevProvincePopulation = district.Provinces.Sum(x => x.Population);
+        var ratio = totalPrevProvincePopulation / district.BasePopulationFromUsers;
+        foreach (var province in district.Provinces)
+        {
+            province.PopulationMultiplier = province.Population / district.BaseProvincePopulation / ratio;
+        }
+    }
+}
+
 Console.WriteLine("Migrating Eco");
 Console.WriteLine($"Total Entites to migrate: {entities.Count}");
 int i = 0;

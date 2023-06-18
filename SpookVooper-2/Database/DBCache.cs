@@ -90,6 +90,8 @@ public static class DBCache
     /// </summary>
     public static Dictionary<long, List<ProducingBuilding>> ProvincesBuildings = new();
 
+    public static ConcurrentDictionary<long, ProducingBuilding> ProducingBuildingsById = new();
+
     public static List<ProducingBuilding> GetAllProducingBuildings() 
     {
         return ProvincesBuildings.SelectMany(x => x.Value).ToList();
@@ -246,21 +248,25 @@ public static class DBCache
         foreach(Factory _obj in dbctx.Factories) {
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
             if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
+            ProducingBuildingsById[_obj.Id] = _obj;
             Put(_obj.Id, _obj);
         }
         foreach(Farm _obj in dbctx.Farms) {
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
             if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
+            ProducingBuildingsById[_obj.Id] = _obj;
             Put(_obj.Id, _obj);
         }
         foreach(Mine _obj in dbctx.Mines) {
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
             if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
+            ProducingBuildingsById[_obj.Id] = _obj;
             Put(_obj.Id, _obj);
         }
         foreach(Infrastructure _obj in dbctx.Infrastructures) {
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
             if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
+            ProducingBuildingsById[_obj.Id] = _obj;
             Put(_obj.Id, _obj);
         }
         foreach(UBIPolicy policy in dbctx.UBIPolicies) {

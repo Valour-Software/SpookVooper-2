@@ -9,14 +9,16 @@ public enum StatType
     GDP,
     Population,
     TotalBuildingSlots,
-    UsedBuildingSlots
+    UsedBuildingSlots,
+    Xp
 }
 
 public enum TargetType
 {
     Global,
     District,
-    State
+    State,
+    User
 }
 
 [Index(nameof(Date))]
