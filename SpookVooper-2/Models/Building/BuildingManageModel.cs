@@ -12,4 +12,6 @@ public class BuildingManageModel {
     public CreateBuildingRequestModel createBuildingRequestModel { get; set; }
     public List<SelectListItem> GroupRolesForEmployee { get; set; }
     public long? GroupRoleIdForEmployee { get; set; }
+
+    public bool IncludeScript { get; set; } = false;
 }

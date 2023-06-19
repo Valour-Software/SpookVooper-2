@@ -11,6 +11,8 @@ using SV2.Database.Models.Districts;
 using System.Xml.Linq;
 using SV2.Database.Managers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using SV2.Models.Building;
 
 namespace SV2.Controllers;
 
@@ -33,6 +35,62 @@ public class StateController : SVController
             return RedirectBack();
 
         return View(state);
+    }
+
+    [UserRequired]
+    public IActionResult ViewBuildings(long id)
+    {
+        var user = HttpContext.GetUser();
+        State? state = DBCache.Get<State>(id);
+        if (state is null)
+            return RedirectBack();
+
+        var viewbuildingmodel = new StateViewBuildingModel()
+        {
+            ManageModels = new(),
+            State = state
+        };
+
+        foreach (var building in state.Provinces.SelectMany(x => x.GetBuildings()))
+        {
+
+            var model = new CreateBuildingRequestModel()
+            {
+                Province = building.Province,
+                LuaBuildingObj = building.BuildingObj,
+                ProvinceId = building.ProvinceId,
+                BuildingId = building.LuaBuildingObjId,
+                AlreadyExistingBuildingId = building.Id,
+                CanBuildAs = new(),
+                IncludeScript = true,
+                PrefixForIds = "",
+                User = user
+            };
+
+            var managemodel = new BuildingManageModel()
+            {
+                Building = building,
+                Name = building.Name,
+                Description = building.Description,
+                RecipeId = building.RecipeId,
+                BuildingId = building.Id,
+                createBuildingRequestModel = model
+            };
+
+            // only groups/corporations can have building employees
+            if (building.Owner.EntityType == EntityType.Group || building.Owner.EntityType == EntityType.Corporation)
+            {
+                var group = (Group)building.Owner;
+                var ownerauthority = group.GetAuthority(user);
+                managemodel.GroupRolesForEmployee = new();
+                managemodel.GroupRolesForEmployee.Add(new("None", "0"));
+                managemodel.GroupRolesForEmployee.AddRange(group.Roles.Where(x => x.Authority < ownerauthority).Select(x => new SelectListItem(x.Name, x.Id.ToString(), x.Id == building.EmployeeGroupRoleId)));
+            }
+
+            viewbuildingmodel.ManageModels.Add(managemodel);
+        }
+
+        return View(viewbuildingmodel);
     }
 
     [UserRequired]

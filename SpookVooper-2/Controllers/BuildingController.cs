@@ -145,6 +145,68 @@ public class BuildingController : SVController
     [HttpPost]
     [ValidateAntiForgeryToken]
     [UserRequired]
+    public async Task<IActionResult> ManageButReturnJson(BuildingManageModel model)
+    {
+        var user = HttpContext.GetUser();
+        var building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == model.BuildingId);
+
+        if (!(building.OwnerId == user.Id || (building.Owner.EntityType != EntityType.User && ((Group)building.Owner).HasPermission(user, GroupPermissions.ManageBuildings))))
+        {
+            return Json(new TaskResult(false, "You lack permission to manage this building!"));
+        }
+
+        var recipeidbefore = building.RecipeId;
+        building.Name = model.Name;
+        building.Description = model.Description;
+        building.RecipeId = model.RecipeId;
+
+        if (building.EmployeeGroupRoleId is not null)
+        {
+            if (model.GroupRoleIdForEmployee == 0)
+            {
+                if (building.EmployeeGroupRoleId is not null)
+                {
+                    return Json(new TaskResult(false, "You must fire this building's employee before you can disable employment!"));
+                }
+            }
+        }
+
+        if (model.GroupRoleIdForEmployee != 0)
+        {
+            var role = DBCache.Get<GroupRole>(model.GroupRoleIdForEmployee);
+            if (role.Salary < 2.0m)
+                return Json(new TaskResult(false, "The hourly pay (salary) of the role must be at or above the minimum wage (2 credits hourly)!"));
+        }
+
+        if (building.EmployeeGroupRoleId is not null && model.GroupRoleIdForEmployee == 0)
+        {
+            _dbctx.JobApplications.RemoveRange(await _dbctx.JobApplications.Where(x => x.BuildingId == building.Id).ToListAsync());
+            await _dbctx.SaveChangesAsync();
+        }
+
+        if (building.EmployeeId is not null && building.EmployeeGroupRoleId != model.GroupRoleIdForEmployee)
+        {
+            var fromrole = DBCache.Get<GroupRole>(building.EmployeeGroupRoleId);
+            var torole = DBCache.Get<GroupRole>(model.GroupRoleIdForEmployee);
+            var group = (Group)building.Owner;
+            group.RemoveEntityFromRole(group, building.Employee, fromrole, true);
+            torole.MembersIds.Add((long)building.EmployeeId);
+        }
+
+        building.EmployeeGroupRoleId = model.GroupRoleIdForEmployee;
+
+        if (recipeidbefore != model.RecipeId)
+        {
+            building.District.UpdateModifiers();
+            building.UpdateModifiers();
+        }
+
+        return Json(new TaskResult(true, $"Successfully updated {model.Name}'s info"));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [UserRequired]
     public async Task<IActionResult> Manage(BuildingManageModel model) {
         var user = HttpContext.GetUser();
         var building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == model.BuildingId);
