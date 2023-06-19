@@ -5,8 +5,13 @@
     <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
+        <span id="sender-balance">Sender's Balance:</span>
+        <br />
+        <span id="receiver-balance">Receiver's' Balance:</span>
+        <br />
+
         <label> What entity do you wish to send this payment from?</label>
-        <select asp-for="FromEntityId" asp-items="Model.CanSendAs" class="form-select form-control"></select>
+        <select asp-for="FromEntityId" asp-items="Model.CanSendAs" class="form-select form-control" onchange="SelectChange(this)"></select>
 
         <br />
         <div class="form-group">
@@ -37,6 +42,20 @@
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
+    function SelectChange(selectedOption) {
+        var url = `/api/entity/${selectedOption.value}/credits`
+        GetHtmlNonJson(url).then(data => {
+            e = document.getElementById("sender-balance")
+            data = parseFloat(data)
+            e.innerHTML = `Sender's Balance: ¢${data.toFixed(2)}`
+        })
+    }
+    var url = `/api/entity/@Model.CanSendAs.First().Value/credits`
+    GetHtmlNonJson(url).then(data => {
+        e = document.getElementById("sender-balance")
+        data = parseFloat(data)
+        e.innerHTML = `Sender's Balance: ¢${data.toFixed(2)}`
+    })
     $('#user-input').on("change keyup paste", OnInput);
     var box = $('#user-input');
     var results = $('#results');
@@ -69,6 +88,12 @@
                             name_text.text("Name of Entity Currently Selected: " + result.name);
                             id_input.val(result.id);
                             selected = result.id;
+                            var url = `/api/entity/${result.id}/credits`
+                            GetHtmlNonJson(url).then(data => {
+                                e = document.getElementById("receiver-balance")
+                                data = parseFloat(data)
+                                e.innerHTML = `Receiver's Balance: ¢${data.toFixed(2)}`
+                            })
                         });
                     }
                     );
@@ -80,4 +105,10 @@
         c.onerror = '';
         c.src = '/media/unity-128.png';
     }
+    async function GetHtmlNonJson(url) {
+        const response = await fetch(url);
+
+        return await response.text();
+    }
+
 </script>

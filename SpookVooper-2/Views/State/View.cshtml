@@ -70,6 +70,7 @@
                     @if (user is not null && Model.CanManageBuildingRequests(user)) {
                         <a asp-route-id="@Model.Id" asp-action="ManageBuildingRequests" asp-controller="State" class="btn btn-primary">Manage Building Requests</a>
                     }
+                    <a asp-route-id="@Model.Id" asp-action="ViewBuildings" asp-controller="State" class="btn btn-primary">View Buildings</a>
                 </center>
             }
             else {

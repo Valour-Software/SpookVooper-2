@@ -1,7 +1,7 @@
-﻿@model Province
+﻿@model StateViewBuildingModel
 
 @{
-    ViewData["Title"] = $"{Model.Name}'s Buildings";
+    ViewData["Title"] = $"{Model.State.Name}'s Buildings";
     SVUser user = UserManager.GetUser(Context)!;
 }
 
@@ -49,7 +49,7 @@
 
         <h3 style="text-align:center">@ViewData["Title"]</h3>
 
-        <a asp-controller="Province" asp-action="View" asp-route-id="@Model.Id">
+        <a asp-controller="State" asp-action="View" asp-route-id="@Model.State.Id">
             <button class="btn btn-primary">Go Back</button>
         </a>
 
@@ -58,17 +58,20 @@
         <br />
         
         <div class="buildings">
-            @foreach (var building in DBCache.ProvincesBuildings[Model.Id])
+            @foreach (var managemodel in Model.ManageModels)
             {
-                if (building.CanManage(user))
+                if (managemodel.Building.CanManage(user))
                 {
-                    <a asp-controller="Building" asp-action="Manage" asp-route-id="@building.Id" style="text-decoration: none;color:white;" class="building-manage-link">
-                        @await Html.PartialAsync("/Views/Shared/Components/ViewBuildingInGrid.cshtml", building)
-                    </a>
+                    <div data-bs-toggle="modal" data-bs-target="#managebuildingmodel-@managemodel.BuildingId" style="cursor: pointer;">
+                        @await Html.PartialAsync("/Views/Shared/Components/ViewBuildingInGrid.cshtml", managemodel.Building)
+                    </div>
+                    <bootstrap-modal asp-modal-id="managebuildingmodel-@managemodel.BuildingId" asp-modal-title="@managemodel.Building.Name">
+                        @await Html.PartialAsync("/Views/Shared/Components/ManageBuildingModal.cshtml", managemodel)
+                    </bootstrap-modal>
                 }
                 else
                 {
-                    @await Html.PartialAsync("/Views/Shared/Components/ViewBuildingInGrid.cshtml", building)
+                    @await Html.PartialAsync("/Views/Shared/Components/ViewBuildingInGrid.cshtml", managemodel.Building)
                 }
             }
         </div>

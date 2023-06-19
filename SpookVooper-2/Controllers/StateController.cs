@@ -62,7 +62,7 @@ public class StateController : SVController
                 BuildingId = building.LuaBuildingObjId,
                 AlreadyExistingBuildingId = building.Id,
                 CanBuildAs = new(),
-                IncludeScript = true,
+                IncludeScript = viewbuildingmodel.ManageModels.Count == 0,
                 PrefixForIds = "",
                 User = user
             };

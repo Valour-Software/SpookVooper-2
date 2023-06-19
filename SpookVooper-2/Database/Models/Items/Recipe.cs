@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using SV2.Database.Models.Entities;
 using SV2.Database.Models.Economy;
+using System.Text.Json.Serialization;
 
 namespace SV2.Database.Models.Items;
 
@@ -18,22 +19,18 @@ public class Recipe : IHasOwner
     public long OwnerId { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public BaseEntity Owner => BaseEntity.Find(OwnerId)!;
 
     [Column(TypeName = "jsonb")]
-    public KeyValuePair<string, int> Output { get; set; }
+    public Dictionary<string, int> Output { get; set; }
 
     [Column(TypeName = "jsonb")]
     public Dictionary<string, int> Inputs { get; set; }
 
     public string Name { get; set; }
+    public double PerHour { get; set; }
+    public string? BaseRecipeId { get; set; }
 
-    public double HourlyProduction { get; set; }
-    public string BaseRecipeName { get; set; }
-
-    public BaseRecipe baseRecipe {
-        get {
-            return null;// ResourceManager.Recipes.FirstOrDefault(x => x.Name == BaseRecipeName)!;
-        }
-    }
+    public BaseRecipe? BaseRecipe => GameDataManager.BaseRecipeObjs.Values.FirstOrDefault(x => x.Id == BaseRecipeId);
 }

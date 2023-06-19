@@ -93,6 +93,7 @@ public class ProvinceManager
                             DistrictId = disid,
                             IsOcean = false
                         };
+                        ProvincesMetadata[id].Path = child.Attributes["d"].Value;
                         mapStates.Add(state);
                     }
                 }

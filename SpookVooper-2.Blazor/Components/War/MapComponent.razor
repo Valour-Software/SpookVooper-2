@@ -1,5 +1,60 @@
-﻿
+﻿@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="panzoom-parent" style="width: 95vw;height: 85vh;">
+    <div class="panzoom" id="panzoom">
+        <svg id="svg" viewBox="0 0 2560 1280">
+            <style>
+                path {
+                    fill: white;
+                    stroke: black;
+                }
+
+                path:hover {
+                    filter: brightness(0.75);
+                }
+            </style>
+            @foreach (Province province in Provinces)
+            {
+                <path d="@province.Metadata.Path" id="@province.Id" style="fill:#@province.MapColor;stroke: black !important;" class="province">
+
+                </path>
+            }
+        </svg>
+    </div>
+</div>
+
+
 
 @code {
+    public List<Province> Provinces = new();
+    private IJSObjectReference? module;
+    public bool CallMapInit = false;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (CallMapInit)
+        {
+            CallMapInit = false;
+            await JS.InvokeVoidAsync("init");
+        }
+
+        if (firstRender)
+        {
+            //module = await JS.InvokeAsync<IJSObjectReference>("import","/js/mapcomponent.js");
+            //wait module.InvokeVoidAsync("init");
+            Provinces = (await SVClient.GetJsonAsync<List<Province>>($"api/getallprovinces")).Data;
+            CallMapInit = true;
+            StateHasChanged();
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
 }

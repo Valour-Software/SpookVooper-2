@@ -14,4 +14,8 @@ public class MiscController : SVController
     {
         return View();
     }
+    public async Task<IActionResult> BlazorMapTest()
+    {
+        return View();
+    }
 }

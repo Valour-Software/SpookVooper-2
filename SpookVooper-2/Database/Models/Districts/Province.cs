@@ -9,6 +9,7 @@ using SV2.Scripting.LuaObjects;
 using SV2.Database.Models.Users;
 using SV2.Scripting;
 using ProvinceModifier = Shared.Models.Districts.ProvinceModifier;
+using Shared.Models.Districts;
 
 namespace SV2.Database.Models.Districts;
 
@@ -51,6 +52,7 @@ public class Province
     public long? GovernorId { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public BaseEntity? Governor => BaseEntity.Find(GovernorId);
 
     public long? StateId { get; set; }
@@ -78,13 +80,18 @@ public class Province
     public double? PropertyTaxPerSize { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public ProvinceDevelopmentStage CurrentDevelopmentStage { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public Dictionary<ProvinceModifierType, ProvinceModifier> Modifiers { get; set; } = new();
 
     [Column("staticmodifiers", TypeName = "jsonb[]")]
     public List<StaticModifier> StaticModifiers { get; set; } = new();
+
+    [NotMapped]
+    public string MapColor => District.Color;
 
     [NotMapped]
     public ProvinceMetadata Metadata => ProvinceManager.ProvincesMetadata[Id];

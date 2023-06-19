@@ -1,0 +1,30 @@
+﻿@using SpookVooper_2.Blazor.Components.War
+<script src="https://unpkg.com/@@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+<div>
+    <component type="typeof(NavBarComponent)" render-mode="WebAssemblyPrerendered" />
+    <component type="typeof(MapComponent)" render-mode="WebAssemblyPrerendered" />
+</div>
+
+<style>
+    footer {
+        display: none !important;
+    }
+    html {
+        height: 100vh !important;
+    }
+</style>
+
+<script>
+    function init() {
+        const elem = document.getElementById('panzoom')
+        const panzoom = Panzoom(elem, {
+            maxScale: 10
+        })
+
+        // Panning and pinch zooming are bound automatically (unless disablePan is true).
+        // There are several available methods for zooming
+        // that can be bound on button clicks or mousewheel.
+        //button.addEventListener('click', panzoom.zoomIn)
+        elem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel)
+    }
+</script>

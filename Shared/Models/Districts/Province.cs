@@ -51,6 +51,8 @@ public class Province : Item
     /// In monthly rate
     /// </summary>
     public double? PropertyTaxPerSize { get; set; }
+
+    public string MapColor { get; set; }
     public Dictionary<ProvinceModifierType, ProvinceModifier> Modifiers { get; set; }
 
     public List<StaticModifier> StaticModifiers { get; set; }
@@ -107,6 +109,7 @@ public class Province : Item
 public class ProvinceMetadata
 {
     public long Id { get; set; }
+    public string Path { get; set; }
 
     [JsonPropertyName("resources")]
     public Dictionary<string, long> Resources { get; set; }

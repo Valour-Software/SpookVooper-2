@@ -1,0 +1,104 @@
+﻿@model SV2.Models.Building.BuildingManageModel
+
+@{ 
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<div class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;" id="alert-@Model.BuildingId">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+    </button>
+    <span id="alert-text-@Model.BuildingId">something</span>
+</div>
+
+<iframe style="display: none;" name="frame-@Model.BuildingId" id="@Model.BuildingId" onLoad="Submitted(this)"></iframe>
+
+@if (user.Id == Model.Building.OwnerId || Model.Building.Owner.HasPermission(user, GroupPermissions.ManageBuildings))
+{
+    <center>
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createbuildingrequest-@Model.BuildingId">
+            <span>Build more levels</span>
+        </button>
+
+        <a href="/Building/Manage/@Model.BuildingId">
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createbuildingrequest-@Model.BuildingId" style="margin-left:8px;">
+                <span>Click to view more details</span>
+            </button>
+        </a>
+    </center>
+}
+<br />
+
+<!form method="post" action="/Building/ManageButReturnJson" target="frame-@Model.BuildingId">
+    @Html.AntiForgeryToken()
+    <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
+            @Html.HiddenFor(x => x.BuildingId)
+        <div class="row">
+            <h4>Building Info</h4>
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Name</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <br />
+
+        <div class="form-group">
+            <label>Description</label>
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <br />
+
+        <div class="form-group">
+            <label>Recipe</label>
+            <span>View list of all recipes <a target="_blank" href="https://dev.spookvooper.com/wiki/List_of_Recipes">here</a></span>
+            <select asp-for="RecipeId" asp-items="Model.Building.BuildingObj.Recipes.Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.Id, Text = x.Name })" class="form-select form-control"></select>
+            <span asp-validation-for="RecipeId" class="text-danger"></span>
+        </div>
+        <br />
+
+        <div class="form-group">
+            <label>Employee's Group Role</label>
+            <span>Set to "None" to disallow people from applying to this job. You can only set to "None" if there's no employee, if there is, you must fire them using the button on the manage building page!</span>
+            <select asp-for="GroupRoleIdForEmployee" asp-items="Model.GroupRolesForEmployee" class="form-select form-control"></select>
+            <span asp-validation-for="GroupRoleIdForEmployee" class="text-danger"></span>
+        </div>
+
+        <br />
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</!form>
+
+@if (Model.IncludeScript)
+{
+    <script>
+        function Submitted(element) {
+            alertelement = document.getElementById("alert-" + element.id)
+            alerttext = document.getElementById("alert-text-" + element.id)
+            alertelement.className = "alert alert-dismissible fade show";
+            var data = JSON.parse(element.contentDocument.body.textContent)
+            alertelement.style = "";
+            alerttext.innerHTML = data["Message"]
+
+            if (data["Success"]) {
+                alertelement.classList.add("alert-success")
+            }
+            else {
+                alertelement.classList.add("alert-danger")
+            }
+        }
+    </script>
+}
+
+<bootstrap-modal asp-modal-id="createbuildingrequest-@Model.BuildingId" asp-modal-title="Request more Levels">
+    @await Html.PartialAsync("/Views/Shared/Components/SubmitBuildingRequest.cshtml", Model.createBuildingRequestModel)
+</bootstrap-modal>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -14,10 +14,16 @@ public class DistrictAPI : BaseAPI
     public static void AddRoutes(WebApplication app)
     {
         app.MapGet   ("api/districts/{id}", GetDistrictAsync).RequireCors("ApiPolicy");
+        app.MapGet   ("api/getallprovinces", GetAllProvincesAsync).RequireCors("ApiPolicy");
     }
 
     private static async Task GetDistrictAsync(HttpContext ctx, long id)
     {
         await ctx.Response.WriteAsJsonAsync(DBCache.Get<District>(id));
+    }
+
+    private static async Task GetAllProvincesAsync(HttpContext ctx)
+    {
+        await ctx.Response.WriteAsJsonAsync(DBCache.GetAll<Province>().ToList());
     }
 }

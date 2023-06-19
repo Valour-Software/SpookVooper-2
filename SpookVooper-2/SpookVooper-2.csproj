@@ -53,4 +53,11 @@
       </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Shared\Components\ManageBuildingModal.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
