@@ -155,16 +155,22 @@ recipe_cars_factory_base = {
     editable = false
 }
 
-recipe_small_arms_factory_base = {
-	name = "Small Arms Production"
+recipe_tank_factory_base = {
+	name = "Tank Production"
 	inputs = {
-		steel = 5
+		any_with_basetype = {
+			id = "tank_engine"
+			basetype = "tank_engine"
+			required = true
+			amount = 1
+		}
 	}
 	outputs = {
-		small_arms = 1
+		tank = 1
 	}
 	perhour = 1
 	editable = true
+	buildingtype = "factory"
 	edits = {
 		attack = {
 			name = "Attack"
@@ -184,9 +190,51 @@ recipe_small_arms_factory_base = {
 			costs = {
 				steel = {
 					base = 1
-					factor = edits.level
+					factor = edit.level
 					factor = {
-						base = edits.level
+						base = edit.level
+						factor = 0.25
+						add = 1
+					}
+				}
+			}
+		}
+	}
+}
+
+recipe_small_arms_factory_base = {
+	name = "Small Arms Production"
+	inputs = {
+		steel = 5
+	}
+	outputs = {
+		small_arms = 1
+	}
+	perhour = 1
+	editable = true
+	buildingtype = "factory"
+	edits = {
+		attack = {
+			name = "Attack"
+
+			-- these are NOT scaled to the edit's level
+			modifiers = {
+				item.attack = {
+					base = 1
+					add = {
+						base = 0.25
+						factor = edit.level
+					}
+				}
+			}
+
+			-- per level
+			costs = {
+				steel = {
+					base = 1
+					factor = edit.level
+					factor = {
+						base = edit.level
 						factor = 0.25
 						add = 1
 					}

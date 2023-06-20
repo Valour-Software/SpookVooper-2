@@ -47,7 +47,7 @@ public abstract class BuildingBase : IHasOwner, ITickable
     public Province Province => DBCache.Get<Province>(ProvinceId)!;
 
     [NotMapped]
-    public BaseRecipe Recipe => GameDataManager.BaseRecipeObjs[RecipeId];
+    public Recipe Recipe => DBCache.Recipes[RecipeId];
 
     [NotMapped]
     public LuaBuilding BuildingObj => GameDataManager.BaseBuildingObjs[LuaBuildingObjId];
@@ -305,7 +305,7 @@ public abstract class ProducingBuilding : BuildingBase
         UpdateModifiers();
 
         double rate = GetRateForProduction();
-        if (!Recipe.Inputcost_Scaleperlevel)
+        if (!Recipe.BaseRecipe.Inputcost_Scaleperlevel)
             rate /= Size;
         double rate_for_input = rate * (1/Efficiency);
         SuccessfullyTicked = false;

@@ -50,8 +50,8 @@
                     <td>@resource.Definition.Name</td>
                     <td>@($"{@resource.Amount:n1}")</td>
                     @{
-                        var hourlyproduction = Model.GetHourlyProductionOfResource(resource.Definition.Name.Replace(" ", "_").ToLower());
-                        var hourlyusage = Model.GetHourlyUsageOfResource(resource.Definition.Name.Replace(" ", "_").ToLower());
+                        var hourlyproduction = Model.GetHourlyProductionOfResource(resource.DefinitionId);
+                        var hourlyusage = Model.GetHourlyUsageOfResource(resource.DefinitionId);
                         var hourlydiff = hourlyproduction - hourlyusage;
                     }
                     <td>@($"{hourlyproduction*24:n1}")</td>

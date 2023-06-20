@@ -241,7 +241,7 @@
                     factorfrominfrastructures = 1;
                     var buildingtick_executionstate = new ExecutionState(Model.District, Model);
                     foreach (Infrastructure building in Infrastructures) {
-                        foreach (var modifiernode in building.Recipe.ModifierNodes) {
+                        foreach (var modifiernode in building.Recipe.BaseRecipe.ModifierNodes) {
                             if (modifiernode.provinceModifierType == ProvinceModifierType.BuildingSlotsExponent) {
                                 var value = (double)modifiernode.GetValue(buildingtick_executionstate, 1);
                                 value *= building.GetRateForProduction();

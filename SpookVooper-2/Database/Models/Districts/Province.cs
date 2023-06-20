@@ -618,8 +618,8 @@ public class Province
         var buildingtick_executionstate = new ExecutionState(District, this);
         foreach (var building in DBCache.ProvincesBuildings[Id]) {
             if (!building.SuccessfullyTicked) continue;
-            if (building.Recipe.ModifierNodes is null) continue;
-            foreach (var modifiernode in building.Recipe.ModifierNodes) {
+            if (building.Recipe.BaseRecipe.ModifierNodes is null) continue;
+            foreach (var modifiernode in building.Recipe.BaseRecipe.ModifierNodes) {
                 var value = (double)modifiernode.GetValue(buildingtick_executionstate, 1);
                 value *= building.GetRateForProduction();
                 UpdateOrAddModifier((ProvinceModifierType)modifiernode.provinceModifierType!, value);

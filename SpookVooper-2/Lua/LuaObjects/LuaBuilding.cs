@@ -4,6 +4,7 @@ using SV2.Managers;
 using SV2.Scripting;
 using SV2.Scripting.Parser;
 using System.Text.Json.Serialization;
+using Valour.Api.Models;
 using Valour.Shared;
 
 namespace SV2.Scripting.LuaObjects;
@@ -24,6 +25,13 @@ public class LuaBuilding
     public bool UseBuildingSlots { get; set; }
     public string MustHaveResource { get; set; }
     public bool ApplyStackingBonus { get; set; }
+
+    public List<Recipe> GetPossibleRecipes(BaseEntity entity)
+    {
+        var recipes = Recipes.Where(x => !x.Editable).Select(x => DBCache.Recipes[x.Id]).ToList();
+        recipes.AddRange(DBCache.GetAll<Recipe>().Where(x => x.CanUse(entity) && x.BaseRecipe.TypeOfBuilding == type));
+        return recipes;
+    }
 
     public Dictionary<string, double> GetConstructionCost(BaseEntity entity, District district, Province province, ProducingBuilding? building, int levels) {
         Dictionary<string, double> totalresources = new();

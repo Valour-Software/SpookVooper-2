@@ -27,7 +27,8 @@ public enum NodeType
     DICTNODE,
     ADDLOCALSNODE,
     GETLOCAL,
-    DIVIDE
+    DIVIDE,
+    HASSTATICMODIFIER
 }
 
 public class ExecutionState
@@ -51,8 +52,22 @@ public class ExecutionState
     }
 }
 
-[JsonDerivedType(typeof(Base), typeDiscriminator: 1)]
-[JsonDerivedType(typeof(Add), typeDiscriminator: 2)]
+[JsonDerivedType(typeof(Base), typeDiscriminator: 0)]
+[JsonDerivedType(typeof(Add), typeDiscriminator: 1)]
+[JsonDerivedType(typeof(Subtract), typeDiscriminator: 2)]
+[JsonDerivedType(typeof(Factor), typeDiscriminator: 3)]
+[JsonDerivedType(typeof(RaiseTo), typeDiscriminator: 4)]
+[JsonDerivedType(typeof(Decimal), typeDiscriminator: 5)]
+[JsonDerivedType(typeof(SystemVar), typeDiscriminator: 6)]
+[JsonDerivedType(typeof(ExpressionNode), typeDiscriminator: 7)]
+[JsonDerivedType(typeof(ConditionalSyntaxNode), typeDiscriminator: 8)]
+[JsonDerivedType(typeof(EffectNode), typeDiscriminator: 9)]
+[JsonDerivedType(typeof(EffectBody), typeDiscriminator: 10)]
+[JsonDerivedType(typeof(SyntaxModifierNode), typeDiscriminator: 11)]
+[JsonDerivedType(typeof(DictNode), typeDiscriminator: 12)]
+[JsonDerivedType(typeof(AddLocalsNode), typeDiscriminator: 13)]
+[JsonDerivedType(typeof(GetLocal), typeDiscriminator: 14)]
+[JsonDerivedType(typeof(Divide), typeDiscriminator: 15)]
 public abstract class SyntaxNode
 {
     public NodeType NodeType;
@@ -66,8 +81,11 @@ public abstract class SyntaxNode
     }
 }
 
-[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
-[JsonDerivedType(typeof(Base))]
+[JsonDerivedType(typeof(ConditionalStatementComparison), typeDiscriminator: 0)]
+[JsonDerivedType(typeof(ConditionalLogicBlockStatement), typeDiscriminator: 1)]
+[JsonDerivedType(typeof(ConditionalStatement), typeDiscriminator: 2)]
+[JsonDerivedType(typeof(HasStaticModifierStatement), typeDiscriminator: 3)]
+[JsonDerivedType(typeof(IfStatement), typeDiscriminator: 4)]
 public abstract class ConditionalSyntaxNode : SyntaxNode
 {
     public NodeType NodeType;
@@ -244,6 +262,26 @@ public class ConditionalStatement : ConditionalSyntaxNode
     public override bool IsTrue(ExecutionState state)
     {
         return Conditionals.All(x => x.IsTrue(state));
+    }
+}
+
+public class HasStaticModifierStatement : ConditionalSyntaxNode
+{
+    public string StaticModifierId { get; set; }
+    public HasStaticModifierStatement()
+    {
+        NodeType = NodeType.HASSTATICMODIFIER;
+    }
+
+    public override bool IsTrue(ExecutionState state)
+    {
+        return state.ParentScopeType switch
+        {
+            ScriptScopeType.District => state.District.StaticModifiers.Any(x => x.LuaStaticModifierObjId == StaticModifierId),
+            ScriptScopeType.Province => state.Province.StaticModifiers.Any(x => x.LuaStaticModifierObjId == StaticModifierId),
+            ScriptScopeType.Building => state.Building.StaticModifiers.Any(x => x.LuaStaticModifierObjId == StaticModifierId),
+            _ => false
+        };
     }
 }
 

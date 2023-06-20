@@ -9,44 +9,57 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using SV2.Scripting.Parser;
 using SV2.Scripting;
+using SV2.Scripting.LuaObjects;
 
 namespace SV2.Managers;
 
+public class LuaAnyWithBaseType
+{
+    public string Id { get; set; }
+    public string BaseType { get; set; }
+    public bool Required { get; set; }
+    public double Amount { get; set; }
+}
+
 public class BaseRecipe
 {
-    public Dictionary<string, double> Inputs { get; set; }
-    public Dictionary<string, double> Outputs { get; set; }
+    public Dictionary<long, double> Inputs { get; set; }
+    public Dictionary<long, double> Outputs { get; set; }
     public string Id { get; set; }
     public long IdAsLong { get; set; }
     public double PerHour { get; set; }
     public bool Editable { get; set; }
     public bool Inputcost_Scaleperlevel { get; set; }
-
-    public BaseRecipe() {
-        Inputs = new Dictionary<string, double>();
-        Outputs = new Dictionary<string, double>();
-    }
     public string Name { get; set; }
-
+    public BuildingType? TypeOfBuilding { get; set; }
     public List<SyntaxModifierNode>? ModifierNodes { get; set; }
+    public Dictionary<string, LuaRecipeEdit> LuaRecipeEdits { get; set; }
+    public List<LuaAnyWithBaseType> AnyWithBaseTypes { get; set; }
+    public KeyValuePair<string, double>? OutputWithCustomItem { get; set; }
+
+    public BaseRecipe()
+    {
+        Inputs = new();
+        Outputs = new();
+    }
 
     /// <summary>
     /// Returns the input costs per 1 output
     /// </summary>
     /// <returns></returns>
-    public Dictionary<string, double> GetRawResourceConsumption(int depth = 1)
+    public Dictionary<long, double> GetRawResourceConsumption(int depth = 1)
     {
-        if (GameDataManager.ResourceConsumptionPerRecipe.ContainsKey(Name))
-            return GameDataManager.ResourceConsumptionPerRecipe[Name];
-        var usage = new Dictionary<string, double>();
+        if (GameDataManager.ResourceConsumptionPerRecipe.ContainsKey(Id))
+            return GameDataManager.ResourceConsumptionPerRecipe[Id];
+        var usage = new Dictionary<long, double>();
         var div = Outputs.First().Value;
         foreach (var input in Inputs)
         {
             Console.WriteLine($"{depth}: {Name}: {input.Key}");
+
             // determine if input resource is a raw resource or not
-            if (GameDataManager.ResourcesByMaterialGroup["metals"].Any(x => x.LowerCaseName == input.Key)
-                || GameDataManager.ResourcesByMaterialGroup["raw"].Any(x => x.LowerCaseName == input.Key)
-                || input.Key == "bauxite")
+            if (GameDataManager.ResourcesByMaterialGroup["metals"].Any(x => x.ItemDefinition.Id == input.Key)
+                || GameDataManager.ResourcesByMaterialGroup["raw"].Any(x => x.ItemDefinition.Id == input.Key))
             {
                 if (!usage.ContainsKey(input.Key))
                     usage[input.Key] = 0;
@@ -86,7 +99,6 @@ public class SVResource
     public string Name { get; set; }
     public string LowerCaseName { get; set; }
     public ConsumerGood? consumerGood { get; set; }
-
     public ItemDefinition ItemDefinition { get; set; }
 }
 

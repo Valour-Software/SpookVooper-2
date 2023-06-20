@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using System.Xml.Linq;
+using Shared.Lua.Scripting;
 using SV2.Scripting;
 using SV2.Scripting.LuaObjects;
 using SV2.Scripting.Parser;
@@ -54,9 +55,22 @@ public class ExecutionState
     }
 }
 
-
-[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
-[JsonDerivedType(typeof(Base))]
+[JsonDerivedType(typeof(Base), typeDiscriminator: 0)]
+[JsonDerivedType(typeof(Add), typeDiscriminator: 1)]
+[JsonDerivedType(typeof(Subtract), typeDiscriminator: 2)]
+[JsonDerivedType(typeof(Factor), typeDiscriminator: 3)]
+[JsonDerivedType(typeof(RaiseTo), typeDiscriminator: 4)]
+[JsonDerivedType(typeof(Decimal), typeDiscriminator: 5)]
+[JsonDerivedType(typeof(SystemVar), typeDiscriminator: 6)]
+[JsonDerivedType(typeof(ExpressionNode), typeDiscriminator: 7)]
+[JsonDerivedType(typeof(ConditionalSyntaxNode), typeDiscriminator: 8)]
+[JsonDerivedType(typeof(EffectNode), typeDiscriminator: 9)]
+[JsonDerivedType(typeof(EffectBody), typeDiscriminator: 10)]
+[JsonDerivedType(typeof(SyntaxModifierNode), typeDiscriminator: 11)]
+[JsonDerivedType(typeof(DictNode), typeDiscriminator: 12)]
+[JsonDerivedType(typeof(AddLocalsNode), typeDiscriminator: 13)]
+[JsonDerivedType(typeof(GetLocal), typeDiscriminator: 14)]
+[JsonDerivedType(typeof(Divide), typeDiscriminator: 15)]
 public abstract class SyntaxNode
 {
     public NodeType NodeType;
@@ -70,6 +84,11 @@ public abstract class SyntaxNode
     }
 }
 
+[JsonDerivedType(typeof(ConditionalStatementComparison), typeDiscriminator: 0)]
+[JsonDerivedType(typeof(ConditionalLogicBlockStatement), typeDiscriminator: 1)]
+[JsonDerivedType(typeof(ConditionalStatement), typeDiscriminator: 2)]
+[JsonDerivedType(typeof(HasStaticModifierStatement), typeDiscriminator: 3)]
+[JsonDerivedType(typeof(IfStatement), typeDiscriminator: 4)]
 public abstract class ConditionalSyntaxNode : SyntaxNode
 {
     public override decimal GetValue(ExecutionState state) => 0.00m;
@@ -349,19 +368,19 @@ public class SystemVar : SyntaxNode
             },
             "building" => levels[1].ToLower() switch
             {
-                "recipe" => state.Building.Recipe.IdAsLong
+                "recipe" => state.Building.Recipe.Id
             },
             "upgrade" => levels[1].ToLower() switch
             {
                 "level" => state.BuildingUpgrade.Level
             },
-            "recipes" => GameDataManager.BaseRecipeObjs.ContainsKey(levels[1]) ? GameDataManager.BaseRecipeObjs[levels[1]].IdAsLong : 0,
+            "recipes" => DBCache.Recipes.ContainsKey(levels[1]) ? DBCache.Recipes[levels[1]].Id : 0,
             "get_local" => state.Locals[levels[1]],
             _ => 0.00m
         };
         if (levels[0] == "recipes")
         {
-            if (!GameDataManager.BaseRecipeObjs.ContainsKey(levels[1]))
+            if (!DBCache.Recipes.ContainsKey(levels[1]))
                 HandleError("Could not find recipe with id", levels[1]);
         }
         if (state.ChangeSystemVarsBy.Count > 0)

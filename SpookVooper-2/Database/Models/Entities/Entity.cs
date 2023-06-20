@@ -98,18 +98,49 @@ public abstract class BaseEntity
         return SVItemsOwnerships[itemdefid].Amount;
     }
 
+    public async ValueTask<double> GetOwnershipOfResource(long itemdefid)
+    {
+        if (!SVItemsOwnerships.ContainsKey(itemdefid)) return 0.0;
+        return SVItemsOwnerships[itemdefid].Amount;
+    }
+
     public async ValueTask<bool> HasEnoughResource(string resource, double amount) 
     {
         return await GetOwnershipOfResource(resource)+0.00000000000000000001 >= amount;
     }
 
+    public async ValueTask<bool> HasEnoughResource(long defid, double amount)
+    {
+        return await GetOwnershipOfResource(defid) + 0.00000000000000000001 >= amount;
+    }
+
     public async ValueTask<bool> ChangeResourceAmount(string resource, double by, string details) {
         var itemdefid = GameDataManager.ResourcesToItemDefinitions[resource].Id;
-        SVItemOwnership ownership = null;
-        if (!SVItemsOwnerships.ContainsKey(itemdefid))
-            ownership = await CreateResourceOwnership(resource);
-        else
-            ownership = SVItemsOwnerships[itemdefid];
+
+        if (false)
+        {
+            SVItemOwnership ownership = null;
+            if (!SVItemsOwnerships.ContainsKey(itemdefid))
+                ownership = await CreateResourceOwnership(resource);
+            else
+                ownership = SVItemsOwnerships[itemdefid];
+        }
+
+        ItemTrade itemtrade = new(ItemTradeType.Server, null, Id, by, itemdefid, details);
+        itemtrade.NonAsyncExecute(true);
+        return true;
+    }
+
+    public async ValueTask<bool> ChangeResourceAmount(long itemdefid, double by, string details)
+    {
+        if (false)
+        {
+            SVItemOwnership ownership = null;
+            if (!SVItemsOwnerships.ContainsKey(itemdefid))
+                ownership = await CreateResourceOwnership(itemdefid);
+            else
+                ownership = SVItemsOwnerships[itemdefid];
+        }
 
         ItemTrade itemtrade = new(ItemTradeType.Server, null, Id, by, itemdefid, details);
         itemtrade.NonAsyncExecute(true);
@@ -117,6 +148,11 @@ public abstract class BaseEntity
     }
 
     public async ValueTask<SVItemOwnership> CreateResourceOwnership(string resource) {
+        return new();
+    }
+
+    public async ValueTask<SVItemOwnership> CreateResourceOwnership(long itemdefid)
+    {
         return new();
     }
 
@@ -139,27 +175,27 @@ public abstract class BaseEntity
         }
     }
 
-    public double GetHourlyProductionOfResource(string resource) 
+    public double GetHourlyProductionOfResource(long itemdefid) 
     {
         double total = 0;
         List<ProducingBuilding> buildings = DBCache.GetAllProducingBuildings().Where(x => x.OwnerId == Id).ToList();
         foreach (var building in buildings) {
-            if (building.Recipe.Outputs.ContainsKey(resource)) {
+            if (building.Recipe.Outputs.ContainsKey(itemdefid)) {
                 if (building.BuildingObj.type == BuildingType.Mine)
-                    total += building.GetHourlyProduction() * building.Recipe.Outputs[resource] * building.MiningOutputFactor();
+                    total += building.GetHourlyProduction() * building.Recipe.Outputs[itemdefid] * building.MiningOutputFactor();
                 else
-                    total += building.GetHourlyProduction() * building.Recipe.Outputs[resource];
+                    total += building.GetHourlyProduction() * building.Recipe.Outputs[itemdefid];
             }
         }
         return total;
     }
 
-    public double GetHourlyUsageOfResource(string resource) {
+    public double GetHourlyUsageOfResource(long itemdefid) {
         double total = 0;
         List<ProducingBuilding> buildings = DBCache.GetAllProducingBuildings().Where(x => x.OwnerId == Id).ToList();
         foreach (var building in buildings) {
-            if (building.Recipe.Inputs.ContainsKey(resource))
-                total += building.GetHourlyProduction() * building.Recipe.Inputs[resource];
+            if (building.Recipe.Inputs.ContainsKey(itemdefid))
+                total += building.GetHourlyProduction() * building.Recipe.Inputs[itemdefid];
         }
         return total;
     }

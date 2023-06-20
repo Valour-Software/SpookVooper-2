@@ -6,24 +6,29 @@ using Shared.Models.Districts;
 
 namespace Shared.Managers;
 
+public class LuaAnyWithBaseType
+{
+    public string Id { get; set; }
+    public string BaseType { get; set; }
+    public bool Required { get; set; }
+    public SyntaxNode Amount { get; set; }
+}
+
 public class BaseRecipe : Item
 {
-    public Dictionary<string, double> Inputs { get; set; }
-    public Dictionary<string, double> Outputs { get; set; }
+    public Dictionary<long, double> Inputs { get; set; }
+    public Dictionary<long, double> Outputs { get; set; }
     public string Id { get; set; }
     public long IdAsLong { get; set; }
     public double PerHour { get; set; }
     public bool Editable { get; set; }
     public bool Inputcost_Scaleperlevel { get; set; }
-
-    public BaseRecipe() {
-        Inputs = new Dictionary<string, double>();
-        Outputs = new Dictionary<string, double>();
-    }
     public string Name { get; set; }
-
-    [JsonIgnore]
+    public BuildingType? TypeOfBuilding { get; set; }
     public List<SyntaxModifierNode>? ModifierNodes { get; set; }
+    public Dictionary<string, LuaRecipeEdit> LuaRecipeEdits { get; set; }
+    public List<LuaAnyWithBaseType> AnyWithBaseTypes { get; set; }
+    public KeyValuePair<string, double>? OutputWithCustomItem { get; set; }
 
     public static async ValueTask<BaseRecipe> FindAsync(string id, bool refresh = false)
     {
@@ -34,7 +39,7 @@ public class BaseRecipe : Item
                 return cached;
         }
 
-        var item = (await SVClient.GetJsonAsync<BaseRecipe>($"api/recipes/{id}")).Data;
+        var item = (await SVClient.GetJsonAsync<BaseRecipe>($"api/baserecipes/{id}")).Data;
 
         if (item is not null)
             await item.AddToCache();

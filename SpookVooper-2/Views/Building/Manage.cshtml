@@ -125,7 +125,7 @@
                 <div class="form-group">
                     <label>Recipe</label>
                     <span>View list of all recipes <a target="_blank" href="https://dev.spookvooper.com/wiki/List_of_Recipes">here</a></span>
-                    <select asp-for="RecipeId" asp-items="Model.Building.BuildingObj.Recipes.Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.Id, Text = x.Name })" class="form-select form-control"></select>
+                    <select asp-for="RecipeId" asp-items="Model.Building.BuildingObj.GetPossibleRecipes(Model.Building.Owner).Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.StringId, Text = x.Name })" class="form-select form-control"></select>
                     <span asp-validation-for="RecipeId" class="text-danger"></span>
                 </div>
                 <br />
@@ -293,15 +293,17 @@
                 @{
                     double rate = Model.Building.GetRateForProduction();
                     rate *= 24;
-                    if (!Model.Building.Recipe.Inputcost_Scaleperlevel)
+                    if (!Model.Building.Recipe.BaseRecipe.Inputcost_Scaleperlevel)
                         rate /= Model.Building.Size;
                     double rate_for_input = rate * (1 / Model.Building.Efficiency);
                     string trclass = "mergedrow dividertop";
                 }
-                @foreach ((var resource, var amount) in Model.Building.Recipe.Inputs) {
+                @foreach ((var itemdefid, var amount) in Model.Building.Recipe.Inputs) {
                     <tr class="@trclass">
-
-                        <th class="infobox-row-name">@($"{resource.Replace('_',' ')}")</th>
+                        @{
+                            var itemdef = DBCache.Get<ItemDefinition>(itemdefid);
+                        }
+                        <th class="infobox-row-name">@($"{itemdef.Name}")</th>
                         <td class="infobox-row-value">@($"{rate_for_input*amount:n1}")</td>
                     </tr>
                     trclass = "mergedrow";
@@ -313,11 +315,13 @@
                             <div>Resources produced daily</div>
                         </td>
                     </tr>
-                    @foreach ((var resource, var amount) in Model.Building.Recipe.Outputs)
+                    @foreach ((var itemdefid, var amount) in Model.Building.Recipe.Outputs)
                     {
                         <tr class="@trclass">
-
-                            <th class="infobox-row-name">@($"{resource.Replace('_', ' ')}")</th>
+                            @{
+                                var itemdef = DBCache.Get<ItemDefinition>(itemdefid);
+                            }
+                            <th class="infobox-row-name">@($"{itemdef.Name}")</th>
                             @if (Model.Building.BuildingObj.type == SV2.Database.Models.Buildings.BuildingType.Mine)
                             {
                                 <td class="infobox-row-value">@(

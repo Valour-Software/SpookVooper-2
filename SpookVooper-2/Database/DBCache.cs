@@ -78,6 +78,7 @@ public static class DBCache
     public static Dictionary<Type, ConcurrentDictionary<long, object>> HCache = new();
 
     public static ConcurrentQueue<DBCacheItemAddition> ItemQueue = new();
+    public static ConcurrentDictionary<string, Recipe> Recipes = new();
 
     public static VooperDB dbctx { get; set; }
 
@@ -283,7 +284,10 @@ public static class DBCache
         foreach (var _obj in dbctx.States)
             Put(_obj.Id, _obj);
         foreach (var _obj in dbctx.Recipes)
+        {
+            Recipes[_obj.StringId] = _obj;
             Put(_obj.Id, _obj);
+        }
         foreach (var _obj in dbctx.Senators)
             Put(_obj.DistrictId, _obj);
         foreach (var _obj in dbctx.Corporations)

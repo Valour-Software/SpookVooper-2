@@ -27,7 +27,7 @@
                 <div class="recipe">
                     <span>@recipe.Name</span>
                     <br />
-                    <span>Per 1 @recipe.Outputs.First().Key.ToTitleCase().Singularize()</span>
+                    <!--<span>Per 1 recipe.Outputs.First().Key.ToTitleCase().Singularize()</span>-->
                     <br />
                     @foreach (var input in recipe.GetRawResourceConsumption())
                     {

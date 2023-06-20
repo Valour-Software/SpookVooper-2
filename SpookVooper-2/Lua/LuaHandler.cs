@@ -384,7 +384,7 @@ public static class LuaHandler
             else if (obj.type == ObjType.LuaTable)
             {
                 if (!(parentname == "effects" || parentname == "add_locals"))
-                {
+;               {
                     var node = new ExpressionNode();
                     node.Body = HandleSyntaxExpression((LuaTable)obj).Body;
                     valuenode = node;
@@ -618,13 +618,15 @@ public static class LuaHandler
     {
         foreach (var (table, key) in HandleFile(content, filename))
         {
-            var recipe = new BaseRecipe()
+            var baserecipe = new BaseRecipe()
             {
                 Id = key,
                 Name = table["name"].Value,
                 PerHour = Convert.ToDouble(table["perhour"].Value),
                 Editable = Convert.ToBoolean(table.GetValue("editable") ?? "false"),
-                Inputcost_Scaleperlevel = Convert.ToBoolean(table.GetValue("inputcost_scaleperlevel") ?? "true")
+                Inputcost_Scaleperlevel = Convert.ToBoolean(table.GetValue("inputcost_scaleperlevel") ?? "true"),
+                TypeOfBuilding = Enum.Parse<BuildingType>(table.GetValue("buildingtype") ?? "mine", true),
+                AnyWithBaseTypes = new()
             };
 
             var inputs = (LuaTable)table["inputs"];
@@ -632,7 +634,22 @@ public static class LuaHandler
             {
                 foreach (string input in inputs.Keys)
                 {
-                    recipe.Inputs[input] = Convert.ToDouble(inputs[input]);
+                    if (input == "any_with_basetype")
+                    {
+                        var anywithTable = (LuaTable)inputs[input];
+                        baserecipe.AnyWithBaseTypes.Add(new()
+                        {
+                            Id = anywithTable["id"].Value,
+                            BaseType = anywithTable["basetype"].Value,
+                            Required = Convert.ToBoolean(anywithTable["required"].Value),
+                            Amount = Convert.ToDouble(anywithTable["amount"].Value)
+                        });
+                    }
+                    else
+                    {
+                        var itemdef = DBCache.GetAll<ItemDefinition>().FirstOrDefault(x => x.OwnerId == 100 && x.Name.ToLower().Replace(" ", "_") == input);
+                        baserecipe.Inputs[itemdef.Id] = Convert.ToDouble(inputs[input]);
+                    }
                 }
             }
             var outputs = (LuaTable)table["outputs"];
@@ -640,13 +657,53 @@ public static class LuaHandler
             {
                 if (output == "modifiers")
                 {
-                    recipe.ModifierNodes = HandleModifierNodes((LuaTable)outputs["modifiers"]);
+                    baserecipe.ModifierNodes = HandleModifierNodes((LuaTable)outputs["modifiers"]);
                 }
                 else
-                    recipe.Outputs[output] = Convert.ToDouble(outputs[output]);
+                {
+                    var itemdef = DBCache.GetAll<ItemDefinition>().FirstOrDefault(x => x.OwnerId == 100 && x.Name.ToLower().Replace(" ", "_") == output);
+                    if (itemdef is null)
+                    {
+                        baserecipe.OutputWithCustomItem = new(output, Convert.ToDouble(outputs[output]));
+                    }
+                    else
+                    {
+                        baserecipe.Outputs[itemdef.Id] = Convert.ToDouble(outputs[output]);
+                    }
+                }
             }
-            recipe.IdAsLong = GameDataManager.BaseRecipeObjs.Count;
-            GameDataManager.BaseRecipeObjs[recipe.Id] = recipe;
+
+            GameDataManager.BaseRecipeObjs[baserecipe.Id] = baserecipe;
+            if (!baserecipe.Editable)
+            {
+                Recipe recipe = DBCache.Recipes.Values.FirstOrDefault(x => x.StringId == baserecipe.Id);
+                if (recipe is null)
+                {
+                    recipe = new Recipe()
+                    {
+                        Id = IdManagers.GeneralIdGenerator.Generate(),
+                        StringId = baserecipe.Id,
+                        Name = baserecipe.Name,
+                        OwnerId = 100,
+                        Outputs = new(),
+                        Inputs = new(),
+                        BaseRecipeId = baserecipe.Id,
+                        EditsLevels = new(),
+                        PerHour = baserecipe.PerHour,
+                        EntityIdsThatCanUseThisRecipe = new(),
+                        Obsolete = false,
+                        AnyWithBaseTypesFilledIn = new()
+                    };
+                    recipe.UpdateInputs();
+                    recipe.UpdateOutputs();
+                    DBCache.AddNew(recipe.Id, recipe);
+                    DBCache.Recipes[recipe.StringId] = recipe;
+                }
+                else
+                {
+                    recipe.PerHour = baserecipe.PerHour;
+                }
+            }
         }
     }
 

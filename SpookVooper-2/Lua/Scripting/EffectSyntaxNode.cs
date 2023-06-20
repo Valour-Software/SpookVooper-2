@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using SV2.Scripting;
 
@@ -21,7 +22,7 @@ public abstract class EffectSyntaxNode : SyntaxNode
 {
 	public NodeType NodeType => NodeType.EFFECT;
 	public EffectType effectType { get; set; }
-	public override decimal GetValue(ExecutionState statet) => 0.00m;
+	public override decimal GetValue(ExecutionState state) => 0.00m;
 	public abstract void Execute(ExecutionState state);
 }
 
@@ -31,7 +32,13 @@ public interface IEffectNode
 	public abstract void Execute(ExecutionState state);
 }
 
-public class EffectNode : EffectSyntaxNode, IEffectNode
+[JsonDerivedType(typeof(AddMoneyNode), typeDiscriminator: 0)]
+[JsonDerivedType(typeof(RemoveStaticModifierNode), typeDiscriminator: 1)]
+[JsonDerivedType(typeof(AddStaticModifierIfNotAlreadyExistsNode), typeDiscriminator: 2)]
+[JsonDerivedType(typeof(AddStaticModifierNode), typeDiscriminator: 3)]
+[JsonDerivedType(typeof(EveryScopeBuildingNode), typeDiscriminator: 4)]
+[JsonDerivedType(typeof(ChangeScopeNode), typeDiscriminator: 5)]
+public abstract class EffectNode : EffectSyntaxNode, IEffectNode
 {
 	public override void Execute(ExecutionState state)
 	{

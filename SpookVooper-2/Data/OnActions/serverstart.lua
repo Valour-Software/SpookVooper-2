@@ -11,8 +11,13 @@ on_server_start = {
 			}
 		}
 		district:lanatia = {
-			add_static_modifier_if_not_already_added = {
-				name = "lanatia_lore"
+			if = {
+				limit = {
+					hasstaticmodifier = "lanatia_lore"
+				}
+				effects = {
+					remove_static_modifier = "lanatia_lore"
+				}
 			}
 		}
 		district:elysian_katonia = {

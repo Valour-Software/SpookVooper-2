@@ -24,12 +24,12 @@ public static class GameDataManager
     static public Dictionary<string, SVResource> Resources = new();
     static public List<SVResource> ConsumerGoods = new();
 
-    static public Dictionary<string, List<SVResource>> ResourcesByMaterialGroup = new();
+    public static Dictionary<string, List<SVResource>> ResourcesByMaterialGroup = new();
 
     static public Dictionary<string, ItemDefinition> ResourcesToItemDefinitions = new();
     static public Dictionary<string, LuaPolicy> LuaPolicyObjs = new();
     static public Dictionary<OnActionType, List<LuaOnAction>> LuaOnActions = new();
-    static public Dictionary<string, Dictionary<string, double>> ResourceConsumptionPerRecipe = new();
+    static public Dictionary<string, Dictionary<long, double>> ResourceConsumptionPerRecipe = new();
 
     public static void LoadResearch (LuaResearchPrototype prototype, LuaResearch? research, int depth = 0)
     {

@@ -69,6 +69,14 @@ public class SVUser : BaseEntity
         return (await GetValourRolesAsync()).Any(x => x.Name == "Government Admin");
     }
 
+    public int GetNumberOfJobSlotsFilled()
+    {
+        int number = 0;
+        number += DBCache.ProducingBuildingsById.Values.Count(x => x.EmployeeId == Id);
+        // TODO: when you add "signing" up for military job, update this
+        return number;
+    }
+
     public override async Task Create()
     {
         if (OAuthToken is null || EcoAccountId != 0)

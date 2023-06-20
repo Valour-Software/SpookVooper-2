@@ -149,6 +149,8 @@ public class UserController : SVController {
         var building = DBCache.ProducingBuildingsById[application.BuildingId];
         if (!application.Accepted)
             return RedirectBack("You can only start working if your application has been accepted!");
+        if (user.GetNumberOfJobSlotsFilled() >= 2)
+            return RedirectBack("You have used your two (2) available job slots!");
 
         building.EmployeeId = user.Id;
 
