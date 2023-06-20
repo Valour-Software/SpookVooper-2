@@ -160,14 +160,11 @@ public class BuildingController : SVController
         building.Description = model.Description;
         building.RecipeId = model.RecipeId;
 
-        if (building.EmployeeGroupRoleId is not null)
+        if (building.EmployeeGroupRoleId is not null && building.EmployeeGroupRoleId != 0)
         {
             if (model.GroupRoleIdForEmployee == 0)
             {
-                if (building.EmployeeGroupRoleId is not null)
-                {
-                    return Json(new TaskResult(false, "You must fire this building's employee before you can disable employment!"));
-                }
+                return Json(new TaskResult(false, "You must fire this building's employee before you can disable employment!"));
             }
         }
 
@@ -178,13 +175,13 @@ public class BuildingController : SVController
                 return Json(new TaskResult(false, "The hourly pay (salary) of the role must be at or above the minimum wage (2 credits hourly)!"));
         }
 
-        if (building.EmployeeGroupRoleId is not null && model.GroupRoleIdForEmployee == 0)
+        if ((building.EmployeeGroupRoleId is not null && building.EmployeeGroupRoleId != 0  && model.GroupRoleIdForEmployee == 0))
         {
             _dbctx.JobApplications.RemoveRange(await _dbctx.JobApplications.Where(x => x.BuildingId == building.Id).ToListAsync());
             await _dbctx.SaveChangesAsync();
         }
 
-        if (building.EmployeeId is not null && building.EmployeeGroupRoleId != model.GroupRoleIdForEmployee)
+        if ((building.EmployeeId is not null && building.EmployeeGroupRoleId != 0) && building.EmployeeGroupRoleId != model.GroupRoleIdForEmployee)
         {
             var fromrole = DBCache.Get<GroupRole>(building.EmployeeGroupRoleId);
             var torole = DBCache.Get<GroupRole>(model.GroupRoleIdForEmployee);

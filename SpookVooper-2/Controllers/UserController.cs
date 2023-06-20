@@ -45,7 +45,7 @@ public class UserController : SVController {
         foreach (var application in jobApplications)
         {
             var building = buildings.FirstOrDefault(x => x.Id == application.BuildingId);
-            if (building.EmployeeId is null && building.EmployeeGroupRoleId is not null)
+            if (building.EmployeeId is null && building.EmployeeGroupRoleId is not null && building.EmployeeGroupRoleId != 0)
             {
                 model.JobOpenings.Add(new()
                 {
@@ -76,7 +76,7 @@ public class UserController : SVController {
 
         foreach (var building in DBCache.GetAllProducingBuildings())
         {
-            if (building.EmployeeId is null && building.EmployeeGroupRoleId is not null) {
+            if (building.EmployeeId is null && building.EmployeeGroupRoleId is not null && building.EmployeeGroupRoleId != 0) {
                 model.JobOpenings.Add(new()
                 {
                     Building = building,
