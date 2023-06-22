@@ -32,6 +32,7 @@ public interface IEffectNode
 	public abstract void Execute(ExecutionState state);
 }
 
+[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor)]
 [JsonDerivedType(typeof(AddMoneyNode), typeDiscriminator: 0)]
 [JsonDerivedType(typeof(RemoveStaticModifierNode), typeDiscriminator: 1)]
 [JsonDerivedType(typeof(AddStaticModifierIfNotAlreadyExistsNode), typeDiscriminator: 2)]

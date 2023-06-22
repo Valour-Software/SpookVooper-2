@@ -40,9 +40,11 @@ public class ExecutionState
     public ProducingBuilding Building { get; set; }
     public LuaResearch Research { get; set; }
     public BuildingUpgrade BuildingUpgrade { get; set; }
+    public Recipe Recipe { get; set; }
+    public LuaRecipeEdit RecipeEdit { get; set; }
     public Dictionary<string, decimal> ChangeSystemVarsBy { get; set; }
     public ScriptScopeType? ParentScopeType { get; set; }
-    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, ProducingBuilding? building = null, LuaResearch? research = null, BuildingUpgrade? buildingUpgrade = null)
+    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, ProducingBuilding? building = null, LuaResearch? research = null, BuildingUpgrade? buildingUpgrade = null, Recipe? recipe = null, LuaRecipeEdit? recipeedit = null)
     {
         Locals = new();
         District = district;
@@ -52,9 +54,12 @@ public class ExecutionState
         Building = building;
         Research = research;
         BuildingUpgrade = buildingUpgrade;
+        Recipe = recipe;
+        RecipeEdit = recipeedit;
     }
 }
 
+[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor)]
 [JsonDerivedType(typeof(Base), typeDiscriminator: 0)]
 [JsonDerivedType(typeof(Add), typeDiscriminator: 1)]
 [JsonDerivedType(typeof(Subtract), typeDiscriminator: 2)]
@@ -75,8 +80,13 @@ public abstract class SyntaxNode
 {
     public NodeType NodeType;
     public SyntaxNode Parent;
+
+    [JsonIgnore]
     public int LineNumber { get; set; }
+
+    [JsonIgnore]
     public string FileName { get; set; }
+
     public abstract decimal GetValue(ExecutionState state);
     public void HandleError(string error, string message)
     {
@@ -84,6 +94,7 @@ public abstract class SyntaxNode
     }
 }
 
+[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor)]
 [JsonDerivedType(typeof(ConditionalStatementComparison), typeDiscriminator: 0)]
 [JsonDerivedType(typeof(ConditionalLogicBlockStatement), typeDiscriminator: 1)]
 [JsonDerivedType(typeof(ConditionalStatement), typeDiscriminator: 2)]
@@ -97,7 +108,7 @@ public abstract class ConditionalSyntaxNode : SyntaxNode
 
 public class Add : SyntaxNode
 {
-    public SyntaxNode Value;
+    public SyntaxNode Value { get; set; }
     public Add()
     {
         NodeType = NodeType.ADD;
@@ -111,7 +122,7 @@ public class Add : SyntaxNode
 
 public class Subtract : SyntaxNode
 {
-    public SyntaxNode Value;
+    public SyntaxNode Value { get; set; }
     public Subtract()
     {
         NodeType = NodeType.SUBTRACT;
@@ -125,7 +136,7 @@ public class Subtract : SyntaxNode
 
 public class Decimal : SyntaxNode
 {
-    public decimal Value;
+    public decimal Value { get; set; }
     public Decimal()
     {
         NodeType = NodeType.DECIMAL;
@@ -139,7 +150,7 @@ public class Decimal : SyntaxNode
 
 public class Base : SyntaxNode
 {
-    public SyntaxNode Value;
+    public SyntaxNode Value { get; set; }
     public Base()
     {
         NodeType = NodeType.BASE;
@@ -153,7 +164,7 @@ public class Base : SyntaxNode
 
 public class RaiseTo : SyntaxNode
 {
-    public SyntaxNode Value;
+    public SyntaxNode Value { get; set; }
     public RaiseTo()
     {
         NodeType = NodeType.RAISETO;
@@ -167,7 +178,7 @@ public class RaiseTo : SyntaxNode
 
 public class Factor : SyntaxNode
 {
-    public SyntaxNode Value;
+    public SyntaxNode Value { get; set; }
     public Factor()
     {
         NodeType = NodeType.FACTOR;
@@ -180,7 +191,7 @@ public class Factor : SyntaxNode
 
 public class Divide : SyntaxNode
 {
-    public SyntaxNode Value;
+    public SyntaxNode Value { get; set; }
     public Divide()
     {
         NodeType = NodeType.DIVIDE;
@@ -202,9 +213,9 @@ public enum ComparisonType
 
 public class ConditionalStatementComparison : ConditionalSyntaxNode
 {
-    public ComparisonType comparisonType;
-    public SyntaxNode LeftSide;
-    public SyntaxNode RightSide;
+    public ComparisonType comparisonType { get; set; }
+    public SyntaxNode LeftSide { get; set; }
+    public SyntaxNode RightSide { get; set; }
     public ConditionalStatementComparison()
     {
         NodeType = NodeType.COMPARISON;
@@ -233,8 +244,8 @@ public enum ConditionalLogicBlockType
 
 public class ConditionalLogicBlockStatement : ConditionalSyntaxNode
 {
-    public List<ConditionalSyntaxNode> Children;
-    public ConditionalLogicBlockType Type;
+    public List<ConditionalSyntaxNode> Children { get; set; }
+    public ConditionalLogicBlockType Type { get; set; }
     public ConditionalLogicBlockStatement()
     {
         NodeType = NodeType.CONDITIONALLOGICBLOCK;
@@ -275,7 +286,7 @@ public class HasStaticModifierStatement : ConditionalSyntaxNode
 
 public class ConditionalStatement : ConditionalSyntaxNode
 {
-    public List<ConditionalSyntaxNode> Conditionals;
+    public List<ConditionalSyntaxNode> Conditionals { get; set; }
     public ConditionalStatement()
     {
         NodeType = NodeType.CONDITIONALSTATEMENT;
@@ -289,9 +300,9 @@ public class ConditionalStatement : ConditionalSyntaxNode
 
 public class IfStatement : ConditionalSyntaxNode, IEffectNode
 {
-    public ConditionalStatement Limit;
-    public ExpressionNode ValueNode;
-    public EffectBody EffectNode;
+    public ConditionalStatement Limit { get; set; }
+    public ExpressionNode ValueNode { get; set; }
+    public EffectBody EffectNode { get; set; }
     public EffectType effectType => EffectType.None;
 
     public IfStatement()
@@ -332,7 +343,7 @@ public class IfStatement : ConditionalSyntaxNode, IEffectNode
 
 public class SystemVar : SyntaxNode
 {
-    public string Value;
+    public string Value { get; set; }
     public SystemVar()
     {
         NodeType = NodeType.SYSTEMVAR;
@@ -373,6 +384,10 @@ public class SystemVar : SyntaxNode
             "upgrade" => levels[1].ToLower() switch
             {
                 "level" => state.BuildingUpgrade.Level
+            },
+            "edit" => levels[1].ToLower() switch
+            {
+                "level" => state.Recipe.EditsLevels[state.RecipeEdit.Id]
             },
             "recipes" => DBCache.Recipes.ContainsKey(levels[1]) ? DBCache.Recipes[levels[1]].Id : 0,
             "get_local" => state.Locals[levels[1]],
@@ -489,7 +504,7 @@ public class DictNode : SyntaxNode
 
 public class GetLocal : SyntaxNode
 {
-    public string Name;
+    public string Name { get; set; }
     public GetLocal()
     {
         NodeType = NodeType.GETLOCAL;

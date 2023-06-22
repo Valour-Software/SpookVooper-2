@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace SV2.Database.Models.Items;
 
@@ -24,6 +25,7 @@ public class ItemDefinition : IHasOwner
     public long OwnerId { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public BaseEntity Owner => BaseEntity.Find(OwnerId)!;
 
     // for example SV would have a "Tank" definition owned by SV, in which case "Tank" would be the name
@@ -48,6 +50,7 @@ public class ItemDefinition : IHasOwner
     public bool Transferable { get; set; }
 
     [NotMapped]
+    [JsonIgnore]
     public bool IsSVItem => OwnerId == 100 || BaseItemDefinitionId is not null;
 
     public ItemDefinition() {

@@ -239,6 +239,7 @@ app.UseRouting();
 app.UseCors();
 
 //BaseAPI       .AddRoutes(app);
+ItemDefinitionAPI.AddRoutes(app);
 ItemAPI.AddRoutes(app);
 EcoAPI.AddRoutes(app);
 EntityAPI.AddRoutes(app);

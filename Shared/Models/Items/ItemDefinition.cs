@@ -12,7 +12,7 @@ public class ItemModifier
     public double Amount { get; set; }
 }
 
-public class ItemDefinition 
+public class ItemDefinition : Item
 {
     public long Id { get; set; }
     public long OwnerId { get; set; }
@@ -32,4 +32,9 @@ public class ItemDefinition
     public bool Transferable { get; set; }
 
     public bool IsSVItem => OwnerId == 100 || BaseItemDefinitionId is not null;
+
+    public override async Task AddToCache()
+    {
+        await SVCache.Put(Id, this);
+    }
 }

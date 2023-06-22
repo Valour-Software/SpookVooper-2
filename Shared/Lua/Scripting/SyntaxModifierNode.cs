@@ -14,6 +14,7 @@ public class SyntaxModifierNode : SyntaxNode
     public ProvinceModifierType? provinceModifierType { get; set; }
     public EntityModifierType? entityModifierType { get; set; }
     public BuildingModifierType? buildingModifierType { get; set; }
+    public ItemModifierType? itemModifierType { get; set; }
     public SyntaxNode Value { get; set; }
 
     public string GetColorClass(bool flip, decimal value)
@@ -46,6 +47,14 @@ public class SyntaxModifierNode : SyntaxNode
                 EntityModifierType.FactoryEfficiencyFactor => "Factories' Efficiency",
                 EntityModifierType.FactoryThroughputFactor => "Factories' Throughput",
                 EntityModifierType.FactoryQuantityCapFactor => "Factories' Quantity Cap",
+                _ => "[No Loc]"
+            };
+        }
+        else if (itemModifierType is not null)
+        {
+            return itemModifierType switch
+            {
+                ItemModifierType.Attack => "Attack",
                 _ => "[No Loc]"
             };
         }
@@ -82,6 +91,14 @@ public class SyntaxModifierNode : SyntaxNode
                 EntityModifierType.FactoryEfficiencyFactor => GetColorClass(false, value),
                 EntityModifierType.FactoryQuantityCapFactor => GetColorClass(false, value),
                 EntityModifierType.FactoryThroughputFactor => GetColorClass(false, value),
+                _ => "modifier-tooltip-modifier-listitem-neutral"
+            };
+        }
+        else if (itemModifierType is not null)
+        {
+            return itemModifierType switch
+            {
+                ItemModifierType.Attack => GetColorClass(false, value),
                 _ => "modifier-tooltip-modifier-listitem-neutral"
             };
         }

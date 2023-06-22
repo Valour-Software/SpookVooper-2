@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Shared.Models.Items;
+using Shared.Models.Districts;
 
 namespace Shared.Models.Entities;
 
@@ -24,6 +25,8 @@ public interface IHasOwner
     public BaseEntity Owner { get; }
 }
 
+[JsonDerivedType(typeof(Group), 0)]
+[JsonDerivedType(typeof(SVUser), 1)]
 public abstract class BaseEntity : Item
 {
     [Key]
@@ -45,18 +48,29 @@ public abstract class BaseEntity : Item
 
     public virtual EntityType EntityType { get; set; }
 
-    public static async ValueTask<BaseEntity> FindAsync(long id)
+    /// <summary>
+    /// Returns the item for the given id
+    /// </summary>
+    public static async ValueTask<BaseEntity> FindAsync(long id, bool refresh = false)
     {
-        int _id = (int)id;
-        Group group = await Group.FindAsync(_id);
-        if (group is not null)
-            return group;
+        if (!refresh)
+        {
+            var cached = SVCache.Get<BaseEntity>(id);
+            if (cached is not null)
+                return cached;
+        }
 
-        SVUser user = await SVUser.FindAsync(_id);
-        if (user is not null)
-            return user;
+        var item = (await SVClient.GetJsonAsync<BaseEntity>($"api/entities/{id}")).Data;
 
-        return null;
+        if (item is not null)
+            await item.AddToCache();
+
+        return item;
+    }
+
+    public override async Task AddToCache()
+    {
+        await SVCache.Put(Id, this);
     }
 }
 

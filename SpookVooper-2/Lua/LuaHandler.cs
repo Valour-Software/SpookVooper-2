@@ -275,6 +275,16 @@ public static class LuaHandler
                     }
                 };
             }
+            else if (levels[0] == "item")
+            {
+                node.itemModifierType = levels[0] switch
+                {
+                    "item" => levels[1] switch
+                    {
+                        "attack" => ItemModifierType.Attack
+                    }
+                };
+            }
             else
             {
                 node.provinceModifierType = levels[0] switch
@@ -372,7 +382,7 @@ public static class LuaHandler
         expr.LineNumber = table.LineNumber;
         foreach (var obj in table.Items)
         {
-            Console.WriteLine($"{obj.Name}: {obj.type}");
+            Console.WriteLine($"Line {obj.LineNumber}: {obj.Name} ({obj.type}): {obj.Value}");
             SyntaxNode valuenode = null;
             ExpressionNode exprnode = null;
             if (obj.Name == "every_scope_building")
@@ -673,6 +683,23 @@ public static class LuaHandler
                 }
             }
 
+            if (table.ContainsKey("edits"))
+            {
+                baserecipe.LuaRecipeEdits = new();
+                var edits = (LuaTable)table["edits"];
+                foreach (var id in edits.Keys)
+                {
+                    var edit = (LuaTable)edits[id];
+                    baserecipe.LuaRecipeEdits[id] = new()
+                    {
+                        Id = id,
+                        Name = edit["name"].Value,
+                        ModifierNodes = HandleModifierNodes((LuaTable)edit["modifiers"]),
+                        Costs = HandleDictExpression((LuaTable)edit["costs"])
+                    };
+                }
+            }
+
             GameDataManager.BaseRecipeObjs[baserecipe.Id] = baserecipe;
             if (!baserecipe.Editable)
             {
@@ -692,7 +719,8 @@ public static class LuaHandler
                         PerHour = baserecipe.PerHour,
                         EntityIdsThatCanUseThisRecipe = new(),
                         Obsolete = false,
-                        AnyWithBaseTypesFilledIn = new()
+                        AnyWithBaseTypesFilledIn = new(),
+                        HasBeenUsed = true
                     };
                     recipe.UpdateInputs();
                     recipe.UpdateOutputs();

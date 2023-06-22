@@ -205,7 +205,7 @@ recipe_tank_factory_base = {
 recipe_small_arms_factory_base = {
 	name = "Small Arms Production"
 	inputs = {
-		steel = 5
+		steel = 0
 	}
 	outputs = {
 		small_arms = 1
@@ -228,16 +228,11 @@ recipe_small_arms_factory_base = {
 				}
 			}
 
-			-- per level
+			-- these are NOT scaled to the edit's level
 			costs = {
 				steel = {
-					base = 1
-					factor = edit.level
-					factor = {
-						base = edit.level
-						factor = 0.25
-						add = 1
-					}
+					base = 2
+					factor = 1.175 ^ edit.level
 				}
 			}
 		}

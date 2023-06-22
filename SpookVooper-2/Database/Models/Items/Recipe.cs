@@ -52,6 +52,8 @@ public class Recipe : IHasOwner
     [Column(TypeName = "jsonb")]
     public Dictionary<string, long> AnyWithBaseTypesFilledIn { get; set; }
 
+    public bool HasBeenUsed { get; set; }
+
     [NotMapped]
     public BaseRecipe? BaseRecipe => GameDataManager.BaseRecipeObjs.Values.FirstOrDefault(x => x.Id == BaseRecipeId);
 

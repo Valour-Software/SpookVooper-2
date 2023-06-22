@@ -18,6 +18,7 @@ public enum EffectType
     EveryScopeBuilding
 }
 
+[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor)]
 [JsonDerivedType(typeof(RemoveStaticModifierNode), typeDiscriminator: 1)]
 [JsonDerivedType(typeof(AddStaticModifierIfNotAlreadyExistsNode), typeDiscriminator: 2)]
 [JsonDerivedType(typeof(AddStaticModifierNode), typeDiscriminator: 3)]

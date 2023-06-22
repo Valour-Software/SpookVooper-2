@@ -1,0 +1,18 @@
+﻿@using SpookVooper_2.Blazor.Components.Recipes
+@model CreateNewRecipeModel
+
+<div class="container vw-100">
+    <div class="col-12">
+        <div class="d-flex">
+            <div class="p-1 align-self-start flex-grow-1">
+                <h1>Create New Recipe</h1>
+            </div>
+        </div>
+        <div class="p-1 align-self-start flex-grow-1">
+            <p>From base recipe @GameDataManager.BaseRecipeObjs[Model.BaseRecipeId].Name</p>
+        </div>
+
+        <link href="/SpookVooper-2.Blazor.styles.css" rel="stylesheet">
+        <component type="typeof(RecipeDesignerComponent)" render-mode="WebAssemblyPrerendered" param-BaseRecipeId="@Model.BaseRecipeId" param-EntityId="@Model.EntityId" />
+    </div>
+</div>

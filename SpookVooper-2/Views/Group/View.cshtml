@@ -107,6 +107,12 @@
                             </div>
                         }
                     }
+                    @if (Model.HasPermission(user, GroupPermissions.Resources))
+                    {
+                        <div class="p-2 align-self-center" style="text-align:center">
+                            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createrecipemodal">Create Recipe</button>
+                        </div>
+                    }
 
                 </div>
             }
@@ -186,6 +192,21 @@
             </div>
         </div>
     </div>
+    <bootstrap-modal asp-modal-id="createrecipemodal" asp-modal-title="Select Base Recipe">
+        <center>
+            <span>Select base recipe to create custom recipe from</span>
+            <br />
+            <br />
+
+            @foreach (var baserecipe in GameDataManager.BaseRecipeObjs.Values.Where(x => x.Editable))
+            {
+                <a href="/Recipe/CreateNewRecipe?entityid=@Model.Id&baserecipeid=@baserecipe.Id" style="text-decoration: none;">
+                    <button style="margin-bottom: 10px;" class='btn btn-outline-primary'>@baserecipe.Name</button>
+                </a>
+                <br/>
+            }
+        </center>
+    </bootstrap-modal>
 }
 else
 {

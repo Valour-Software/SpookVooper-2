@@ -24,6 +24,8 @@ public interface IHasOwner
     public BaseEntity Owner { get;}
 }
 
+[JsonDerivedType(typeof(Group), 0)]
+[JsonDerivedType(typeof(SVUser), 1)]
 public abstract class BaseEntity
 {
     [Key]

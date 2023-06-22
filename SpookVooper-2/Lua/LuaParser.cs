@@ -340,9 +340,18 @@ public class LuaParser
                 obj.type = ObjType.String;
                 CurrentParent.Items.Add(obj);
             }
+            else if (nexttoken.Type == LuaTokenType.Item)
+            {
+                var returndata = GetStringValue(tokens, i);
+                obj.Value = returndata.Item1;
+                i = returndata.Item2;
+                obj.type = ObjType.String;
+                CurrentParent.Items.Add(obj);
+            }
             else if (tokens[i + 1].Type == LuaTokenType.NewLine || tokens[i + 2].Type == LuaTokenType.CloseCurlyBracket ||
                 tokens[i + 2].Type == LuaTokenType.Comment)
             {
+                //obj.LineNumber = 2000;
                 obj.type = ObjType.StringForNumber;
                 obj.Value = nexttoken.Value;
                 CurrentParent.Items.Add(obj);

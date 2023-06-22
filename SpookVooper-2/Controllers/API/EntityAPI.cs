@@ -4,6 +4,7 @@ using System.Diagnostics;
 using SV2.Database;
 using SV2.Database.Models.Entities;
 using Microsoft.AspNetCore.Cors;
+using SV2.Extensions;
 
 namespace SV2.API;
 
@@ -14,7 +15,17 @@ public class EntityAPI : BaseAPI
     {
         app.MapGet   ("api/entity/{svid}/name", GetName).RequireCors("ApiPolicy");
         app.MapGet   ("api/entity/{svid}/credits", GetCredits).RequireCors("ApiPolicy");
+        app.MapGet   ("api/entities/{svid}", GetEntity).RequireCors("ApiPolicy");
         app.MapGet   ("api/entity/search", Search).RequireCors("ApiPolicy");
+    }
+
+    private static async Task GetEntity(HttpContext ctx, long svid)
+    {
+        BaseEntity? entity = BaseEntity.Find(svid);
+        if (entity is null)
+            await ctx.Response.WriteAsJsonAsync(ValourResult.NotFound($"Could not find entity with svid {svid}"));
+
+        await ctx.Response.WriteAsJsonAsync(entity);
     }
 
     private static async Task GetName(HttpContext ctx, VooperDB db, long svid)
