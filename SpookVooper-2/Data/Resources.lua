@@ -33,7 +33,11 @@ raw = {
 	}
 	copper_ore = {
 	}
+	zinc_ore = {
+	}
 	gold_ore = {
+	}
+	lead_ore = {
 	}
 	crystallite = {
 	}
@@ -65,6 +69,10 @@ metals = {
 	}
 	gold = {
 	}
+	lead = {
+	}
+	zinc = {
+	}
 }
 
 products = {
@@ -74,10 +82,18 @@ products = {
 	}
 	plastic = {
 	}
+	brass = {
+	}
 }
 
 military = {
-	ammo = {
+	normal_ammo = {
+	}
+	crystallite_infused_ammo = {
+	}
+	artillery_shell_105mm = {
+	}
+	artillery_shell_155mm = {
 	}
 	arms = {
 	}

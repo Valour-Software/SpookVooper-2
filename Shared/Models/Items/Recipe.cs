@@ -11,8 +11,9 @@ public enum ItemModifierType
     Attack = 1
 }
 
-public class Recipe
+public class Recipe : Item
 {
+    public override string BaseRoute => $"api/recipes";
     public long Id { get; set; }
     public string Name { get; set; }
     public string StringId { get; set; }
@@ -37,6 +38,7 @@ public class Recipe
     public Dictionary<string, long> AnyWithBaseTypesFilledIn { get; set; }
     public Dictionary<string, long> CustomOutputItemDefinitionsIds { get; set; }
     public Dictionary<ItemModifierType, double> Modifiers { get; set; }
+    public string OutputItemName { get; set; }
     public bool HasBeenUsed { get; set; }
     public async ValueTask<BaseRecipe> GetBaseRecipeAsync()
     {

@@ -22,6 +22,30 @@ recipe_copper_mining_base = {
     editable = false
 }
 
+recipe_lead_mining_base = {
+	name = "Lead Mining"
+    inputs = {
+        tools = 0.05
+    }
+	outputs = {
+		lead_ore = 1
+	}
+	perhour = 15
+    editable = false
+}
+
+recipe_zinc_mining_base = {
+	name = "Zinc Mining"
+    inputs = {
+        tools = 0.05
+    }
+	outputs = {
+		zinc_ore = 1
+	}
+	perhour = 10
+    editable = false
+}
+
 recipe_silicon_mining_base = {
 	name = "Silicon Mining"
     inputs = {

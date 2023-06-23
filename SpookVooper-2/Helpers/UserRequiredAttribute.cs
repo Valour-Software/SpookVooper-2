@@ -7,10 +7,18 @@ using Valour.Api.Models;
 namespace SV2.Helpers;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-public class UserRequiredAttribute : ActionFilterAttribute
+public class UserRequiredAttribute : ActionFilterAttribute, IActionFilter, IEndpointFilter
 {
     public UserRequiredAttribute()
     {
+    }
+
+    public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+    {
+        SVUser? user = UserManager.GetUser(context.HttpContext);
+        context.HttpContext.Items["user"] = user;
+        var result = await next(context);
+        return result;
     }
 
     public override void OnActionExecuting(ActionExecutingContext context)

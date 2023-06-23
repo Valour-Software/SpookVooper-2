@@ -516,6 +516,8 @@ public static class SVClient
     {
         if (http is null)
             http = Http;
+        if (http is null)
+            http = new HttpClient() { BaseAddress = new Uri(BaseAddress) };
 
         JsonContent jsonContent = JsonContent.Create(content);
 

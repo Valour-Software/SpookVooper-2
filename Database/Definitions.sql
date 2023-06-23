@@ -220,7 +220,6 @@ CREATE TABLE IF NOT EXISTS itemdefinitions (
     name text NOT NULL,
     description text NULL,
     created timestamp with time zone NOT NULL,
-    modifiers jsonb NULL,
     baseitemdefinitionid bigint NULL,
     transferable boolean NOT NULL,
     CONSTRAINT pk_itemdefinitions PRIMARY KEY (id)
@@ -332,6 +331,9 @@ CREATE TABLE IF NOT EXISTS recipes (
     entityidsthatcanusethisrecipe bigint[] NOT NULL,
     editslevels jsonb NOT NULL,
     anywithbasetypesfilledin jsonb NOT NULL,
+    outputitemname text NOT NULL,
+    hasbeenused boolean NOT NULL,
+    created timestamp with time zone NOT NULL,
     CONSTRAINT pk_recipes PRIMARY KEY (id)
 );
 

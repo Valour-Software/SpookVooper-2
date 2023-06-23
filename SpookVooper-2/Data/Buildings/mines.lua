@@ -27,6 +27,32 @@ building_copper_mine = {
 	type = "Mine"
 }
 
+building_lead_mine = {
+	recipes = [
+		recipe_lead_mining_base
+	]
+	buildingcosts = {
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
+	}
+    musthaveresource = "Lead"
+	type = "Mine"
+}
+
+building_zinc_mine = {
+	recipes = [
+		recipe_zinc_mining_base
+	]
+	buildingcosts = {
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
+	}
+    musthaveresource = "Zinc"
+	type = "Mine"
+}
+
 building_silicon_mine = {
 	recipes = [
 		recipe_silicon_mining_base

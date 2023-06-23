@@ -4,6 +4,8 @@ using SV2.Database.Models.Entities;
 using SV2.Database.Models.Economy;
 using System.Text.Json.Serialization;
 using SV2.Scripting.LuaObjects;
+using Shared.Client;
+using SV2.Scripting;
 
 namespace SV2.Database.Models.Items;
 
@@ -51,11 +53,15 @@ public class Recipe : IHasOwner
     /// </summary>
     [Column(TypeName = "jsonb")]
     public Dictionary<string, long> AnyWithBaseTypesFilledIn { get; set; }
-
+    public string OutputItemName { get; set; }
     public bool HasBeenUsed { get; set; }
+    public DateTime Created { get; set; }
 
     [NotMapped]
     public BaseRecipe? BaseRecipe => GameDataManager.BaseRecipeObjs.Values.FirstOrDefault(x => x.Id == BaseRecipeId);
+
+    [NotMapped]
+    public Dictionary<ItemModifierType, double> Modifiers { get; set; }
 
     public bool CanUse(BaseEntity entity)
     {
@@ -65,18 +71,49 @@ public class Recipe : IHasOwner
             return true;
         return false;
     }
+    public bool CanUse(long entityid)
+    {
+        if (OwnerId == entityid)
+            return true;
+        if (EntityIdsThatCanUseThisRecipe.Contains(entityid))
+            return true;
+        return false;
+    }
 
     public void UpdateOutputs()
     {
         Outputs = new();
+        if (BaseRecipe.OutputWithCustomItem is not null)
+            Outputs[(long)CustomOutputItemDefinitionId] = BaseRecipe.OutputWithCustomItem.Value.Value;
+
         foreach (var pair in BaseRecipe.Outputs)
         {
-            if (pair.Key == 0)
+            Outputs[pair.Key] = pair.Value;
+        }
+    }
+
+    public void UpdateOrAddModifier(ItemModifierType type, double value)
+    {
+        if (!Modifiers.ContainsKey(type))
+            Modifiers[type] = value;
+        else
+            Modifiers[type] += value;
+    }
+
+    public void UpdateModifiers()
+    {
+        Modifiers = new();
+
+        var value_executionstate = new ExecutionState(null, null, parentscopetype: ScriptScopeType.Recipe, recipe: this);
+        //var scaleby_executionstate = new ExecutionState(District, this);
+        foreach (var pair in EditsLevels)
+        {
+            var edit = BaseRecipe.LuaRecipeEdits[pair.Key];
+            value_executionstate.RecipeEdit = edit;
+            foreach (var modifiernode in edit.ModifierNodes)
             {
-                Outputs[(long)CustomOutputItemDefinitionId] = pair.Value;
-            }
-            else {
-                Outputs[pair.Key] = pair.Value;
+                var value = (double)modifiernode.GetValue(value_executionstate);
+                UpdateOrAddModifier((ItemModifierType)modifiernode.itemModifierType!, value);
             }
         }
     }
@@ -88,11 +125,21 @@ public class Recipe : IHasOwner
         {
             Inputs[pair.Key] = pair.Value;
         }
-        foreach (var anywith in BaseRecipe.AnyWithBaseTypes)
+
+        var value_executionstate = new ExecutionState(null, null, parentscopetype: ScriptScopeType.Recipe, recipe: this);
+        //var scaleby_executionstate = new ExecutionState(District, this);
+        foreach (var pair in EditsLevels)
         {
-            if (!AnyWithBaseTypesFilledIn.ContainsKey(anywith.Id))
-                continue;
-            Inputs[AnyWithBaseTypesFilledIn[anywith.Id]] = anywith.Amount;
+            var edit = BaseRecipe.LuaRecipeEdits[pair.Key];
+            value_executionstate.RecipeEdit = edit;
+            foreach ((var resource, var amount) in edit.Costs.Evaluate(value_executionstate))
+            {
+                //Console.WriteLine(resource);
+                var itemdef = DBCache.GetAll<ItemDefinition>().FirstOrDefault(x => x.Name.ToLower().Replace(" ", "_") == resource);
+                if (!Inputs.ContainsKey(itemdef.Id))
+                    Inputs[itemdef.Id] = 0;
+                Inputs[itemdef.Id] += (double)amount;
+            }
         }
     }
 }

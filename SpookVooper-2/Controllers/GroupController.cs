@@ -343,6 +343,7 @@ public class GroupController : SVController
         if (model.ManageBuildingRequests) { permcode |= GroupPermissions.ManageBuildingRequests.Value; }
         if (model.Build) { permcode |= GroupPermissions.Build.Value; }
         if (model.Resources) { permcode |= GroupPermissions.Resources.Value; }
+        if (model.Recipes) { permcode |= GroupPermissions.Recipes.Value; }
 
         if (model.RoleId == 0)
             model.RoleId = IdManagers.GeneralIdGenerator.Generate();

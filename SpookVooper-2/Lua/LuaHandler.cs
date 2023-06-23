@@ -706,6 +706,7 @@ public static class LuaHandler
                 Recipe recipe = DBCache.Recipes.Values.FirstOrDefault(x => x.StringId == baserecipe.Id);
                 if (recipe is null)
                 {
+                    Console.WriteLine(baserecipe.Id);
                     recipe = new Recipe()
                     {
                         Id = IdManagers.GeneralIdGenerator.Generate(),
@@ -720,7 +721,9 @@ public static class LuaHandler
                         EntityIdsThatCanUseThisRecipe = new(),
                         Obsolete = false,
                         AnyWithBaseTypesFilledIn = new(),
-                        HasBeenUsed = true
+                        HasBeenUsed = true,
+                        OutputItemName = DBCache.Get<ItemDefinition>(baserecipe.Outputs.FirstOrDefault().Key)?.Name ?? "",
+                        Created = DateTime.UtcNow
                     };
                     recipe.UpdateInputs();
                     recipe.UpdateOutputs();

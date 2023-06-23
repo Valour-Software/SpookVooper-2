@@ -24,6 +24,32 @@ recipe_copper_smeltery_base = {
     editable = false
 }
 
+recipe_lead_smeltery_base = {
+	name = "Lead Smelting"
+	inputs = {
+		lead_ore = 1
+		tools = 0.005
+	}
+	outputs = {
+		lead = 1
+	}
+	perhour = 50
+    editable = false
+}
+
+recipe_zinc_smeltery_base = {
+	name = "Zinc Smelting"
+	inputs = {
+		zinc_ore = 1
+		tools = 0.005
+	}
+	outputs = {
+		zinc = 1
+	}
+	perhour = 50
+    editable = false
+}
+
 recipe_bauxite_smeltery_base = {
 	name = "Bauxite Smelting"
 	inputs = {
@@ -34,6 +60,19 @@ recipe_bauxite_smeltery_base = {
 		aluminium = 0.75
 	}
 	perhour = 50
+    editable = false
+}
+
+recipe_brass_factory_base = {
+	name = "Brass Production"
+	inputs = {
+		copper = 2
+		zinc = 1
+	}
+	outputs = {
+		brass = 3
+	}
+	perhour = 7.5
     editable = false
 }
 
@@ -155,6 +194,101 @@ recipe_cars_factory_base = {
     editable = false
 }
 
+recipe_normal_ammo_factory_base = {
+	name = "Normal Ammo Production"
+	inputs = {
+		lead = 1
+		steel = 0.25
+		copper = 0.25
+	}
+	outputs = {
+		normal_ammo = 1
+	}
+	perhour = 50
+	editable = false
+}
+
+recipe_crystallite_infused_ammo_factory_base = {
+	name = "Crystallite Infused Ammo Production"
+	inputs = {
+		lead = 0.75
+		steel = 0.25
+		copper = 0.25
+		crystallite = 0.25
+	}
+	outputs = {
+		crystallite_infused_ammo = 1
+	}
+	perhour = 50
+	editable = false
+}
+
+recipe_105mm_artillery_shell_factory_base = {
+	name = "105mm Artillery Shell Production"
+	inputs = {
+		brass = 10
+		lead = 5
+		steel = 5
+	}
+	outputs = {
+		artillery_shell_105mm = 1
+	}
+	perhour = 15
+	editable = false
+}
+
+recipe_155mm_artillery_shell_factory_base = {
+	name = "155mm Artillery Shell Production"
+	inputs = {
+		brass = 20
+		lead = 10
+		steel = 10
+	}
+	outputs = {
+		artillery_shell_155mm = 1
+	}
+	perhour = 10
+	editable = false
+}
+
+recipe_105mm_artillery_factory_base = {
+	name = "105mm Artillery Production"
+	inputs = {
+		
+	}
+	outputs = {
+		artillery_105mm = 1
+	}
+	perhour = 1
+	editable = true
+	buildingtype = "factory"
+	edits = {
+		attack = {
+			name = "Attack"
+			modifiers = {
+				item.attack = {
+					base = 1
+					add = {
+						base = 0.25
+						factor = edit.level
+					}
+				}
+			}
+			costs = {
+				steel = {
+					base = 1
+					factor = edit.level
+					factor = {
+						base = edit.level
+						factor = 0.25
+						add = 1
+					}
+				}
+			}
+		}
+	}
+}
+
 recipe_tank_factory_base = {
 	name = "Tank Production"
 	inputs = {
@@ -202,8 +336,8 @@ recipe_tank_factory_base = {
 	}
 }
 
-recipe_small_arms_factory_base = {
-	name = "Small Arms Production"
+recipe_rifle_factory_base = {
+	name = "Rifle Production"
 	inputs = {
 		steel = 0
 	}

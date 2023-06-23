@@ -88,6 +88,9 @@ public class CreateRoleModel
     [Display(Name = "Resources", Description = "The ability to trade resources as this group.")]
     public bool Resources { get; set; }
 
+    [Display(Name = "Recipes", Description = "The ability to create and edit recipes owned by this group.")]
+    public bool Recipes { get; set; }
+
     public static CreateRoleModel FromExisting(GroupRole role)
     {
         CreateRoleModel model = new CreateRoleModel()
@@ -115,6 +118,7 @@ public class CreateRoleModel
         model.Build = role.HasPermission(GroupPermissions.Build);
         model.ManageBuildings = role.HasPermission(GroupPermissions.ManageBuildings);
         model.Resources = role.HasPermission(GroupPermissions.Resources);
+        model.Recipes = role.HasPermission(GroupPermissions.Recipes);
 
         return model;
     }

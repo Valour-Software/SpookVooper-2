@@ -1,15 +1,38 @@
 ﻿@using Shared.Models.Items;
 @using Shared.Models.Users;
 @using Shared.Managers;
+@using Shared.Models;
 
 @if (Loaded) {
     <div class="recipe-designer-div">
         <div class="recipe-designer-body">
             <div class="left-side">
-                <div class="form-group">
-                    <label asp-for="Name">New Recipe Name</label>
-                    <input asp-for="Name" class="form-control" @bind-value="Recipe.Name" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                <div style="height: 425px;">
+                    <div class="form-group">
+                        <center>
+                            <span id="info-span" class="@infoSpanClass" style="color:white">@infoSpan</span>
+                            @if (infoSpanClass == "text-success")
+                            {
+                                
+                            }
+                        </center>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Name">New Recipe Name</label>
+                        <input asp-for="Name" class="form-control" @bind-value="Recipe.Name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        <label asp-for="Name">Output Item Name</label>
+                        <input asp-for="Name" class="form-control" @bind-value="Recipe.OutputItemName" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div style="">
+                    <button class="btn btn-outline-primary" @onclick="ClickedCreate">
+                        Create
+                    </button>
                 </div>
             </div>
             <div class="right-side">
@@ -78,6 +101,8 @@ else
     public List<ItemDefinition> ItemDefinitions { get; set; }
     public BaseEntity Entity { get; set; }
     public bool Loaded = false;
+    public string infoSpan = "";
+    public string infoSpanClass = "";
 
     public KeyValuePair<string, double> GetPairFromIndex(int index)
     {
@@ -126,7 +151,8 @@ else
                 EditsLevels = new(),
                 AnyWithBaseTypesFilledIn = new(),
                 Inputs = new(),
-                Outputs = new()
+                Outputs = new(),
+                OutputItemName = "New Item"
             };
             foreach (var luaedit in BaseRecipe.LuaRecipeEdits.Values)
             {
@@ -138,5 +164,21 @@ else
             Loaded = true;
             StateHasChanged();
         }
+    }
+
+    public async Task ClickedCreate()
+    {
+        var result = await Item.CreateAsync(Recipe);
+        if (!result.Success)
+        {
+            string errorText = result.Message;
+            Console.WriteLine(errorText);
+            infoSpan = errorText;
+            infoSpanClass = "text-danger";
+            return;
+        }
+
+        infoSpan = $"Successfully created recipe for {Recipe.OutputItemName}";
+        infoSpanClass = "text-success";
     }
 }

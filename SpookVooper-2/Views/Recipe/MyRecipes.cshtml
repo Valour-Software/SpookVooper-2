@@ -1,0 +1,84 @@
+﻿@using SpookVooper_2.Blazor.Components
+@using System.Text.Json
+@model List<Recipe>
+
+@{
+    ViewData["Title"] = "My Recipes";
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .limit-width {
+        max-width: 200px;
+    }
+
+    input {
+        width: 100%;
+    }
+
+    thead, tbody, tfoot, tr, td, th {
+        border-style: none;
+    }
+
+        tr:nth-child(odd) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        tr:nth-child(even), .header {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+    th {
+        background-color: unset !important;
+    }
+</style>
+
+<div class="container vw-100">
+    @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+    <div class="col-12">
+        <a asp-controller="Recipe" asp-action="RecipesThatICanUse">
+            <button class="btn btn-outline-primary">View recipes your groups can use</button>
+        </a>
+        <div class="d-flex">
+            <div class="p-1 align-self-start flex-grow-1">
+                <h2>Recipes that your groups own</h2>
+            </div>
+        </div>
+
+        <br />
+        <table class="table">
+            <thead>
+                <tr class="header">
+                    <th>Name</th>
+                    <th>Created</th>
+                    <th>Used in x levels of factories</th>
+                    <th>Owner</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    List<long> canbuildasids = new() { user.Id };
+                    canbuildasids.AddRange(DBCache.GetAll<Group>().Where(x => x.HasPermission(user, GroupPermissions.ManageBuildings)).Select(x => x.Id).ToList());
+                    foreach (var recipe in Model)
+                    {
+                        <tr>
+                            <td>@recipe.Name</td>
+                            <td>@String.Format("{0:M/d/yyyy}", recipe.Created)</td>
+                            <td>@($"{DBCache.GetAll<Factory>().Where(x => x.RecipeId == recipe.StringId && canbuildasids.Contains(x.OwnerId)).Count()}")</td>
+                            <td>
+                                @if (recipe.Owner.EntityType == EntityType.User)
+                                {
+                                    <a asp-controller="User" asp-action="Info" asp-route-id="@recipe.OwnerId">@recipe.Owner.Name</a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Group" asp-action="View" asp-route-id="@recipe.OwnerId">@recipe.Owner.Name</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

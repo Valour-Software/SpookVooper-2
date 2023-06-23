@@ -20,6 +20,7 @@ global using SV2.Http;
 global using Shared.Models.TradeDeals;
 global using ProvinceModifierType = Shared.Models.Districts.ProvinceModifierType;
 global using DistrictModifierType = Shared.Models.Districts.Modifiers.DistrictModifierType;
+global using DivisionModifierType = Shared.Models.Military.DivisionModifierType;
 global using ProvinceMetadata = Shared.Models.Districts.ProvinceMetadata;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
@@ -316,6 +317,15 @@ foreach (var state in DBCache.GetAll<State>())
 
         state.Group.AddEntityToRole(DBCache.Get<Group>(100), entity, state.Group.Roles.First(x => x.Name == "Governor"), true);
     }
+}
+
+foreach (var recipe in DBCache.GetAll<Recipe>())
+{
+    recipe.UpdateInputs();
+    recipe.UpdateOutputs();
+    recipe.UpdateModifiers();
+    var itemdef = DBCache.Get<ItemDefinition>(recipe.CustomOutputItemDefinitionId);
+    itemdef.Modifiers = recipe.Modifiers;
 }
 
 app.Run();

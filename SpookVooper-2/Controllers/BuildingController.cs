@@ -160,7 +160,10 @@ public class BuildingController : SVController
         building.Description = model.Description;
         building.RecipeId = model.RecipeId;
 
-        if (building.EmployeeGroupRoleId is not null && building.EmployeeGroupRoleId != 0)
+        if (model.GroupRoleIdForEmployee is null || model.GroupRoleIdForEmployee == 0)
+            model.GroupRoleIdForEmployee = null;
+
+        if (building.EmployeeGroupRoleId is not null)
         {
             if (model.GroupRoleIdForEmployee == 0)
             {
@@ -168,20 +171,20 @@ public class BuildingController : SVController
             }
         }
 
-        if (model.GroupRoleIdForEmployee != 0)
+        if (model.GroupRoleIdForEmployee is not null)
         {
             var role = DBCache.Get<GroupRole>(model.GroupRoleIdForEmployee);
             if (role.Salary < 2.0m)
                 return Json(new TaskResult(false, "The hourly pay (salary) of the role must be at or above the minimum wage (2 credits hourly)!"));
         }
 
-        if ((building.EmployeeGroupRoleId is not null && building.EmployeeGroupRoleId != 0  && model.GroupRoleIdForEmployee == 0))
+        if ((building.EmployeeGroupRoleId is not null && model.GroupRoleIdForEmployee is null))
         {
             _dbctx.JobApplications.RemoveRange(await _dbctx.JobApplications.Where(x => x.BuildingId == building.Id).ToListAsync());
             await _dbctx.SaveChangesAsync();
         }
 
-        if ((building.EmployeeId is not null && building.EmployeeGroupRoleId != 0) && building.EmployeeGroupRoleId != model.GroupRoleIdForEmployee)
+        if (building.EmployeeId is not null && building.EmployeeGroupRoleId != model.GroupRoleIdForEmployee)
         {
             var fromrole = DBCache.Get<GroupRole>(building.EmployeeGroupRoleId);
             var torole = DBCache.Get<GroupRole>(model.GroupRoleIdForEmployee);
@@ -191,6 +194,7 @@ public class BuildingController : SVController
         }
 
         building.EmployeeGroupRoleId = model.GroupRoleIdForEmployee;
+        building.Recipe.HasBeenUsed = true;
 
         if (recipeidbefore != model.RecipeId)
         {
@@ -217,6 +221,9 @@ public class BuildingController : SVController
         building.Name = model.Name;
         building.Description = model.Description;
         building.RecipeId = model.RecipeId;
+
+        if (model.GroupRoleIdForEmployee is null || model.GroupRoleIdForEmployee == 0)
+            model.GroupRoleIdForEmployee = null;
 
         if (building.EmployeeGroupRoleId is not null)
         {
@@ -258,6 +265,8 @@ public class BuildingController : SVController
             building.District.UpdateModifiers();
             building.UpdateModifiers();
         }
+
+        building.Recipe.HasBeenUsed = true;
 
         return RedirectBack($"Successfully updated {model.Name}'s info");
     }

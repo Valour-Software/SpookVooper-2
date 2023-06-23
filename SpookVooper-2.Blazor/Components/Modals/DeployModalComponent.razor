@@ -1,0 +1,13 @@
+﻿<div class="large-modal" style="@Style">
+    <div class="left-side">
+
+    </div>
+    <div class="right-side">
+        <button class="btn btn-outline-primary">Create New Template</button>
+    </div>
+</div>
+
+@code {
+    public bool Display = false;
+    public string Style => Display ? "" : "display:none";
+}

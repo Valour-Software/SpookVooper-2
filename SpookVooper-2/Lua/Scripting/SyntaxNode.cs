@@ -549,7 +549,8 @@ public enum ScriptScopeType
     District,
     Province,
     Building,
-    Research
+    Research,
+    Recipe
 }
 
 public class ChangeScopeNode : EffectNode

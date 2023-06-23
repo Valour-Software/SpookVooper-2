@@ -43,10 +43,10 @@ public class Regiment
     [Key]
     public long Id {get; set; }
     public RegimentType Type { get; set;}
-    
+
     // number of things in this regiment
     // for example in an Infantry Regiment, Count will be the number of soldiers
-    // only allowed values are in 1k increments
+    // only allowed values are in 100 increments for infantry and 1 increments for everything else
     public int Count { get; set;}
 
     public long DivisionId { get; set; }
@@ -56,14 +56,14 @@ public class Regiment
 
     public List<KeyValuePair<string, double>> GetEquipmentNeeds()
     {
-        // NOTE: 1 of Infantry equipment is enough for 1k troops that uses that equipment, anything else is 1 for 100 troops
-        // for example 100k Infantry needs 100 Guns & 100 Ammo.
+        // NOTE: 1 of Infantry equipment is enough for 100 troops that uses that equipment, anything else is 1 for 1
+        // for example 100k Infantry needs 1000 Guns & 1000 Ammo.
         switch (Type)
         {
             case RegimentType.Infantry:
                 return new List<KeyValuePair<string, double>> {
-                    KeyValuePair.Create("Ammo", Count/1000.0),
-                    KeyValuePair.Create("Rifle", Count/1000.0)
+                    KeyValuePair.Create("Ammo", Count/100.0),
+                    KeyValuePair.Create("Rifle", Count/100.0)
                 };
         }
         return new List<KeyValuePair<string, double>> {};

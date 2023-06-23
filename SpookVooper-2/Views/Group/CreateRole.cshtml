@@ -133,6 +133,12 @@
                         <span asp-description-for="Resources" class="form-text" style="color:#888888" />
                         <span asp-validation-for="Resources" class="text-danger"></span>
                     </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="Recipes" class="form-check-inline" />
+                        <label asp-for="Recipes"></label>
+                        <span asp-description-for="Recipes" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="Recipes" class="text-danger"></span>
+                    </div>
                     @if (group.Flags.Contains(GroupFlag.News))
                     {
                         <div class="form-group">

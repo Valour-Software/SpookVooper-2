@@ -2,18 +2,9 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SV2.Database.Models.Items;
-
-public enum ItemModifierTypes {
-    Attack = 0
-}
-
-public class ItemModifier 
-{
-    public ItemModifierTypes Type { get; set; }
-    public double Amount { get; set; }
-}
 
 public class ItemDefinition : IHasOwner 
 {
@@ -38,8 +29,8 @@ public class ItemDefinition : IHasOwner
     [Column("created")]
     public DateTime Created { get; set; }
 
-    [Column("modifiers", TypeName = "jsonb")]
-    public List<ItemModifier>? Modifiers { get; set; }
+    [NotMapped]
+    public Dictionary<ItemModifierType, double>? Modifiers { get; set; }
 
     /// <summary>
     /// For example, if this was a NVTech Tank, the base item would be the SV Tank item definition
