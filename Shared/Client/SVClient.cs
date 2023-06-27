@@ -30,6 +30,8 @@ public static class SVClient
     /// </summary>
     public static void SetHttpClient(HttpClient client) => _httpClient = client;
 
+    public static Group? CurrentlySelectedGroup { get; set; }
+
     public static readonly JsonSerializerOptions DefaultJsonOptions = new JsonSerializerOptions()
     {
         PropertyNameCaseInsensitive = true

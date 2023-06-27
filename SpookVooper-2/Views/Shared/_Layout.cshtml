@@ -179,7 +179,7 @@
         Blazor.start({
             // manually start blazor and override boot load to redirect http requests to /_framework/ instead of /{controller}/_framework
             loadBootResource: function (type, name, defaultUri, integrity) {
-                console.log(`Loading: '${type}', '${name}', '${defaultUri}', '${integrity}'`);
+                //console.log(`Loading: '${type}', '${name}', '${defaultUri}', '${integrity}'`);
 
                 //https://learn.microsoft.com/en-us/aspnet/core/blazor/fundamentals/startup?view=aspnetcore-6.0
                 // change framework uri's to be absolute instead of relative.

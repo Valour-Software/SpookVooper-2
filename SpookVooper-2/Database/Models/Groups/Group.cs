@@ -31,9 +31,10 @@ public enum ReadableGroupTypes {
 public enum GroupFlag
 {
     // is only given by the CFV
-    Charity,
+    NonProfit = 0,
     // is only given by the MOJ
-    News
+    News = 1,
+    CanHaveMilitary = 2
 }
 
 public class Group : BaseEntity, IHasOwner

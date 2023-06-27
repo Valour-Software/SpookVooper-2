@@ -1,0 +1,43 @@
+﻿@if (Loaded)
+{
+    <div class="switchgroup-modal">
+        <span class="info">Only groups which has the CanUseMilitary fla and which you have the ManageMilitary permission in will show up here.</span>
+        <br />
+        <br />
+        <span class="currently-selected-as">You are viewing everything on this page as @(SVClient.CurrentlySelectedGroup?.Name ?? "None")</span>
+        <div class="list">
+            @foreach (var group in Groups)
+            {
+                <div class='list-item @((SVClient.CurrentlySelectedGroup?.Id ?? 0) == group.Id ? "selected" : "")'>
+                    <div style="margin:5px" @onclick="() => Select(group)">
+                        <img class="smallpfp" style="display: inline-block" src="@group.ImageUrl" onerror="fiximg(this)">
+                        <h5 style="display: inline-block; padding:5px">@group.Name</h5>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    public List<Group> Groups = new();
+    public bool Loaded = false;
+    //public bool Display = false;
+    //public string Style => Display ? "" : "display:none";
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Groups = (await SVClient.GetJsonAsync<List<Group>>($"api/groups/mine/all/withperm/ManageMilitary")).Data;
+            Groups = Groups.Where(x => x.Flags.Contains(GroupFlag.CanHaveMilitary)).ToList();
+            Loaded = true;
+            StateHasChanged();
+        }
+    }
+
+    public void Select(Group group)
+    {
+        ClientData.NavBar.Refresh();
+        SVClient.CurrentlySelectedGroup = group;
+    }
+}

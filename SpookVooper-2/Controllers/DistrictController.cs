@@ -258,7 +258,7 @@ public class DistrictController : SVController
     }
 
     [UserRequired]
-    public IActionResult EditPolicies(long Id)
+    public IActionResult TaxPolicies(long Id)
     {
         District district = DBCache.Get<District>(Id);
         SVUser user = HttpContext.GetUser();
@@ -268,12 +268,9 @@ public class DistrictController : SVController
         }
 
         if (user.Id != district.GovernorId)
-        {
             return Redirect("/");
-        }
 
-        DistrictPolicyModel model = new(district);
-        return View(model);
+        return View(district);
     }
 
     [HttpPost]

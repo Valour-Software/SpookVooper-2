@@ -1,13 +1,38 @@
-﻿<div class="large-modal" style="@Style">
-    <div class="left-side">
+﻿@if (SVClient.CurrentlySelectedGroup is null)
+{
+    <span style="font-size: 16px;">You must select a group to view as! You can do this by clicking "Switch Group".</span>
+}
+else if (Loaded)
+{
+    <div class="deploy-modal">
+        <div class="deploy-modal-body">
+            <div class="left-side">
 
+            </div>
+            <div class="right-side">
+                <center>
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#DivisionDesigner">Create New Template</button>
+                </center>
+            </div>
+        </div>
     </div>
-    <div class="right-side">
-        <button class="btn btn-outline-primary">Create New Template</button>
-    </div>
-</div>
+}
+else
+{
+    <span>Loading...</span>
+}
 
 @code {
-    public bool Display = false;
-    public string Style => Display ? "" : "display:none";
+    //public bool Display = false;
+    //public string Style => Display ? "" : "display:none";
+    public bool Loaded = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Loaded = true;
+            StateHasChanged();
+        }
+    }
 }

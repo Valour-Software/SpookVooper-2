@@ -32,6 +32,45 @@ public class GroupController : SVController
         return View();
     }
 
+    [UserRequired]
+    public async Task<IActionResult> AddFlag(long groupid, string flag)
+    {
+        var user = HttpContext.GetUser();
+        if (!(await user.IsGovernmentAdmin()))
+            return RedirectBack("You must be a government admin add a flag to a group!");
+
+        var _flag = Enum.Parse<GroupFlag>(flag);
+
+        Group? group = DBCache.Get<Group>(groupid);
+        if (group == null) return RedirectBack($"Failed to find group {groupid}");
+
+        if (!group.Flags.Contains(_flag))
+            group.Flags.Add(_flag);
+
+        StatusMessage = $"Added {_flag} flag to {group.Name}";
+        return Redirect($"/Group/View/{groupid}");
+    }
+
+    [UserRequired]
+    public async Task<IActionResult> RemoveFlag(long groupid, string flag)
+    {
+        var user = HttpContext.GetUser();
+        if (!(await user.IsGovernmentAdmin()))
+            return RedirectBack("You must be a government admin remove a group's flag!");
+
+        Group? group = DBCache.Get<Group>(groupid);
+        if (group == null) return RedirectBack($"Failed to find group {groupid}");
+
+        var _flag = Enum.Parse<GroupFlag>(flag);
+
+        if (!group.Flags.Contains(_flag)) return RedirectBack($"Failed: Group does not {_flag} flag!");
+
+        group.Flags.Remove(_flag);
+
+        StatusMessage = $"Removed {_flag} flag from {group.Name}";
+        return Redirect($"/Group/View/{groupid}");
+    }
+
     [HttpGet]
     public async Task<IActionResult> Search(string id = "", bool excludeprovincegroups = false)
     {
@@ -53,7 +92,7 @@ public class GroupController : SVController
         });
     }
 
-    public IActionResult View(long id)
+    public async Task<IActionResult> View(long id)
     {
         Group? group = Group.Find(id);
         if (group is null)
@@ -344,6 +383,10 @@ public class GroupController : SVController
         if (model.Build) { permcode |= GroupPermissions.Build.Value; }
         if (model.Resources) { permcode |= GroupPermissions.Resources.Value; }
         if (model.Recipes) { permcode |= GroupPermissions.Recipes.Value; }
+        if (group.Flags.Contains(GroupFlag.CanHaveMilitary))
+        {
+            if (model.ManageMilitary) { permcode |= GroupPermissions.ManageMilitary.Value; }
+        }
 
         if (model.RoleId == 0)
             model.RoleId = IdManagers.GeneralIdGenerator.Generate();

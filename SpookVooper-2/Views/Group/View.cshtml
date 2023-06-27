@@ -59,9 +59,12 @@
                 <div class="d-flex justify-content-center">
                     @if (!Model.IsInGroup(user))
                     {
-                        <div class="p-2 align-self-center" style="text-align:center">
-                            <a asp-action="Join" asp-controller="Group" asp-route-id="@Model.Id" class="btn btn-outline-primary">Join Group</a>
-                        </div>
+                        @if (false)
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="Join" asp-controller="Group" asp-route-id="@Model.Id" class="btn btn-outline-primary">Join Group</a>
+                            </div>
+                        }
                     }
                     else
                     {
@@ -107,6 +110,36 @@
                             </div>
                         }
                     }
+
+                    @if (await user.IsGovernmentAdmin())
+                    {
+                        if (!Model.Flags.Contains(GroupFlag.NonProfit))
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="AddFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="NonProfit" class="btn btn-outline-warning">Add NonProfit FLag</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="RemoveFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="NonProfit" class="btn btn-outline-warning">Remove NonProfit FLag</a>
+                            </div>
+                        }
+
+                        if (!Model.Flags.Contains(GroupFlag.CanHaveMilitary))
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="AddFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="CanHaveMilitary" class="btn btn-outline-warning">Add CanHaveMilitary FLag</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="RemoveFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="CanHaveMilitary" class="btn btn-outline-warning">Remove CanHaveMilitary FLag</a>
+                            </div>
+                        }
+                    }
+
                     @if (Model.HasPermission(user, GroupPermissions.Recipes))
                     {
                         <div class="p-2 align-self-center" style="text-align:center">

@@ -24,6 +24,8 @@ public enum TaxType
     PersonalIncome = 13,
     CorporateIncome = 14,
     GroupIncome = 15,
+    ResourceSale = 16,
+    ResourceBrought = 17
 }
 
 public class TaxPolicy
@@ -75,6 +77,6 @@ public class TaxPolicy
         if (Maximum != 0.0m) {
             amount = Math.Min(Maximum, amount);
         }
-        return amount * Rate;
+        return (amount - Minimum) * Rate;
     }
 }

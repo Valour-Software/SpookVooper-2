@@ -1,9 +1,24 @@
 ﻿@using SpookVooper_2.Blazor.Components.War
+@using SpookVooper_2.Blazor.Components.Modals
+
+<link href="/SpookVooper-2.Blazor.styles.css" rel="stylesheet">
 <script src="https://unpkg.com/@@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
 <div>
     <component type="typeof(NavBarComponent)" render-mode="WebAssemblyPrerendered" />
     <component type="typeof(MapComponent)" render-mode="WebAssemblyPrerendered" />
 </div>
+
+<bootstrap-modal asp-modal-id="DivisionDesigner" asp-modal-title="Division Designer" asp-modal-extraclasses="modal-lg">
+    <component type="typeof(DivisionDesignerModalComponent)" render-mode="WebAssemblyPrerendered" />
+</bootstrap-modal>
+
+<bootstrap-modal asp-modal-id="DeployModal" asp-modal-title="Deployment" asp-modal-extraclasses="modal-lg">
+    <component type="typeof(DeployModalComponent)" render-mode="WebAssemblyPrerendered" />
+</bootstrap-modal>
+
+<bootstrap-modal asp-modal-id="SwitchGroupModal" asp-modal-title="Switch Group">
+    <component type="typeof(SwitchGroupModalComponent)" render-mode="WebAssemblyPrerendered" />
+</bootstrap-modal>
 
 <style>
     footer {
@@ -26,5 +41,11 @@
         // that can be bound on button clicks or mousewheel.
         //button.addEventListener('click', panzoom.zoomIn)
         elem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel)
+
+        //const modal2 = new bootstrap.Modal(document.getElementById('DivisionDesigner'), {})
+    }
+    function fiximg(c) {
+        c.onerror = '';
+        c.src = '/media/unity-128.png';
     }
 </script>

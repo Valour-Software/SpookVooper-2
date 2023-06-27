@@ -1,12 +1,16 @@
 ﻿<nav class="navbar navbar-expand-lg" style="background-color: var(--bg-color) !important;margin-top: -16px;border-width:0px;">
   <div class="container">
+        <span class="navbar-brand">Viewing as @(SVClient.CurrentlySelectedGroup?.Name ?? "None")</span>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
+                    <button class="btn btn-outline-secondary" style="color: white;" data-bs-toggle="modal" data-bs-target="#SwitchGroupModal">Switch Group</button>
+                </li>
+                <li class="nav-item" style="margin-left: 8px;">
                     <button class="btn btn-outline-secondary" style="color: white;">Divisions</button>
                 </li>
                 <li class="nav-item" style="margin-left: 8px;">
-                     <button class="btn btn-outline-secondary" style="color: white;">Deploy</button>
+                     <button class="btn btn-outline-secondary" style="color: white;" data-bs-toggle="modal" data-bs-target="#DeployModal">Deploy</button>
                 </li>
             </ul>
         </div>
@@ -14,5 +18,17 @@
 </nav>
 
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            ClientData.NavBar = this;
+        }
+    }
 
+
+    public void Refresh()
+    {
+        StateHasChanged();
+    }
 }

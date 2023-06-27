@@ -144,11 +144,11 @@
                 }
                 <div class="p-2 align-self-center" style="text-align:center">
                     <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewusers">View Citizens</button>
+                    <a asp-controller="District" asp-action="TaxPolicies" asp-route-id="@Model.Id" class="btn btn-outline-primary">View Taxes</a>
                 </div>
                 if (user is not null && user!.Id == Model.GovernorId) {
                     <div class="p-2 align-self-center" style="text-align:center">
                         <a asp-controller="District" asp-action="Manage" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
-                        <a asp-controller="District" asp-action="EditPolicies" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit Policies</a>
                         <a asp-controller="District" asp-action="ManageStates" asp-route-id="@Model.Id" class="btn btn-outline-primary">Manage States</a>
                     </div>
                 }

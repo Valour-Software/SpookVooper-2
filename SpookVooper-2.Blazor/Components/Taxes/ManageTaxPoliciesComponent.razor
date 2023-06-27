@@ -1,0 +1,250 @@
+﻿@using Shared.Models.Military
+
+@if (Loaded)
+{
+    @if (infoSpan != "")
+    {
+        <div class="alert alert-@statusMessageClass alert-dismissible fade show" role="alert" style='@(CurrentlyEditing ? "width:500px;" : "")'>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            </button>
+            @infoSpan
+        </div>
+    }
+    @if (CurrentlyEditing)
+    {
+        <div class="form">
+            <button class="btn btn-outline-primary" @onclick="() => GoBack()">Go Back</button>
+            <br/>
+            <br/>
+            <div class="form-group">
+                <label>Policy Name</label>
+                <input @bind-value="@CurrentlyEditingTaxPolicy.Name" class="form-control" />
+            </div>
+            <br/>
+            <div class="form-group">
+                <label>Tax Type</label>
+                <select @bind="CurrentlyEditingTaxPolicy.taxType" disabled="@(CurrentlyEditingTaxPolicy.Id != 0)" class="form-select form-control">
+                    @foreach (var taxType in Enum.GetValues<TaxType>())
+                    {
+                        <option value="@taxType">@TaxPolicy.GetReadableTypeName(taxType)</option>
+                    }
+                </select>
+            </div>
+            <br/>
+            <div class="form-group">
+                @if (CurrentlyEditingTaxPolicy.taxType is TaxType.CorporateIncome or TaxType.PersonalIncome or TaxType.GroupIncome)
+                {
+                    <label>Minimun (yearly income)</label>
+                }
+                else
+                {
+                    <label>Minimun</label>
+                }
+                <input @bind-value="@CurrentlyEditingTaxPolicy.Minimum" class="form-control" />
+            </div>
+
+            <br />
+            <div class="form-group">
+                @if (CurrentlyEditingTaxPolicy.taxType is TaxType.CorporateIncome or TaxType.PersonalIncome or TaxType.GroupIncome)
+                {
+                    <label>Maximum (yearly income)</label>
+                }
+                else
+                {
+                    <label>Maximum</label>
+                }
+                <input @bind-value="@CurrentlyEditingTaxPolicy.Maximum" class="form-control" />
+            </div>
+
+            <br />
+            <div class="form-group">
+                @if (CurrentlyEditingTaxPolicy.taxType != TaxType.ResourceMined)
+                {
+                    <label>The amount between the two above boxes will be taxed at (%)</label>
+                }
+                else
+                {
+                    <label>The amount between the two above boxes will be taxed at (¢)</label>
+                }
+                <input @bind-value="@CurrentlyEditingTaxPolicy.Rate" class="form-control" />
+            </div>
+
+            <br />
+            @if (CurrentlyEditingTaxPolicy.taxType == TaxType.ResourceMined)
+            {
+                <div class="form-group">
+                    <label>Resource to tax</label>
+                    <select @bind="CurrentlyEditingTaxPolicy.Target" disabled="@(CurrentlyEditingTaxPolicy.Id != 0)" class="form-select form-control">
+                        @foreach (var resource in Resources)
+                        {
+                            <option value="@resource">@resource</option>
+                        }
+                    </select>
+                </div>
+                <br />
+            }
+
+            <button class="btn btn-outline-primary" @onclick="async () => { await ClickedSave(); }">
+                @if (CurrentlyEditingTaxPolicy.Id == 0)
+                {
+                    @("Create")
+                }
+                else
+                {
+                    @("Save")
+                }
+            </button>
+        </div>
+    }
+    else
+    {
+        @if (IsGovernor)
+        {
+            <button class="btn btn-outline-primary" @onclick="() => ClickedEdit(null)">Create a New Tax Policy</button>
+            <br/>
+            <br />
+        }
+        <table class="table">
+            <thead>
+                <tr class="header">
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Rate</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Collected</th>
+                    @if (IsGovernor)
+                    {
+                        <td>Edit</td>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var policy in TaxPolicies)
+                    {
+                        <tr>
+                            <td>@policy.Name</td>
+                            <td>@TaxPolicy.GetReadableTypeName(policy.taxType)</td>
+                            <td>@policy.GetHumanReadableRate()</td>
+                            @if (policy.taxType != TaxType.ResourceMined)
+                            {
+                                @if (policy.taxType is TaxType.CorporateIncome or TaxType.PersonalIncome or TaxType.GroupIncome)
+                                {
+                                    <td>¢@($"{policy.Minimum * 365:n0}")</td>
+                                    <td>¢@($"{policy.Maximum * 365:n0}")</td>
+                                }
+                                else
+                                {
+                                    <td>¢@($"{policy.Minimum:n2}")</td>
+                                    <td>¢@($"{policy.Maximum:n2}")</td>
+                                }
+                            }
+                            else
+                            {
+                                <td>@Math.Round(policy.Minimum, 0)</td>
+                                <td>@Math.Round(policy.Maximum, 0)</td>
+                            }
+                            <td>¢@($"{policy.Collected:n2}")</td>
+                            @if (IsGovernor)
+                            {
+                                <td><button class="btn btn-outline-primary" @onclick="() => ClickedEdit(policy)">Edit</button></td>
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public long DistrictId { get; set; }
+
+    [Parameter]
+    public bool IsGovernor { get; set; }
+
+    public bool Loaded = false;
+    public string statusMessageClass = "";
+    public string infoSpan = "";
+    public List<TaxPolicy> TaxPolicies { get; set; }
+    public TaxPolicy CurrentlyEditingTaxPolicy { get; set; }
+    public bool CurrentlyEditing = false;
+    public List<string> Resources = "Crystallite,Iron,Silicon,Copper,Gold,Bauxite,Oil,Coal,Zinc,Lead".Split(",").ToList();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            CurrentlyEditingTaxPolicy = new();
+            TaxPolicies = (await SVClient.GetJsonAsync<List<TaxPolicy>>($"api/districts/{DistrictId}/taxpolicies/all")).Data.OrderByDescending(x => x.Id).ToList();
+
+            Loaded = true;
+            StateHasChanged();
+        }
+    }
+
+    public void GoBack()
+    {
+        CurrentlyEditing = false;
+    }
+
+    public void ClickedEdit(TaxPolicy? policy)
+    {
+        CurrentlyEditing = true;
+        if (policy is null)
+        {
+            policy = new()
+            {
+                Id = 0,
+                Name = "Tax Policy Name Here",
+                Rate = 0.00m,
+                DistrictId = DistrictId,
+                taxType = TaxType.Transactional,
+                Minimum = 0.00m,
+                Maximum = 99_999_999.00m,
+                Target = Resources.First()
+            };
+        }
+        else if (policy.taxType is TaxType.CorporateIncome or TaxType.PersonalIncome or TaxType.GroupIncome)
+        {
+            CurrentlyEditingTaxPolicy.Minimum *= 365m;
+            CurrentlyEditingTaxPolicy.Maximum *= 365m;
+        }
+        CurrentlyEditingTaxPolicy = policy;
+    }
+
+    public async Task ClickedSave()
+    {
+        if (CurrentlyEditingTaxPolicy.taxType is TaxType.CorporateIncome or TaxType.PersonalIncome or TaxType.GroupIncome)
+        {
+            CurrentlyEditingTaxPolicy.Minimum /= 365m;
+            CurrentlyEditingTaxPolicy.Maximum /= 365m;
+        }
+        var result = await Item.CreateAsync(CurrentlyEditingTaxPolicy);
+        if (!result.Success)
+        {
+            string errorText = result.Message;
+            Console.WriteLine(errorText);
+            infoSpan = errorText;
+            statusMessageClass = "danger";
+            if (CurrentlyEditingTaxPolicy.taxType is TaxType.CorporateIncome or TaxType.PersonalIncome or TaxType.GroupIncome)
+            {
+                CurrentlyEditingTaxPolicy.Minimum *= 365m;
+                CurrentlyEditingTaxPolicy.Maximum *= 365m;
+            }
+            return;
+        }
+
+        infoSpan = $"Successfully created tax policy";
+        statusMessageClass = "success";
+        CurrentlyEditing = false;
+        if (CurrentlyEditingTaxPolicy.Id == 0)
+            TaxPolicies.Add(result.Data);
+    }
+}

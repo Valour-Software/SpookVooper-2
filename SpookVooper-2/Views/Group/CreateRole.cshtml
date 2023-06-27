@@ -139,6 +139,15 @@
                         <span asp-description-for="Recipes" class="form-text" style="color:#888888" />
                         <span asp-validation-for="Recipes" class="text-danger"></span>
                     </div>
+                    @if (group.Flags.Contains(GroupFlag.CanHaveMilitary))
+                    {
+                        <div class="form-group">
+                            <input type="checkbox" asp-for="ManageMilitary" class="form-check-inline" />
+                            <label asp-for="ManageMilitary"></label>
+                            <span asp-description-for="ManageMilitary" class="form-text" style="color:#888888" />
+                            <span asp-validation-for="ManageMilitary" class="text-danger"></span>
+                        </div>
+                    }
                     @if (group.Flags.Contains(GroupFlag.News))
                     {
                         <div class="form-group">

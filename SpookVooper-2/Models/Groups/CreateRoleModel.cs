@@ -91,6 +91,12 @@ public class CreateRoleModel
     [Display(Name = "Recipes", Description = "The ability to create and edit recipes owned by this group.")]
     public bool Recipes { get; set; }
 
+    [Display(Name = "ManageDivisions", Description = "The ability to create, edit, and delete division templates, to start the training of new divisions, and delete divisions.")]
+    public bool ManageDivisions { get; set; }
+
+    [Display(Name = "ManageMilitary", Description = "The ability to create, edit, and delete Army Groups, Field Armies, etc and to add/remove commanders and divisions from them, and the ability to create, edit, and delete division templates, to start the training of new divisions, and delete divisions.")]
+    public bool ManageMilitary { get; set; }
+
     public static CreateRoleModel FromExisting(GroupRole role)
     {
         CreateRoleModel model = new CreateRoleModel()
@@ -119,6 +125,7 @@ public class CreateRoleModel
         model.ManageBuildings = role.HasPermission(GroupPermissions.ManageBuildings);
         model.Resources = role.HasPermission(GroupPermissions.Resources);
         model.Recipes = role.HasPermission(GroupPermissions.Recipes);
+        model.ManageMilitary = role.HasPermission(GroupPermissions.ManageMilitary);
 
         return model;
     }

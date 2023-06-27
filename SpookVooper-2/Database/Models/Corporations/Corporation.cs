@@ -17,17 +17,6 @@ public class Corporation
 
     public async Task ExecuteDividends(VooperDB dbctx)
     {
-        var group = DBCache.Get<Group>(GroupId)!;
-        var shares = await dbctx.CorporationShares.Where(x => x.CorporationId == Id).ToListAsync();
-        foreach (var share in shares)
-        {
-            if (share.ShareClass.DividendRate > 0.0m)
-            {
-                var amount = share.ShareClass.DividendRate * share.Amount / 30 / 24;
-                var tran = new SVTransaction(group, BaseEntity.Find(share.EntityId), amount, TransactionType.DividendPayment, $"Dividend Pay for {share.Amount} Class {share.ShareClass.ClassName} shares of Corporation {group.Name}");
-                tran.NonAsyncExecute(true);
-            }
-        }
     }
 
     public void CreateFromGroup(Group group, VooperDB dbctx)

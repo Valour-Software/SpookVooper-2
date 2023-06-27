@@ -43,7 +43,7 @@ public class CorporationShareClass
     public decimal VotingPower { get; set; }
 
     /// <summary>
-    /// Dividend payment per share per month
+    /// Dividend payment per share per month, min rate is 0.10 monthly
     /// </summary>
     [Column("dividendrate", TypeName = "numeric(9, 3)")]
     public decimal DividendRate { get; set; }

@@ -214,6 +214,10 @@ public abstract class BaseEntity
         if (EntityType == EntityType.Group && DBCache.Get<District>(Id) is not null)
             return;
 
+        // nonprofits do not pay taxes
+        if (EntityType == EntityType.Group && ((Group)this).Flags.Contains(GroupFlag.NonProfit))
+            return;
+
         if (TaxAbleBalance <= 0.0m)
             return;
 

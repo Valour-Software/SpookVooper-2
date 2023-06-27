@@ -249,6 +249,8 @@ BuildingAPI.AddRoutes(app);
 RecipeAPI.AddRoutes(app);
 DistrictAPI.AddRoutes(app);
 UserAPI.AddRoutes(app);
+TaxAPI.AddRoutes(app);
+GroupAPI.AddRoutes(app);
 
 app.MapControllerRoute(
     name: "default",
@@ -324,8 +326,11 @@ foreach (var recipe in DBCache.GetAll<Recipe>())
     recipe.UpdateInputs();
     recipe.UpdateOutputs();
     recipe.UpdateModifiers();
-    var itemdef = DBCache.Get<ItemDefinition>(recipe.CustomOutputItemDefinitionId);
-    itemdef.Modifiers = recipe.Modifiers;
+    if (recipe.CustomOutputItemDefinitionId is not null)
+    {
+        var itemdef = DBCache.Get<ItemDefinition>(recipe.CustomOutputItemDefinitionId);
+        itemdef.Modifiers = recipe.Modifiers;
+    }
 }
 
 app.Run();

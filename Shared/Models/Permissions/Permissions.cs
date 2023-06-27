@@ -31,7 +31,8 @@ public static class GroupPermissions
                 Build,
                 ManageBuildings,
                 Resources,
-                Recipes
+                Recipes,
+                ManageMilitary
         };
     }
 
@@ -57,6 +58,7 @@ public static class GroupPermissions
     public static readonly GroupPermission ManageBuildings = new GroupPermission(0x2000, "Manage Buildings", "Allows members to manage building owned by this group.");
     public static readonly GroupPermission Resources = new GroupPermission(0x4000, "Resources", "Allows members to send resource trades as this group.");
     public static readonly GroupPermission Recipes = new GroupPermission(0x8000, "Recipes", "Stuff");
+    public static readonly GroupPermission ManageMilitary = new GroupPermission(0x20000, "ManageMilitary", "Stuff");
 }
 
 public class GroupPermission : Permission

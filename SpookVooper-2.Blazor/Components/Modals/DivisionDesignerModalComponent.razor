@@ -1,0 +1,94 @@
+﻿@using Shared.Models.Military
+
+@if (SVClient.CurrentlySelectedGroup is null)
+{
+    <span style="font-size: 16px;">You must select a group to view as! You can do this by clicking "Switch Group".</span>
+}
+else if (Loaded) {
+    <div class="recipe-designer-div">
+        <div class="recipe-designer-body">
+            <div class="left-side">
+                <div style="height: 425px;">
+                    <div class="form-group">
+                        <center>
+                            <span id="info-span" class="@infoSpanClass" style="color:white">@infoSpan</span>
+                            @if (infoSpanClass == "text-success")
+                            {
+
+                            }
+                        </center>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Name">Template's Name</label>
+                        <input asp-for="Name" class="form-control" @bind-value="Template.Name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div style="">
+                    <button class="btn btn-outline-primary" @onclick="ClickedCreate">
+                        Create
+                    </button>
+                </div>
+            </div>
+            <div class="right-side">
+                <div class="container">
+                    <div class="edit-regiment-div">
+                        
+                    </div>
+                </div>
+                <div class="bottom-container">
+                    <div class="row">
+                        <div class="col-sm">
+                            Basic Info
+                        </div>
+                        <div class="col-sm">
+                            Combat Stats
+                        </div>
+                        <div class="col-sm">
+                            Misc. Stats
+                        </div>
+                        <div class="col-sm">
+                            Inputs
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <span>Loading...</span>
+}
+
+@code {
+    public bool Display = false;
+    public string Style => Display ? "" : "display:none";
+    public DivisionTemplate Template = null;
+
+    public bool Loaded = false;
+    public string infoSpan = "";
+    public string infoSpanClass = "";
+
+    public async Task ClickedCreate()
+    {
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Template = new()
+            {
+                Id = 0
+            };
+            var itemDefinitions = (await SVClient.GetJsonAsync<List<ItemDefinition>>($"api/itemdefinitions/all")).Data;
+            foreach (var itemdef in itemDefinitions)
+                await itemdef.AddToCache();
+
+            Loaded = true;
+            StateHasChanged();
+        }
+    }
+}

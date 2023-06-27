@@ -15,8 +15,11 @@ public class BootstrapModalTagHelper : TagHelper
     [HtmlAttributeName("asp-modal-to-open-on-close-id")]
     public string? ModalToOpenOnCloseId { get; set; }
 
+    [HtmlAttributeName("asp-modal-extraclasses")]
+    public string? ExtraClasses { get; set; }
+
     public override void Process(TagHelperContext context, TagHelperOutput output) {
-        output.PreContent.SetHtmlContent($@"<div class=""modal fade"" id=""{ModalId}"" tabindex=""-1"" aria-labelledby=""exampleModalLabel"" aria-hidden=""true"">
+        output.PreContent.SetHtmlContent($@"<div class=""modal fade {ExtraClasses}"" id=""{ModalId}"" tabindex=""-1"" aria-labelledby=""exampleModalLabel"" aria-hidden=""true"">
     <div class=""modal-dialog"">
         <div class=""modal-content"" data-bs-theme=""dark"">
             <div class=""modal-header"">

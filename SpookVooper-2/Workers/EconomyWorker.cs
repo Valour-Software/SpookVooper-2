@@ -1,6 +1,8 @@
 using IdGen;
+using Microsoft.EntityFrameworkCore;
 using SV2.Database;
 using SV2.Database.Managers;
+using SV2.Database.Models.Corporations;
 using SV2.Database.Models.Economy;
 using SV2.Database.Models.Users;
 using SV2.Web;
@@ -36,6 +38,31 @@ namespace SV2.Workers
                     {
                         try
                         {
+                            // do corporate dividends
+                            var shareClassesIds = DBCache.GetAll<CorporationShareClass>().Where(x => x.DividendRate >= 0.1m).Select(x => x.Id).ToHashSet();
+                            var shares = await _dbctx.CorporationShares.Where(x => shareClassesIds.Contains(x.ShareClassId)).ToListAsync();
+                            Dictionary<long, decimal> DividendsPaid = new();
+                            foreach (var share in shares)
+                            {
+                                var amount = share.Amount * share.ShareClass.DividendRate / 30 / 24;
+                                if (!DividendsPaid.ContainsKey(share.CorporationId))
+                                    DividendsPaid[share.CorporationId] = amount;
+                                var tran = new SVTransaction(share.Corporation.Group, BaseEntity.Find(share.EntityId), amount, TransactionType.DividendPayment, $"Dividend Pay for {share.Amount} Class {share.ShareClass.ClassName} shares of Corporation {share.Corporation.Group}");
+                                tran.NonAsyncExecute(true);
+                            }
+
+                            // handle imperial dividend tax credit
+                            // TODO: add district level too
+                            var taxcreditpolicy = DBCache.GetAll<TaxCreditPolicy>().FirstOrDefault(x => x.DistrictId == 100 && x.taxCreditType == TaxCreditType.Dividend);
+                            foreach (var pair in DividendsPaid)
+                            {
+                                var amount = pair.Value * taxcreditpolicy.Rate;
+                                taxcreditpolicy.Paid += amount;
+                                var group = DBCache.Get<Corporation>(pair.Key).Group;
+                                var tran = new SVTransaction(BaseEntity.Find(taxcreditpolicy.DistrictId), group, amount, TransactionType.DividendPayment, $"Imperial Dividend Tax Credit");
+                                tran.NonAsyncExecute(true);
+                            }
+
                             // do district funding
                             foreach(var district in DBCache.GetAll<District>())
                             {
@@ -57,11 +84,13 @@ namespace SV2.Workers
                                             // no sense to keep paying these members since the group has ran out of credits
                                             break;
                                         }
-                                        if (taxcredit is not null) {
+                                        
+                                        // TODO: add check for parent ownership too
+                                        if (taxcredit is not null && Id != role.Group.OwnerId) {
                                             amount += role.Salary;
                                         }
                                     }
-                                    if (taxcredit is not null && amount > 0.00m)
+                                    if (taxcredit is not null && amount > 0.05m)
                                     {
                                         var TaxCreditTran = new SVTransaction(BaseEntity.Find(taxcredit.DistrictId!), BaseEntity.Find(role.GroupId), amount * taxcredit.Rate, TransactionType.TaxCreditPayment, $"Employee Tax Credit Payment");
                                         TaxCreditTran.NonAsyncExecute();
@@ -97,7 +126,7 @@ namespace SV2.Workers
                                         rate *= increase+1;
                                     }
                                     rate = policy.Rate * 5.0m;
-                                    var tran = new SVTransaction(BaseEntity.Find(fromId), BaseEntity.Find(user.Id), rate/24.0m, TransactionType.Paycheck, $"UBI for rank {policy.ApplicableRank.ToString()}");
+                                    var tran = new SVTransaction(BaseEntity.Find(fromId), BaseEntity.Find(user.Id), rate/24.0m, TransactionType.UBI, $"UBI for rank {policy.ApplicableRank.ToString()}");
                                     tran.NonAsyncExecute();
                                 }
                             }

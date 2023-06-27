@@ -173,8 +173,17 @@ public abstract class ProducingBuilding : BuildingBase
             if (BuildingObj.ApplyStackingBonus)
                 basevalue *= 1+Math.Min(Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Size, Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"]);
 
-            if (BuildingType == BuildingType.Factory)
-                basevalue *= 5.5;
+            if (BuildingType == BuildingType.Factory || BuildingType == BuildingType.Mine)
+            {
+                var start = 10.0;
+                var end = 2;
+                var diff = start - end;
+                var startdate = new DateTime(2023, 7, 7);
+                var hourstotal = 24 * 7 * 6;
+                var progress = Math.Max(0, (DateTime.UtcNow - startdate).TotalHours);
+                var muit = end + (diff * (1 - (progress / hourstotal)));
+                basevalue *= Math.Max(end, muit);
+            }
 
             basevalue *= GetModifierValue(BuildingModifierType.ThroughputFactor) + 1.00;
             basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;
@@ -323,7 +332,20 @@ public abstract class ProducingBuilding : BuildingBase
         foreach (var resourcename in Recipe.Outputs.Keys) {
             double amount = rate * Recipe.Outputs[resourcename];
             if (BuildingObj.MustHaveResource is not null)
+            {
                 amount *= MiningOutputFactor();
+                var policies = DBCache.GetAll<TaxPolicy>().Where(x => (x.DistrictId == DistrictId || x.DistrictId == 100) && x.taxType == TaxType.ResourceMined && x.Target == BuildingObj.MustHaveResource);
+                foreach (var policy in policies)
+                {
+                    if (policy is not null)
+                    {
+                        decimal due = policy.GetTaxAmountForResource((decimal)amount);
+                        policy.Collected += due;
+                        var taxtrans = new SVTransaction(Owner, BaseEntity.Find(policy.DistrictId), due, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType}");
+                        taxtrans.NonAsyncExecute(true);
+                    }
+                }
+            }
             await Owner.ChangeResourceAmount(resourcename, amount, $"Output for building {Name} ({BuildingObj.PrintableName})");
         }
 

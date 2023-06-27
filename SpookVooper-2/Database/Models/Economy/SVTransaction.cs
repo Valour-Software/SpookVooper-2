@@ -13,6 +13,8 @@ public enum TransactionType
     // also includes trading resources
     ItemTrade = 2,
     Paycheck = 3,
+
+    [Obsolete]
     StockTrade = 4,
     // use this when the transaction does not fit the other types
     Payment = 5,
@@ -21,7 +23,12 @@ public enum TransactionType
     TaxPayment = 7,
     FreeMoney = 8,
     LoanRepayment = 9,
-    DividendPayment = 10
+    DividendPayment = 10,
+    StockSale = 11,
+    StockBrought = 12,
+    ResourceSale = 13,
+    ResourceBrought = 14,
+    UBI = 15
 }
 
 public class SVTransaction
@@ -278,7 +285,7 @@ public class SVTransaction
 
         if (transactionType != TransactionType.TaxPayment && transactionType != TransactionType.Loan) {
 
-            List<TaxPolicy> policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == null || x.DistrictId == fromEntity.DistrictId || x.DistrictId == toEntity.DistrictId).ToList();
+            List<TaxPolicy> policies = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == 100 || x.DistrictId == fromEntity.DistrictId || x.DistrictId == toEntity.DistrictId).ToList();
 
             // must do TAXES (don't let Etho see this)
 
@@ -289,7 +296,7 @@ public class SVTransaction
                     continue;
                 }
                 decimal amount = 0.0m;
-                switch (policy.taxType) 
+                switch (policy.taxType)
                 {
                     case TaxType.Transactional:
                         amount = policy.GetTaxAmount(Credits);
@@ -299,13 +306,25 @@ public class SVTransaction
                             amount = policy.GetTaxAmount(Credits);
                         }
                         break;
-                    case TaxType.StockBought:
-                        if (transactionType == TransactionType.StockTrade) {
+                    case TaxType.StockSale:
+                        if (transactionType == TransactionType.StockSale) {
                             amount = policy.GetTaxAmount(Credits);
                         }
                         break;
-                    case TaxType.StockSale:
-                        if (transactionType == TransactionType.StockTrade) {
+                    case TaxType.StockBought:
+                        if (transactionType == TransactionType.StockBrought) {
+                            amount = policy.GetTaxAmount(Credits);
+                        }
+                        break;
+                    case TaxType.ResourceSale:
+                        if (transactionType == TransactionType.ResourceSale)
+                        {
+                            amount = policy.GetTaxAmount(Credits);
+                        }
+                        break;
+                    case TaxType.ResourceBrought:
+                        if (transactionType == TransactionType.ResourceBrought)
+                        {
                             amount = policy.GetTaxAmount(Credits);
                         }
                         break;
@@ -336,7 +355,7 @@ public class SVTransaction
                         totaltaxpaid += amount;
                         taxtrans.NonAsyncExecute(true);
                     }
-                    else if (policy.DistrictId == ToEntity.DistrictId){
+                    else if (policy.DistrictId == ToEntity.DistrictId) {
                         SVTransaction taxtrans = new SVTransaction(ToEntity, BaseEntity.Find(policy.DistrictId), amount, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType.ToString()}");
                         policy.Collected += amount;
                         totaltaxpaid += amount;
@@ -349,9 +368,32 @@ public class SVTransaction
         //fromEntity.Credits -= Credits;
         //toEntity.Credits += Credits;
 
-        if (transactionType == TransactionType.DividendPayment || transactionType == TransactionType.ItemTrade || transactionType == TransactionType.Paycheck || transactionType == TransactionType.Payment || transactionType == TransactionType.StockTrade)
+        if (transactionType is TransactionType.DividendPayment
+            or TransactionType.ItemTrade
+            or TransactionType.Paycheck
+            or TransactionType.Payment
+            or TransactionType.StockSale
+            or TransactionType.ResourceSale)
         {
             fromEntity.TaxAbleBalance -= Credits;
+            toEntity.TaxAbleBalance += Credits;
+        }
+
+        else if (transactionType == TransactionType.ResourceBrought)
+        {
+            if (fromEntity.EntityType == EntityType.Group)
+            {
+                fromEntity.TaxAbleBalance -= Credits;
+                toEntity.TaxAbleBalance += Credits;
+            }
+            else
+            {
+                toEntity.TaxAbleBalance += Credits;
+            }
+        }
+
+        else if (transactionType == TransactionType.StockBrought)
+        {
             toEntity.TaxAbleBalance += Credits;
         }
 
