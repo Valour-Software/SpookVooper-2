@@ -37,12 +37,48 @@ public class ItemDefinition : IHasOwner
     /// </summary>
     [Column("baseitemdefinitionid")]
     public long? BaseItemDefinitionId { get; set; }
-
     public bool Transferable { get; set; }
+
+    [NotMapped]
+    public string? BaseItemName => BaseItemDefinitionId is null ? null : DBCache.Get<ItemDefinition>(BaseItemDefinitionId).Name;
 
     [NotMapped]
     [JsonIgnore]
     public bool IsSVItem => OwnerId == 100 || BaseItemDefinitionId is not null;
+
+    public void UpdateOrAddModifier(ItemModifierType type, double value)
+    {
+        if (!Modifiers.ContainsKey(type))
+            Modifiers[type] = value;
+        else
+            Modifiers[type] += value;
+    }
+
+    public async ValueTask UpdateModifiers()
+    {
+        Modifiers = new();
+        if (BaseItemDefinitionId is not null)
+        {
+            var recipe = DBCache.GetAll<Recipe>().FirstOrDefault(x => x.CustomOutputItemDefinitionId == Id);
+            Modifiers = recipe.Modifiers;
+        }
+        else
+        {
+            Modifiers = Name switch
+            {
+                "Normal Ammo" => new()
+                {
+                    { ItemModifierType.Attack, 0.75}
+                },
+                "Crystallite Infused Ammo" => new()
+                {
+                    { ItemModifierType.Attack, 1.5 },
+                    { ItemModifierType.AttackFactor, 0.25 }
+                },
+                _ => new()
+            };
+        }
+    }
 
     public ItemDefinition() {
 
@@ -54,4 +90,6 @@ public class ItemDefinition : IHasOwner
         Name = name;
         Created = DateTime.UtcNow;
     }
+
+
 }

@@ -32,7 +32,13 @@ else
         if (firstRender)
         {
             Loaded = true;
+            ClientData.DeployModal = this;
             StateHasChanged();
         }
+    }
+
+    public async Task Refresh()
+    {
+        StateHasChanged();
     }
 }

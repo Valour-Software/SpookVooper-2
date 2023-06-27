@@ -26,7 +26,7 @@ public abstract class BuildingBase : Item, ITickable
     public async ValueTask<Province> GetProvinceAsync() => await Province.FindAsync(ProvinceId);
     public async ValueTask<LuaBuilding> GetLuaBuildingAsync() => await LuaBuilding.FindAsync(LuaBuildingObjId);
     public async ValueTask<District> GetDistrictAsync() => await District.FindAsync(DistrictId);
-    public async ValueTask<BaseRecipe> GetRecipeAsync() => await BaseRecipe.FindAsync(RecipeId);
+    public async ValueTask<Recipe> GetRecipeAsync() => await Recipe.FindAsync(RecipeId);
 
     public bool SuccessfullyTicked { get; set; }
 

@@ -46,7 +46,7 @@ public class Regiment
 
     // number of things in this regiment
     // for example in an Infantry Regiment, Count will be the number of soldiers
-    // only allowed values are in 100 increments for infantry and 1 increments for everything else
+    // only allowed values are in 1k increments for infantry and 1 increments for everything else
     public int Count { get; set;}
 
     public long DivisionId { get; set; }

@@ -307,6 +307,7 @@ public static class DBCache
             Put(item.Id, item);
         }
         foreach (ItemDefinition definition in dbctx.ItemDefinitions) {
+            await definition.UpdateModifiers();
             Put(definition.Id, definition);
         }
 

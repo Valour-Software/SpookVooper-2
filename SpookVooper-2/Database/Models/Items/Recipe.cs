@@ -11,7 +11,8 @@ namespace SV2.Database.Models.Items;
 
 public enum ItemModifierType
 {
-    Attack = 1
+    Attack = 1,
+    AttackFactor = 2
 }
 
 public class Recipe : IHasOwner

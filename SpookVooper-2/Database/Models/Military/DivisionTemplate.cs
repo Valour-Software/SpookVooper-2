@@ -46,11 +46,12 @@ public class RegimentTemplate
     // for example in an Infantry Regiment, Count will be the number of soldiers
     // only allowed values are in 1k increments for infantry and 1 increments for everything else
     public int Count { get; set; }
-    public long ItemDefinitionId { get; set; }
+    public long WeaponItemDefinitionId { get; set; }
+    public long AmmoWeaponItemDefinitionId { get; set; }
 
     [NotMapped]
     [JsonIgnore]
-    public ItemDefinition ItemDefinition => DBCache.Get<ItemDefinition>(ItemDefinitionId)!;
+    public ItemDefinition WeaponItemDefinition => DBCache.Get<ItemDefinition>(WeaponItemDefinitionId)!;
 
     [NotMapped]
     [JsonIgnore]

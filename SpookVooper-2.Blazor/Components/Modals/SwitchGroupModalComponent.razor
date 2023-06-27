@@ -9,7 +9,7 @@
             @foreach (var group in Groups)
             {
                 <div class='list-item @((SVClient.CurrentlySelectedGroup?.Id ?? 0) == group.Id ? "selected" : "")'>
-                    <div style="margin:5px" @onclick="() => Select(group)">
+                    <div style="margin:5px" @onclick="async () => { await Select(group); }">
                         <img class="smallpfp" style="display: inline-block" src="@group.ImageUrl" onerror="fiximg(this)">
                         <h5 style="display: inline-block; padding:5px">@group.Name</h5>
                     </div>
@@ -35,9 +35,11 @@
         }
     }
 
-    public void Select(Group group)
+    public async Task Select(Group group)
     {
-        ClientData.NavBar.Refresh();
         SVClient.CurrentlySelectedGroup = group;
+        ClientData.NavBar!.Refresh();
+        await ClientData.DivisionDesignerModal!.Refresh();
+        await ClientData.DeployModal!.Refresh();
     }
 }

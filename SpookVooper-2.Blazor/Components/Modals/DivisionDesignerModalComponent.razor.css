@@ -12,15 +12,35 @@
     flex-direction: row;
 }
 
+.regiment-list {
+    height: 360px;
+    overflow-y: auto;
+    width: 100%;
+
+}
+
+.selected {
+    background-color: rgba(0, 255, 0, 0.1);
+}
+
+.edit-regiment-div {
+
+}
+
+.regiment-list-item {
+    margin: 5px;
+    padding: 1px;
+}
+
 .left-side {
-    width: 40%;
+    width: 45%;
     border-right: solid white;
     height: 500px;
     padding: 16px;
 }
 
 .right-side {
-    width: 60%;
+    width: 55%;
     padding: 16px;
 }
 

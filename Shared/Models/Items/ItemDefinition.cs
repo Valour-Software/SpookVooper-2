@@ -23,6 +23,14 @@ public class ItemDefinition : Item
     public bool Transferable { get; set; }
 
     public bool IsSVItem => OwnerId == 100 || BaseItemDefinitionId is not null;
+    public string? BaseItemName { get; set; }
+
+    public async ValueTask<Recipe> GetRecipeAsync()
+    {
+        if (SVCache.ItemDefIdToRecipe.ContainsKey(Id))
+            return SVCache.ItemDefIdToRecipe[Id];
+        return null;
+    }
 
     public static async ValueTask<ItemDefinition> FindAsync(long id, bool refresh = false)
     {

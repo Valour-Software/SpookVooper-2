@@ -8,11 +8,14 @@ namespace Shared.Models.Items;
 
 public enum ItemModifierType
 {
-    Attack = 1
+    Attack = 1,
+    AttackFactor = 2
 }
 
 public class Recipe : Item
 {
+    [NotMapped]
+    [JsonIgnore]
     public override string BaseRoute => $"api/recipes";
     public long Id { get; set; }
     public string Name { get; set; }
@@ -36,13 +39,30 @@ public class Recipe : Item
     public List<long> EntityIdsThatCanUseThisRecipe { get; set; }
     public Dictionary<string, int> EditsLevels { get; set; }
     public Dictionary<string, long> AnyWithBaseTypesFilledIn { get; set; }
-    public Dictionary<string, long> CustomOutputItemDefinitionsIds { get; set; }
+    public long? CustomOutputItemDefinitionId { get; set; }
     public Dictionary<ItemModifierType, double> Modifiers { get; set; }
     public string OutputItemName { get; set; }
     public bool HasBeenUsed { get; set; }
     public async ValueTask<BaseRecipe> GetBaseRecipeAsync()
     {
         return await BaseRecipe.FindAsync(BaseRecipeId);
+    }
+
+    public static async ValueTask<Recipe> FindAsync(string id, bool refresh = false)
+    {
+        if (!refresh)
+        {
+            var cached = SVCache.Get<Recipe>(id);
+            if (cached is not null)
+                return cached;
+        }
+
+        var item = (await SVClient.GetJsonAsync<Recipe>($"api/recipes/{id}")).Data;
+
+        if (item is not null)
+            await item.AddToCache();
+
+        return item;
     }
 
     public bool CanUse(BaseEntity entity)
@@ -114,5 +134,15 @@ public class Recipe : Item
                 Inputs[itemdef.Id] += (double)amount;
             }
         }
+    }
+
+    public async ValueTask<string> GetBaseOutput()
+    {
+        return (await GetBaseRecipeAsync()).OutputWithCustomItem.Value.Key;
+    }
+
+    public override async Task AddToCache()
+    {
+        await SVCache.Put(Id, this);
     }
 }

@@ -281,7 +281,8 @@ public static class LuaHandler
                 {
                     "item" => levels[1] switch
                     {
-                        "attack" => ItemModifierType.Attack
+                        "attack" => ItemModifierType.Attack,
+                        "attackfactor" => ItemModifierType.AttackFactor
                     }
                 };
             }

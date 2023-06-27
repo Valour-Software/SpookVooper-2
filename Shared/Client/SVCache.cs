@@ -9,6 +9,8 @@ public static class SVCache
     /// </summary>
     public static Dictionary<Type, ConcurrentDictionary<object, object>> HCache = new();
 
+    public static Dictionary<long?, Recipe> ItemDefIdToRecipe = new();
+
     /// <summary>
     /// Places an item into the cache
     /// </summary>

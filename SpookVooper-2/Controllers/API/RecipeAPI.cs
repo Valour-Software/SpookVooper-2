@@ -17,15 +17,20 @@ public class RecipeAPI : BaseAPI
 {
     public static void AddRoutes(WebApplication app)
     {
-        app.MapGet   ("api/recipes/getall", GetAllAsync).RequireCors("ApiPolicy");
+        app.MapGet   ("api/recipes/all", GetAllAsync).RequireCors("ApiPolicy");
+        app.MapGet   ("api/baserecipes/all", GetAllRecipesAsync).RequireCors("ApiPolicy");
         app.MapGet   ("api/baserecipes/{id}", GetAsync).RequireCors("ApiPolicy");
         app.MapPost  ("api/recipes", CreateAsync).RequireCors("ApiPolicy").AddEndpointFilter<UserRequiredAttribute>();
     }
 
     private static async Task GetAllAsync(HttpContext ctx)
     {
-        var recipes = GameDataManager.BaseRecipeObjs.Values.ToList();
-        await ctx.Response.WriteAsync(JsonSerializer.Serialize(recipes));
+        await ctx.Response.WriteAsync(JsonSerializer.Serialize(DBCache.GetAll<Recipe>().ToList()));
+    }
+
+    private static async Task GetAllRecipesAsync(HttpContext ctx)
+    {
+        await ctx.Response.WriteAsync(JsonSerializer.Serialize(GameDataManager.BaseRecipeObjs.Values.ToList()));
     }
 
     private static async Task<IResult> GetAsync(HttpContext ctx, string id)
@@ -80,6 +85,8 @@ public class RecipeAPI : BaseAPI
 
         DBCache.AddNew(recipe.Id, recipe);
         DBCache.Recipes[recipe.StringId] = recipe;
+
+        await itemdef.UpdateModifiers();
 
         return Results.Json(recipe);
     }
