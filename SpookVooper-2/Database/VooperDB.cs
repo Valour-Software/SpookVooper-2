@@ -264,6 +264,8 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
         }
 
         foreach (var district in DBCache.GetAll<District>()) {
+            if (district.Group.GroupType != GroupTypes.District)
+                district.Group.GroupType = GroupTypes.District;;
             if (!district.Group.Roles.Any(x => x.Name == "Governor")) {
                 var role = new GroupRole() {
                     Name = "Governor",
@@ -277,6 +279,11 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
                 };
                 DBCache.AddNew(role.Id, role);
             }
+        }
+
+        foreach (var state in DBCache.GetAll<State>()) {
+            if (state.Group.GroupType != GroupTypes.State)
+                state.Group.GroupType = GroupTypes.State;
         }
     }
 }

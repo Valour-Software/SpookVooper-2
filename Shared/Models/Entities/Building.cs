@@ -85,7 +85,7 @@ public abstract class ProducingBuilding : BuildingBase
     public BaseEntity Owner { get; set; }
     public District District { get; set; }
     public Province Province { get; set; }
-    public BaseRecipe Recipe { get; set; }
+    public Recipe Recipe { get; set; }
 }
 
 public enum BuildingModifierType

@@ -233,7 +233,8 @@ public class DistrictController : SVController
             DistrictId = district.Id
         };
         Group stategroup = new(model.Name, district.GroupId) {
-            Id = IdManagers.GroupIdGenerator.Generate()
+            Id = IdManagers.GroupIdGenerator.Generate(),
+            GroupType = GroupTypes.State
         };
 
         DBCache.AddNew(stategroup.Id, stategroup);

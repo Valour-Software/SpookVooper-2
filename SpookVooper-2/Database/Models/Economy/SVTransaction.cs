@@ -46,6 +46,7 @@ public class SVTransaction
 
     [VarChar(1024)]
     public string Details { get; set; }
+    public bool? IsAnExpense {get; set; }
 
     [NotMapped]
 
@@ -368,32 +369,37 @@ public class SVTransaction
         //fromEntity.Credits -= Credits;
         //toEntity.Credits += Credits;
 
-        if (transactionType is TransactionType.DividendPayment
-            or TransactionType.ItemTrade
-            or TransactionType.Paycheck
-            or TransactionType.Payment
-            or TransactionType.StockSale
-            or TransactionType.ResourceSale)
+        if (transactionType is TransactionType.Paycheck) 
         {
             fromEntity.TaxAbleBalance -= Credits;
             toEntity.TaxAbleBalance += Credits;
         }
 
+        if (transactionType is TransactionType.DividendPayment
+            or TransactionType.ItemTrade
+            or TransactionType.Payment
+            or TransactionType.StockSale
+            or TransactionType.ResourceSale)
+        {
+            if (IsAnExpense is not null and true)
+                fromEntity.TaxAbleBalance -= Credits;
+            toEntity.TaxAbleBalance += Credits;
+        }
+
         else if (transactionType == TransactionType.ResourceBrought)
         {
-            if (fromEntity.EntityType == EntityType.Group)
-            {
+            if (IsAnExpense is not null and true)
                 fromEntity.TaxAbleBalance -= Credits;
-                toEntity.TaxAbleBalance += Credits;
-            }
-            else
-            {
-                toEntity.TaxAbleBalance += Credits;
-            }
+            toEntity.TaxAbleBalance += Credits;
         }
 
         else if (transactionType == TransactionType.StockBrought)
         {
+            toEntity.TaxAbleBalance += Credits;
+        }
+
+        else if (transactionType == TransactionType.TaxPayment) {
+            // we do this so that districts, states, and province groups can have a "profit" for banks and loan brokers to use.
             toEntity.TaxAbleBalance += Credits;
         }
 

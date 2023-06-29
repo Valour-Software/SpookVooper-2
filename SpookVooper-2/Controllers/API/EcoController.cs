@@ -17,7 +17,7 @@ namespace SV2.API
             app.MapGet   ("api/eco/transaction/send", SendTransaction).RequireCors("ApiPolicy");
         }
 
-        private static async Task SendTransaction(HttpContext ctx, VooperDB db, long fromid, long toid, string apikey, decimal amount, string detail, TransactionType trantype)
+        private static async Task SendTransaction(HttpContext ctx, VooperDB db, long fromid, long toid, string apikey, decimal amount, string detail, TransactionType trantype, bool? isanexpense = null)
         {
             // get Entity with the api key
             BaseEntity? entity = await BaseEntity.FindByApiKey(apikey, db);
@@ -58,7 +58,27 @@ namespace SV2.API
                 return;
             }
 
+            if (isanexpense is not null) 
+            {
+                // only groups with the CanSetTransactionsExpenseStatus flag can set the isanexpense
+                if (toentity.EntityType != EntityType.Group && toentity.EntityType != EntityType.Corporation)
+                {
+                    ctx.Response.StatusCode = 401;
+                    await ctx.Response.WriteAsync("Only groups can use isanexpense!");
+                    return;
+                }
+                Group group = (Group)toentity;
+                if (!group.Flags.Contains(GroupFlag.CanSetTransactionsExpenseStatus))
+                {
+                    ctx.Response.StatusCode = 401;
+                    await ctx.Response.WriteAsync("Only groups with the CanSetTransactionsExpenseStatus flag can use isanexpense!");
+                    return;
+                }
+            }
+
             var tran = new SVTransaction(fromentity, toentity, amount, trantype, detail);
+            if (isanexpense is not null)
+                tran.IsAnExpense = isanexpense;
 
             TaskResult result = await tran.Execute();
 

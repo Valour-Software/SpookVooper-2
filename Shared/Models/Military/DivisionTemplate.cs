@@ -56,13 +56,14 @@ public class RegimentTemplate
     // only allowed values are in 1k increments for infantry and 1 increments for everything else
     public int Count { get; set; }
     public long WeaponItemDefinitionId { get; set; }
-    public long AmmoWeaponItemDefinitionId { get; set; }
+    public long AmmoItemDefinitionId { get; set; }
 
     [NotMapped]
     [JsonIgnore]
     public Dictionary<DivisionModifierType, double> Modifiers { get; set; }
 
     public async ValueTask<ItemDefinition> GetWeaponItemDefinitionAsync() => await ItemDefinition.FindAsync(WeaponItemDefinitionId);
+    public async ValueTask<ItemDefinition> GetAmmoItemDefinitionAsync() => await ItemDefinition.FindAsync(AmmoItemDefinitionId);
 
     public void UpdateOrAddModifier(DivisionModifierType type, double value)
     {
@@ -80,10 +81,16 @@ public class RegimentTemplate
     public async ValueTask UpdateModifiers()
     {
         Modifiers = new();
-        if (ItemDefinitionId == 0)
-            return;
+        if (WeaponItemDefinitionId != 0)
+        {
+            foreach (var pair in (await GetWeaponItemDefinitionAsync())!.Modifiers)
+                UpdateOrAddModifier(ConvertItemModifierToDivisionModifier[pair.Key], pair.Value * Count);
+        }
 
-        foreach (var pair in (await GetItemDefinitionAsync())!.Modifiers)
-            UpdateOrAddModifier(ConvertItemModifierToDivisionModifier[pair.Key], pair.Value * Count);
+        if (AmmoItemDefinitionId != 0)
+        {
+            foreach (var pair in (await GetAmmoItemDefinitionAsync())!.Modifiers)
+                UpdateOrAddModifier(ConvertItemModifierToDivisionModifier[pair.Key], pair.Value * Count);
+        }
     }
 }

@@ -5,6 +5,7 @@ using SV2.Database;
 using SV2.Database.Models.Entities;
 using Microsoft.AspNetCore.Cors;
 using SV2.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace SV2.API;
 
@@ -17,6 +18,21 @@ public class EntityAPI : BaseAPI
         app.MapGet   ("api/entity/{svid}/credits", GetCredits).RequireCors("ApiPolicy");
         app.MapGet   ("api/entities/{svid}", GetEntity).RequireCors("ApiPolicy");
         app.MapGet   ("api/entity/search", Search).RequireCors("ApiPolicy");
+        app.MapGet   ("api/entities/{entityid}/taxablebalancehistory", GetTaxableBalanceHistory).RequireCors("ApiPolicy");
+    }
+
+    private static async Task GetTaxableBalanceHistory(HttpContext ctx, VooperDB dbctx, long entityid, int days)
+    {
+        if (days > 90)
+            days = 90;
+        BaseEntity? entity = BaseEntity.Find(entityid);
+        if (entity is null) {
+            await ctx.Response.WriteAsJsonAsync(ValourResult.NotFound($"Could not find entity with svid {entityid}"));
+            return;
+        }
+
+        var records = await dbctx.EntityBalanceRecords.Where(x => x.EntityId == entityid).OrderByDescending(x => x.Time).Take(days).ToListAsync();
+        await ctx.Response.WriteAsJsonAsync(records);
     }
 
     private static async Task GetEntity(HttpContext ctx, long svid)
@@ -28,7 +44,7 @@ public class EntityAPI : BaseAPI
         await ctx.Response.WriteAsJsonAsync(entity);
     }
 
-    private static async Task GetName(HttpContext ctx, VooperDB db, long svid)
+    private static async Task GetName(HttpContext ctx, long svid)
     {
         BaseEntity? entity = BaseEntity.Find(svid);
         if (entity == null)
@@ -41,7 +57,7 @@ public class EntityAPI : BaseAPI
         await ctx.Response.WriteAsync(entity.Name);
     }
 
-    private static async Task GetCredits(HttpContext ctx, VooperDB db, long svid)
+    private static async Task GetCredits(HttpContext ctx, long svid)
     {
         BaseEntity? account = BaseEntity.Find(svid);
         if (account == null)

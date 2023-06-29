@@ -47,11 +47,15 @@ public class RegimentTemplate
     // only allowed values are in 1k increments for infantry and 1 increments for everything else
     public int Count { get; set; }
     public long WeaponItemDefinitionId { get; set; }
-    public long AmmoWeaponItemDefinitionId { get; set; }
+    public long AmmoItemDefinitionId { get; set; }
 
     [NotMapped]
     [JsonIgnore]
     public ItemDefinition WeaponItemDefinition => DBCache.Get<ItemDefinition>(WeaponItemDefinitionId)!;
+
+    [NotMapped]
+    [JsonIgnore]
+    public ItemDefinition AmmoItemDefinition => DBCache.Get<ItemDefinition>(AmmoItemDefinitionId)!;
 
     [NotMapped]
     [JsonIgnore]
@@ -74,7 +78,10 @@ public class RegimentTemplate
     {
         Modifiers = new();
 
-        foreach (var pair in ItemDefinition.Modifiers)
+        foreach (var pair in WeaponItemDefinition.Modifiers)
             UpdateOrAddModifier(ConvertItemModifierToDivisionModifier[pair.Key], pair.Value*Count);
+
+        foreach (var pair in AmmoItemDefinition.Modifiers)
+            UpdateOrAddModifier(ConvertItemModifierToDivisionModifier[pair.Key], pair.Value * Count);
     }
 }

@@ -59,7 +59,7 @@ else if (Loaded) {
                         else if (CurrentlyEdittingRegimentTemplate is not null)
                         {
                             <div class="form-group">
-                                <label>Current Selected Rifle: @CurrentlyEdittingRegimentTemplate.ItemDefinitionId</label>
+                                <label>Current Selected Rifle: @WeaponDefinition.Name</label>
                                 
                             </div>
                         }
@@ -124,7 +124,8 @@ else
             Id = 0,
             Type = RegimentType.Infantry,
             Count = 0,
-            ItemDefinitionId = 0,
+            WeaponItemDefinitionId = 0,
+            AmmoItemDefinitionId = 0,
             Modifiers = new(),
         };
 

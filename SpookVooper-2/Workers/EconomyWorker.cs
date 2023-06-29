@@ -131,7 +131,8 @@ namespace SV2.Workers
                                 }
                             }
 
-                            if (DateTime.UtcNow.Hour == 1) {
+                            var lastrecord = await _dbctx.EntityBalanceRecords.OrderByDescending(x => x.Time).LastOrDefaultAsync();
+                            if (DateTime.UtcNow.Subtract(lastrecord.Time).TotalHours >= 24) {
                                 // every day, update credit snapchats
                                 List<BaseEntity> entities = DBCache.GetAll<SVUser>().ToList<BaseEntity>();
                                 entities.AddRange(DBCache.GetAll<Group>());

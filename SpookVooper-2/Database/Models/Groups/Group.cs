@@ -24,8 +24,12 @@ public enum GroupTypes
 
 public enum ReadableGroupTypes {
     Company = 0,
+    Corporation = 1,
     NonProfit = 2,
-    PoliticalParty = 3
+    PoliticalParty = 3,
+    District = 4,
+    State = 5,
+    Province = 6
 }
 
 public enum GroupFlag
@@ -34,7 +38,11 @@ public enum GroupFlag
     NonProfit = 0,
     // is only given by the MOJ
     News = 1,
-    CanHaveMilitary = 2
+    CanHaveMilitary = 2,
+    // is only given by the CFV
+    CanSetTransactionsExpenseStatus = 3,
+    // is only given by the CFV
+    AccreditedBank = 4
 }
 
 public class Group : BaseEntity, IHasOwner

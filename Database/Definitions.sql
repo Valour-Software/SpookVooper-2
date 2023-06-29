@@ -401,6 +401,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     toid bigint NOT NULL,
     transactiontype integer NOT NULL,
     details VARCHAR(1024) NOT NULL,
+    isanexpense boolean NULL,
     CONSTRAINT pk_transactions PRIMARY KEY (id)
 );
 
