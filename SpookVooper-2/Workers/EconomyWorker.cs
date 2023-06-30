@@ -205,7 +205,7 @@ namespace SV2.Workers
                                 foreach (var governorid in paymentpergovernorid.Keys)
                                 {
                                     if (paymentpergovernorid[governorid] <= 0) break;
-                                    var tran = new SVTransaction(BaseEntity.Find(entityid), BaseEntity.Find(governorid), (decimal)(paymentpergovernorid[governorid]/30/24), TransactionType.TaxPayment, $"Property Tax Payment");
+                                    var tran = new SVTransaction(BaseEntity.Find(entityid), BaseEntity.Find(governorid), (decimal)(paymentpergovernorid[governorid]/24), TransactionType.TaxPayment, $"Property Tax Payment");
                                     tran.NonAsyncExecute();
                                 }
                             }

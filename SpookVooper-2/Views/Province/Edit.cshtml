@@ -54,13 +54,13 @@
                 <br />
                 <p>Property Taxes are paid to the @Model.District.NameForGovernorOfAProvince of a @Model.District.NameForProvince.ToLower(), or to the District if the @Model.District.NameForGovernorOfAProvince is not set</p>
                 <div class="form-group">
-                    <label>Base monthly property tax per building (not size!)</label>
+                    <label>Base daily property tax per building (not size!)</label>
                     <input asp-for="BasePropertyTax" class="form-control" value='@((int?)Model.BasePropertyTax)'/>
                     <span asp-validation-for="BasePropertyTax" class="text-danger"></span>
                 </div>
                 <br />
                 <div class="form-group">
-                    <label>Monthly Property Tax per size (level) of a building (ex: a level 15 factory will pay 15x this tax monthly)</label>
+                    <label>Daily Property Tax per size (level) of a building (ex: a level 15 factory will pay 15x this tax daily)</label>
                     <input asp-for="PropertyTaxPerSize" class="form-control" value='@((int?)Model.PropertyTaxPerSize)' />
                     <span asp-validation-for="PropertyTaxPerSize" class="text-danger"></span>
                 </div>

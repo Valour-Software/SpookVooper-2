@@ -58,7 +58,7 @@
 
             <br />
             <div class="form-group">
-                @if (CurrentlyEditingTaxPolicy.taxType != TaxType.ResourceMined)
+                @if (!(CurrentlyEditingTaxPolicy.taxType is TaxType.ResourceMined or TaxType.ImportTariff or TaxType.ExportTariff))
                 {
                     <label>The amount between the two above boxes will be taxed at (%)</label>
                 }
@@ -70,7 +70,7 @@
             </div>
 
             <br />
-            @if (CurrentlyEditingTaxPolicy.taxType == TaxType.ResourceMined)
+            @if (CurrentlyEditingTaxPolicy.taxType is TaxType.ResourceMined or TaxType.ImportTariff or TaxType.ExportTariff)
             {
                 <div class="form-group">
                     <label>Resource to tax</label>

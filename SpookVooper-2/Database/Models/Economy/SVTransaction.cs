@@ -168,26 +168,34 @@ public class SVTransaction
                         amount = policy.GetTaxAmount(Credits);
                         break;
                     case TaxType.Sales:
-                        if (transactionType == TransactionType.ItemTrade)
-                        {
-                            amount = policy.GetTaxAmount(Credits);
-                        }
-                        break;
-                    case TaxType.StockBought:
-                        if (transactionType == TransactionType.StockTrade)
-                        {
+                        if (transactionType == TransactionType.ItemTrade) {
                             amount = policy.GetTaxAmount(Credits);
                         }
                         break;
                     case TaxType.StockSale:
-                        if (transactionType == TransactionType.StockTrade)
+                        if (transactionType == TransactionType.StockSale) {
+                            amount = policy.GetTaxAmount(Credits);
+                        }
+                        break;
+                    case TaxType.StockBought:
+                        if (transactionType == TransactionType.StockBrought) {
+                            amount = policy.GetTaxAmount(Credits);
+                        }
+                        break;
+                    case TaxType.ResourceSale:
+                        if (transactionType == TransactionType.ResourceSale)
+                        {
+                            amount = policy.GetTaxAmount(Credits);
+                        }
+                        break;
+                    case TaxType.ResourceBrought:
+                        if (transactionType == TransactionType.ResourceBrought)
                         {
                             amount = policy.GetTaxAmount(Credits);
                         }
                         break;
                     case TaxType.Payroll:
-                        if (transactionType == TransactionType.Paycheck)
-                        {
+                        if (transactionType == TransactionType.Paycheck) {
                             amount = policy.GetTaxAmount(Credits);
                         }
                         break;
@@ -232,9 +240,37 @@ public class SVTransaction
         //fromEntity.Credits -= Credits;
         //toEntity.Credits += Credits;
 
-        if (transactionType == TransactionType.ItemTrade || transactionType == TransactionType.Paycheck || transactionType == TransactionType.Payment || transactionType == TransactionType.StockTrade)
+        if (transactionType is TransactionType.Paycheck) 
         {
             FromEntity.TaxAbleBalance -= Credits;
+            ToEntity.TaxAbleBalance += Credits;
+        }
+
+        if (transactionType is TransactionType.DividendPayment
+            or TransactionType.ItemTrade
+            or TransactionType.Payment
+            or TransactionType.StockSale
+            or TransactionType.ResourceSale)
+        {
+            if (IsAnExpense is not null and true)
+                FromEntity.TaxAbleBalance -= Credits;
+            ToEntity.TaxAbleBalance += Credits;
+        }
+
+        else if (transactionType == TransactionType.ResourceBrought)
+        {
+            if (IsAnExpense is not null and true)
+                FromEntity.TaxAbleBalance -= Credits;
+            ToEntity.TaxAbleBalance += Credits;
+        }
+
+        else if (transactionType == TransactionType.StockBrought)
+        {
+            ToEntity.TaxAbleBalance += Credits;
+        }
+
+        else if (transactionType == TransactionType.TaxPayment) {
+            // we do this so that districts, states, and province groups can have a "profit" for banks and loan brokers to use.
             ToEntity.TaxAbleBalance += Credits;
         }
 

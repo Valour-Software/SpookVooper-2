@@ -26,7 +26,7 @@ namespace SV2.API
             if (fromentity == null)
             {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"Could not find entity with svid {fromid}");
+                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find entity with svid {fromid}"));
                 return;
             }
 
@@ -34,27 +34,27 @@ namespace SV2.API
             if (toentity == null)
             {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"Could not find entity with svid {toid}");
+                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find entity with svid {toid}"));
                 return;
             }
 
             if (entity.Id != fromentity.Id)
             {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"You can not use one entity's api key or oauth key to send a transaction from another entity!");
+                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"You can not use one entity's api key or oauth key to send a transaction from another entity!"));
                 return;
             }
 
             if (!fromentity.HasPermission(entity, GroupPermissions.Eco))
             {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"You lack permission to send transactions!");
+                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"You lack permission to send transactions!"));
                 return;
             }
 
             if (amount <= 0) {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"Amount must be greater than 0!");
+                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Amount must be greater than 0!"));
                 return;
             }
 
@@ -64,14 +64,14 @@ namespace SV2.API
                 if (toentity.EntityType != EntityType.Group && toentity.EntityType != EntityType.Corporation)
                 {
                     ctx.Response.StatusCode = 401;
-                    await ctx.Response.WriteAsync("Only groups can use isanexpense!");
+                    await ctx.Response.WriteAsJsonAsync(new TaskResult(false, "Only groups can use isanexpense!"));
                     return;
                 }
                 Group group = (Group)toentity;
                 if (!group.Flags.Contains(GroupFlag.CanSetTransactionsExpenseStatus))
                 {
                     ctx.Response.StatusCode = 401;
-                    await ctx.Response.WriteAsync("Only groups with the CanSetTransactionsExpenseStatus flag can use isanexpense!");
+                    await ctx.Response.WriteAsJsonAsync(new TaskResult(false, "Only groups with the CanSetTransactionsExpenseStatus flag can use isanexpense!"));
                     return;
                 }
             }

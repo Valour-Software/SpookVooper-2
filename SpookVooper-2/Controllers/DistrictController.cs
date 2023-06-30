@@ -75,10 +75,10 @@ public class DistrictController : SVController
         if (district.GovernorId != user.Id)
             return RedirectBack("You must be governor of the district to change the details of the district!");
 
-        if (model.BasePropertyTax > 2000)
-            return RedirectBack("District's Base Property Tax must be 2,000 or less!");
-        if (model.PropertyTaxPerSize > 2000)
-            return RedirectBack("District's Property Tax per size must be 2,000 or less!");
+        if (model.BasePropertyTax > 1000)
+            return RedirectBack("District's Base Property Tax must be 1,000 or less!");
+        if (model.PropertyTaxPerSize > 1000)
+            return RedirectBack("District's Property Tax per size must be 1,000 or less!");
 
         district.Description = model.Description;
         district.TitleForProvince = model.NameForProvince?.ToTitleCase();
