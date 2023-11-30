@@ -1,0 +1,503 @@
+@using SV2.Database.Managers
+@model BuildingManageModel
+
+@{
+    ViewData["Title"] = "Building Admin";
+
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .tooltip-dontshow {
+        opacity: 0 !important;
+    }
+
+    .mergedrow {
+        width: 25em;
+        line-height: 1.2em;
+    }
+
+    .dividertop {
+        border-top: 1px solid darkgray;
+    }
+
+    .infobox {
+        border: 1px solid darkgray;
+        background-color: rgba(255, 255, 255, 0.1);
+        max-width: 300px;
+    }
+
+    .infobox-header div {
+        text-align: center;
+    }
+
+    .infobox-subheader div {
+        text-align: center;
+    }
+
+    .infobox-row-name {
+        padding: 0 0.6em 0.2em 0.6em;
+    }
+
+    .mergedrow th {
+    }
+
+    .buildings {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .building {
+        width: 300px;
+        height: 285px;
+        border-radius: 18px;
+        margin: 8px;
+        background-color: rgba(0,0,0,0.3);
+        padding: 16px;
+    }
+
+    .resource-row {
+        width: 100%;
+    }
+
+    .buildingcosts {
+        flex-direction: column;
+        padding-left: 2px;
+        padding-right: 2px;
+        text-align: start;
+        margin-left: 20px;
+    }
+</style>
+
+<div class="d-flex flex-row align-content-center" style="width:100%">
+    <!-- Leftmost column -->
+    <div class="p-2 flex-shrink-1 ms-auto"></div>
+
+    <div class="p-4" style="width:80em">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h3 style="text-align:center">@ViewData["Title"]</h3>
+        <h2 style="text-align:center">@Model.Building.Name</h2>
+
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+
+            </div>
+            <div class="col-4"></div>
+        </div>
+
+        <br />
+        <hr />
+        @if (user.Id == Model.Building.OwnerId || Model.Building.Owner.HasPermission(user, GroupPermissions.ManageBuildings)) {
+            <center>
+                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createbuildingrequest">
+                    <span>Build more levels</span>
+                </button>
+            </center>
+        }
+        <br />
+        <form method="post">
+            <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
+                @Html.HiddenFor(x => x.BuildingId)
+                <div class="row">
+                    <h4>Building Info</h4>
+
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <br />
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <br />
+
+                <div class="form-group">
+                    <label>Recipe</label>
+                    <span>View list of all recipes <a target="_blank" href="https://dev.spookvooper.com/wiki/List_of_Recipes">here</a></span>
+                    <select asp-for="RecipeId" asp-items="Model.Building.BuildingObj.GetPossibleRecipes(Model.Building.Owner).Select(x => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = x.StringId, Text = x.Name })" class="form-select form-control"></select>
+                    <span asp-validation-for="RecipeId" class="text-danger"></span>
+                </div>
+                <br />
+
+                <div class="form-group">
+                    <label>Employee's Group Role</label>
+                    <span>Set to "None" to disallow people from applying to this job. You can only set to "None" if there's no employee, if there is, you must fire them using the button below!</span>
+                    <select asp-for="GroupRoleIdForEmployee" asp-items="Model.GroupRolesForEmployee" class="form-select form-control"></select>
+                    <span asp-validation-for="GroupRoleIdForEmployee" class="text-danger"></span>
+                </div>
+
+                <br />
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+        <br />
+
+        @if ((Model.Building.Owner.EntityType == EntityType.User && Model.Building.OwnerId == user.Id) || ((Group)Model.Building.Owner).IsOwner(user))
+        {
+
+
+            @if (Model.Building.EmployeeId is not null)
+            {
+                <div class="col-12 align-content-center text-center">
+                    <a asp-action="FireEmployee" asp-controller="Building" asp-route-buildingid="@Model.Building.Id" class="btn btn-outline-danger">Fire Employee</a>
+                </div>
+                <br/>
+            }
+            <div class="col-12 align-content-center text-center">
+                <a asp-action="TransferBuilding" asp-controller="Building" asp-route-buildingid="@Model.Building.Id" class="btn btn-danger">Transfer Building</a>
+            </div>
+        }
+
+        <br />
+        <br />
+
+        <div class="d-flex justify-content-evenly">
+            @foreach (var luaupgrade in Model.Building.BuildingObj.Upgrades)
+            {
+                BuildingUpgrade? upgrade = Model.Building.Upgrades.FirstOrDefault(x => x.LuaBuildingUpgradeId == luaupgrade.Id);
+                <div class="building">
+                    <p style="text-align: center;margin: 0px;">@luaupgrade.Name (Level @(upgrade is null ? 0 : upgrade.Level))</p>
+                    <span>Effects Per Level (noncompounding):</span>
+                    <br />
+                    <div class="buildingcosts" style="margin-bottom:8px;height:50px;">
+                        @foreach (var item in luaupgrade.ModifierNodes) {
+                            @Html.Raw(item.GenerateHTMLForListing(new(null, null)));
+                            <br />
+                        }
+                    </div>
+                    <span>Costs to upgrade:</span>
+                    <br/>
+                    <div class="buildingcosts" style="height: 75px;">
+                        @foreach ((var resource, var amount) in luaupgrade.GetConstructionCost(Model.Building.Owner, Model.Building.District, Model.Building.Province, Model.Building, upgrade, 1))
+                        {
+                            <div class="resource-row">
+                                <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                                <span style="align-self: flex-end">@($"{amount:n0}")</span>
+                            </div>
+                        }
+                    </div>
+                    <div>
+                        <center>
+                            <a href="/Building/@Model.BuildingId/Upgrade/@luaupgrade.Id">
+                                <button class="btn btn-outline-warning" style="margin-top: 10px;">Upgrade</button>
+                            </a>
+                        </center>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Rightmost column -->
+    <div class="p-4 flex-shrink-1 me-auto" style="margin-top: 2em;">
+        <table class="infobox">
+            <tbody>
+                <tr>
+                    <th colspan="2" class="infobox-header">
+                        <div>@Model.Building.Name</div>
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan="2" class="infobox-subheader">
+                        <div>@Model.Building.BuildingType.ToString()</div>
+                    </td>
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">@Model.Building.District.NameForProvince</th>
+                    <td class="infobox-row-value">
+                        <a href="/Province/View/@Model.Building.ProvinceId">
+                            <span>@Model.Building.Province.Name</span>
+                        </a>
+                   </td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">District</th>
+                    <td class="infobox-row-value">
+                        <a href="/District/View/@Model.Building.District.Name">@Model.Building.District.Name</a>
+                    </td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Owner</th>
+                    <td class="infobox-row-value">
+                        @if (Model.Building.Owner.EntityType == EntityType.User) {
+                            <a asp-controller="User" asp-action="Info" asp-route-id="@Model.Building.OwnerId">@Model.Building.Owner.Name</a>
+                        }
+                        else {
+                            <a asp-controller="Group" asp-action="View" asp-route-id="@Model.Building.OwnerId">@Model.Building.Owner.Name</a>
+                        }
+                    </td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Employee</th>
+                    <td class="infobox-row-value">@(Model.Building.Employee is not null ? Model.Building.Employee.Name : "No one")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Efficiency</th>
+                    <td class="infobox-row-value">@($"{1/Model.Building.Efficiency:n2}")x input</td>
+                </tr>
+                @if (Model.Building.BuildingType != BuildingType.Infrastructure)
+                {
+                    <tr class="mergedrow">
+                        <th class="infobox-row-name">QuantityCap</th>
+                        <td class="infobox-row-value">@(
+                        $"{Model.Building.QuantityCap * 100:n2}%"
+                        )</td>
+                    </tr>
+                    <tr class="mergedrow">
+                        <th class="infobox-row-name">Daily Quantity Growth</th>
+                        <td class="infobox-row-value">@(
+                        $"{Model.Building.QuantityHourlyGrowth * 100 * 24:n2}%"
+                        )</td>
+                    </tr>
+                    <tr class="mergedrow">
+                        <th class="infobox-row-name">Quantity</th>
+                        <td class="infobox-row-value">
+                            @($"{Model.Building.Quantity * 100:n2}%")
+                        </td>
+                    </tr>
+                }
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Throughput</th>
+                    <td class="infobox-row-value has-expanded-info" data-bs-toggle="modal" data-bs-target="#ThroughputModal">@($"{Model.Building.ThroughputFactor:n3}")x</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Levels</th>
+                    <td class="infobox-row-value">@Model.Building.Size</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Times Recipe Executed per hour</th>
+                    <td class="infobox-row-value">@($"{Model.Building.GetRateForProduction():n1}")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Recipe</th>
+                    <td class="infobox-row-value">@Model.Building.Recipe.Name</td>
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <td colspan="2" class="infobox-subheader">
+                        <div>Resources consumed daily</div>
+                    </td>
+                </tr>
+                @{
+                    double rate = Model.Building.GetRateForProduction();
+                    rate *= 24;
+                    if (!Model.Building.Recipe.BaseRecipe.Inputcost_Scaleperlevel)
+                        rate /= Model.Building.Size;
+                    double rate_for_input = rate * (1 / Model.Building.Efficiency);
+                    string trclass = "mergedrow dividertop";
+                }
+                @foreach ((var itemdefid, var amount) in Model.Building.Recipe.Inputs) {
+                    <tr class="@trclass">
+                        @{
+                            var itemdef = DBCache.Get<ItemDefinition>(itemdefid);
+                        }
+                        <th class="infobox-row-name">@($"{itemdef.Name}")</th>
+                        <td class="infobox-row-value">@($"{rate_for_input*amount:n1}")</td>
+                    </tr>
+                    trclass = "mergedrow";
+                }
+                @if (Model.Building.Recipe.Outputs is not null && Model.Building.Recipe.Outputs.Count > 0)
+                {
+                    <tr class="mergedrow dividertop">
+                        <td colspan="2" class="infobox-subheader">
+                            <div>Resources produced daily</div>
+                        </td>
+                    </tr>
+                    @foreach ((var itemdefid, var amount) in Model.Building.Recipe.Outputs)
+                    {
+                        <tr class="@trclass">
+                            @{
+                                var itemdef = DBCache.Get<ItemDefinition>(itemdefid);
+                            }
+                            <th class="infobox-row-name">@($"{itemdef.Name}")</th>
+                            @if (Model.Building.BuildingObj.type == SV2.Database.Models.Buildings.BuildingType.Mine)
+                            {
+                                <td class="infobox-row-value">@(
+                                  $"{rate * amount * Model.Building.MiningOutputFactor():n1}"
+                                  )</td>
+                            }
+                            else
+                            {
+                                <td class="infobox-row-value">@($"{rate * amount:n1}")</td>
+                            }
+                        </tr>
+                        trclass = "mergedrow";
+                    }
+                }
+                @{
+                    var province = Model.Building.Province;
+                    var totalbase = (province.BasePropertyTax ?? 0) + (province.State is not null ? province.State.BasePropertyTax ?? 0 : 0) + (province.District.BasePropertyTax ?? 0);
+                    var totalpersize = (province.PropertyTaxPerSize ?? 0) + (province.State is not null ? province.State.PropertyTaxPerSize ?? 0 : 0) + (province.District.PropertyTaxPerSize ?? 0);
+                    totalpersize *= Model.Building.Size * Model.Building.GetThroughputFromUpgrades();
+                }
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">Base Property Tax</th>
+                    <td class="infobox-row-value">@($"¢{totalbase:n0}")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Property Tax From Building's' Size</th>
+                    <td class="infobox-row-value">@($"¢{totalpersize:n0}")</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <bootstrap-modal asp-modal-id="createbuildingrequest" asp-modal-title="Request more Levels">
+        @await Html.PartialAsync("/Views/Shared/Components/SubmitBuildingRequest.cshtml", Model.createBuildingRequestModel)
+    </bootstrap-modal>
+
+    <bootstrap-modal asp-modal-id="ThroughputModal" asp-modal-title="Throughput">
+        <span>Note, most values with "x" stack additivity! The final value may be slightly different than the actual number due to rounding.</span>
+        <table class="table table-dark table-striped">
+            <tbody>
+                @{
+                    double runningtotal = 1;
+                    <tr>
+                        <td>Base</td>
+                        <td></td>
+                        <td>1x</td>
+                    </tr>
+
+                    @if (Model.Building.EmployeeId is not null)
+                    {
+                        runningtotal *= 1.15;
+                        <tr>
+                            <td>Employee Bonus</td>
+                            <td>x1.15</td>
+                            <td>@($"{runningtotal:n3}")x</td>
+                        </tr>
+                    }
+
+                    if (Model.Building.BuildingObj.ApplyStackingBonus)
+                    {
+                        double EconomicsofScale = Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Model.Building.Size;
+                        bool IsMaxed = false;
+                        if (EconomicsofScale >= Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"])
+                        {
+                            EconomicsofScale = Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"];
+                            IsMaxed = true;
+                        }
+                        runningtotal += EconomicsofScale;
+
+                        <tr>
+                            <td>
+                                <span>Stacking Bonus</span>
+                                @if (IsMaxed)
+                                {
+                                    <span> (maxed)</span>
+                                }
+                            </td>
+                            <td>x@($"{1+EconomicsofScale:n3}")</td>
+                            <td>@($"{runningtotal:n3}")x</td>
+                        </tr>
+                    }
+
+                    var throughputtype = Model.Building.BuildingType switch
+                    {
+                        BuildingType.Mine => ProvinceModifierType.MineThroughputFactor,
+                        BuildingType.Factory => ProvinceModifierType.FactoryThroughputFactor,
+                        BuildingType.Farm => ProvinceModifierType.FarmThroughputFactor,
+                        BuildingType.Infrastructure => ProvinceModifierType.InfrastructureThroughputFactor
+                    };
+
+                    double runningtotalforstacking = 1;
+                    if (Model.Building.Province.Modifiers.ContainsKey(throughputtype))
+                    {
+                        var value = Model.Building.Province.Modifiers[throughputtype].Amount;
+                        runningtotalforstacking += value;
+                        <tr>
+                            <td>Province's Infrastructure</td>
+                            <td>+@($"{value:n3}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n3}")x</td>
+                        </tr>
+                    }
+
+                    runningtotal *= runningtotalforstacking;
+
+                    runningtotalforstacking = 1;
+                    @foreach (var upgrade in Model.Building.Upgrades)
+                    {
+                        @foreach (var node in upgrade.LuaBuildingUpgradeObj.ModifierNodes)
+                        {
+                            @if (node.buildingModifierType == BuildingModifierType.ThroughputFactor)
+                            {
+                                var value = (double)node.GetValue(new(null, null)) * upgrade.Level;
+                                runningtotalforstacking += value;
+                                <tr>
+                                    <td>@upgrade.LuaBuildingUpgradeObj.Name (@upgrade.Level Levels)</td>
+                                    <td>+@($"{value:n3}")</td>
+                                    <td>@($"{runningtotal * runningtotalforstacking:n3}")x</td>
+                                </tr>
+                            }
+                        }
+                    }
+
+                    var provincetypestoget = new List<ProvinceModifierType?>() { ProvinceModifierType.AllProducingBuildingThroughputFactor };
+                    provincetypestoget.Add(throughputtype);
+
+
+                    @foreach (var item in Model.Building.Province.GetStaticModifiersOfTypes(provincetypestoget, null, false))
+                    {
+                        runningtotalforstacking += item.value - 1;
+                        <tr>
+                            <td>@item.modifiername</td>
+                            <td>+@($"{item.value:n3}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n3}")</td>
+                        </tr>
+                    }
+
+                    runningtotal *= runningtotalforstacking;
+
+                    runningtotalforstacking = 1;
+                    var districttypestoget = new List<DistrictModifierType?>() { DistrictModifierType.AllProducingBuildingThroughputFactor };
+                    districttypestoget.Add(Model.Building.BuildingType switch
+                    {
+                        BuildingType.Mine => DistrictModifierType.MineThroughputFactor,
+                        BuildingType.Factory => DistrictModifierType.FactoryThroughputFactor,
+                        BuildingType.Farm => DistrictModifierType.FarmThroughputFactor,
+                        BuildingType.Infrastructure => DistrictModifierType.InfrastructureThroughputFactor
+                    });
+
+                    @foreach (var item in Model.Building.Province.GetStaticModifiersOfTypes(null, districttypestoget, true, false))
+                    {
+                        runningtotalforstacking += item.value;
+                        <tr>
+                            <td>@item.modifiername</td>
+                            <td>+@($"{item.value:n3}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n3}")</td>
+                        </tr>
+                    }
+
+                    runningtotalforstacking = 1;
+                    var state = new ExecutionState(Model.Building.District, Model.Building.Province, parentscopetype: ScriptScopeType.Building, building: Model.Building);
+                    @foreach (var item in Model.Building.StaticModifiers.Where(x => x.BaseStaticModifiersObj.ModifierNodes.Any(n => n.buildingModifierType == BuildingModifierType.ThroughputFactor)))
+                    {
+                        var node = item.BaseStaticModifiersObj.ModifierNodes.FirstOrDefault(x => x.buildingModifierType == BuildingModifierType.ThroughputFactor);
+                        runningtotalforstacking += (double)node.GetValue(state);
+                        <tr>
+                            <td>@item.BaseStaticModifiersObj.Name</td>
+                            <td>+@($"{node.GetValue(state):n3}")</td>
+                            <td>@($"{runningtotal * runningtotalforstacking:n3}")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </bootstrap-modal>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>

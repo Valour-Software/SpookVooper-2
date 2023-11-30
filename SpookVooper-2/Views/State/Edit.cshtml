@@ -1,0 +1,160 @@
+@model State
+
+@{
+    ViewData["Title"] = $"{Model.District.NameForState} Admin";
+
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h3 style="text-align:center">@ViewData["Title"]</h3>
+        <h2 style="text-align:center">The @Model.District.NameForState of @Model.Name</h2>
+
+        <a asp-controller="State" asp-action="View" asp-route-id="@Model.Id">
+            <button class="btn btn-primary">Go Back</button>
+        </a>
+
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+
+            </div>
+            <div class="col-4"></div>
+        </div>
+
+        <br />
+        <hr />
+        <br />
+        <form method="post">
+            <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
+                @Html.HiddenFor(x => x.Id)
+                <div class="row">
+                    <h4>@Model.District.NameForState Info</h4>
+
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <br />
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <br />
+                <div class="form-group">
+                    <label>Map Color</label>
+                    <input asp-for="MapColor" class="form-control" />
+                    <span asp-validation-for="MapColor" class="text-danger"></span>
+                </div>
+                <br />
+
+                <p>Property Taxes are paid to the state's group <a href="/Group/View/@Model.GroupId">@Model.Group.Name</a></p>
+                <div class="form-group">
+                    <label>Base daily property tax per building (not size!)</label>
+                    <input asp-for="BasePropertyTax" class="form-control" value='@((int?)Model.BasePropertyTax)' />
+                    <span asp-validation-for="BasePropertyTax" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label>Daily Property Tax per size (level) of a building (ex: a level 15 factory will pay 15x this tax daily)</label>
+                    <input asp-for="PropertyTaxPerSize" class="form-control" value='@((int?)Model.PropertyTaxPerSize)' />
+                    <span asp-validation-for="PropertyTaxPerSize" class="text-danger"></span>
+                </div>
+                <br />
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+        <br />
+        <!form method="post" action="/State/ChangeGovernor/@Model.Id">
+            @Html.AntiForgeryToken()
+            <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
+                @if (Model.District.GovernorId == user.Id)
+                {
+                    <p>@Model.District.NameForGovernorOfAState Entity's (user or group) name</p>
+                    <input data-val="true" data-val-required="The Id field is required." id="GovernorId" name="GovernorId" type="hidden" value="@Model.GovernorId">
+                    <div class="input-group" style="max-width:700px;margin-left:auto;margin-right:auto;">
+                        <input style="margin-bottom:20px; display:inline-block; max-width:500px;" id="user-input" class="form-control" value="@(Model.Governor?.Name ?? "")"/>
+                        <div class="input-group-append">
+                            <button id="submit" class="btn btn-outline-warning" style="display:inline-block;margin-bottom:20px">Confirm</button>
+                        </div>
+                    </div>
+                    <span id="svid-text" class="text-warning">Id of entity selected: </span>
+                    <br />
+                    <span id="name-text" class="text-warning">Name of entity selected: </span>
+
+                    <div id="results" style="margin-top:20px">
+                    </div>
+                }
+            </div>
+        </!form>
+
+        <br />
+        <hr />
+        <br />
+    </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    $('#user-input').on("change keyup paste", OnInput);
+    var box = $('#user-input');
+    var results = $('#results');
+    var svid_text = $('#svid-text');
+    var name_text = $('#name-text');
+    var id_input = $('#GovernorId');
+    var selected = "";
+    var last = "";
+    var cur = [];
+    function OnInput() {
+        var name = box.val();
+        if (name != last) {
+            last = name;
+            $.getJSON("/api/entity/search?name=" + name, function (data) {
+                if (data != null) {
+                    results.empty();
+                    data.forEach(result => console.log(result));
+                    data.forEach(result => new function () {
+                        console.log(result);
+                        var add = "<div id='" + result.id + "' style='margin:5px'><img class='smallpfp' style='display: inline-block' src='" + result.image_Url + "' onerror='fiximg(this)'><h5 style='display: inline-block; padding:5px'>" + result.name + "</h5></div>";
+                        results.prepend(add);
+                        var element = $('#' + result.id);
+                        cur.push(element);
+                        element.click(function () {
+                            cur.forEach(ele => new function () {
+                                ele.css("background-color", "rgba(0, 0, 0, 0)");
+                            });
+                            element.css("background-color", "rgba(0, 255, 0, 0.1)");
+                            svid_text.text("Id of Entity Currently Selected: " + result.id);
+                            name_text.text("Name of Entity Currently Selected: " + result.name);
+                            id_input.val(result.id);
+                            selected = result.id;
+                        });
+                    }
+                    );
+                }
+            }).fail(function () { });
+        }
+    }
+    function fiximg(c) {
+        c.onerror = '';
+        c.src = '/media/unity-128.png';
+    }
+</script>

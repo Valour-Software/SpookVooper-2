@@ -1,0 +1,171 @@
+﻿@using Shared.Models.Military
+
+@if (SVClient.CurrentlySelectedGroup is null)
+{
+    <span style="font-size: 16px;">You must select a group to view as! You can do this by clicking "Switch Group".</span>
+}
+else if (Loaded) {
+    <div class="recipe-designer-div">
+        <div class="recipe-designer-body">
+            <div class="left-side">
+                <div style="height: 72px;">
+                    <div class="form-group">
+                        <center>
+                            <span id="info-span" class="@infoSpanClass" style="color:white">@infoSpan</span>
+                            @if (infoSpanClass == "text-success")
+                            {
+
+                            }
+                        </center>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Name">Template's Name</label>
+                        <input asp-for="Name" class="form-control" @bind-value="Template.Name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="regiment-list">
+                    <button class="btn btn-outline-primary" style="width: 100%;" @onclick="ClickedNewRegiment">
+                        New Regiment
+                    </button>
+                    @{
+                        int CurrentNumOfInfantry = 0;
+                    }
+                    @foreach (var regiment in Template.RegimentsTemplates)
+                    {
+                        if (regiment.Type == RegimentType.Infantry) CurrentNumOfInfantry += 1;
+                        <div class='regiment-list-item @(regiment == CurrentlyEdittingRegimentTemplate ? "selected" : "")'>
+                            <h5 style="display: inline-block; padding:5px">Infrantry Regiment #@CurrentNumOfInfantry</h5>
+                        </div>
+                    }
+                </div>
+                <div style="">
+                    <button class="btn btn-outline-primary" @onclick="ClickedCreate">
+                        Create
+                    </button>
+                </div>
+            </div>
+            <div class="right-side">
+                <div class="container">
+                    <div class="edit-regiment-div">
+                        @if (DisplaySelectItemComponentForWeapon)
+                        {
+                            
+                        }
+                        else if (DisplaySelectItemComponentForAmmo)
+                        {
+                            
+                        }
+                        else if (CurrentlyEdittingRegimentTemplate is not null)
+                        {
+                            <div class="form-group">
+                                <label>Current Selected Rifle: @WeaponDefinition.Name</label>
+                                
+                            </div>
+                        }
+                        else
+                        {
+                            <span>Either Create a new regiment or click on the edit button on a regiment!</span>
+                        }
+                    </div>
+                </div>
+                <div class="bottom-container">
+                    <div class="row">
+                        <div class="col-sm">
+                            Basic Info
+                        </div>
+                        <div class="col-sm">
+                            Combat Stats
+                        </div>
+                        <div class="col-sm">
+                            Misc. Stats
+                        </div>
+                        <div class="col-sm">
+                            Inputs
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <span>Loading...</span>
+}
+
+@code {
+    public bool Display = false;
+    public string Style => Display ? "" : "display:none";
+    public DivisionTemplate Template = null;
+    public RegimentTemplate CurrentlyEdittingRegimentTemplate = null;
+    public List<ItemDefinition> ItemDefinitions = new();
+    public List<Recipe> Recipes = new();
+
+    public ItemDefinition? WeaponDefinition = null;
+    public ItemDefinition? AmmoDefinition = null;
+
+    public bool DisplaySelectItemComponentForWeapon = false;
+    public bool DisplaySelectItemComponentForAmmo = false;
+
+    public bool Loaded = false;
+    public string infoSpan = "";
+    public string infoSpanClass = "";
+
+    public async Task ClickedCreate()
+    {
+
+    }
+
+    public async Task ClickedNewRegiment()
+    {
+        CurrentlyEdittingRegimentTemplate = new()
+        {
+            Id = 0,
+            Type = RegimentType.Infantry,
+            Count = 0,
+            WeaponItemDefinitionId = 0,
+            AmmoItemDefinitionId = 0,
+            Modifiers = new(),
+        };
+
+        Template.RegimentsTemplates.Add(CurrentlyEdittingRegimentTemplate);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Template = new()
+            {
+                Id = 0,
+                RegimentsTemplates = new()
+            };
+            ItemDefinitions = (await SVClient.GetJsonAsync<List<ItemDefinition>>($"api/itemdefinitions/all")).Data;
+            Recipes = (await SVClient.GetJsonAsync<List<Recipe>>($"api/recipes/all")).Data;
+            ItemDefinitions = ItemDefinitions.Where(x => Recipes.Any(r => r.CustomOutputItemDefinitionId == x.Id)).ToList();
+
+            foreach (var itemdef in ItemDefinitions)
+                await itemdef.AddToCache();
+
+            foreach (var recipe in Recipes)
+            {
+                if (recipe.CustomOutputItemDefinitionId is not null)
+                    SVCache.ItemDefIdToRecipe[recipe.CustomOutputItemDefinitionId] = recipe;
+                await recipe.AddToCache();
+            }
+
+            foreach (var baserecipe in (await SVClient.GetJsonAsync<List<BaseRecipe>>($"api/baserecipes/all")).Data)
+                await baserecipe.AddToCache();
+
+            Loaded = true;
+            ClientData.DivisionDesignerModal = this;
+            StateHasChanged();
+        }
+    }
+
+    public async Task Refresh()
+    {
+        StateHasChanged();
+    }
+}

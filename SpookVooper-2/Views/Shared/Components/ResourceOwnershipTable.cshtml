@@ -1,0 +1,67 @@
+﻿@model BaseEntity
+
+<style>
+    .limit-width {
+        max-width: 200px;
+    }
+
+    input {
+        width: 100%;
+    }
+
+    thead, tbody, tfoot, tr, td, th {
+        border-style: none;
+    }
+
+        tr:nth-child(odd) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        tr:nth-child(even), .header {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+    th {
+        background-color: unset !important;
+    }
+</style>
+
+<center>
+    <h4 style="text-align:center">@Model.Name's Resources</h4>
+</center>
+
+<table class="table">
+    <thead>
+        <tr class="header">
+            <th>Resource</th>
+            <th>Ownership</th>
+            <th>Resource Production (daily)</th>
+            <th>Resource Production (monthly)</th>
+            <th>Resource Usage (daily)</th>
+            <th>Resource Usage (monthly)</th>
+            <th>Net (daily)</th>
+            <th>Net (monthly)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var resource in Model.SVItemsOwnerships.Values) {
+                <tr>
+                    <td>@resource.Definition.Name</td>
+                    <td>@($"{@resource.Amount:n1}")</td>
+                    @{
+                        var hourlyproduction = Model.GetHourlyProductionOfResource(resource.DefinitionId);
+                        var hourlyusage = Model.GetHourlyUsageOfResource(resource.DefinitionId);
+                        var hourlydiff = hourlyproduction - hourlyusage;
+                    }
+                    <td>@($"{hourlyproduction*24:n1}")</td>
+                    <td>@($"{(hourlyproduction*24*30):n0}")</td>
+                    <td>@($"{hourlyusage * 24:n1}")</td>
+                    <td>@($"{(hourlyusage * 24 * 30):n0}")</td>
+                    <td>@($"{hourlydiff * 24:n1}")</td>
+                    <td>@($"{(hourlydiff * 24 * 30):n0}")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

@@ -1,0 +1,65 @@
+﻿@model SV2.Models.Groups.ViewMemberRolesModel
+
+@{
+    ViewData["Title"] = $"{Model.Target.Name}'s Roles in {Model.Group.Name}";
+
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <a asp-controller="Group" asp-action="Edit" asp-route-id="@Model.Group.Id">
+            <button class="btn btn-primary">Go Back</button>
+        </a>
+
+        @if (Model == null)
+        {
+            <h1>Role not found!</h1>
+        }
+        else
+        {
+            <h3 style="text-align:center">@ViewData["Title"]</h3>
+            <div class="row srow">
+                @foreach (GroupRole role in Model.Group.Roles.Where(x => x.MembersIds.Contains(Model.Target.Id))) {
+                    <div class="col-6">
+                        <h4>@role.Name</h4>
+                    </div>
+                    <div class="col-6">
+                        @if (Model.Group.HasPermission(user, GroupPermissions.RemoveMembersFromRoles))
+                        {
+                            <a asp-action="RemoveEntityFromRole" asp-controller="Group" asp-route-groupid="@Model.Group.Id" asp-route-targetid="@Model.Target.Id" asp-route-roleid="@role.Id" class="btn btn-outline-primary">
+                                Remove
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+
+            <br />
+
+            <h2 style="text-align:center">Other roles</h2>
+            <div class="row srow">
+                @foreach (GroupRole role in Model.Group.Roles.Where(x => !x.MembersIds.Contains(Model.Target.Id))) {
+                    <div class="col-6">
+                        <h4>@role.Name</h4>
+                    </div>
+                    <div class="col-6">
+                        @if (Model.Group.HasPermission(user, GroupPermissions.AddMembersToRoles))
+                        {
+                            <a asp-action="AddEntityToRole" asp-controller="Group" asp-route-groupid="@Model.Group.Id" asp-route-targetid="@Model.Target.Id" asp-route-roleid="@role.Id" class="btn btn-outline-warning">
+                                Add
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>

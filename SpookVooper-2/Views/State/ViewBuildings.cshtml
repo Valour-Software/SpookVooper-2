@@ -1,0 +1,83 @@
+﻿@model StateViewBuildingModel
+
+@{
+    ViewData["Title"] = $"{Model.State.Name}'s Buildings";
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .buildings {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .building {
+        width: 300px;
+        height: 185px;
+        border-radius: 18px;
+        margin: 8px;
+        text-align: center;
+        background-color: rgba(0,0,0,0.3);
+        padding: 16px;
+    }
+
+    .resource-row {
+        width: 100%;
+    }
+
+    .buildingcosts {
+        flex-direction: column;
+        padding-left: 2px;
+        padding-right: 2px;
+        text-align: start;
+        margin-left: 20px;
+    }
+
+    a .building:hover {
+        border-color: pink;
+        border-width: 1px;
+        border-style: solid;
+        cursor: pointer;
+    }
+</style>
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h3 style="text-align:center">@ViewData["Title"]</h3>
+
+        <a asp-controller="State" asp-action="View" asp-route-id="@Model.State.Id">
+            <button class="btn btn-primary">Go Back</button>
+        </a>
+
+        <br />
+        <hr />
+        <br />
+        
+        <div class="buildings">
+            @foreach (var managemodel in Model.ManageModels)
+            {
+                if (managemodel.Building.CanManage(user))
+                {
+                    <div data-bs-toggle="modal" data-bs-target="#managebuildingmodel-@managemodel.BuildingId" style="cursor: pointer;">
+                        @await Html.PartialAsync("/Views/Shared/Components/ViewBuildingInGrid.cshtml", managemodel.Building)
+                    </div>
+                    <bootstrap-modal asp-modal-id="managebuildingmodel-@managemodel.BuildingId" asp-modal-title="@managemodel.Building.Name">
+                        @await Html.PartialAsync("/Views/Shared/Components/ManageBuildingModal.cshtml", managemodel)
+                    </bootstrap-modal>
+                }
+                else
+                {
+                    @await Html.PartialAsync("/Views/Shared/Components/ViewBuildingInGrid.cshtml", managemodel.Building)
+                }
+            }
+        </div>
+    </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>

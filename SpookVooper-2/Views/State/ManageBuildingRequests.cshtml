@@ -1,0 +1,144 @@
+﻿@model ManageBuildingRequestsModel
+
+@{
+    ViewData["Title"] = "Manage Building Requests";
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .limit-width {
+        max-width:200px;
+    }
+    input {
+        width: 100%;
+    }
+
+    thead, tbody, tfoot, tr, td, th {
+        border-style: none;
+    }
+
+    tr:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    tr:nth-child(even), .header {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    th {
+        background-color: unset !important;
+    }
+</style>
+
+<div class="container vw-100">
+    @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+    <div class="col-12">
+        <div class="d-flex">
+            <div class="p-1 align-self-start flex-grow-1">
+                <h2>Manage Building Requests for @Model.State.Name</h2>
+            </div>
+        </div>
+
+        @{
+            bool ShowOnlyReviewed = Context.Request.QueryString.Value.Contains("toggleonlyreviewed=true");
+        }
+
+        <center>
+            @if (ShowOnlyReviewed) {
+                <a href="/State/ManageBuildingRequests/@Model.State.Id?toggleonlyreviewed=false" style="text-decoration:none;">
+                    <button class="btn btn-outline-primary">Show only requests not reviewed</button>
+                </a>
+                <a href="/State/ManageBuildingRequests/@Model.State.Id?toggleonlyreviewed=true" style="text-decoration:none;">
+                    <button class="btn btn-primary">Show only requests reviewed</button>
+                </a>
+            }
+            else {
+                <a href="/State/ManageBuildingRequests/@Model.State.Id?toggleonlyreviewed=false" style="text-decoration:none;">
+                    <button class="btn btn-primary">Show only requests not reviewed</button>
+                </a>
+                <a href="/State/ManageBuildingRequests/@Model.State.Id?toggleonlyreviewed=true" style="text-decoration:none;">
+                    <button class="btn btn-outline-primary">Show only requests reviewed</button>
+                </a>
+            }
+        </center>
+
+        <br />
+        <center>
+            <span id="result" style="font-size: 16px;"></span>
+        </center>
+        <iframe style="display: none;" name="frame" onLoad="Submitted(this)"></iframe>
+        <table class="table">
+            <thead>
+                <tr class="header">
+                    <th>@Model.State.District.NameForProvince Name</th>
+                    <th>Requester Name</th>
+                    <th>Building Requested</th>
+                    <th>Levels Requested</th>
+                    <th>Levels Constructed</th>
+                    <th>Approve?</th>
+                    <th>Deny?</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var request in Model.BuildingRequests.Where(x => x.LevelsBuilt != x.LevelsRequested))
+                    {
+                        <tr id="@request.Id">
+                            <td>
+                                <a href="/Province/View/@request.ProvinceId">@request.Province.Name</a>
+                            </td>
+                            <td>
+                                @if (request.Requester.EntityType == EntityType.User) {
+                                    <a asp-controller="User" asp-action="Info" asp-route-id="@request.RequesterId">@request.Requester.Name</a>
+                                }
+                                else {
+                                    <a asp-controller="Group" asp-action="View" asp-route-id="@request.RequesterId">@request.Requester.Name</a>
+                                }
+                            </td>
+                            <td>@request.BuildingLuaObj.PrintableName</td>
+                            <td>@request.LevelsRequested</td>
+                            <td>@request.LevelsBuilt</td>
+                            <td>
+                                <!form method="post" action="/Province/BuildingRequest/Approve?id=@request.Id" target="frame">
+                                    @Html.AntiForgeryToken()
+                                    @if (request.Granted) {
+                                        <button class="btn btn-success">Approve</button>
+                                    }
+                                    else if (!request.Reviewed) {
+                                        <button class="btn btn-outline-success">Approve</button>
+                                    }
+                                    else {
+                                        <button class="btn btn-outline-success">Approve</button>
+                                    }
+                                </!form>
+                            </td>
+                            <td>
+                                <!form method="post" action="/Province/BuildingRequest/Deny?id=@request.Id" target="frame">
+                                    @Html.AntiForgeryToken()
+                                    @if (!request.Granted && request.Reviewed) {
+                                        <button class="btn btn-warning">Deny</button>
+                                    }
+                                    else if (!request.Reviewed) {
+                                        <button class="btn btn-outline-warning">Deny</button>
+                                    }
+                                    else {
+                                        <button class="btn btn-outline-warning">Deny</button>
+                                    }
+                                </!form>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function Submitted(element) {
+        var text = element.contentDocument.body.textContent.split(",")
+        var e = document.getElementById("result")
+        e.innerHTML = text[0]
+        e = document.getElementById(text[1])
+        e.style = "display: none;"
+    }
+</script>

@@ -1,0 +1,52 @@
+﻿@model NewsPost
+
+@{
+    SVUser author = DBCache.Get<SVUser>(Model.AuthorId)!;
+    Group group = DBCache.Get<Group>(Model.GroupId);
+
+    if (group is null)
+    {
+        group = new Group()
+        {
+            ImageUrl = "/media/unity-256.png",
+            Name = "Unknown Group"
+        };
+    }
+}
+
+<!-- Main container for blurb -->
+<div class="row newsblurb justify-content-between" style="width:60em">
+    <!-- Title section -->
+    <div class="newsblurbtitle">
+
+        <!-- Group image -->
+        <img class="newsblurbgroupimage" src="@group.ImageUrl" />
+
+        <!-- Text portion -->
+        <div class="newstitletext">
+            <a asp-controller="News" asp-action="ViewPost" asp-route-id="@Model.Id"><h4>@Model.Title</h4></a>
+            <h6>
+                by
+                <a asp-controller="User" asp-action="Info" asp-route-id="@Model.AuthorId">
+                    <i style="color:white">
+                        @author.Name
+                    </i>
+                </a>
+                with
+                <a asp-controller="Group" asp-action="View" asp-route-id="@Model.GroupId">
+                    <b style="color:white">
+                        @group.Name
+                    </b>
+                </a>
+            </h6>
+            <br />
+        </div>
+    </div>
+    <div>
+        <img class="newsblurbimg" src="@Model.ImageUrl" />
+        <br />
+    </div>
+
+    <span style="float:left">Posted @DateTime.UtcNow.Subtract(Model.Timestamp).ToReadableString().Split(',')[0] ago</span>
+
+</div>

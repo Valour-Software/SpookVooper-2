@@ -1,0 +1,251 @@
+@model Group
+
+<head>
+    <meta property="og:title" content="@Model.Name">
+    <meta name="keywords" content="Group, SpookVooper, @Model.Name">
+    <meta property="og:description" content="@Model.Description">
+    <meta property="og:url" content="https://spookvooper.com/Group/View?groupid=@Model.Id">
+    <meta property="og:image" content="@Model.ImageUrl">
+    <meta name="twitter:image" content="@Model.ImageUrl">
+</head>
+
+
+@if (Model != null)
+{
+
+    ViewData["Title"] = Model.Name;
+
+    SVUser user = UserManager.GetUser(Context)!;
+
+    // Add auth for roles later
+    //if (user != null && Model.own == user.Id)
+    //{
+    //    <a asp-action="SetInfo" asp-controller="User" class="btn btn-primary">Modify</a>
+    //}
+
+    <div class="container vw-100">
+        <div class="col-12">
+
+            @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+            <h1 style="text-align:center" class="display-4">@Model.Name</h1>
+            <h2 style="text-align:center" class="display-4">In: @Model.GroupType.ToString()</h2>
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4 col-sm-offset-4">
+                        <div>
+                            <br />
+
+                            @await Component.InvokeAsync("GroupImage", Model)
+                        </div>
+                    </div>
+                    <div class="col-sm-4"></div>
+                </div>
+            </div>
+
+            @if (Model.DistrictId is not null)
+            {
+                <p class="m-2" style="text-align:center; font-size:x-large">District: @Model.District.Name</p>
+            }
+            else
+            {
+                <p class="m-2" style="text-align:center; font-size:x-large">District: Offworld</p>
+            }
+
+            @if (user != null)
+            {
+                <div class="d-flex justify-content-center">
+                    @if (!Model.IsInGroup(user))
+                    {
+                        @if (false)
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="Join" asp-controller="Group" asp-route-id="@Model.Id" class="btn btn-outline-primary">Join Group</a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="p-2 align-self-center" style="text-align:center">
+                            <a asp-action="Leave" asp-controller="Group" asp-route-id="@Model.Id" class="btn btn-outline-danger">Leave Group</a>
+                        </div>
+                    }
+                    @if (Model.HasPermission(user, GroupPermissions.Edit))
+                    {
+                        <div class="p-2 align-self-center" style="text-align:center">
+                            <a asp-action="Edit" asp-controller="Group" asp-route-id="@Model.Id" class="btn btn-outline-warning">Edit</a>
+                        </div>
+                    }
+                    @if (Model.HasPermission(user, GroupPermissions.ManageInvites))
+                    {
+                        <div class="p-2 align-self-center" style="text-align:center">
+                            <a asp-action="Invite" asp-controller="Group" asp-route-id="@Model.Id" class="btn btn-outline-primary">Invite</a>
+                        </div>
+                    }
+
+                    @if (Model.Flags.Contains(GroupFlag.News))
+                    {
+                        @if (Model.HasPermission(user, GroupPermissions.News))
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="Create" asp-controller="News" asp-route-groupid="@Model.Id" class="btn btn-outline-primary">New Story</a>
+                            </div>
+                        }
+
+                        @if (user.IsMinister("Minister of Journalism"))
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="RemovePressPass" asp-controller="News" asp-route-groupid="@Model.Id" class="btn btn-outline-danger">Revoke Pass</a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        if (user.IsMinister("Minister of Journalism"))
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="AddPressPass" asp-controller="News" asp-route-groupid="@Model.Id" class="btn btn-outline-warning">Give Pass</a>
+                            </div>
+                        }
+                    }
+
+                    @if (await user.IsGovernmentAdmin())
+                    {
+                        if (!Model.Flags.Contains(GroupFlag.NonProfit))
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="AddFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="NonProfit" class="btn btn-outline-warning">Add NonProfit FLag</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="RemoveFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="NonProfit" class="btn btn-outline-warning">Remove NonProfit FLag</a>
+                            </div>
+                        }
+
+                        if (!Model.Flags.Contains(GroupFlag.CanHaveMilitary))
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="AddFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="CanHaveMilitary" class="btn btn-outline-warning">Add CanHaveMilitary FLag</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="RemoveFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="CanHaveMilitary" class="btn btn-outline-warning">Remove CanHaveMilitary FLag</a>
+                            </div>
+                        }
+                    }
+
+                    @if (Model.HasPermission(user, GroupPermissions.Recipes))
+                    {
+                        <div class="p-2 align-self-center" style="text-align:center">
+                            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createrecipemodal">Create Recipe</button>
+                        </div>
+                    }
+
+                </div>
+            }
+
+            @if (Model.Description != null)
+            {
+                <br />
+                <p class="p m-2" style="font-size:large; text-align:center">@Html.Raw(MarkdownManager.GetHtml(Model.Description))</p>
+                <br />
+            }
+
+            <br />
+            <hr />
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="d-flex justify-content-center flex-wrap">
+            <div class="m-2" style="width:500px">
+                <h2>Recent Posts</h2>
+                <br />
+            </div>
+            <div class="m-2" style="width:500px">
+                <h2>Members</h2>
+                <br />
+                <div class="container">
+                    <div class="row">
+                        <div class="col-6 memberbox">
+                            <div class="m-2">
+                                <img class="memberpfp" src="@Model.Owner.ImageUrl" />
+                            </div>
+                            @if (Model.Owner.EntityType == EntityType.User)
+                            {
+                                <a asp-controller="User" asp-action="Info" asp-route-id="@Model.Owner.Id" style="text-decoration: none;">
+                                    <span class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(Model.Owner).Color;">@Model.Owner.Name</span>
+                                    <span class="nametext" style="max-width:60%;color:white">(Owner)</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Group" asp-action="View" asp-route-id="@Model.Owner.Id">
+                                    <span class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(Model.Owner).Color;">@Model.Owner.Name</span>
+                                    <span class="nametext" style="max-width:60%;color:white">(Owner)</span>
+                                </a>
+                            }
+                        </div>
+                        @foreach (BaseEntity entity in Model.Members.Where(x => x.Id != Model.OwnerId))
+                        {
+                            <div class="col-6 memberbox">
+                                <div class="m-2">
+                                    <img class="memberpfp" src="@entity.ImageUrl" />
+                                </div>
+                                @if (entity.EntityType == EntityType.User)
+                                {
+                                    <a asp-controller="User" asp-action="Info" asp-route-id="@entity.Id">
+                                        <span class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(entity).Color;">@entity.Name</span>
+                                        @if (Model.GetHighestRole(entity).GroupId != 0)
+                                        {
+                                            <span class="nametext" style="max-width:60%;color:white">(@Model.GetHighestRole(entity).Name)</span>
+                                        }
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Group" asp-action="View" asp-route-id="@entity.Id">
+                                        <span class="nametext" style="max-width:60%; color:#@Model.GetHighestRole(entity).Color;">@entity.Name</span>
+                                        @if (Model.GetHighestRole(entity).GroupId != 0)
+                                        {
+                                            <span class="nametext" style="max-width:60%;color:white">(@Model.GetHighestRole(entity).Name)</span>
+                                        }
+                                    </a>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <bootstrap-modal asp-modal-id="createrecipemodal" asp-modal-title="Select Base Recipe">
+        <center>
+            <span>Select base recipe to create custom recipe from</span>
+            <br />
+            <br />
+
+            @foreach (var baserecipe in GameDataManager.BaseRecipeObjs.Values.Where(x => x.Editable))
+            {
+                <a href="/Recipe/CreateNewRecipe?entityid=@Model.Id&baserecipeid=@baserecipe.Id" style="text-decoration: none;">
+                    <button style="margin-bottom: 10px;" class='btn btn-outline-primary'>@baserecipe.Name</button>
+                </a>
+                <br/>
+            }
+        </center>
+    </bootstrap-modal>
+}
+else
+{
+    <div class="container vw-100">
+        <div class="col-12">
+            <h1 style="text-align:center" class="display-4">Group not found!</h1>
+        </div>
+    </div>
+}

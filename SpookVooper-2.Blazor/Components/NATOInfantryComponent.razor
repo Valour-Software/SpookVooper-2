@@ -1,0 +1,21 @@
+﻿<g style="transform: scale(0.08) translate(@(X/0.08)px, @(Y/0.08)px);">
+    <path d="M25,50 l150,0 0,100 -150,0 z" stroke-width="4" stroke="black" fill="rgb(128,224,255)" fill-opacity="1"></path>
+    <path d="M25,50 L175,150 M25,150 L175,50" stroke-width="4" stroke="black" fill="black"></path>
+    <rect x="25px" y="150px" width="150px" height="15px" style="stroke-width: 4px;stroke: black;" />
+    <rect x="27px" y="152px" width="@(Health*146)px" height="12px" style="fill: white;"/>
+    <rect x="@(Health*146+27)px" y="152px" width="@((1-Health)*146)px" height="12px" style="fill: red;" />
+</g>
+
+@code {
+    [Parameter]
+    public double X { get; set; }
+
+    [Parameter]
+    public double Y { get; set; }
+
+    /// <summary>
+    /// Out of 1
+    /// </summary>
+    [Parameter]
+    public double Health { get; set; }
+}

@@ -1,0 +1,52 @@
+﻿.recipe-designer-div {
+    width: 1200px;
+    height: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+.recipe-designer-body {
+    display: flex;
+    flex-direction: row;
+}
+
+.left-side {
+    width: 40%;
+    border-right: solid white;
+    height: 500px;
+    padding: 16px;
+}
+
+.right-side {
+    width: 60%;
+    padding: 16px;
+}
+
+.right-side .container {
+    height: 350px;
+}
+
+.edit-buttons-div {
+}
+
+.edit-holder {
+
+}
+
+.edit-button-div {
+    display: flex;
+    flex-direction: row;
+}
+
+.edit-button {
+    display: flex;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: none;
+    padding: 6px;
+    padding-top: 0px;
+}

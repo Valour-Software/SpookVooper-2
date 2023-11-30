@@ -1,0 +1,199 @@
+﻿@using SV2.Managers;
+
+<!DOCTYPE html>
+<html lang="en-us" data-bs-theme="dark">
+<head>
+    <!--
+     ___                _  __   __
+    / __|_ __  ___  ___| |_\ \ / /__  ___ _ __  ___ _ _
+    \__ \ '_ \/ _ \/ _ \ / /\ V / _ \/ _ \ '_ \/ -_) '_|
+    |___/ .__/\___/\___/_\_\ \_/\___/\___/ .__/\___|_|
+        |_|                              |_|
+
+        Written by Spike Viper with love and care!
+    -->
+    <link rel="~/media/apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/media/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/media/favicon-16x16.png">
+    <link rel="manifest" href="~/media/site.webmanifest">
+    <link rel="mask-icon" href="~/media/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#2d89ef">
+    <meta name="description" content="A large community of online nerds looking to play games,
+          make videos, and have some fun!">
+    <meta name="keywords" content="Gaming,YouTube,Community,Forums">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta property="og:site_name" content="SpookVooper">
+    <meta name="twitter:site" content="@@SpikeViperYT">
+    <meta name="twitter:image:alt" content="Potato soldiers on a planet">
+    <meta name="theme-color" content="#3948ed">
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <!---<script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>-->
+
+    <script src="/js/chart.bundle.min.js"></script>
+
+    <title>@ViewData["Title"] - SpookVooper</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <!---<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" /> --->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-expand-lg navbar-light box-shadow mb-3">
+            <div class="container">
+                <div>
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="word-break:keep-all">SpookVooper</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse" style="" id="navbarSupportedContent">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <!--<li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="CommunityDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Nerdcraft
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="CommunityDropdown">
+                                <a class="dropdown-item" asp-area="" asp-controller="Nerdcraft" asp-action="Index">Home</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Nerdcraft" asp-action="RulesGeneral">Rules</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Nerdcraft" asp-action="Laws">Laws</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Nerdcraft" asp-action="Jobs">Jobs</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Nerdcraft" asp-action="Guide">Guide</a>
+                            </div>
+                        </li>-->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="News" asp-action="Index">News</a>
+                        </li>
+                        <!--
+                            <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Exchange" asp-action="Index">Exchange</a>
+                        </li>
+                        -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="CommunityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
+                                Community
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="CommunityDropdown">
+                                <a class="dropdown-item" asp-controller="Map" asp-action="World">Districts</a>
+                                <a class="dropdown-item" asp-controller="Government" asp-action="Index">Government</a>
+                                <a class="dropdown-item" asp-controller="Leaderboard" asp-action="Index">Leaderboard</a>
+                                <a class="dropdown-item" asp-controller="Leaderboard" asp-action="EconomicScore">Economic Score Leaderboard</a>
+                                <a class="dropdown-item" asp-controller="Time" asp-action="Index">Current Time</a>
+                                <a class="dropdown-item" asp-controller="Stats" asp-action="GlobalGraphs">Global Graphs</a>
+                                <a class="dropdown-item" asp-controller="Stats" asp-action="AllDistrictsGraphs">All Districts Graphed</a>
+                                <!--<a class="dropdown-item" asp-controller="Government" asp-action="Elections">Elections</a>-->
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="SearchDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                People
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="SearchDropdown">
+                                @{
+                                    SVUser? user = UserManager.GetUser(Context);
+                                    //if (User != null) { user = await userManager.GetUserAsync(User); }
+
+                                    if (user is not null)
+                                    {
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Manage">My Account</a>
+                                        <a class="dropdown-item" asp-controller="User" asp-action="Info" asp-route-id="@user.Id">My Page</a>
+                                    }
+                                    else
+                                    {
+                                        <a class="dropdown-item" asp-controller="Manage" asp-action="Index" disabled>My Account</a>
+                                        <a class="dropdown-item" asp-controller="User" asp-action="Info" disabled>My Page</a>
+                                    }
+
+                                    <a class="dropdown-item" asp-controller="User" asp-action="JobOpenings">Job Openings</a>
+                                    <a class="dropdown-item" asp-controller="User" asp-action="MyJobOpenings">My Posted Job Openings</a>
+                                }
+
+                                <!--
+                                    <a class="dropdown-item" asp-controller="User" asp-action="Search">Find</a>
+                                    -->
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="GroupDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Groups
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="GroupDropdown">
+                                <a class="dropdown-item" asp-controller="Group" asp-action="Create">Create</a>
+                                <a class="dropdown-item" asp-controller="Group" asp-action="MyGroups">My Groups</a>
+                                <a class="dropdown-item" asp-controller="Group" asp-action="Search">Find</a>
+                                <a class="dropdown-item" asp-controller="Group" asp-action="ViewInvited">Groups invited to</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="ProvincesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Manage
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="ProvincesDropdown">
+                                <a class="dropdown-item" asp-controller="Province" asp-action="BulkManage">Bulk Manage</a>
+                                <a class="dropdown-item" asp-controller="Province" asp-action="BulkBuildingRequests" asp-route-filter="Provinces" asp-route-toggleonlygranted="false">Bulk Manage Building Requests</a>
+                                <a class="dropdown-item" asp-controller="Province" asp-action="MyRequests" asp-route-toggleonlygranted="true">My Building Requests</a>
+                                <a class="dropdown-item" asp-controller="Building" asp-action="MyBuildings">My Buildings</a>
+                                <a class="dropdown-item" asp-controller="Global" asp-action="Pay">Pay</a>
+                                <a class="dropdown-item" asp-controller="Global" asp-action="Trade">Send Resources</a>
+                                <a class="dropdown-item" asp-controller="Recipe" asp-action="MyRecipes">My Recipes</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    @await Html.PartialAsync("_LoginPartial")
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div>
+        <partial name="_CookieConsentPartial" />
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="d-flex justify-content-between">
+                <div class="p-1">
+                    &copy; 2019-2023 - Vooper Media LLC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </div>
+                <div class="p-10" />
+            </div>
+        </div>
+    </footer>
+    
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="/_framework/blazor.webassembly.js" autostart="false"></script>
+    <script>
+        Blazor.start({
+            // manually start blazor and override boot load to redirect http requests to /_framework/ instead of /{controller}/_framework
+            loadBootResource: function (type, name, defaultUri, integrity) {
+                //console.log(`Loading: '${type}', '${name}', '${defaultUri}', '${integrity}'`);
+
+                //https://learn.microsoft.com/en-us/aspnet/core/blazor/fundamentals/startup?view=aspnetcore-6.0
+                // change framework uri's to be absolute instead of relative.
+                if (defaultUri.startsWith("_framework")) {
+                    return `/${defaultUri}`;
+                }
+
+                // over ride dotnet js location to correct locaction.
+                if (type == 'dotnetjs') {
+                    return `/_framework/${name}`;
+                }
+            }
+        });
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

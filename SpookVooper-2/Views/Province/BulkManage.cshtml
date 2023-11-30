@@ -1,0 +1,95 @@
+﻿@model SV2.Models.Provinces.BulkManageModel
+
+@{
+    ViewData["Title"] = "Bulk Manage Provinces";
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .limit-width {
+        max-width:200px;
+    }
+    input {
+        width: 100%;
+    }
+
+    thead, tbody, tfoot, tr, td, th {
+        border-style: none;
+    }
+
+    tr:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    tr:nth-child(even), .header {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    th {
+        background-color: unset !important;
+    }
+</style>
+
+<div class="container vw-100">
+    @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+    <div class="col-12">
+        <div class="d-flex">
+            <div class="p-1 align-self-start flex-grow-1">
+                <h1>Bulk Manage Provinces You Have Governorship Over</h1>
+            </div>
+        </div>
+
+
+        <!form method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr class="header">
+                        <td>Id</td>
+                        <th>Province Name</th>
+                        <th>Base Property Tax</th>
+                        <th>Property Tax Per Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        Province prevprovince = null;
+                        for (int i = 0; i < Model.Provinces.Count; i++)
+                        {
+                            if (prevprovince is null || prevprovince.DistrictId != Model.Provinces[i].DistrictId)
+                            {
+                                <row class="text-center">
+                                    <h4>@Model.Provinces[i].District.Name</h4>
+                                </row>
+                            }
+                            prevprovince = Model.Provinces[i];
+                            <tr>
+                                <td>
+                                    <a href="/Province/View/@Model.Provinces[i].Id">@Model.Provinces[i].Id</a>
+                                </td>
+                                <td>
+                                    <div class="form-control new-input-style">
+                                        @Html.TextBoxFor(x => Model.Provinces[i].Name)
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-control new-input-style limit-width">
+                                        @Html.TextBoxFor(x => Model.Provinces[i].BasePropertyTax)
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-control new-input-style limit-width">
+                                        @Html.TextBoxFor(x => Model.Provinces[i].PropertyTaxPerSize)
+                                    </div>
+                                </td>
+                                @Html.HiddenFor(x => Model.Provinces[i].Id)
+                            </tr>
+                        }
+                    }
+                    </tbody>
+            </table>
+        </!form>
+    </div>
+</div>

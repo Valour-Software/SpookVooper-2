@@ -1,0 +1,52 @@
+@using SV2.Models;
+@using SV2.Managers;
+
+@inject VooperDB context
+
+@if (UserManager.GetUser(Context) is not null)
+{
+    <div class="nav navbar-nav navbar-right">
+
+        @{
+            int ncount = 0;//context.Notifications.Count(n => !n.Seen && n.Target == UserManager.GetUserAsync(User).Result.Id);
+        }
+
+        <div style="display:inline-block; margin-top: auto; margin-bottom: auto;">
+            @if (ncount > 0)
+            {
+                <a asp-controller="Notification" asp-action="Index">
+                    <div class="notidot m-2" style="background-color:red;">
+                        <p>@ncount</p>
+                    </div>
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Notification" asp-action="Index">
+                    <div class="notidot m-2" style="background-color:#222222; text-align:center; float:left;">
+                    </div>
+                </a>
+            }
+        </div>
+
+        <div style="display:inline-block">
+            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
+
+                <ul style="align-content: center; align-items: center" class="nav navbar-nav navbar-right">
+                    <li>
+                        <a style="justify-content: center" asp-controller="Account" asp-action="Manage" title="Manage">Hello @UserManager.GetUser(Context)!.Name </a>
+                    </li>
+                    <li>
+                        <button style="justify-content: center" type="submit" class="btn btn-link navbar-btn navbar-link">Log out</button>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li><a style="margin: 5px" asp-area="" asp-controller="Account" asp-action="Login">Log in</a></li>
+    </ul>
+}

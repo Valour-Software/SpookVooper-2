@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32317.152
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpookVooper-2", "SpookVooper-2.csproj", "{62D48C14-8EE2-4593-BA98-C3606A0E4A1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpookVooper-2", "SpookVooper-2\SpookVooper-2.csproj", "{62D48C14-8EE2-4593-BA98-C3606A0E4A1C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpookVooper-2.Blazor", "SpookVooper-2.Blazor\SpookVooper-2.Blazor.csproj", "{D01E06B9-EF35-4327-A51C-A2F18EA27749}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{BE696402-2EAE-4673-9183-6B611CB0D15B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{62D48C14-8EE2-4593-BA98-C3606A0E4A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62D48C14-8EE2-4593-BA98-C3606A0E4A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62D48C14-8EE2-4593-BA98-C3606A0E4A1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D01E06B9-EF35-4327-A51C-A2F18EA27749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D01E06B9-EF35-4327-A51C-A2F18EA27749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D01E06B9-EF35-4327-A51C-A2F18EA27749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D01E06B9-EF35-4327-A51C-A2F18EA27749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE696402-2EAE-4673-9183-6B611CB0D15B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE696402-2EAE-4673-9183-6B611CB0D15B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE696402-2EAE-4673-9183-6B611CB0D15B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE696402-2EAE-4673-9183-6B611CB0D15B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

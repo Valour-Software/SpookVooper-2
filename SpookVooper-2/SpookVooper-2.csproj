@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>SV2</RootNamespace>
+    <EnablePreviewFeatures>True</EnablePreviewFeatures>
+    <Version>0.0.1</Version>
+	<AssemblyName>SV2</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ChartJSCore" Version="3.10.0" />
+    <PackageReference Include="EFCore.NamingConventions" Version="7.0.2" />
+    <PackageReference Include="Humanizer.Core" Version="2.14.1" />
+    <PackageReference Include="Markdig" Version="0.31.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="7.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.5" />
+    <PackageReference Include="Npgsql" Version="7.0.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1" />
+	<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.5" />
+	<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
+	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
+	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0" />
+  </ItemGroup>
+
+	<ItemGroup Condition="true">
+		<PackageReference Include="Valour.Net" Version="0.6.9.4" />
+		<PackageReference Include="Valour.Api" Version="0.2.0.1" />
+	</ItemGroup>
+	
+	<ItemGroup Condition="false">
+		<ProjectReference Include="..\..\..\Valour\Valour\API\Valour.Api.csproj" />
+		<ProjectReference Include="..\..\..\Valour\Valour\Shared\Valour.Shared.csproj" />
+		<ProjectReference Include="..\..\..\Valour.Net\Valour.Net\Valour.Net.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\Shared\Shared.csproj" />
+	  <ProjectReference Include="..\SpookVooper-2.Blazor\SpookVooper-2.Blazor.csproj" />
+	</ItemGroup>
+
+  <ItemGroup>
+      <Content Remove="Data\**\*.json" />
+      <Content Include="Data\**">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\Shared\Components\ManageBuildingModal.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

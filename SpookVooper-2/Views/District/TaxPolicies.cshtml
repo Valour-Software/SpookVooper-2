@@ -1,0 +1,39 @@
+@model SV2.Database.Models.Districts.District
+@using SpookVooper_2.Blazor.Components.Taxes
+
+@{
+    ViewData["Title"] = $"Edit Tax Policies";
+}
+
+@{
+    SVUser user = UserManager.GetUser(Context)!;
+}
+<link href="/SpookVooper-2.Blazor.styles.css" rel="stylesheet">
+
+<center>
+    <div class="container vw-100">
+        <div class="col-12">
+            @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+            <h3 style="text-align:center">@ViewData["Title"]</h3>
+            <h2 style="text-align:center">@Model.Name</h2>
+
+            <br />
+
+            <a asp-controller="District" asp-action="View" asp-route-name="@Model.Name">
+                <button class="btn btn-primary" style="float:left;">Go Back To District Page</button>
+            </a>
+
+            <br />
+            <br/>
+
+            <component type="typeof(ManageTaxPoliciesComponent)" render-mode="WebAssemblyPrerendered" param-DistrictId="@Model.Id" param-IsGovernor="@(Model.GovernorId == user.Id)"/>
+
+        <br />
+        <br />
+
+        @section Scripts {
+            @await Html.PartialAsync("_ValidationScriptsPartial")
+        }
+    </div>
+</center>

@@ -1,0 +1,12 @@
+﻿.list {
+    max-height: 400px;
+    margin-top: 12px;
+}
+
+.list-item {
+    padding: 2px;
+}
+
+.selected {
+    background-color: rgba(0, 255, 0, 0.1);
+}

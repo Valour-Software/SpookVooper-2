@@ -1,0 +1,86 @@
+﻿@model SV2.Database.Models.Misc.CurrentTime
+
+<style>
+
+    #rpClockDisplay {
+        color: white;
+        padding: 4px;
+        border-radius: 5px;
+        width: 15em;
+        font-size: 20px;
+    }
+
+</style>
+
+<center>
+    <div id="rpClockDisplay"
+            onClick="toggleRPClockMode()"
+            title="Click to change mode">
+        RP Clock
+    </div>
+</center>
+
+<script>
+
+    //names for days and moths
+    const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    //get the place to display the time
+    let rpClockDisplay = document.getElementById("rpClockDisplay").childNodes[0];
+
+    //should the rp clock be 24 hour?
+    let rpClock24Hour = localStorage.getItem("rpClock24Hour") == "true";
+    console.log(rpClock24Hour);
+
+    let startTime = Date.now();
+
+    //run the updater function
+    updateRPClockTime();
+
+    //update the time
+    function updateRPClockTime() {
+        //get the current tine in unix seconds
+        let currentTime = Date.now();
+
+        //convert to RP time
+        let rpTime = new Date(@((Model.Time.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))).TotalMilliseconds) + (currentTime - startTime) * 3);
+
+        //format
+        let hours = rpTime.getUTCHours();
+        if (rpClock24Hour) {
+            if (hours == 0) hours = 24
+        } else {
+            hours %= 12;
+            if (hours == 0) hours = 12;
+        }
+        let formattedTime =
+            DAYS[rpTime.getUTCDay()] + " " +
+            MONTHS[rpTime.getUTCMonth()] + " " +
+            rpTime.getUTCDate() + " " +
+            rpTime.getUTCFullYear() + " " +
+            hours + ":" +
+            (rpTime.getUTCMinutes() + "").padStart(2, "0") + ":" +
+            (rpTime.getUTCSeconds() + "").padStart(2, "0");
+        if (!rpClock24Hour)
+            formattedTime += " " + (rpTime.getUTCHours > 12 ? "PM" : "AM");
+
+        //update the display
+        rpClockDisplay.nodeValue = formattedTime;
+
+        //schedule the next update
+        window.requestAnimationFrame(updateRPClockTime);
+    }
+
+    //24/12 hour button handler
+    function toggleRPClockMode() {
+        //toggle the mode
+        rpClock24Hour = !rpClock24Hour;
+
+        console.log(rpClock24Hour);
+
+        //update the value in localStorage
+        localStorage.setItem("rpClock24Hour", rpClock24Hour);
+    }
+
+</script>

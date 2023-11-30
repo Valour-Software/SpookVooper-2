@@ -1,0 +1,120 @@
+@model SV2.Views.ProvinceViews.Models.SelectBuildingModel
+@using SV2.Scripting
+
+@{
+    ViewData["Title"] = "Province Builder";
+
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .buildings {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .building {
+        width: 300px;
+        height: 150px;
+        border-radius: 18px;
+        margin: 8px;
+        text-align: center;
+        background-color: rgba(0,0,0,0.3);
+    }
+
+    .building:hover {
+        border-color: pink;
+        border-width: 1px;
+        border-style: solid;
+    }
+
+    .resource-row {
+        width: 100%;
+    }
+
+    .buildingcosts {
+        flex-direction: column;
+        padding-left: 2px;
+        padding-right: 2px;
+        text-align: start;
+        margin-left: 20px;
+    }
+</style>
+
+<div class="container vw-100">
+    <div class="col-12">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <h3 style="text-align:center">@ViewData["Title"]</h3>
+        <h2 style="text-align:center">The @Model.Province.District.NameForProvince of @Model.Province.Name</h2>
+
+        <a asp-controller="Province" asp-action="View" asp-route-id="@Model.Province.Id">
+            <button class="btn btn-primary">Go Back</button>
+        </a>
+
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+
+            </div>
+            <div class="col-4"></div>
+        </div>
+
+        <br />
+        <hr />
+        <br />
+        
+        <div class="buildings">
+            @foreach (var buildingobj in GameDataManager.BaseBuildingObjs.Values) 
+            {
+                bool first = true;
+                if (!buildingobj.OnlyGovernorCanBuild || (buildingobj.OnlyGovernorCanBuild && Model.Province.CanEdit(user)))
+                {
+                    if (buildingobj.MustHaveResource is null || (Model.Province.Metadata.Resources.ContainsKey(buildingobj.MustHaveResource))) {
+                        <div class="building" data-bs-toggle="modal" data-bs-target="#createbuildingrequest-@buildingobj.Name" style="cursor: pointer;">
+                            <span data-bs-toggle="modal" data-bs-target="#createbuildingrequest-@buildingobj.Name" class="has-expanded-info" style="cursor: pointer;">@buildingobj.PrintableName</span>
+                            <br>
+                            <span>Costs to build</span>
+                            <br>
+                            <div class="buildingcosts">
+                                @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(Model.Province.District, Model.Province)))
+                                {
+                                    <div class="resource-row">
+                                        <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                                        <span style="align-self: flex-end">@(
+                            $"{amount:n0}"
+                            )</span>
+                                    </div>
+                                }
+                            </div>
+                            @if (buildingobj.type == SV2.Database.Models.Buildings.BuildingType.Mine) {
+                                <span>Production: @(
+                            $"{(Model.Province.GetMiningResourceProduction(buildingobj.MustHaveResource) / 10550.0 * buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value):n2} hourly"
+                            )</span>
+                            }
+                        </div>
+                        CreateBuildingRequestModel model = new() {
+                            Province = Model.Province,
+                            LuaBuildingObj = buildingobj,
+                            ProvinceId = Model.Province.Id,
+                            BuildingId = buildingobj.Name,
+                            CanBuildAs = Model.CanBuildAs,
+                            IncludeScript = first,
+                            PrefixForIds = buildingobj.Name,
+                            User = user
+                        };
+                        first = false;
+                        <bootstrap-modal asp-modal-id="createbuildingrequest-@buildingobj.Name" asp-modal-title="Submit Request">
+                            @await Html.PartialAsync("/Views/Shared/Components/SubmitBuildingRequest.cshtml", model)
+                        </bootstrap-modal>
+                    }
+                }
+            }
+        </div>
+    </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>

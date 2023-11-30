@@ -1,0 +1,41 @@
+﻿@using SV2.Scripting.Parser;
+
+<style>
+    .recipes {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .recipe {
+        width: 300px;
+        height: 260px;
+        border-radius: 18px;
+        margin: 8px;
+        text-align: center;
+        background-color: rgba(0,0,0,0.3);
+        padding: 16px;
+    }
+</style>
+
+<div class="container vw-100">
+    <div class="col-12">
+        <h3 style="text-align:center">Net Raw Resource Usage Per Produced Good</h3>
+        <div class="recipes">
+            @foreach (var recipe in GameDataManager.BaseBuildingObjs.Values.Where(x => x.type == BuildingType.Factory || x.type == BuildingType.ResearchLab).SelectMany(x => x.Recipes))
+            {
+                <div class="recipe">
+                    <span>@recipe.Name</span>
+                    <br />
+                    <!--<span>Per 1 recipe.Outputs.First().Key.ToTitleCase().Singularize()</span>-->
+                    <br />
+                    @foreach (var input in recipe.GetRawResourceConsumption())
+                    {
+                        <span>@input.Key: @($"{input.Value:n3}")</span>
+                        <br />
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

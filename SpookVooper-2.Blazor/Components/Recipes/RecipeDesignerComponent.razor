@@ -1,0 +1,184 @@
+﻿@using Shared.Models.Items;
+@using Shared.Models.Users;
+@using Shared.Managers;
+@using Shared.Models;
+
+@if (Loaded) {
+    <div class="recipe-designer-div">
+        <div class="recipe-designer-body">
+            <div class="left-side">
+                <div style="height: 425px;">
+                    <div class="form-group">
+                        <center>
+                            <span id="info-span" class="@infoSpanClass" style="color:white">@infoSpan</span>
+                            @if (infoSpanClass == "text-success")
+                            {
+                                
+                            }
+                        </center>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Name">New Recipe Name</label>
+                        <input asp-for="Name" class="form-control" @bind-value="Recipe.Name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        <label asp-for="Name">Output Item Name</label>
+                        <input asp-for="Name" class="form-control" @bind-value="Recipe.OutputItemName" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div style="">
+                    <button class="btn btn-outline-primary" @onclick="ClickedCreate">
+                        Create
+                    </button>
+                </div>
+            </div>
+            <div class="right-side">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            Basic Info
+                        </div>
+                        <div class="col-sm">
+                            Combat Stats
+                        </div>
+                        <div class="col-sm">
+                            Misc. Stats
+                        </div>
+                        <div class="col-sm">
+                            Inputs
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm">Owner: @Entity.Name</div>
+                        <div class="col-sm">Attack: @Math.Round(Recipe.Modifiers[ItemModifierType.Attack],2)</div>
+                        <div class="col-sm"></div>
+                        <div class="col-sm">@GetPairFromIndex(0).Key: @GetPairFromIndex(0).Value</div>
+                    </div>
+                    @for (int i = 0; i < Recipe.Inputs.Count-1; i++)
+                    {
+                        <div class="row">
+                            <div class="col-sm"></div>
+                            <div class="col-sm"></div>
+                            <div class="col-sm"></div>
+                            <div class="col-sm">@GetPairFromIndex(i+1).Key: @GetPairFromIndex(i+1).Value</div>
+                        </div>
+                    }
+                </div>
+                <div class="edit-buttons-div">
+                    @foreach (var luaedit in BaseRecipe.LuaRecipeEdits.Values)
+                    {
+                        <div class="edit-holder">
+                            <span>@luaedit.Name Edit</span>
+                            <div class="edit-button-div">
+                                <button class="edit-button btn" @onclick="async () => { await DecreaseEditLevel(luaedit.Id);}" style="margin-right: 4px;">-</button>
+                                <span class="edit-level">@Recipe.EditsLevels[luaedit.Id]</span>
+                                <button class="edit-button btn" @onclick="async () => {await IncreaseEditLevel(luaedit.Id);}" style="margin-left: 4px;">+</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading</p>
+}
+
+@code {
+    [Parameter]
+    public string BaseRecipeId { get; set; }
+
+    [Parameter]
+    public long EntityId { get; set; }
+
+    public BaseRecipe BaseRecipe { get; set; }
+    public Recipe Recipe { get; set; }
+    public List<ItemDefinition> ItemDefinitions { get; set; }
+    public BaseEntity Entity { get; set; }
+    public bool Loaded = false;
+    public string infoSpan = "";
+    public string infoSpanClass = "";
+
+    public KeyValuePair<string, double> GetPairFromIndex(int index)
+    {
+        var key = Recipe.Inputs.Keys.ToList()[index];
+        return new(GetNameFromDefId(key), Math.Round(Recipe.Inputs[key], 2));
+    }
+
+    private string GetNameFromDefId(long defid)
+    {
+        return SVCache.Get<ItemDefinition>(defid).Name;
+    }
+
+    private async Task IncreaseEditLevel(string editid)
+    {
+        Recipe.EditsLevels[BaseRecipe.LuaRecipeEdits[editid].Id] += 1;
+        await Recipe.UpdateInputs();
+        await Recipe.UpdateModifiers();
+    }
+
+    private async Task DecreaseEditLevel(string editid)
+    {
+        if (Recipe.EditsLevels[BaseRecipe.LuaRecipeEdits[editid].Id] > 0)
+        {
+            Recipe.EditsLevels[BaseRecipe.LuaRecipeEdits[editid].Id] -= 1;
+            await Recipe.UpdateInputs();
+            await Recipe.UpdateModifiers();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            ItemDefinitions = (await SVClient.GetJsonAsync<List<ItemDefinition>>($"api/itemdefinitions/all")).Data;
+            foreach (var itemdef in ItemDefinitions)
+                await itemdef.AddToCache();
+
+            BaseRecipe = await BaseRecipe.FindAsync(BaseRecipeId);
+            Entity = await BaseEntity.FindAsync(EntityId);
+            Recipe = new()
+            {
+                Name = "New Recipe",
+                StringId = "new_recipe",
+                OwnerId = Entity.Id,
+                BaseRecipeId = BaseRecipe.Id,
+                EditsLevels = new(),
+                AnyWithBaseTypesFilledIn = new(),
+                Inputs = new(),
+                Outputs = new(),
+                OutputItemName = "New Item"
+            };
+            foreach (var luaedit in BaseRecipe.LuaRecipeEdits.Values)
+            {
+                Recipe.EditsLevels.Add(luaedit.Id, 0);
+            }
+            await Recipe.UpdateInputs();
+            await Recipe.UpdateOutputs();
+            await Recipe.UpdateModifiers();
+            Loaded = true;
+            StateHasChanged();
+        }
+    }
+
+    public async Task ClickedCreate()
+    {
+        var result = await Item.CreateAsync(Recipe);
+        if (!result.Success)
+        {
+            string errorText = result.Message;
+            Console.WriteLine(errorText);
+            infoSpan = errorText;
+            infoSpanClass = "text-danger";
+            return;
+        }
+
+        infoSpan = $"Successfully created recipe for {Recipe.OutputItemName}";
+        infoSpanClass = "text-success";
+    }
+}

@@ -1,0 +1,59 @@
+﻿@model NewsPost
+
+@{
+    ViewData["Title"] = Model.Title;
+    SVUser author = DBCache.Get<SVUser>(Model.AuthorId);
+    Group group = DBCache.Get<Group>(Model.GroupId);
+}
+
+<head>
+    <meta property="og:title" content="@Model.Title">
+    <meta name="keywords" content="@Model.Tags">
+    <meta property="og:description" content="@Model.Content">
+    <meta property="og:url" content="https://spookvooper.com/News/View?postid=@Model.Id">
+    <meta property="og:image" content="@Model.ImageUrl">
+    <meta name="twitter:image" content="@Model.ImageUrl">
+</head>
+
+<!-- Main container -->
+<div class="d-flex flex-row align-content-center" style="width:100%">
+    <!-- Left column -->
+    <div class="p-4 flex-shrink-1 ml-auto"></div>
+    <!-- Center column -->
+    <div class="p-4" style="width:80em;margin-left: auto;margin-right: auto;">
+        <!-- Title area -->
+        <div class="newsviewbox">
+            <div class="row justify-content-between" style="padding:20px">
+                <div style="width:80%">
+                    <h1 class="display-4" style="font-size:40px">@Model.Title</h1>
+                    <h5>
+                        by
+                        <a asp-controller="User" asp-action="Info" asp-route-id="@Model.AuthorId">
+                            <i style="color:white">
+                                @author.Name
+                            </i>
+                        </a>
+                        with
+                        <a asp-controller="Group" asp-action="View" asp-route-id="@Model.GroupId">
+                            <b style="color:white">
+                                @group.Name
+                            </b>
+                        </a>
+                    </h5>
+                </div>
+
+                <img class="newspostgroupimage" src="@group.ImageUrl" />
+            </div>
+            <!-- Content area -->
+            <hr />
+            <br />
+            <img class="newsinnerimage" src="@Model.ImageUrl" />
+            <br />
+            <br />
+            <div class="newscontent">
+                @Html.Raw(MarkdownManager.GetHtml(Model.Content))
+            </div>
+        </div>
+    </div>
+    <!-- Right column -->
+    <div class="p-4 flex-shrink-1 mr-auto"></div>

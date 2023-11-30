@@ -1,0 +1,150 @@
+@model State
+
+<style>
+    .tooltip-dontshow {
+        opacity: 0 !important;
+    }
+
+    .mergedrow {
+        width: 25em;
+        line-height: 1.2em;
+    }
+
+    .dividertop {
+        border-top: 1px solid darkgray;
+    }
+
+    .infobox {
+        border: 1px solid darkgray;
+        background-color: rgba(255, 255, 255, 0.1);
+        max-width: 300px;
+    }
+
+    .infobox-header div {
+        text-align: center;
+    }
+
+    .infobox-subheader div {
+        text-align: center;
+    }
+
+    .infobox-row-name {
+        padding: 0 0.6em 0.2em 0.6em;
+    }
+
+    .mergedrow th {
+    }
+</style>
+
+<!-- Main row for page -->
+<div class="d-flex flex-row align-content-center" style="width:100%">
+    <!-- Leftmost column -->
+    <div class="p-2 flex-shrink-1 ms-auto"></div>
+
+    <!-- Center column -->
+    <div class="p-4" style="width:80em">
+
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+        @{
+            if (Model is not null) {
+                SVUser? user = UserManager.GetUser(Context);
+
+                <div class="d-flex align-content-center align-items-center">
+                    <div style="display:inline-block; margin:2em;margin-left: auto;margin-right: auto;">
+                        <h2 style="text-align:center" class="display-4">The @Model.District.NameForState of</h2>
+                        <h1 style="text-align:center" class="display-3">@Model.Name</h1>
+                    </div>
+                </div>
+
+                if (Model.Description is not null) {
+                    <h1 style="text-align:center">Description</h1>
+                    <div style="margin-left:auto;margin-right:auto;max-width: 70%;width: fit-content;">
+                        @Html.Raw(MarkdownManager.GetHtml(Model.Description))
+                    </div>
+                }
+                <br />
+                <center>
+                    @if (user is not null && Model.CanEdit(user)) {
+                        <a asp-route-id="@Model.Id" asp-action="Edit" asp-controller="State" class="btn btn-primary">Modify</a>
+                    }
+                    @if (user is not null && Model.CanManageBuildingRequests(user)) {
+                        <a asp-route-id="@Model.Id" asp-action="ManageBuildingRequests" asp-controller="State" class="btn btn-primary">Manage Building Requests</a>
+                    }
+                    <a asp-route-id="@Model.Id" asp-action="ViewBuildings" asp-controller="State" class="btn btn-primary">View Buildings</a>
+                </center>
+            }
+            else {
+                <h1 style="text-align:center" class="display-4">State not found!</h1>
+            }
+        }
+    </div>
+
+    <!-- Rightmost column -->
+    <div class="p-4 flex-shrink-1 me-auto" style="margin-top: 2em;">
+        <table class="infobox">
+            <tbody>
+                <tr>
+                    <th colspan="2" class="infobox-header">
+                        <div>@Model.Name, @Model.District.Name</div>
+                    </th>
+                </tr>
+                <tr>
+                    <td colspan="2" class="infobox-subheader">
+                        <div>@Model.District.NameForState</div>
+                    </td>
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">District</th>
+                    <td class="infobox-row-value"><a href="/District/View/@Model.District.Name">@Model.District.Name</a></td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">@Model.District.NameForGovernorOfAState</th>
+                    @if (Model.Governor is null) {
+                        <td class="infobox-row-value">None</td>
+                    }
+                    else {
+                        <td class="infobox-row-value">
+                            @if (Model.Governor.EntityType == EntityType.User) {
+                                <a asp-controller="User" asp-action="Info" asp-route-id="@Model.GovernorId">@Model.Governor.Name</a>
+                            }
+                            else {
+                                <a asp-controller="Group" asp-action="View" asp-route-id="@Model.GovernorId">@Model.Governor.Name</a>
+                            }
+                        </td>
+                    }
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Population</th>
+                    <td class="infobox-row-value">@($"{Model.Population:n0}")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Color on Map</th>
+                    <td class="infobox-row-value">
+                        <div style="width:16px;height:16px;background-color:#@Model.MapColor"></div>
+                    </td>
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">Base Property Tax</th>
+                    <td class="infobox-row-value">@($"¢{Model.BasePropertyTax ?? 0:n0}")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Property Tax per Building Size</th>
+                    <td class="infobox-row-value">@($"¢{Model.PropertyTaxPerSize ?? 0:n0}")</td>
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">@Model.District.NameForProvince.Pluralize()</th>
+                    <td class="infobox-row-value">
+                        @foreach (var province in Model.Provinces.OrderByDescending(x => x.Population)) {
+                            <span><a href="/Province/View/@province.Id">@province.Name</a></span>
+                            <br />
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <center>
+            <p>Property tax rates are daily!</p>
+        </center>
+        <a target="_blank" href="https://dev.spookvooper.com/wiki/State">Wiki page for States</a>
+    </div>
+</div>

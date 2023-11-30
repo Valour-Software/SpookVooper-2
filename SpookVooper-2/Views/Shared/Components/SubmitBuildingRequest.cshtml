@@ -1,0 +1,142 @@
+﻿@model SV2.Models.Building.CreateBuildingRequestModel
+
+<div class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;" id="alert-@Model.PrefixForIds">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+    </button>
+    <span id="alert-text-@Model.PrefixForIds">something</span>
+</div>
+
+@if (Model.IncludeScript)
+{
+<style>
+    .buildingcosts {
+        flex-direction: column;
+        padding-left: 2px;
+    }
+
+    .buildingcosts-holder {
+        margin-left: auto;
+        margin-right: auto;
+        width: 250px;
+    }
+</style>
+}
+
+@if (Model.Province.CanManageBuildingRequests(Model.User) && Model.LuaBuildingObj.type == BuildingType.Infrastructure)
+{
+    <div class="buildingcosts-holder">
+        @if (Model.LuaBuildingObj.type == BuildingType.Infrastructure) {
+            <span class="text-warning">Note: This building's construction cost increases per level!!</span>
+            <br />  
+        }
+        <span>Costs to build:</span>
+        <br />
+        <div class="buildingcosts">
+            @foreach ((var resource, var amount) in Model.LuaBuildingObj.BuildingCosts.Evaluate(new ExecutionState(Model.Province.District, Model.Province)))
+            {
+                <div class="resource-row">
+                    <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                    <span style="align-self: flex-end">@($"{amount:n0}")</span>
+                </div>
+            }
+        </div>
+    </div>
+    <hr />
+}
+
+<iframe style="display: none;" name="frame-@Model.PrefixForIds" id="@Model.PrefixForIds" onLoad="Submitted(this)"></iframe>
+
+<!form method="post" action="/Building/Build" target="frame-@Model.PrefixForIds">
+    @Html.AntiForgeryToken()
+    <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
+        @Html.HiddenFor(x => x.ProvinceId)
+        @Html.HiddenFor(x => x.BuildingId)
+        @{
+            string value = "";
+            if (Model.AlreadyExistingBuildingId is null) {
+                var output = Context.Request.Query.FirstOrDefault(x => x.Key == "AlreadyExistingBuildingId").Value.ToString();
+                if (output is not null && output != "")
+                    value = output;
+            }
+            else {
+                value = Model.AlreadyExistingBuildingId.ToString();
+            }
+        }
+        <input data-val="true" data-val-required="The AlreadyExistingBuildingId field is required." id="AlreadyExistingBuildingId" name="AlreadyExistingBuildingId" type="hidden" value='@value'>
+
+        <div class="row">
+            <h4>Form for submitting a building request for @Model.LuaBuildingObj.PrintableName</h4>
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+        </div>
+
+        @if (!(Model.Province.CanManageBuildingRequests(Model.User) && Model.LuaBuildingObj.type == BuildingType.Infrastructure)) {
+            <div class="buildingcosts-holder">
+                <span>Costs to build (per level):</span>
+                <br />
+                <div class="buildingcosts">
+                    @{
+                        ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => Model.AlreadyExistingBuildingId == x.Id);
+                    }
+                    @foreach ((var resource, var amount) in Model.LuaBuildingObj.GetConstructionCost(BaseEntity.Find(Model.RequesterId), Model.Province.District, Model.Province, building, 1))
+                    {
+                        <div class="resource-row">
+                            <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                            <span style="align-self: flex-end">@($"{amount:n0}")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            <br />
+        }
+
+        @if (value == "" || value is null) {
+            <label> Build As(what entity should this request be made from)</label>
+            <select asp-for="BuildAsId" asp-items="Model.CanBuildAs" class="form-select form-control"></select>
+            <div class="form-group">
+                <label>What should this building be called?</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        }
+        else {
+            @Html.HiddenFor(x => x.BuildAsId)
+        }
+
+        <div class="form-group">
+            <label>Number of Levels to you want to be able to build</label>
+            <input asp-for="levelsToBuild" class="form-control" type="number" min="0" max="1000" />
+            <span asp-validation-for="levelsToBuild" class="text-danger"></span>
+        </div>
+        <br />
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Submit Request</button>
+        </div>
+    </div>
+</!form>
+
+@if (Model.IncludeScript)
+{
+    <script>
+        function Submitted(element) {
+            alertelement = document.getElementById("alert-" + element.id)
+            alerttext = document.getElementById("alert-text-" + element.id)
+            alertelement.className = "alert alert-dismissible fade show";
+            var data = JSON.parse(element.contentDocument.body.textContent)
+            alertelement.style = "";
+            alerttext.innerHTML = data["Message"]
+
+            if (data["Success"]) {
+                alertelement.classList.add("alert-success")
+            }
+            else {
+                alertelement.classList.add("alert-danger")
+            }
+        }
+    </script>
+}
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

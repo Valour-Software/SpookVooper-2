@@ -1,0 +1,102 @@
+﻿@using SpookVooper_2.Blazor.Components
+@using System.Text.Json
+@model List<ProducingBuilding>
+
+@{
+    ViewData["Title"] = "My Buildings";
+    SVUser user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .limit-width {
+        max-width: 200px;
+    }
+
+    input {
+        width: 100%;
+    }
+
+    thead, tbody, tfoot, tr, td, th {
+        border-style: none;
+    }
+
+        tr:nth-child(odd) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        tr:nth-child(even), .header {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+    th {
+        background-color: unset !important;
+    }
+</style>
+
+<div class="container vw-100">
+    @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+    <div class="col-12">
+        <div class="d-flex">
+            <div class="p-1 align-self-start flex-grow-1">
+                <h2>Buildings that you can manage</h2>
+            </div>
+        </div>
+
+        <br />
+        @if (true)
+        {
+            <table class="table">
+                <thead>
+                    <tr class="header">
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Level</th>
+                        <th>District</th>
+                        <th>Province</th>
+                        <th>Recipe Name</th>
+                        <th>Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var building in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="Building" asp-action="Manage" asp-route-id="@building.Id">@(
+                                building.Name is null || building.Name == "" ? "No Name Set" : building.Name
+                                )</a>
+                                </td>
+                                @if (building.LuaBuildingObjId != "building_advanced_factory")
+                                {
+                                    <td>@building.BuildingType.ToString()</td>
+                                }
+                                else
+                                {
+                                    <td>Advanced Factory</td>
+                                }
+                                <td>@building.Size</td>
+                                <td>@building.District.Name</td>
+                                <td>@building.Province.Name</td>
+                                <td>@building.Recipe.Name</td>
+                                <td>
+                                    @if (building.Owner.EntityType == EntityType.User)
+                                    {
+                                        <a asp-controller="User" asp-action="Info" asp-route-id="@building.OwnerId">@building.Owner.Name</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Group" asp-action="View" asp-route-id="@building.OwnerId">@building.Owner.Name</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+        else {
+            <component type="typeof(MyBuildingsComponent)" render-mode="WebAssemblyPrerendered" param-BuildingData="JsonSerializer.Serialize(Model)" param-DistrictData="JsonSerializer.Serialize(Model.Select(x => x.District).ToList())" />
+        }
+    </div>
+</div>

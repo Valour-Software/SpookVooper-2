@@ -1,0 +1,178 @@
+﻿@model SV2.Models.Groups.CreateRoleModel
+@{
+    ViewData["Title"] = "Add Role";
+    Group group = DBCache.Get<Group>(Model.GroupId)!;
+}
+
+<style>
+    .form-text {
+        display: block;
+    }
+</style>
+
+<div class="container vw-100">
+    <div class="col-12">
+        <h4>@ViewData["Title"]</h4>
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+        <form method="post">
+            <div class="row">
+                <div class="col-md-6">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    @Html.HiddenFor(x => x.GroupId)
+                    @Html.HiddenFor(x => x.Members)
+                    <div class="form-group">
+                        <label asp-for="Name"></label>
+                        <span asp-description-for="Name" class="form-text" style="color:#888888" />
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Color"></label>
+                        <span asp-description-for="Color" class="form-text" style="color:#888888" />
+                        <input asp-for="Color" class="form-control" />
+                        <span asp-validation-for="Color" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Authority"></label>
+                        <span asp-description-for="Authority" class="form-text" style="color:#888888" />
+                        <input asp-for="Authority" class="form-control" />
+                        <span asp-validation-for="Authority" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Salary"></label>
+                        <span asp-description-for="Salary" class="form-text" style="color:#888888" />
+                        <input asp-for="Salary" class="form-control" />
+                        <span asp-validation-for="Salary" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="CreateRole" class="form-check-inline" />
+                        <label asp-for="CreateRole"></label>
+                        <span asp-description-for="CreateRole" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="CreateRole" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="DeleteRole" class="form-check-inline" />
+                        <label asp-for="DeleteRole"></label>
+                        <span asp-description-for="DeleteRole" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="DeleteRole" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="AddRole" class="form-check-inline" />
+                        <label asp-for="AddRole"></label>
+                        <span asp-description-for="AddRole" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="AddRole" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="RemoveRole" class="form-check-inline" />
+                        <label asp-for="RemoveRole"></label>
+                        <span asp-description-for="RemoveRole" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="RemoveRole" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="ManageInvites" class="form-check-inline" />
+                        <label asp-for="ManageInvites"></label>
+                        <span asp-description-for="ManageInvites" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="ManageInvites" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="ManageMembership" class="form-check-inline" />
+                        <label asp-for="ManageMembership"></label>
+                        <span asp-description-for="ManageMembership" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="ManageMembership" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="Edit" class="form-check-inline" />
+                        <label asp-for="Edit"></label>
+                        <span asp-description-for="Edit" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="Edit" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="Post" class="form-check-inline" />
+                        <label asp-for="Post"></label>
+                        <span asp-description-for="Post" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="Post" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="Eco" class="form-check-inline" />
+                        <label asp-for="Eco"></label>
+                        <span asp-description-for="Eco" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="Eco" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="ManageProvinces" class="form-check-inline" />
+                        <label asp-for="ManageProvinces"></label>
+                        <span asp-description-for="ManageProvinces" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="ManageProvinces" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="ManageBuildingRequests" class="form-check-inline" />
+                        <label asp-for="ManageBuildingRequests"></label>
+                        <span asp-description-for="ManageBuildingRequests" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="ManageBuildingRequests" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="Build" class="form-check-inline" />
+                        <label asp-for="Build"></label>
+                        <span asp-description-for="Build" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="Build" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="ManageBuildings" class="form-check-inline" />
+                        <label asp-for="ManageBuildings"></label>
+                        <span asp-description-for="ManageBuildings" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="ManageBuildings" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="Resources" class="form-check-inline" />
+                        <label asp-for="Resources"></label>
+                        <span asp-description-for="Resources" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="Resources" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" asp-for="Recipes" class="form-check-inline" />
+                        <label asp-for="Recipes"></label>
+                        <span asp-description-for="Recipes" class="form-text" style="color:#888888" />
+                        <span asp-validation-for="Recipes" class="text-danger"></span>
+                    </div>
+                    @if (group.Flags.Contains(GroupFlag.CanHaveMilitary))
+                    {
+                        <div class="form-group">
+                            <input type="checkbox" asp-for="ManageMilitary" class="form-check-inline" />
+                            <label asp-for="ManageMilitary"></label>
+                            <span asp-description-for="ManageMilitary" class="form-text" style="color:#888888" />
+                            <span asp-validation-for="ManageMilitary" class="text-danger"></span>
+                        </div>
+                    }
+                    @if (group.Flags.Contains(GroupFlag.News))
+                    {
+                        <div class="form-group">
+                            <input type="checkbox" asp-for="News" class="form-check-inline" />
+                            <label asp-for="News"></label>
+                            <span asp-description-for="News" class="form-text" style="color:#888888" />
+                            <span asp-validation-for="News" class="text-danger"></span>
+                        </div>
+                    }
+                </div>
+                <br />
+            </div>
+
+            <div class="form-group">
+                <div class="container" style="align-content:flex-start">
+                    <div class="d-flex">
+                        <div class="flex-column" style="margin-right:5px; margin-left: -15px">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+</div>

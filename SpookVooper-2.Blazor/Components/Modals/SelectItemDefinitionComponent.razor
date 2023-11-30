@@ -1,0 +1,70 @@
+﻿@using Shared.Lua.LuaObjects
+@using Shared.Lua.Scripting
+
+@if (Loaded)
+{
+    <div>
+        @foreach (var itemdef in ItemDefinitions) {
+            <div class='list-item @(itemdef == CurrentlySelected ? "selected" : "")' @onclick="async () => { await Select(itemdef); }">
+                <h5 style="display: inline-block; padding:5px">@itemdef.Name</h5>
+                <div class="modifiers">
+                    @HtmlForModifiers[itemdef.Id]
+                </div>
+            </div>
+        }
+        <button class="btn btn-outline-primary" @onclick="ClickedSave">
+            Save
+        </button>
+    </div>
+}
+@code {
+    public bool Loaded = false;
+
+    [Parameter]
+    public List<ItemDefinition> ItemDefinitions { get; set; }
+
+    [Parameter]
+    public ItemDefinition CurrentlySelected { get; set; }
+
+    [Parameter]
+    public string BaseItemNameNeeded { get; set; }
+
+    [Parameter]
+    public bool WeaponOrAmmo { get; set; }
+
+    public Dictionary<long, MarkupString> HtmlForModifiers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        foreach (var itemdef in ItemDefinitions)
+        {
+            string currenthtml = "";
+            foreach (var pair in itemdef.Modifiers) {
+                var syntaxnode = new SyntaxModifierNode()
+                {
+                    itemModifierType = pair.Key,
+                    Value = new Shared.Lua.Scripting.Decimal() {
+                        Value = (decimal)pair.Value
+                    }
+                };
+                currenthtml += syntaxnode.GenerateHTMLForListing(new ExecutionState(null, null));
+            }
+            HtmlForModifiers[itemdef.Id] = (MarkupString)currenthtml;
+        }
+    }
+
+    public async Task ClickedSave()
+    {
+        //ClientData.DivisionDesignerModal;
+    }
+
+    public async Task Select(ItemDefinition itemdef)
+    {
+        if (WeaponOrAmmo)
+            ClientData.DivisionDesignerModal.WeaponDefinition = itemdef;
+        else
+            ClientData.DivisionDesignerModal.AmmoDefinition = itemdef;
+
+        await ClientData.DivisionDesignerModal.Refresh();
+    }
+}
